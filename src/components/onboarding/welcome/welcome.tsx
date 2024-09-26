@@ -14,33 +14,39 @@ const Welcome: React.FC = () => {
   const navigation = useNavigation<WelcomeScreenNavigationProp>();
 
   return (
-    <Swiper style={styles.wrapper} showsButtons={false}>
+    <Swiper
+      style={styles.wrapper}
+      showsButtons={false}
+      loop={false}
+      activeDotColor="#e5e5e5"
+      dotColor="#393939"
+    >
       <View style={styles.slide1}>
-        <Text style={styles.text}>Welcome to myApp</Text>
+        <Text style={styles.slide1text}>Welcome to myApp</Text>
       </View>
       <View style={styles.slide2}>
-        <Text style={styles.text}>Beautiful</Text>
+        <Text style={styles.slide2text}>Beautiful</Text>
       </View>
       <View style={styles.slide3}>
-        <Text style={styles.text}>And simple</Text>
+        <Text style={styles.slide3text}>Simple</Text>
       </View>
       <View style={styles.slide4}>
-        <Text style={styles.text}>Continue Here</Text>
+        <Text style={styles.slide4text}>Continue Here</Text>
         <View style={styles.buttonContainer}>
           <Pressable
-            style={styles.loginButton}
+            style={styles.authButton}
             onPress={() => navigation.navigate("Login")}
           >
             <Text style={styles.buttonText}>Login</Text>
           </Pressable>
           <Pressable
-            style={styles.signupButton}
+            style={styles.authButton}
             onPress={() => navigation.navigate("SignUp")}
           >
             <Text style={styles.buttonText}>Sign Up</Text>
           </Pressable>
           <Pressable
-            style={styles.guestButton}
+            style={styles.authButton}
             onPress={() => navigation.navigate("AppTabNav")}
           >
             <Text style={styles.buttonText}>Use as Guest</Text>
@@ -59,25 +65,47 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#9DD6EB",
+    backgroundColor: "#fff",
+  },
+  slide1text: {
+    color: "#000",
+    fontSize: 30,
+    fontWeight: "bold",
   },
   slide2: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#97CAE5",
+    backgroundColor: "#b5b5b5",
+  },
+  slide2text: {
+    color: "#5f5f5f",
+    fontSize: 30,
+    fontWeight: "bold",
   },
   slide3: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#92BBD9",
+    backgroundColor: "#5f5f5f",
   },
+  slide3text: {
+    color: "#b5b5b5",
+    fontSize: 30,
+    fontWeight: "bold",
+  },
+
+  // User Auth Screen
   slide4: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#92FFC3",
+    backgroundColor: "#000000",
+  },
+  slide4text: {
+    color: "#fff",
+    fontSize: 30,
+    fontWeight: "bold",
   },
   buttonContainer: {
     flexDirection: "column",
@@ -86,37 +114,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: "80%",
   },
-  loginButton: {
-    backgroundColor: "#4CAF50",
+  authButton: {
+    backgroundColor: "#fff",
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
-    alignItems: "center",
-    width: "100%",
-  },
-  signupButton: {
-    backgroundColor: "#3F51B5",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-    alignItems: "center",
-    width: "100%",
-  },
-  guestButton: {
-    backgroundColor: "#F44336",
-    padding: 10,
-    borderRadius: 5,
     alignItems: "center",
     width: "100%",
   },
   buttonText: {
-    color: "#fff",
+    color: "#000000",
     fontSize: 18,
-    fontWeight: "bold",
-  },
-  text: {
-    color: "#fff",
-    fontSize: 30,
     fontWeight: "bold",
   },
 });

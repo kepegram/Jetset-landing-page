@@ -4,37 +4,49 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
+import { FIREBASE_AUTH } from "../../../../firebase.config";
+import { createUserWithEmailAndPassword } from "@firebase/auth";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../../../../App";
 
-const SignUp = () => {
-  const [name, setName] = useState("");
+type SignUpScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "SignUp"
+>;
+
+const SignUp: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const auth = FIREBASE_AUTH;
 
-  const handleSignUp = () => {
-    // Add signup logic here
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
+  const navigation = useNavigation<SignUpScreenNavigationProp>();
+
+  const handleSignUp = async () => {
+    setLoading(true);
+    try {
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log(response);
+      navigation.navigate("Login");
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
     }
-    console.log("Name:", name);
-    console.log("Email:", email);
-    console.log("Password:", password);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={(text) => setName(text)}
-        autoCapitalize="words"
-      />
 
       <TextInput
         style={styles.input}
@@ -63,11 +75,15 @@ const SignUp = () => {
         autoCapitalize="none"
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator size="large" color="#000" />
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+      )}
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
         <Text style={styles.loginLink}>Already have an account? Log In</Text>
       </TouchableOpacity>
     </View>
@@ -92,15 +108,13 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 15,
     backgroundColor: "#f9f9f9",
   },
   button: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#000",
     width: "100%",
     padding: 15,
     borderRadius: 5,
@@ -113,7 +127,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   loginLink: {
-    color: "#2196F3",
+    color: "#b1b1b1",
     fontSize: 14,
     textDecorationLine: "underline",
   },

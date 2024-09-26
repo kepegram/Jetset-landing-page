@@ -13,7 +13,7 @@ const AppTabNav = () => {
     <Tab.Navigator
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: "#4CAF50",
+          backgroundColor: "#000",
         },
         tabBarLabelStyle: {
           fontSize: 14,
