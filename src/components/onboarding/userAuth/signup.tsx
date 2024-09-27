@@ -1,20 +1,21 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
-  Pressable,
+  Alert,
   ActivityIndicator,
   Image,
-  Alert,
+  Pressable,
   KeyboardAvoidingView,
-  ScrollView,
   Platform,
+  ScrollView,
 } from "react-native";
-import React, { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
-import { createUserWithEmailAndPassword } from "@firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../../App";
@@ -25,6 +26,7 @@ type SignUpScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const SignUp: React.FC = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,6 +40,7 @@ const SignUp: React.FC = () => {
       Alert.alert("Error", "Passwords do not match");
       return;
     }
+
     setLoading(true);
     try {
       const response = await createUserWithEmailAndPassword(
@@ -46,9 +49,10 @@ const SignUp: React.FC = () => {
         password
       );
       console.log(response);
-      navigation.navigate("Login");
+      await AsyncStorage.setItem("userName", name);
     } catch (err) {
       console.log(err);
+      Alert.alert("Error", "Sign Up failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -61,7 +65,6 @@ const SignUp: React.FC = () => {
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
         <View style={styles.container}>
-          {/* Back Button */}
           <Pressable
             style={styles.backButton}
             onPress={() => navigation.navigate("Welcome")}
@@ -69,14 +72,21 @@ const SignUp: React.FC = () => {
             <Ionicons name="arrow-back" size={24} color="black" />
           </Pressable>
 
-          {/* Image */}
           <Image
             style={styles.image}
             source={require("../../../../assets/onboarding-imgs/undraw_Sign_up_n6im.png")}
           />
 
-          {/* Title */}
           <Text style={styles.title}>Sign Up</Text>
+
+          {/* Name Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            placeholderTextColor="#9f9f9f"
+            value={name}
+            onChangeText={setName}
+          />
 
           {/* Email Input */}
           <TextInput
@@ -84,7 +94,7 @@ const SignUp: React.FC = () => {
             placeholder="Email"
             placeholderTextColor="#9f9f9f"
             value={email}
-            onChangeText={(text) => setEmail(text)}
+            onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
           />
@@ -95,7 +105,7 @@ const SignUp: React.FC = () => {
             placeholder="Password"
             placeholderTextColor="#9f9f9f"
             value={password}
-            onChangeText={(text) => setPassword(text)}
+            onChangeText={setPassword}
             secureTextEntry
             autoCapitalize="none"
           />
@@ -106,7 +116,7 @@ const SignUp: React.FC = () => {
             placeholder="Confirm Password"
             placeholderTextColor="#9f9f9f"
             value={confirmPassword}
-            onChangeText={(text) => setConfirmPassword(text)}
+            onChangeText={setConfirmPassword}
             secureTextEntry
             autoCapitalize="none"
           />
@@ -149,9 +159,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   image: {
-    width: 500,
-    height: 500,
+    width: "100%",
+    height: 250,
     resizeMode: "contain",
+    marginBottom: 20,
   },
   title: {
     fontSize: 28,
@@ -169,7 +180,7 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   button: {
-    backgroundColor: "#000",
+    backgroundColor: "#A463FF",
     width: "100%",
     padding: 15,
     borderRadius: 25,

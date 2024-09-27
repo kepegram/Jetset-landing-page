@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
-  View,
   TextInput,
   Alert,
   ActivityIndicator,
@@ -33,6 +32,11 @@ const Login: React.FC = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
+    if (email === "" || password === "") {
+      Alert.alert("Error", "Please enter both email and password");
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
@@ -40,69 +44,67 @@ const Login: React.FC = () => {
       navigation.navigate("AppTabNav");
     } catch (err) {
       console.log(err);
+      Alert.alert("Error", "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
-    if (email === "" || password === "") {
-      Alert.alert("Error", "Please enter both email and password");
-    } else {
-      console.log("Email:", email);
-      console.log("Password:", password);
-    }
+    console.log("Email:", email);
+    console.log("Password:", password);
   };
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
-        <View style={styles.container}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.navigate("Welcome")}
-          >
-            <Ionicons name="arrow-back" size={24} color="black" />
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.navigate("Welcome")}
+        >
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </Pressable>
+
+        <Image
+          style={styles.image}
+          source={require("../../../../assets/onboarding-imgs/undraw_Mobile_login_re_9ntv.png")}
+        />
+        <Text style={styles.title}>Login</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor={"#9f9f9f"}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor={"#9f9f9f"}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+        />
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#000" />
+        ) : (
+          <Pressable style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Login</Text>
           </Pressable>
+        )}
 
-          <Image
-            style={styles.image}
-            source={require("../../../../assets/onboarding-imgs/undraw_Mobile_login_re_9ntv.png")}
-          />
-          <Text style={styles.title}>Login</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor={"#9f9f9f"}
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor={"#9f9f9f"}
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry
-            autoCapitalize="none"
-          />
-
-          {loading ? (
-            <ActivityIndicator size="large" color="#000" />
-          ) : (
-            <Pressable style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Login</Text>
-            </Pressable>
-          )}
-
-          <Pressable onPress={() => navigation.navigate("ForgotPassword")}>
-            <Text style={styles.forgotPassword}>Forgot Password?</Text>
-          </Pressable>
-        </View>
+        <Pressable onPress={() => navigation.navigate("ForgotPassword")}>
+          <Text style={styles.forgotPassword}>Forgot Password?</Text>
+        </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -114,6 +116,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  scrollContainer: {
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
@@ -125,8 +130,8 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   image: {
-    width: 500,
-    height: 500,
+    width: "100%",
+    height: 250,
     resizeMode: "contain",
     marginBottom: 20,
   },

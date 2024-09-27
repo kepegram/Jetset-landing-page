@@ -1,5 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, View, Pressable, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  Image,
+  Dimensions,
+} from "react-native";
 import Swiper from "react-native-swiper";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -9,6 +16,8 @@ type WelcomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Welcome"
 >;
+
+const { width } = Dimensions.get("window");
 
 const Welcome: React.FC = () => {
   const navigation = useNavigation<WelcomeScreenNavigationProp>();
@@ -62,8 +71,8 @@ const Welcome: React.FC = () => {
           style={styles.image}
           source={require("../../../../assets/onboarding-imgs/undraw_enter_uhqk.png")}
         />
-        <Text style={styles.title}>Get Started</Text>
-        <Text style={styles.paragraph}>
+        <Text style={styles.slide4title}>Get Started</Text>
+        <Text style={styles.slide4paragraph}>
           Sign up to unlock the full experience or continue as a guest to
           explore the app.
         </Text>
@@ -99,12 +108,20 @@ const styles = StyleSheet.create({
   image: {
     position: "absolute",
     top: 100,
-    width: 500,
-    height: 500,
+    width: 450, // Responsive width
+    height: 450,
+    aspectRatio: 1, // Maintain aspect ratio
     resizeMode: "contain",
   },
 
   title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#000",
+  },
+
+  slide4title: {
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
@@ -115,7 +132,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     color: "#737373",
-    marginBottom: 70,
+    marginBottom: 150,
+    paddingHorizontal: 20, // Add horizontal padding
+  },
+
+  slide4paragraph: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#737373",
+    marginBottom: 40,
+    paddingHorizontal: 20, // Add horizontal padding
   },
 
   buttonContainer: {
@@ -139,7 +165,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  
   linkText: {
     color: "#000",
     fontSize: 17,

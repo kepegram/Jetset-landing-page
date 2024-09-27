@@ -1,15 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const Settings = () => {
+const Explore = () => {
   return (
     <View style={styles.container}>
-      <Text>Settings</Text>
+      <Text>Explore</Text>
     </View>
   );
 };
 
-export default Settings;
+export default Explore;
 
 const styles = StyleSheet.create({
   container: {
