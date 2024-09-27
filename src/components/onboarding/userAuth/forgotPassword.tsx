@@ -1,53 +1,49 @@
-import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
-  Alert,
+  TouchableOpacity,
   ActivityIndicator,
-  Image,
   Pressable,
+  Image,
+  ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
+import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { FIREBASE_AUTH } from "../../../../firebase.config";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
+import { FIREBASE_AUTH } from "../../../../firebase.config";
+import { sendPasswordResetEmail } from "firebase/auth";
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<
+type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "Login"
+  "ForgotPassword"
 >;
 
-const Login: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+const ForgotPassword: React.FC = () => {
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const auth = FIREBASE_AUTH;
 
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+  const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
 
-  const handleLogin = async () => {
+  const handlePasswordReset = async () => {
     setLoading(true);
+    setFeedbackMessage(null);
     try {
-      const response = await signInWithEmailAndPassword(auth, email, password);
-      console.log(response);
-      navigation.navigate("AppTabNav");
+      await sendPasswordResetEmail(auth, email);
+      setFeedbackMessage("Password reset link sent! If email exists in our system, check your email.");
+      console.log("Password reset link sent to: ", email);
     } catch (err) {
       console.log(err);
+      setFeedbackMessage("Failed to send reset link. Please try again.");
     } finally {
       setLoading(false);
-    }
-    if (email === "" || password === "") {
-      Alert.alert("Error", "Please enter both email and password");
-    } else {
-      console.log("Email:", email);
-      console.log("Password:", password);
     }
   };
 
@@ -60,55 +56,50 @@ const Login: React.FC = () => {
         <View style={styles.container}>
           <Pressable
             style={styles.backButton}
-            onPress={() => navigation.navigate("Welcome")}
+            onPress={() => navigation.navigate("Login")}
           >
             <Ionicons name="arrow-back" size={24} color="black" />
           </Pressable>
 
           <Image
+            source={require("../../../../assets/onboarding-imgs/undraw_Forgot_password_re_hxwm.png")}
             style={styles.image}
-            source={require("../../../../assets/onboarding-imgs/undraw_Mobile_login_re_9ntv.png")}
+            resizeMode="contain"
           />
-          <Text style={styles.title}>Login</Text>
+
+          <Text style={styles.title}>Forgot Password</Text>
 
           <TextInput
             style={styles.input}
-            placeholder="Email"
-            placeholderTextColor={"#9f9f9f"}
+            placeholder="Enter your email"
+            placeholderTextColor="#9f9f9f"
             value={email}
             onChangeText={(text) => setEmail(text)}
             keyboardType="email-address"
             autoCapitalize="none"
           />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor={"#9f9f9f"}
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry
-            autoCapitalize="none"
-          />
-
           {loading ? (
             <ActivityIndicator size="large" color="#000" />
           ) : (
-            <Pressable style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Login</Text>
-            </Pressable>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handlePasswordReset}
+            >
+              <Text style={styles.buttonText}>Send Reset Link</Text>
+            </TouchableOpacity>
           )}
 
-          <Pressable onPress={() => navigation.navigate("ForgotPassword")}>
-            <Text style={styles.forgotPassword}>Forgot Password?</Text>
-          </Pressable>
+          {feedbackMessage && (
+            <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
+          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
-export default Login;
+export default ForgotPassword;
 
 const styles = StyleSheet.create({
   container: {
@@ -124,29 +115,27 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
   },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#000",
+  },
   image: {
     width: 500,
     height: 500,
-    resizeMode: "contain",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    marginBottom: 20,
-    fontWeight: "bold",
-    color: "#000",
   },
   input: {
     width: "100%",
     height: 50,
     borderRadius: 25,
     paddingHorizontal: 10,
-    marginBottom: 15,
+    marginBottom: 20,
     backgroundColor: "#f0f0f0",
     color: "#000",
   },
   button: {
-    backgroundColor: "#A463FF",
+    backgroundColor: "#000",
     width: "100%",
     padding: 15,
     borderRadius: 25,
@@ -158,7 +147,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  forgotPassword: {
+  feedbackMessage: {
+    marginTop: 10,
+    fontSize: 14,
+    color: "#A463FF", // Change color to match your theme
+    textAlign: "center",
+  },
+  loginLink: {
     color: "#A463FF",
     fontSize: 14,
     textDecorationLine: "underline",

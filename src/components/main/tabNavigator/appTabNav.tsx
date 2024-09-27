@@ -8,7 +8,7 @@ import Profile from "../profileScreen/profile";
 // Create the tab navigator
 const Tab = createBottomTabNavigator();
 
-const AppTabNav = () => {
+const AppTabNav: React.FC = () => {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -19,7 +19,7 @@ const AppTabNav = () => {
           fontSize: 14,
           fontWeight: "bold",
         },
-        tabBarActiveTintColor: "#fff",
+        tabBarActiveTintColor: "#A463FF",
         tabBarInactiveTintColor: "#d3d3d3",
       }}
     >

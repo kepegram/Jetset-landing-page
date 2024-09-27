@@ -3,10 +3,16 @@ import {
   Text,
   View,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   ActivityIndicator,
+  Image,
+  Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { createUserWithEmailAndPassword } from "@firebase/auth";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -28,6 +34,10 @@ const SignUp: React.FC = () => {
   const navigation = useNavigation<SignUpScreenNavigationProp>();
 
   const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
+      return;
+    }
     setLoading(true);
     try {
       const response = await createUserWithEmailAndPassword(
@@ -45,48 +55,80 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
+        <View style={styles.container}>
+          {/* Back Button */}
+          <Pressable
+            style={styles.backButton}
+            onPress={() => navigation.navigate("Welcome")}
+          >
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </Pressable>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+          {/* Image */}
+          <Image
+            style={styles.image}
+            source={require("../../../../assets/onboarding-imgs/undraw_Sign_up_n6im.png")}
+          />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={(text) => setPassword(text)}
-        secureTextEntry
-        autoCapitalize="none"
-      />
+          {/* Title */}
+          <Text style={styles.title}>Sign Up</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={(text) => setConfirmPassword(text)}
-        secureTextEntry
-        autoCapitalize="none"
-      />
+          {/* Email Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#9f9f9f"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#000" />
-      ) : (
-        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-      )}
+          {/* Password Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#9f9f9f"
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            secureTextEntry
+            autoCapitalize="none"
+          />
 
-      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-        <Text style={styles.loginLink}>Already have an account? Log In</Text>
-      </TouchableOpacity>
-    </View>
+          {/* Confirm Password Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            placeholderTextColor="#9f9f9f"
+            value={confirmPassword}
+            onChangeText={(text) => setConfirmPassword(text)}
+            secureTextEntry
+            autoCapitalize="none"
+          />
+
+          {/* Sign Up Button */}
+          {loading ? (
+            <ActivityIndicator size="large" color="#000" />
+          ) : (
+            <Pressable style={styles.button} onPress={handleSignUp}>
+              <Text style={styles.buttonText}>Sign Up</Text>
+            </Pressable>
+          )}
+
+          {/* Login Link */}
+          <Pressable onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.loginLink}>
+              Already have an account? Log In
+            </Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -100,24 +142,37 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
   },
+  backButton: {
+    position: "absolute",
+    top: 60,
+    left: 20,
+    zIndex: 10,
+  },
+  image: {
+    width: 500,
+    height: 500,
+    resizeMode: "contain",
+  },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
+    color: "#000",
   },
   input: {
     width: "100%",
     height: 50,
-    borderRadius: 5,
+    borderRadius: 25,
     paddingHorizontal: 10,
     marginBottom: 15,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#f0f0f0",
+    color: "#000",
   },
   button: {
     backgroundColor: "#000",
     width: "100%",
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 25,
     alignItems: "center",
     marginBottom: 20,
   },
@@ -127,7 +182,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   loginLink: {
-    color: "#b1b1b1",
+    color: "#A463FF",
     fontSize: 14,
     textDecorationLine: "underline",
   },

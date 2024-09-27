@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import Swiper from "react-native-swiper";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -18,38 +18,64 @@ const Welcome: React.FC = () => {
       style={styles.wrapper}
       showsButtons={false}
       loop={false}
-      activeDotColor="#e5e5e5"
-      dotColor="#393939"
+      activeDotColor="#A463FF"
+      dotColor="#c8c8c8"
     >
-      <View style={styles.slide1}>
-        <Text style={styles.slide1text}>Welcome to myApp</Text>
+      <View style={styles.slide}>
+        <Image
+          style={styles.image}
+          source={require("../../../../assets/onboarding-imgs/undraw_Mindfulness_8gqa.png")}
+        />
+        <Text style={styles.title}>Welcome to myApp</Text>
+        <Text style={styles.paragraph}>
+          Discover a new way to stay organized, productive, and efficient with
+          our beautifully crafted app.
+        </Text>
       </View>
-      <View style={styles.slide2}>
-        <Text style={styles.slide2text}>Beautiful</Text>
+
+      <View style={styles.slide}>
+        <Image
+          style={styles.image}
+          source={require("../../../../assets/onboarding-imgs/undraw_flying_drone.png")}
+        />
+        <Text style={styles.title}>Stay Connected</Text>
+        <Text style={styles.paragraph}>
+          Keep track of your tasks, manage your schedule, and stay on top of
+          everything effortlessly.
+        </Text>
       </View>
-      <View style={styles.slide3}>
-        <Text style={styles.slide3text}>Simple</Text>
+
+      <View style={styles.slide}>
+        <Image
+          style={styles.image}
+          source={require("../../../../assets/onboarding-imgs/undraw_Woman_ffrd.png")}
+        />
+        <Text style={styles.title}>Achieve More</Text>
+        <Text style={styles.paragraph}>
+          With simple tools and a powerful interface, we help you achieve your
+          goals with ease.
+        </Text>
       </View>
-      <View style={styles.slide4}>
-        <Text style={styles.slide4text}>Continue Here</Text>
+
+      <View style={styles.slide}>
+        <Image
+          style={styles.image}
+          source={require("../../../../assets/onboarding-imgs/undraw_enter_uhqk.png")}
+        />
+        <Text style={styles.title}>Get Started</Text>
+        <Text style={styles.paragraph}>
+          Sign up to unlock the full experience or continue as a guest to
+          explore the app.
+        </Text>
         <View style={styles.buttonContainer}>
-          <Pressable
-            style={styles.authButton}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <Text style={styles.buttonText}>Login</Text>
-          </Pressable>
           <Pressable
             style={styles.authButton}
             onPress={() => navigation.navigate("SignUp")}
           >
             <Text style={styles.buttonText}>Sign Up</Text>
           </Pressable>
-          <Pressable
-            style={styles.authButton}
-            onPress={() => navigation.navigate("AppTabNav")}
-          >
-            <Text style={styles.buttonText}>Use as Guest</Text>
+          <Pressable onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.linkText}>Login</Text>
           </Pressable>
         </View>
       </View>
@@ -61,70 +87,63 @@ export default Welcome;
 
 const styles = StyleSheet.create({
   wrapper: {},
-  slide1: {
+
+  slide: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-end",
     alignItems: "center",
     backgroundColor: "#fff",
+    padding: 20,
   },
-  slide1text: {
+
+  image: {
+    position: "absolute",
+    top: 100,
+    width: 500,
+    height: 500,
+    resizeMode: "contain",
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 20,
     color: "#000",
-    fontSize: 30,
-    fontWeight: "bold",
   },
-  slide2: {
-    flex: 1,
-    justifyContent: "center",
+
+  paragraph: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#737373",
+    marginBottom: 70,
+  },
+
+  buttonContainer: {
+    width: "100%",
+    marginBottom: 50,
     alignItems: "center",
-    backgroundColor: "#b5b5b5",
   },
-  slide2text: {
-    color: "#5f5f5f",
-    fontSize: 30,
-    fontWeight: "bold",
-  },
-  slide3: {
-    flex: 1,
-    justifyContent: "center",
+
+  authButton: {
+    backgroundColor: "#A463FF",
+    width: "70%",
+    padding: 15,
+    borderRadius: 25,
+    marginBottom: 5,
     alignItems: "center",
-    backgroundColor: "#5f5f5f",
   },
-  slide3text: {
-    color: "#b5b5b5",
-    fontSize: 30,
+
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
     fontWeight: "bold",
   },
 
-  // User Auth Screen
-  slide4: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#000000",
-  },
-  slide4text: {
-    color: "#fff",
-    fontSize: 30,
-    fontWeight: "bold",
-  },
-  buttonContainer: {
-    flexDirection: "column",
-    justifyContent: "space-around",
-    marginTop: 20,
-    marginBottom: 20,
-    width: "80%",
-  },
-  authButton: {
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-    alignItems: "center",
-    width: "100%",
-  },
-  buttonText: {
-    color: "#000000",
-    fontSize: 18,
+  
+  linkText: {
+    color: "#000",
+    fontSize: 17,
+    marginTop: 10,
     fontWeight: "bold",
   },
 });
