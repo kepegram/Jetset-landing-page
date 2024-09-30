@@ -17,7 +17,7 @@ const Settings: React.FC = () => {
   const handleLogout = () => {
     FIREBASE_AUTH.signOut();
   };
-  
+
   return (
     <View style={styles.container}>
       <Pressable
@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#dadada",
   },
   backButton: {
     position: "absolute",

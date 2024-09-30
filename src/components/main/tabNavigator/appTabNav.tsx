@@ -1,13 +1,14 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { ProfileProvider } from "../profileScreen/profileContext";
 import { Ionicons } from "@expo/vector-icons";
 import Home from "../homeScreen/home";
 import Notifications from "../notificationsScreen/notifications";
 import Explore from "../exploreScreen/explore";
 import Profile from "../profileScreen/profile";
-import Edit from "../profileScreen/edit"; // Make sure to create this screen
-import Settings from "../profileScreen/settings"; // Make sure to create this screen
+import Edit from "../profileScreen/edit";
+import Settings from "../profileScreen/settings";
 
 export type RootStackParamList = {
   Profile: undefined;
@@ -15,18 +16,21 @@ export type RootStackParamList = {
   Settings: undefined;
 };
 
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
 const ProfileStack = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Profile" component={Profile} />
-      <Stack.Screen name="Edit" component={Edit} />
-      <Stack.Screen name="Settings" component={Settings} />
-    </Stack.Navigator>
+    <ProfileProvider>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="Edit" component={Edit} />
+        <Stack.Screen name="Settings" component={Settings} />
+      </Stack.Navigator>
+    </ProfileProvider>
   );
 };
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppTabNav: React.FC = () => {
   return (
@@ -73,7 +77,7 @@ const AppTabNav: React.FC = () => {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileStack} // Use the stack navigator here
+        component={ProfileStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" color={color} size={size} />

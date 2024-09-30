@@ -8,12 +8,12 @@ import {
   Button,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appTabNav";
+import { useProfile } from "./profileContext";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -21,29 +21,34 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Profile: React.FC = () => {
+  const { profilePicture, headerColors, setProfilePicture } = useProfile();
   const [userName, setUserName] = useState<string | null>(null);
-  const [headerColors, setHeaderColors] = useState<string[]>([
-    "#A463FF",
-    "#6a00fe",
-  ]);
-  const [profilePicture, setProfilePicture] = useState<string>(
-    "https://via.placeholder.com/150"
-  );
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const navigation = useNavigation<ProfileScreenNavigationProp>();
 
   useEffect(() => {
-    const fetchUserName = async () => {
-      const name = await AsyncStorage.getItem("userName");
-      setUserName(name);
+    const fetchProfileData = async () => {
+      try {
+        const name = await AsyncStorage.getItem("userName");
+        const picture = await AsyncStorage.getItem("profilePicture");
+
+        setUserName(name);
+
+        if (picture) {
+          // Set it in the profile context as well
+          await setProfilePicture(picture); // Call the context method correctly
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile data:", error);
+      }
     };
 
-    fetchUserName();
-  }, []);
+    fetchProfileData();
+  }, [setProfilePicture]); // Add setProfilePicture to the dependency array
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={headerColors} style={styles.header}>
+      <View style={[styles.header, { backgroundColor: headerColors[0] }]}>
         <View style={styles.headerContent}>
           <Pressable
             style={styles.icon}
@@ -58,7 +63,7 @@ const Profile: React.FC = () => {
             <MaterialIcons name="settings" size={30} color="#fff" />
           </Pressable>
         </View>
-      </LinearGradient>
+      </View>
 
       <View style={styles.profileContainer}>
         <Pressable onPress={() => setModalVisible(true)}>
@@ -70,7 +75,6 @@ const Profile: React.FC = () => {
         {userName && <Text style={styles.userName}>{userName}</Text>}
       </View>
 
-      {/* Modal for the profile picture */}
       <Modal
         animationType="fade"
         transparent={true}
