@@ -27,7 +27,7 @@ const Home: React.FC = () => {
   const { profilePicture } = useProfile();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [searchText, setSearchText] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("u"); // Track which list (visited/unvisited) is shown
+  const [selectedCategory, setSelectedCategory] = useState("u");
   const [userName, setUserName] = useState<string | null>(null);
   const auth = FIREBASE_AUTH;
   const db = FIREBASE_DB;
@@ -52,7 +52,8 @@ const Home: React.FC = () => {
   const [unvisitedData, setUnvisitedData] = useState([
     {
       id: "1",
-      image: "https://source.unsplash.com/900x900/?house",
+      image:
+        "https://plus.unsplash.com/premium_photo-1677829177642-30def98b0963?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Bali, Indonesia",
       address: "123 Main St",
       beds: "3",
@@ -60,7 +61,8 @@ const Home: React.FC = () => {
     },
     {
       id: "2",
-      image: "https://source.unsplash.com/900x900/?apartment",
+      image:
+        "https://images.unsplash.com/photo-1720747588320-5116a13e5dba?q=80&w=2835&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Aspen, Colorado",
       address: "456 Oak Ave",
       beds: "4",
@@ -68,7 +70,8 @@ const Home: React.FC = () => {
     },
     {
       id: "3",
-      image: "https://source.unsplash.com/900x900/?house+front",
+      image:
+        "https://plus.unsplash.com/premium_photo-1661963265512-73e8d1053b9a?q=80&w=2910&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Rome, Italy",
       address: "789 Maple Rd",
       beds: "2",
@@ -76,7 +79,8 @@ const Home: React.FC = () => {
     },
     {
       id: "4",
-      image: "https://source.unsplash.com/900x900/?small+house",
+      image:
+        "https://plus.unsplash.com/premium_photo-1661902398022-762e88ff3f82?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Tokyo, Japan",
       address: "789 Maple Rd",
       beds: "2",
@@ -87,7 +91,8 @@ const Home: React.FC = () => {
   const [visitedData, setVisitedData] = useState([
     {
       id: "1",
-      image: "https://source.unsplash.com/900x900/?house",
+      image:
+        "https://images.unsplash.com/photo-1662265955250-76ea201aff0d?q=80&w=2832&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Labadee, Haiti",
       address: "123 Main St",
       beds: "3",
@@ -95,7 +100,8 @@ const Home: React.FC = () => {
     },
     {
       id: "2",
-      image: "https://source.unsplash.com/900x900/?apartment",
+      image:
+        "https://images.unsplash.com/photo-1559956144-83a135c9872e?q=80&w=2874&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Coco Cay, Bahamas",
       address: "456 Oak Ave",
       beds: "4",
@@ -103,7 +109,8 @@ const Home: React.FC = () => {
     },
     {
       id: "3",
-      image: "https://source.unsplash.com/900x900/?house+front",
+      image:
+        "https://images.unsplash.com/photo-1515885267349-1fcef6e00fd1?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Juneau, Alaska",
       address: "789 Maple Rd",
       beds: "2",
@@ -111,7 +118,8 @@ const Home: React.FC = () => {
     },
     {
       id: "4",
-      image: "https://source.unsplash.com/900x900/?small+house",
+      image:
+        "https://upload.wikimedia.org/wikipedia/commons/e/e6/Paris_Night.jpg",
       location: "Paris, France",
       address: "789 Maple Rd",
       beds: "2",
@@ -129,7 +137,6 @@ const Home: React.FC = () => {
   };
 
   const addToBucketList = (item) => {
-    // Logic to add to bucket list
     Alert.alert("Bucket List", `${item.location} added to bucket list.`);
   };
 
@@ -154,7 +161,10 @@ const Home: React.FC = () => {
   };
 
   const renderItem = ({ item }) => (
-    <Pressable style={styles.card}>
+    <Pressable
+      style={styles.card}
+      onPress={() => navigation.navigate("DestinationDetailView", { item })}
+    >
       <Image source={{ uri: item.image }} style={styles.image} />
       <View style={styles.cardBody}>
         <Text style={styles.location}>{item.location}</Text>
@@ -183,12 +193,11 @@ const Home: React.FC = () => {
     </Pressable>
   );
 
-  // Filter data based on selected category and search text
   const filteredData =
     selectedCategory === "u"
       ? unvisitedData.filter((item) =>
           item.location.toLowerCase().includes(searchText.toLowerCase())
-        ) // Updated to search by location instead of address
+        )
       : visitedData.filter((item) =>
           item.location.toLowerCase().includes(searchText.toLowerCase())
         );
@@ -218,10 +227,11 @@ const Home: React.FC = () => {
             value={searchText}
           />
           <SwitchSelector
+            style={styles.switchSelector}
             initial={0}
             onPress={(value: string) => {
               setSelectedCategory(value);
-              setSearchText(""); // Clear the search text when switching categories
+              setSearchText("");
             }}
             textColor={"#000"}
             selectedColor={"white"}
@@ -257,7 +267,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 55,
     paddingBottom: 10,
     backgroundColor: "#fff",
     elevation: 3,
@@ -284,72 +294,59 @@ const styles = StyleSheet.create({
   searchInput: {
     height: 40,
     borderWidth: 1,
-    borderColor: "#dcdcdc",
+    borderColor: "orange",
     backgroundColor: "#fff",
-    borderRadius: 5,
-    padding: 10,
+    borderRadius: 25,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  switchSelector: {
     marginBottom: 10,
   },
   destinationListContainer: {
-    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 5,
-    marginTop: 10,
+    borderRadius: 10,
     marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    overflow: "hidden",
+    elevation: 2,
   },
   image: {
-    height: 150,
-    marginBottom: 10,
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
+    width: "100%",
+    height: 200,
+    resizeMode: "cover",
   },
   cardBody: {
-    marginBottom: 10,
     padding: 10,
   },
   location: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5,
   },
   address: {
-    fontSize: 16,
-    marginBottom: 5,
+    fontSize: 14,
+    color: "#666",
   },
   cardFooter: {
-    padding: 10,
     flexDirection: "row",
-    borderTopWidth: 1,
-    borderTopColor: "#dcdcdc",
     justifyContent: "space-between",
-    alignItems: "center",
+    padding: 10,
+  },
+  beds: {
+    fontSize: 14,
+  },
+  baths: {
+    fontSize: 14,
   },
   action1Text: {
     color: "#A463FF",
     fontWeight: "bold",
-    marginLeft: 10,
+    marginRight: 10,
   },
   action2Text: {
     color: "orange",
     fontWeight: "bold",
-    marginLeft: 10,
-  },
-  beds: {
-    fontSize: 14,
-    marginRight: 5,
-  },
-  baths: {
-    fontSize: 14,
-    marginRight: 5,
   },
 });

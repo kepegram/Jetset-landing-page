@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
@@ -28,7 +29,6 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const auth = FIREBASE_AUTH;
-
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
@@ -48,8 +48,6 @@ const Login: React.FC = () => {
     } finally {
       setLoading(false);
     }
-    console.log("Email:", email);
-    console.log("Password:", password);
   };
 
   return (
@@ -82,6 +80,7 @@ const Login: React.FC = () => {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
+          editable={!loading} // Disable input when loading
         />
 
         <TextInput
@@ -92,20 +91,27 @@ const Login: React.FC = () => {
           onChangeText={setPassword}
           secureTextEntry
           autoCapitalize="none"
+          editable={!loading} // Disable input when loading
         />
 
-        {loading ? (
-          <ActivityIndicator size="large" color="#000" />
-        ) : (
+        {!loading ? (
           <Pressable style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Login</Text>
           </Pressable>
+        ) : (
+          <ActivityIndicator size="large" color="#000" />
         )}
 
         <Pressable onPress={() => navigation.navigate("ForgotPassword")}>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </Pressable>
       </ScrollView>
+
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#A463FF" />
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 };
@@ -167,5 +173,16 @@ const styles = StyleSheet.create({
     color: "#A463FF",
     fontSize: 14,
     textDecorationLine: "underline",
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.8)", // Optional: semi-transparent background
+    zIndex: 20,
   },
 });

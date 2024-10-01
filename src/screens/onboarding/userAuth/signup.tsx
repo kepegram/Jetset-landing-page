@@ -45,7 +45,6 @@ const SignUp: React.FC = () => {
 
     setLoading(true);
     try {
-      // Create user with email and password
       const response = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -53,28 +52,20 @@ const SignUp: React.FC = () => {
       );
       const user = response.user;
 
-      // Now, attempt to write the user data to Firestore
-      const userRef = doc(db, "users", user.uid); // Reference to the user's document in Firestore
-
-      // Save the user's name and email to Firestore using their UID
+      const userRef = doc(db, "users", user.uid);
       await setDoc(userRef, {
         name: name,
         email: email,
         createdAt: new Date().toISOString(),
       });
 
-      // Optionally store the name locally in AsyncStorage
       await AsyncStorage.setItem("userName", name);
-      
     } catch (err) {
       console.error("Error signing up:", err);
-
-      // Delete the user if Firestore write fails
       const user = auth.currentUser;
       if (user) {
-        await deleteUser(user); // Remove the user if Firestore operation fails
+        await deleteUser(user);
       }
-
       Alert.alert("Error", "Sign Up failed. Please try again.");
     } finally {
       setLoading(false);
@@ -102,16 +93,15 @@ const SignUp: React.FC = () => {
 
           <Text style={styles.title}>Sign Up</Text>
 
-          {/* Name Input */}
           <TextInput
             style={styles.input}
             placeholder="Name"
             placeholderTextColor="#9f9f9f"
             value={name}
             onChangeText={setName}
+            editable={!loading} // Disable input when loading
           />
 
-          {/* Email Input */}
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -120,9 +110,9 @@ const SignUp: React.FC = () => {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            editable={!loading} // Disable input when loading
           />
 
-          {/* Password Input */}
           <TextInput
             style={styles.input}
             placeholder="Password"
@@ -131,9 +121,9 @@ const SignUp: React.FC = () => {
             onChangeText={setPassword}
             secureTextEntry
             autoCapitalize="none"
+            editable={!loading} // Disable input when loading
           />
 
-          {/* Confirm Password Input */}
           <TextInput
             style={styles.input}
             placeholder="Confirm Password"
@@ -142,24 +132,23 @@ const SignUp: React.FC = () => {
             onChangeText={setConfirmPassword}
             secureTextEntry
             autoCapitalize="none"
+            editable={!loading} // Disable input when loading
           />
 
-          {/* Sign Up Button */}
-          {loading ? (
-            <ActivityIndicator size="large" color="#000" />
-          ) : (
+          {!loading ? (
             <Pressable style={styles.button} onPress={handleSignUp}>
               <Text style={styles.buttonText}>Sign Up</Text>
             </Pressable>
+          ) : (
+            <ActivityIndicator size="large" color="#000" />
           )}
-
-          {/* Login Link */}
-          <Pressable onPress={() => navigation.navigate("Login")}>
-            <Text style={styles.loginLink}>
-              Already have an account? Log In
-            </Text>
-          </Pressable>
         </View>
+
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color="#A463FF" />
+          </View>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -189,8 +178,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: "bold",
     marginBottom: 20,
+    fontWeight: "bold",
     color: "#000",
   },
   input: {
@@ -215,9 +204,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  loginLink: {
-    color: "#A463FF",
-    fontSize: 14,
-    textDecorationLine: "underline",
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.8)", // Optional: semi-transparent background
+    zIndex: 20,
   },
 });

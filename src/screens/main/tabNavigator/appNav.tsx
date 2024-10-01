@@ -14,9 +14,19 @@ import Settings from "../profileScreen/settings";
 import Planner from "../plannerScreen/planner";
 import Memories from "../memoriesScreen/memories";
 import Community from "../communityScreen/community";
+import DestinationDetailView from "../homeScreen/destinationDetail";
 
 export type RootStackParamList = {
   Home: undefined;
+  DestinationDetailView: {
+    item: {
+      image: string;
+      location: string;
+      address: string;
+      beds: number;
+      baths: number;
+    };
+  };
   Profile: undefined;
   Edit: undefined;
   Settings: undefined;
@@ -29,6 +39,10 @@ const HomeStack = () => {
     <ProfileProvider>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen
+          name="DestinationDetailView"
+          component={DestinationDetailView}
+        />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="Edit" component={Edit} />
         <Stack.Screen name="Settings" component={Settings} />
@@ -46,14 +60,15 @@ const AppNav: React.FC = () => {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: "#000",
+            backgroundColor: "#fff",
+            borderTopWidth: 1,
           },
           tabBarLabelStyle: {
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: "bold",
           },
           tabBarActiveTintColor: "#A463FF",
-          tabBarInactiveTintColor: "#d3d3d3",
+          tabBarInactiveTintColor: "#aaa",
         }}
       >
         <Tab.Screen
