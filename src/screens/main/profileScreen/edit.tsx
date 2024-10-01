@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../tabNavigator/appTabNav";
+import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useProfile } from "./profileContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { doc, setDoc } from "firebase/firestore"; // Firestore functions
+import { getAuth } from "firebase/auth"; // Firebase auth
+import { FIREBASE_DB } from "../../../../firebase.config"; // Firebase Firestore configuration
 
 type EditScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -15,7 +18,7 @@ type EditScreenNavigationProp = NativeStackNavigationProp<
 
 const Edit: React.FC = () => {
   const navigation = useNavigation<EditScreenNavigationProp>();
-  const { setProfilePicture, headerColors, setHeaderColors } = useProfile();
+  const { setProfilePicture } = useProfile();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handlePickImage = async () => {
@@ -34,20 +37,28 @@ const Edit: React.FC = () => {
     });
 
     if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
-      setProfilePicture(result.assets[0].uri);
-      await AsyncStorage.setItem("profilePicture", result.assets[0].uri);
+      const uri = result.assets[0].uri;
+      setSelectedImage(uri);
+      setProfilePicture(uri);
+
+      // Save profile picture to Firebase Firestore
+      const user = getAuth().currentUser;
+      if (user) {
+        try {
+          await setDoc(
+            doc(FIREBASE_DB, "users", user.uid),
+            { profilePicture: uri },
+            { merge: true }
+          );
+          console.log("Profile picture updated successfully in Firestore.");
+        } catch (error) {
+          console.error("Failed to save profile picture to Firestore:", error);
+        }
+      }
+
+      await AsyncStorage.setItem("profilePicture", uri);
       navigation.navigate("Profile");
     }
-  };
-
-  const handleChangeColor = async (color: string) => {
-    setHeaderColors([color, "#6a00fe"]); // Update colors
-    await AsyncStorage.setItem(
-      "headerColors",
-      JSON.stringify([color, "#6a00fe"])
-    );
-    navigation.navigate("Profile");
   };
 
   return (
@@ -67,26 +78,6 @@ const Edit: React.FC = () => {
       {selectedImage && (
         <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
       )}
-
-      {/* Color Selection Section */}
-      <Text style={styles.colorTitle}>Select Header Color:</Text>
-      <View style={styles.colorContainer}>
-        {[
-          "#FF0000",
-          "#FF7F00",
-          "#FFFF00",
-          "#00FF00",
-          "#0000FF",
-          "#4B0082",
-          "#9400D3",
-        ].map((color) => (
-          <Pressable
-            key={color}
-            onPress={() => handleChangeColor(color)}
-            style={[styles.colorBox, { backgroundColor: color }]}
-          />
-        ))}
-      </View>
     </View>
   );
 };
@@ -134,26 +125,5 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#ddd",
     marginBottom: 30,
-  },
-  colorTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#555",
-    marginBottom: 10,
-  },
-  colorContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-  colorBox: {
-    width: 50,
-    height: 50,
-    margin: 8,
-    borderRadius: 25,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: "#ccc",
   },
 });

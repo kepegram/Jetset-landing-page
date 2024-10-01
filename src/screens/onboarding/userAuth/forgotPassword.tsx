@@ -122,8 +122,8 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   image: {
-    width: 500,
-    height: 500,
+    width: 450,
+    height: 450,
   },
   input: {
     width: "100%",

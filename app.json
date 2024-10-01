@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "myApp",
-    "slug": "myApp",
+    "name": "jetset",
+    "slug": "jetset",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,11 +14,11 @@
     "ios": {
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
-      "bundleIdentifier": "com.mycorp.myapp"
+      "bundleIdentifier": "com.pegram.jetset"
     },
     "android": {
       "googleServicesFile": "./google-services.json",
-      "package": "com.mycorp.myapp",
+      "package": "com.pegram.jetset",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

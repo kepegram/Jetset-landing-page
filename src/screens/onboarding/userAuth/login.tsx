@@ -63,7 +63,7 @@ const Login: React.FC = () => {
       >
         <Pressable
           style={styles.backButton}
-          onPress={() => navigation.navigate("Welcome")}
+          onPress={() => navigation.navigate("UserAuth")}
         >
           <Ionicons name="arrow-back" size={24} color="black" />
         </Pressable>

@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../tabNavigator/appTabNav";
+import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
 
 type SettingsScreenNavigationProp = NativeStackNavigationProp<

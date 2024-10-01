@@ -1,15 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const Notifications = () => {
+const Planner = () => {
   return (
     <View style={styles.container}>
-      <Text>Notifications</Text>
+      <Text>Trip Planner</Text>
     </View>
   );
 };
 
-export default Notifications;
+export default Planner;
 
 const styles = StyleSheet.create({
   container: {

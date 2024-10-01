@@ -12,7 +12,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../tabNavigator/appTabNav";
+import { RootStackParamList } from "../tabNavigator/appNav";
 import { useProfile } from "./profileContext";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
@@ -21,7 +21,7 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Profile: React.FC = () => {
-  const { profilePicture, headerColors, setProfilePicture } = useProfile();
+  const { profilePicture } = useProfile();
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const navigation = useNavigation<ProfileScreenNavigationProp>();
@@ -30,39 +30,30 @@ const Profile: React.FC = () => {
     const fetchProfileData = async () => {
       try {
         const name = await AsyncStorage.getItem("userName");
-        const picture = await AsyncStorage.getItem("profilePicture");
-
         setUserName(name);
-
-        if (picture) {
-          // Set it in the profile context as well
-          await setProfilePicture(picture); // Call the context method correctly
-        }
       } catch (error) {
         console.error("Failed to fetch profile data:", error);
       }
     };
 
     fetchProfileData();
-  }, [setProfilePicture]); // Add setProfilePicture to the dependency array
+  }, []);
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { backgroundColor: headerColors[0] }]}>
-        <View style={styles.headerContent}>
-          <Pressable
-            style={styles.icon}
-            onPress={() => navigation.navigate("Edit")}
-          >
-            <MaterialIcons name="edit" size={30} color="#fff" />
-          </Pressable>
-          <Pressable
-            style={styles.icon}
-            onPress={() => navigation.navigate("Settings")}
-          >
-            <MaterialIcons name="settings" size={30} color="#fff" />
-          </Pressable>
-        </View>
+      <View style={styles.headerContent}>
+        <Pressable
+          style={styles.icon}
+          onPress={() => navigation.navigate("Edit")}
+        >
+          <MaterialIcons name="edit" size={30} color="#fff" />
+        </Pressable>
+        <Pressable
+          style={styles.icon}
+          onPress={() => navigation.navigate("Settings")}
+        >
+          <MaterialIcons name="settings" size={30} color="#fff" />
+        </Pressable>
       </View>
 
       <View style={styles.profileContainer}>
@@ -94,7 +85,7 @@ const Profile: React.FC = () => {
             />
             <Button
               title="Close"
-              color={"black"}
+              color={"red"}
               onPress={() => setModalVisible(false)}
             />
           </View>
@@ -109,17 +100,9 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#dadada",
+    backgroundColor: "#f0f0f0",
     justifyContent: "center",
     alignItems: "center",
-  },
-  header: {
-    height: "20%",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    position: "absolute",
-    top: 0,
   },
   headerContent: {
     flexDirection: "row",
@@ -128,42 +111,42 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 60,
   },
+  icon: {
+    padding: 10,
+  },
   profileContainer: {
     alignItems: "center",
-    bottom: "25%",
+    marginTop: 30,
   },
   profilePicture: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: "#ddd",
   },
   userName: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#000",
     marginTop: 10,
-  },
-  icon: {
-    justifyContent: "center",
-    alignItems: "center",
+    color: "#333",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: 300,
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
     alignItems: "center",
-    backgroundColor: "white",
   },
   modalImage: {
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    marginBottom: 10,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    marginBottom: 20,
   },
 });

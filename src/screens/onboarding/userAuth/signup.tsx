@@ -14,8 +14,9 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
-import { FIREBASE_AUTH } from "../../../../firebase.config";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
+import { doc, setDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../../App";
@@ -32,6 +33,7 @@ const SignUp: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const auth = FIREBASE_AUTH;
+  const db = FIREBASE_DB;
 
   const navigation = useNavigation<SignUpScreenNavigationProp>();
 
@@ -43,15 +45,36 @@ const SignUp: React.FC = () => {
 
     setLoading(true);
     try {
+      // Create user with email and password
       const response = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      console.log(response);
+      const user = response.user;
+
+      // Now, attempt to write the user data to Firestore
+      const userRef = doc(db, "users", user.uid); // Reference to the user's document in Firestore
+
+      // Save the user's name and email to Firestore using their UID
+      await setDoc(userRef, {
+        name: name,
+        email: email,
+        createdAt: new Date().toISOString(),
+      });
+
+      // Optionally store the name locally in AsyncStorage
       await AsyncStorage.setItem("userName", name);
+      
     } catch (err) {
-      console.log(err);
+      console.error("Error signing up:", err);
+
+      // Delete the user if Firestore write fails
+      const user = auth.currentUser;
+      if (user) {
+        await deleteUser(user); // Remove the user if Firestore operation fails
+      }
+
       Alert.alert("Error", "Sign Up failed. Please try again.");
     } finally {
       setLoading(false);
@@ -67,7 +90,7 @@ const SignUp: React.FC = () => {
         <View style={styles.container}>
           <Pressable
             style={styles.backButton}
-            onPress={() => navigation.navigate("Welcome")}
+            onPress={() => navigation.navigate("UserAuth")}
           >
             <Ionicons name="arrow-back" size={24} color="black" />
           </Pressable>
