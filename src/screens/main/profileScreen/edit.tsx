@@ -1,13 +1,20 @@
-import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, View, Image } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useState, useEffect } from "react";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TextInput,
+} from "react-native";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useProfile } from "./profileContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { doc, setDoc } from "firebase/firestore"; // Firestore functions
+import { doc, getDoc, setDoc } from "firebase/firestore"; // Firestore functions
 import { getAuth } from "firebase/auth"; // Firebase auth
 import { FIREBASE_DB } from "../../../../firebase.config"; // Firebase Firestore configuration
 
@@ -18,8 +25,34 @@ type EditScreenNavigationProp = NativeStackNavigationProp<
 
 const Edit: React.FC = () => {
   const navigation = useNavigation<EditScreenNavigationProp>();
-  const { setProfilePicture } = useProfile();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const { profilePicture, setProfilePicture } = useProfile();
+  const [selectedImage, setSelectedImage] = useState<string | null>(
+    profilePicture
+  );
+  const [userName, setUserName] = useState<string | null>("");
+  const [email, setEmail] = useState<string | null>("");
+  const [password, setPassword] = useState<string>("********");
+
+  // Fetch user data from Firestore on load
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = getAuth().currentUser;
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(FIREBASE_DB, "users", user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            setUserName(data?.name || "");
+            setEmail(data?.email || "");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handlePickImage = async () => {
     const permissionResult =
@@ -41,7 +74,7 @@ const Edit: React.FC = () => {
       setSelectedImage(uri);
       setProfilePicture(uri);
 
-      // Save profile picture to Firebase Firestore
+      // Save profile picture to Firestore
       const user = getAuth().currentUser;
       if (user) {
         try {
@@ -57,27 +90,102 @@ const Edit: React.FC = () => {
       }
 
       await AsyncStorage.setItem("profilePicture", uri);
-      navigation.navigate("Profile");
     }
+  };
+
+  const handleSave = async () => {
+    const user = getAuth().currentUser;
+    if (user) {
+      try {
+        // Save updated information to Firestore
+        await setDoc(
+          doc(FIREBASE_DB, "users", user.uid),
+          { name: userName, email: email, profilePicture: selectedImage },
+          { merge: true }
+        );
+        console.log("Profile information updated successfully.");
+        navigation.navigate("Profile");
+      } catch (error) {
+        console.error("Error saving profile data:", error);
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    navigation.navigate("Profile");
   };
 
   return (
     <View style={styles.container}>
-      <Pressable
-        style={styles.backButton}
-        onPress={() => navigation.navigate("Profile")}
-      >
-        <Ionicons name="arrow-back" size={28} color="#000" />
-      </Pressable>
+      {/* Back button and Settings Icon */}
+      <View style={styles.topIcons}>
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.navigate("Profile")}
+        >
+          <Ionicons name="arrow-back" size={28} color="#000" />
+        </Pressable>
+        <Pressable
+          style={styles.settingsButton}
+          onPress={() => navigation.navigate("Settings")}
+        >
+          <Ionicons name="settings-sharp" size={28} color="#000" />
+        </Pressable>
+      </View>
+
       <Text style={styles.title}>Edit Profile</Text>
 
-      {/* Profile Picture Selection */}
-      <Pressable onPress={handlePickImage} style={styles.imageButton}>
-        <Text style={styles.imageButtonText}>Select Profile Picture</Text>
-      </Pressable>
-      {selectedImage && (
-        <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
-      )}
+      {/* Profile Picture */}
+      <View style={styles.profilePictureContainer}>
+        <Pressable onPress={handlePickImage}>
+          <Image
+            source={{ uri: selectedImage || profilePicture }}
+            style={styles.profilePicture}
+          />
+          <MaterialIcons
+            name="edit"
+            size={24}
+            color="white"
+            style={styles.editIcon}
+          />
+        </Pressable>
+      </View>
+
+      {/* Name Input */}
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        value={userName || ""}
+        onChangeText={setUserName}
+      />
+
+      {/* Email Input */}
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email || ""}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+      />
+
+      {/* Password Input */}
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        secureTextEntry
+        onChangeText={setPassword}
+      />
+
+      {/* Save and Cancel Buttons */}
+      <View style={styles.buttonContainer}>
+        <Pressable style={styles.buttonCancel} onPress={handleCancel}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </Pressable>
+        <Pressable style={styles.buttonSave} onPress={handleSave}>
+          <Text style={styles.buttonText}>Save</Text>
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -87,43 +195,84 @@ export default Edit;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
     backgroundColor: "#f0f0f0",
+    padding: 20,
+    alignItems: "center",
   },
-  backButton: {
+  topIcons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     position: "absolute",
     top: 60,
-    left: 20,
-    zIndex: 10,
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    flex: 1,
+  },
+  settingsButton: {
+    flex: 1,
+    alignItems: "flex-end",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 30,
+    marginTop: 100,
     color: "#333",
+    marginBottom: 30,
   },
-  imageButton: {
-    backgroundColor: "#4CAF50",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    elevation: 3,
+  profilePictureContainer: {
+    position: "relative",
     marginBottom: 20,
   },
-  imageButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  imagePreview: {
+  profilePicture: {
     width: 120,
     height: 120,
-    marginTop: 20,
     borderRadius: 60,
     borderWidth: 2,
     borderColor: "#ddd",
-    marginBottom: 30,
+  },
+  editIcon: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "#000",
+    borderRadius: 12,
+    padding: 2,
+  },
+  input: {
+    width: "100%",
+    padding: 15,
+    marginVertical: 10,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    borderColor: "#ddd",
+    borderWidth: 1,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 30,
+  },
+  buttonCancel: {
+    flex: 1,
+    borderColor: "orange",
+    borderWidth: 2,
+    padding: 15,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  buttonSave: {
+    flex: 1,
+    backgroundColor: "#A463FF",
+    padding: 15,
+    borderRadius: 25,
+  },
+  buttonText: {
+    textAlign: "center",
+    color: "#000",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });

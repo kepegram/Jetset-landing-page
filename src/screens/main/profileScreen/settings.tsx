@@ -22,12 +22,12 @@ const Settings: React.FC = () => {
     <View style={styles.container}>
       <Pressable
         style={styles.backButton}
-        onPress={() => navigation.navigate("Profile")}
+        onPress={() => navigation.navigate("Edit")}
       >
         <Ionicons name="arrow-back" size={24} color="black" />
       </Pressable>
       <Pressable style={styles.button} onPress={handleLogout}>
-        <Text style={styles.buttonText}>Logout</Text>
+        <Text style={styles.buttonText}>Sign out</Text>
       </Pressable>
     </View>
   );
@@ -36,7 +36,6 @@ const Settings: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#dadada",
   },
@@ -50,7 +49,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     width: "50%",
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 25,
+    position: "absolute",
+    bottom: 20,
     alignItems: "center",
   },
   buttonText: {
