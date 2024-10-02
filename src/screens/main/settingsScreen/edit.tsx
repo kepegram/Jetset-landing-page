@@ -17,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc, setDoc } from "firebase/firestore"; // Firestore functions
 import { getAuth } from "firebase/auth"; // Firebase auth
 import { FIREBASE_DB } from "../../../../firebase.config"; // Firebase Firestore configuration
+import { Button, AltButton } from "../../../components/button";
 
 type EditScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -30,8 +31,6 @@ const Edit: React.FC = () => {
     profilePicture
   );
   const [userName, setUserName] = useState<string | null>("");
-  const [email, setEmail] = useState<string | null>("");
-  const [password, setPassword] = useState<string>("********");
 
   // Fetch user data from Firestore on load
   useEffect(() => {
@@ -43,7 +42,6 @@ const Edit: React.FC = () => {
           if (userDoc.exists()) {
             const data = userDoc.data();
             setUserName(data?.name || "");
-            setEmail(data?.email || "");
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -100,7 +98,7 @@ const Edit: React.FC = () => {
         // Save updated information to Firestore
         await setDoc(
           doc(FIREBASE_DB, "users", user.uid),
-          { name: userName, email: email, profilePicture: selectedImage },
+          { name: userName, profilePicture: selectedImage },
           { merge: true }
         );
         console.log("Profile information updated successfully.");
@@ -112,24 +110,15 @@ const Edit: React.FC = () => {
   };
 
   const handleCancel = () => {
-    navigation.navigate("Profile");
+    navigation.navigate("Settings");
   };
 
   return (
     <View style={styles.container}>
       {/* Back button and Settings Icon */}
       <View style={styles.topIcons}>
-        <Pressable
-          style={styles.backButton}
-          onPress={() => navigation.navigate("Profile")}
-        >
+        <Pressable onPress={() => navigation.navigate("Settings")}>
           <Ionicons name="arrow-back" size={28} color="#000" />
-        </Pressable>
-        <Pressable
-          style={styles.settingsButton}
-          onPress={() => navigation.navigate("Settings")}
-        >
-          <Ionicons name="settings-sharp" size={28} color="#000" />
         </Pressable>
       </View>
 
@@ -144,47 +133,28 @@ const Edit: React.FC = () => {
           />
           <MaterialIcons
             name="edit"
-            size={24}
+            size={34}
             color="white"
             style={styles.editIcon}
           />
         </Pressable>
       </View>
 
-      {/* Name Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={userName || ""}
-        onChangeText={setUserName}
-      />
-
-      {/* Email Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email || ""}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-
-      {/* Password Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        secureTextEntry
-        onChangeText={setPassword}
-      />
+      {/* Name Input with Title */}
+      <Text style={styles.inputLabel}>Name</Text>
+      <View style={styles.inputWrapper}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your name"
+          value={userName || ""}
+          onChangeText={setUserName}
+        />
+      </View>
 
       {/* Save and Cancel Buttons */}
       <View style={styles.buttonContainer}>
-        <Pressable style={styles.buttonCancel} onPress={handleCancel}>
-          <Text style={styles.buttonText}>Cancel</Text>
-        </Pressable>
-        <Pressable style={styles.buttonSave} onPress={handleSave}>
-          <Text style={styles.buttonText}>Save</Text>
-        </Pressable>
+        <Button onPress={handleCancel} buttonText="Cancel" />
+        <AltButton onPress={handleSave} buttonText="Save" />
       </View>
     </View>
   );
@@ -195,8 +165,6 @@ export default Edit;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f0f0",
-    padding: 20,
     alignItems: "center",
   },
   topIcons: {
@@ -204,75 +172,57 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     position: "absolute",
-    top: 60,
+    marginTop: 60,
     paddingHorizontal: 20,
-  },
-  backButton: {
-    flex: 1,
-  },
-  settingsButton: {
-    flex: 1,
-    alignItems: "flex-end",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 100,
+    marginTop: 110,
+    marginRight: 200,
     color: "#333",
-    marginBottom: 30,
+    marginBottom: 20,
   },
   profilePictureContainer: {
     position: "relative",
     marginBottom: 20,
   },
   profilePicture: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 220,
+    height: 220,
+    borderRadius: 120,
     borderWidth: 2,
     borderColor: "#ddd",
   },
   editIcon: {
     position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: "#000",
-    borderRadius: 12,
-    padding: 2,
+    bottom: 5,
+    right: 30,
+    backgroundColor: "#A463FF",
+    borderRadius: 22,
+  },
+  inputLabel: {
+    alignSelf: "flex-start",
+    fontSize: 16,
+    color: "#333",
+    marginTop: 20,
+    marginLeft: 25,
+  },
+  inputWrapper: {
+    flexDirection: "row", // Align icon and input horizontally
+    alignItems: "center", // Center align vertically
   },
   input: {
-    width: "100%",
+    width: "90%", // Allow input to take up remaining space
     padding: 15,
-    marginVertical: 10,
-    backgroundColor: "#fff",
-    borderRadius: 10,
+    marginVertical: 5,
     borderColor: "#ddd",
-    borderWidth: 1,
+    borderBottomWidth: 1,
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     width: "100%",
     marginTop: 30,
-  },
-  buttonCancel: {
-    flex: 1,
-    borderColor: "orange",
-    borderWidth: 2,
-    padding: 15,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  buttonSave: {
-    flex: 1,
-    backgroundColor: "#A463FF",
-    padding: 15,
-    borderRadius: 25,
-  },
-  buttonText: {
-    textAlign: "center",
-    color: "#000",
-    fontWeight: "bold",
-    fontSize: 16,
   },
 });

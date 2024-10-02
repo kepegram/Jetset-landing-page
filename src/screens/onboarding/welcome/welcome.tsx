@@ -26,9 +26,7 @@ const Welcome: React.FC = () => {
           style={styles.image}
           source={require("../../../../assets/onboarding-imgs/undraw_Traveling_yhxq.png")}
         />
-        <Text style={styles.appName}>
-          <Text style={{ color: "orange" }}>Jetset</Text>
-        </Text>
+        <Text style={styles.appName}>Jetset</Text>
         <Text style={styles.paragraph}>Discover. Dream. Explore.</Text>
       </View>
 
@@ -71,7 +69,7 @@ const Welcome: React.FC = () => {
           source={require("../../../../assets/onboarding-imgs/undraw_enter_uhqk.png")}
         />
         <Text style={styles.specialTitle}>
-          Become <Text style={{ color: "orange" }}>Jetset</Text> Today
+          Become <Text style={{ color: "#A463FF" }}>Jetset</Text> Today
         </Text>
         <Text style={styles.specialParagraph}>
           Join our community to start planning your travel list and explore the
@@ -113,9 +111,9 @@ const styles = StyleSheet.create({
   },
 
   appName: {
-    fontSize: 32,
+    fontSize: 72,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 100,
     color: "#A463FF", // Keep this for the rest of the app name
   },
 
@@ -159,7 +157,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "700",
     textAlign: "center",
-    color: "#A463FF",
     marginBottom: 20,
   },
 

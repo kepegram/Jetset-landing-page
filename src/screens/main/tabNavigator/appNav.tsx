@@ -1,20 +1,21 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { ProfileProvider } from "../profileScreen/profileContext";
+import { ProfileProvider } from "../settingsScreen/profileContext";
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Home from "../homeScreen/home";
 import Explore from "../exploreScreen/explore";
-import Profile from "../profileScreen/profile";
-import Edit from "../profileScreen/edit";
-import Settings from "../profileScreen/settings";
+import Profile from "../settingsScreen/profile";
+import Edit from "../settingsScreen/edit";
+import Settings from "../settingsScreen/settings";
 import Planner from "../plannerScreen/planner";
 import Memories from "../memoriesScreen/memories";
 import Community from "../communityScreen/community";
 import DestinationDetailView from "../homeScreen/destinationDetail";
+import ChangePassword from "../settingsScreen/changePassword";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -30,6 +31,7 @@ export type RootStackParamList = {
   Profile: undefined;
   Edit: undefined;
   Settings: undefined;
+  ChangePassword: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -46,6 +48,7 @@ const HomeStack = () => {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="Edit" component={Edit} />
         <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="ChangePassword" component={ChangePassword} />
       </Stack.Navigator>
     </ProfileProvider>
   );
@@ -61,7 +64,7 @@ const AppNav: React.FC = () => {
           headerShown: false,
           tabBarStyle: {
             backgroundColor: "#fff",
-            borderTopWidth: 1,
+            borderTopWidth: 0,
           },
           tabBarLabelStyle: {
             fontSize: 12,

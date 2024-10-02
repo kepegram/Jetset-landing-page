@@ -9,12 +9,11 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useProfile } from "../profileScreen/profileContext";
+import { useProfile } from "../settingsScreen/profileContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import SwitchSelector from "react-native-switch-selector";
 import { FIREBASE_DB, FIREBASE_AUTH } from "../../../../firebase.config";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -27,7 +26,7 @@ const Home: React.FC = () => {
   const { profilePicture } = useProfile();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [searchText, setSearchText] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("u");
+  const [selectedCategory, setSelectedCategory] = useState("unvisited");
   const [userName, setUserName] = useState<string | null>(null);
   const auth = FIREBASE_AUTH;
   const db = FIREBASE_DB;
@@ -56,8 +55,6 @@ const Home: React.FC = () => {
         "https://plus.unsplash.com/premium_photo-1677829177642-30def98b0963?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Bali, Indonesia",
       address: "123 Main St",
-      beds: "3",
-      baths: "2",
     },
     {
       id: "2",
@@ -65,8 +62,6 @@ const Home: React.FC = () => {
         "https://images.unsplash.com/photo-1720747588320-5116a13e5dba?q=80&w=2835&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Aspen, Colorado",
       address: "456 Oak Ave",
-      beds: "4",
-      baths: "3",
     },
     {
       id: "3",
@@ -74,8 +69,6 @@ const Home: React.FC = () => {
         "https://plus.unsplash.com/premium_photo-1661963265512-73e8d1053b9a?q=80&w=2910&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Rome, Italy",
       address: "789 Maple Rd",
-      beds: "2",
-      baths: "1",
     },
     {
       id: "4",
@@ -83,8 +76,6 @@ const Home: React.FC = () => {
         "https://plus.unsplash.com/premium_photo-1661902398022-762e88ff3f82?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Tokyo, Japan",
       address: "789 Maple Rd",
-      beds: "2",
-      baths: "1",
     },
   ]);
 
@@ -95,8 +86,6 @@ const Home: React.FC = () => {
         "https://images.unsplash.com/photo-1662265955250-76ea201aff0d?q=80&w=2832&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Labadee, Haiti",
       address: "123 Main St",
-      beds: "3",
-      baths: "2",
     },
     {
       id: "2",
@@ -104,8 +93,6 @@ const Home: React.FC = () => {
         "https://images.unsplash.com/photo-1559956144-83a135c9872e?q=80&w=2874&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Coco Cay, Bahamas",
       address: "456 Oak Ave",
-      beds: "4",
-      baths: "3",
     },
     {
       id: "3",
@@ -113,8 +100,6 @@ const Home: React.FC = () => {
         "https://images.unsplash.com/photo-1515885267349-1fcef6e00fd1?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       location: "Juneau, Alaska",
       address: "789 Maple Rd",
-      beds: "2",
-      baths: "1",
     },
     {
       id: "4",
@@ -122,8 +107,6 @@ const Home: React.FC = () => {
         "https://upload.wikimedia.org/wikipedia/commons/e/e6/Paris_Night.jpg",
       location: "Paris, France",
       address: "789 Maple Rd",
-      beds: "2",
-      baths: "1",
     },
   ]);
 
@@ -171,10 +154,7 @@ const Home: React.FC = () => {
         <Text style={styles.address}>{item.address}</Text>
       </View>
       <View style={styles.cardFooter}>
-        <Text style={styles.beds}>{item.beds} beds</Text>
-        <Text style={styles.baths}>{item.baths} baths</Text>
-
-        {selectedCategory === "u" && (
+        {selectedCategory === "unvisited" && (
           <>
             <Pressable onPress={() => addToVisited(item)}>
               <Text style={styles.action1Text}>Add to Visited</Text>
@@ -184,7 +164,7 @@ const Home: React.FC = () => {
             </Pressable>
           </>
         )}
-        {selectedCategory === "v" && (
+        {selectedCategory === "visited" && (
           <Pressable onPress={() => deleteVisitedItem(item.id)}>
             <AntDesign name="delete" size={24} color="red" />
           </Pressable>
@@ -194,7 +174,7 @@ const Home: React.FC = () => {
   );
 
   const filteredData =
-    selectedCategory === "u"
+    selectedCategory === "unvisited"
       ? unvisitedData.filter((item) =>
           item.location.toLowerCase().includes(searchText.toLowerCase())
         )
@@ -205,11 +185,7 @@ const Home: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Text style={styles.appName}>
-          Welcome to{" "}
-          <Text style={{ color: "orange", fontWeight: "bold" }}>Jetset</Text>,{" "}
-          {userName || "Guest"}
-        </Text>
+        <Text style={styles.appName}>Jetset</Text>
         <Pressable onPress={() => navigation.navigate("Profile")}>
           <Image
             source={{ uri: profilePicture }}
@@ -219,29 +195,51 @@ const Home: React.FC = () => {
       </View>
 
       <View style={styles.content}>
-        <View style={styles.searchInputContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search destinations..."
-            onChangeText={handleSearch}
-            value={searchText}
-          />
-          <SwitchSelector
-            style={styles.switchSelector}
-            initial={0}
-            onPress={(value: string) => {
-              setSelectedCategory(value);
-              setSearchText("");
-            }}
-            textColor={"#000"}
-            selectedColor={"white"}
-            buttonColor={"#A463FF"}
-            hasPadding
-            options={[
-              { label: "Unvisited", value: "u" },
-              { label: "Visited", value: "v" },
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search destinations..."
+          placeholderTextColor={"#777"}
+          onChangeText={handleSearch}
+          value={searchText}
+        />
+
+        {/* Updated Pressable buttons with divider */}
+        <View style={styles.switchContainer}>
+          <Pressable
+            onPress={() => setSelectedCategory("unvisited")}
+            style={[
+              styles.switchButton,
+              selectedCategory === "unvisited" && styles.selectedButton,
             ]}
-          />
+          >
+            <Text
+              style={[
+                styles.switchText,
+                selectedCategory === "unvisited" && styles.selectedText,
+              ]}
+            >
+              Unvisited
+            </Text>
+          </Pressable>
+
+          <View style={styles.divider} />
+
+          <Pressable
+            onPress={() => setSelectedCategory("visited")}
+            style={[
+              styles.switchButton,
+              selectedCategory === "visited" && styles.selectedButton,
+            ]}
+          >
+            <Text
+              style={[
+                styles.switchText,
+                selectedCategory === "visited" && styles.selectedText,
+              ]}
+            >
+              Visited
+            </Text>
+          </Pressable>
         </View>
 
         <FlatList
@@ -260,7 +258,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#dadada",
+    backgroundColor: "#fff",
   },
   topBar: {
     flexDirection: "row",
@@ -272,6 +270,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     elevation: 3,
   },
+  appName: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#333", // Subtle dark color for modern look
+  },
   profilePicture: {
     width: 40,
     height: 40,
@@ -279,39 +282,53 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
   },
-  appName: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#A463FF",
-  },
   content: {
     flex: 1,
     paddingTop: 10,
   },
-  searchInputContainer: {
-    paddingHorizontal: 20,
-  },
   searchInput: {
-    height: 40,
-    borderWidth: 1,
-    borderColor: "orange",
     backgroundColor: "#fff",
-    borderRadius: 25,
     paddingHorizontal: 10,
-    marginBottom: 10,
+    marginBottom: 20,
+    fontSize: 16,
   },
-  switchSelector: {
-    marginBottom: 10,
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  switchButton: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  switchText: {
+    fontSize: 16,
+    color: "#888", // Lighter color for unselected text
+  },
+  selectedButton: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#A463FF",
+  },
+  selectedText: {
+    color: "#000", // Darker color for selected text
+    fontWeight: "bold",
+  },
+  divider: {
+    height: "100%",
+    width: 1,
+    backgroundColor: "#CCC", // Subtle divider color
   },
   destinationListContainer: {
     paddingBottom: 100,
   },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 10,
+    elevation: 3,
     overflow: "hidden",
-    elevation: 2,
   },
   image: {
     width: "100%",
@@ -319,34 +336,31 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   cardBody: {
-    padding: 10,
+    padding: 12,
+    flexGrow: 1, // Allow card body to grow
   },
   location: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#333",
   },
   address: {
     fontSize: 14,
-    color: "#666",
+    color: "#888",
   },
   cardFooter: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-between", // Distribute space evenly
     padding: 10,
-  },
-  beds: {
-    fontSize: 14,
-  },
-  baths: {
-    fontSize: 14,
+    alignItems: "center", // Align items vertically centered
   },
   action1Text: {
     color: "#A463FF",
-    fontWeight: "bold",
-    marginRight: 10,
+    fontSize: 14,
   },
   action2Text: {
-    color: "orange",
-    fontWeight: "bold",
+    color: "#000",
+    fontSize: 14,
+    marginLeft: 10,
   },
 });

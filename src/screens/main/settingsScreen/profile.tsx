@@ -10,11 +10,13 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { doc, getDoc, setDoc } from "firebase/firestore"; // Firestore functions
+import { getAuth } from "firebase/auth"; // Firebase auth
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useProfile } from "./profileContext";
+import { FIREBASE_DB } from "../../../../firebase.config";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -32,16 +34,22 @@ const Profile: React.FC = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const name = await AsyncStorage.getItem("userName");
-        setUserName(name);
-      } catch (error) {
-        console.error("Failed to fetch profile data:", error);
+    const fetchUserData = async () => {
+      const user = getAuth().currentUser;
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(FIREBASE_DB, "users", user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            setUserName(data?.name || "");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
       }
     };
 
-    fetchProfileData();
+    fetchUserData();
   }, []);
 
   const handleTabPress = (tab: "bucketlists" | "memories") => {
@@ -103,17 +111,13 @@ const Profile: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContent}>
-        <Pressable style={styles.icon} onPress={() => navigation.goBack()}>
+        <Pressable onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={30} color="black" />
         </Pressable>
-        <Pressable
-          style={styles.icon}
-          onPress={() => navigation.navigate("Edit")}
-        >
-          <MaterialIcons name="edit" size={30} color="black" />
+        <Pressable onPress={() => navigation.navigate("Settings")}>
+          <Ionicons name="settings-sharp" size={30} color="black" />
         </Pressable>
       </View>
-
       <View style={styles.profileContainer}>
         <Pressable onPress={() => setModalVisible(true)}>
           <Image
@@ -121,11 +125,11 @@ const Profile: React.FC = () => {
             style={styles.profilePicture}
           />
         </Pressable>
+
         {userName && <Text style={styles.userName}>{userName}</Text>}
         {/* Make this a random travel quote (fetch from travel quote API) */}
         <Text style={styles.mottoText}>Become Jetset Today</Text>
       </View>
-
       <View style={styles.iconsContainer}>
         <Pressable
           onPress={() => handleTabPress("bucketlists")}
@@ -133,13 +137,13 @@ const Profile: React.FC = () => {
         >
           <MaterialIcons
             name="list"
-            size={40}
-            color={activeTab === "bucketlists" ? "orange" : "black"}
+            size={30}
+            color={activeTab === "bucketlists" ? "#A463FF" : "black"}
           />
           <Text
             style={[
               styles.iconText,
-              { color: activeTab === "bucketlists" ? "orange" : "black" },
+              { color: activeTab === "bucketlists" ? "#A463FF" : "black" },
             ]}
           >
             Bucketlists
@@ -154,7 +158,7 @@ const Profile: React.FC = () => {
         >
           <MaterialIcons
             name="photo-library"
-            size={40}
+            size={30}
             color={activeTab === "memories" ? "#A463FF" : "black"}
           />
           <Text
@@ -167,14 +171,12 @@ const Profile: React.FC = () => {
           </Text>
         </Pressable>
       </View>
-
       <FlatList
         data={activeTab === "bucketlists" ? bucketlistData : memoriesData}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         style={styles.flatList}
       />
-
       <Modal
         animationType="fade"
         transparent={true}
@@ -189,16 +191,11 @@ const Profile: React.FC = () => {
             <Image source={{ uri: profilePicture }} style={styles.modalImage} />
             <Button
               title="Edit"
-              color={"black"}
+              color={"white"}
               onPress={() => {
                 setModalVisible(false);
                 navigation.navigate("Edit");
               }}
-            />
-            <Button
-              title="Close"
-              color={"red"}
-              onPress={() => setModalVisible(false)}
             />
           </View>
         </Pressable>
@@ -212,7 +209,6 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f0f0",
     alignItems: "center",
   },
   headerContent: {
@@ -220,10 +216,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "90%",
     position: "absolute",
-    top: 60,
-  },
-  icon: {
-    padding: 10,
+    marginTop: 60,
   },
   profileContainer: {
     alignItems: "center",
@@ -237,7 +230,7 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
   },
   userName: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: "bold",
     marginTop: 10,
     color: "#333",
@@ -260,13 +253,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   separator: {
-    height: 30,
+    height: 20,
     width: 1,
     backgroundColor: "#333",
     marginHorizontal: 20,
   },
   flatList: {
-    marginTop: 30,
+    marginTop: 10,
     width: "100%",
   },
 
@@ -308,15 +301,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
   modalContent: {
-    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
     alignItems: "center",
