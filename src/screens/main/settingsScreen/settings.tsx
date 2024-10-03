@@ -109,6 +109,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   topIcons: {
     flexDirection: "row",
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 5,
+    paddingVertical: 10,
     paddingHorizontal: 10,
     marginBottom: 5,
   },

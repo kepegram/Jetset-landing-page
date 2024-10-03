@@ -6,11 +6,10 @@ import {
   Image,
   Modal,
   Button,
-  FlatList,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { doc, getDoc, setDoc } from "firebase/firestore"; // Firestore functions
+import { Ionicons, MaterialIcons, AntDesign } from "@expo/vector-icons"; // Ensure Ionicons is imported
+import { doc, getDoc } from "firebase/firestore"; // Firestore functions
 import { getAuth } from "firebase/auth"; // Firebase auth
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -56,58 +55,6 @@ const Profile: React.FC = () => {
     setActiveTab(tab);
   };
 
-  const bucketlistData = [
-    {
-      id: "1",
-      text: "Visit the Eiffel Tower",
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      id: "2",
-      text: "Swim in the Great Barrier Reef",
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      id: "3",
-      text: "Hike the Grand Canyon",
-      image: "https://via.placeholder.com/100",
-    },
-  ];
-
-  const memoriesData = [
-    { id: "1", text: "Trip to Bali", image: "https://via.placeholder.com/100" },
-    {
-      id: "2",
-      text: "Safari in Kenya",
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      id: "3",
-      text: "New Year's Eve in Times Square",
-      image: "https://via.placeholder.com/100",
-    },
-  ];
-
-  const renderItem = ({
-    item,
-  }: {
-    item: { id: string; text: string; image: string };
-  }) => (
-    <View
-      style={activeTab === "memories" ? styles.memoryItem : styles.listItem}
-    >
-      <Image
-        source={{ uri: item.image }}
-        style={activeTab === "memories" ? styles.memoryImage : styles.listImage}
-      />
-      <Text
-        style={activeTab === "memories" ? styles.memoryText : styles.listText}
-      >
-        {item.text}
-      </Text>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
       <View style={styles.headerContent}>
@@ -127,7 +74,6 @@ const Profile: React.FC = () => {
         </Pressable>
 
         {userName && <Text style={styles.userName}>{userName}</Text>}
-        {/* Make this a random travel quote (fetch from travel quote API) */}
         <Text style={styles.mottoText}>Become Jetset Today</Text>
       </View>
       <View style={styles.iconsContainer}>
@@ -171,12 +117,32 @@ const Profile: React.FC = () => {
           </Text>
         </Pressable>
       </View>
-      <FlatList
-        data={activeTab === "bucketlists" ? bucketlistData : memoriesData}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        style={styles.flatList}
-      />
+
+      {/* Unique Add New Buttons with Plus Icons */}
+      <View style={styles.buttonContainer}>
+        {activeTab === "bucketlists" ? (
+          <Pressable
+            style={styles.bucketlistButton} // Unique style for bucketlist button
+            onPress={
+              () => navigation.navigate("Home") // Navigates to a stack screen
+            }
+          >
+            <AntDesign name="pluscircleo" size={21} color="#999" />
+            <Text style={styles.addButtonText}>Add New Bucketlist</Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            style={styles.memoryButton} // Unique style for memory button
+            onPress={
+              () => navigation.navigate("Memories") // Navigates to bottom tab screen
+            }
+          >
+            <AntDesign name="pluscircleo" size={21} color="#999" />
+            <Text style={styles.addButtonText}>Add New Memory</Text>
+          </Pressable>
+        )}
+      </View>
+
       <Modal
         animationType="fade"
         transparent={true}
@@ -194,7 +160,7 @@ const Profile: React.FC = () => {
               color={"white"}
               onPress={() => {
                 setModalVisible(false);
-                navigation.navigate("Edit");
+                navigation.navigate("Edit"); // Navigate to Edit stack screen
               }}
             />
           </View>
@@ -210,6 +176,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   headerContent: {
     flexDirection: "row",
@@ -258,48 +225,36 @@ const styles = StyleSheet.create({
     backgroundColor: "#333",
     marginHorizontal: 20,
   },
-  flatList: {
-    marginTop: 10,
+  buttonContainer: {
+    flex: 1, // Allow the container to grow and center the buttons
+    justifyContent: "center", // Center buttons vertically
+    alignItems: "center", // Center buttons horizontally
     width: "100%",
   },
-
-  // Bucketlists styling
-  listItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  listImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  listText: {
-    fontSize: 18,
-    color: "#333",
-  },
-
-  // Memories styling
-  memoryItem: {
-    padding: 10,
-    alignItems: "center", // Center the content
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  memoryImage: {
-    width: "100%",
-    height: 200,
+  bucketlistButton: {
+    padding: 15,
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 20, // Space below the button
+    alignItems: "center",
+    width: "80%", // Adjust as necessary
+    flexDirection: "row", // Align icon and text horizontally
+    justifyContent: "center", // Center content
   },
-  memoryText: {
+  memoryButton: {
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20, // Space below the button
+    alignItems: "center",
+    width: "80%", // Adjust as necessary
+    flexDirection: "row", // Align icon and text horizontally
+    justifyContent: "center", // Center content
+  },
+  addButtonText: {
+    color: "#999",
     fontSize: 16,
-    color: "#333",
     fontWeight: "bold",
-    textAlign: "center",
+    textDecorationLine: "underline",
+    marginLeft: 10, // Space between icon and text
   },
   modalOverlay: {
     flex: 1,

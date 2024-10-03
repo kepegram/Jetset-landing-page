@@ -4,18 +4,17 @@ import { User, onAuthStateChanged } from "firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Welcome from "./src/screens/onboarding/welcome/welcome";
-import Login from "./src/screens/onboarding/userAuth/login";
+import UserAuth from "./src/screens/onboarding/userAuth/userAuth";
 import SignUp from "./src/screens/onboarding/userAuth/signup";
 import ForgotPassword from "./src/screens/onboarding/userAuth/forgotPassword";
 import AppNav from "./src/screens/main/tabNavigator/appNav";
 import { FIREBASE_AUTH } from "./firebase.config";
-import UserAuth from "./src/screens/onboarding/userAuth/userAuth";
+import { useColorScheme } from "react-native";
 
 // Define the types for each screen's navigation prop
 export type RootStackParamList = {
   Welcome: undefined;
   UserAuth: undefined;
-  Login: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
   AppTabNav: undefined;
@@ -25,6 +24,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
+  const colorScheme = useColorScheme(); // Get the user's color scheme preference
 
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
@@ -35,7 +35,7 @@ const App: React.FC = () => {
 
   return (
     <NavigationContainer>
-      <StatusBar style="dark" />
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <Stack.Navigator
         initialRouteName="Welcome"
         screenOptions={{ headerShown: false }}
@@ -46,7 +46,6 @@ const App: React.FC = () => {
           <>
             <Stack.Screen name="Welcome" component={Welcome} />
             <Stack.Screen name="UserAuth" component={UserAuth} />
-            <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
           </>

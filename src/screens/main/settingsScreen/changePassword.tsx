@@ -83,48 +83,47 @@ const ChangePassword: React.FC = () => {
 
       <Text style={styles.title}>Change Password</Text>
 
-      
-        <Text style={styles.inputLabel}>Old Password</Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter old password"
-            value={password}
-            secureTextEntry={hidden}
-            onChangeText={setPassword}
+      <Text style={styles.inputLabel}>Old Password</Text>
+      <View style={styles.inputWrapper}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter old password"
+          value={password}
+          secureTextEntry={hidden}
+          onChangeText={setPassword}
+        />
+        <Pressable
+          style={styles.hiddenButton}
+          onPress={() => setHidden(!hidden)}
+        >
+          <Ionicons
+            name={hidden ? "eye-off-outline" : "eye-outline"}
+            size={24}
+            color="black"
           />
-          <Pressable
-            style={styles.hiddenButton}
-            onPress={() => setHidden(!hidden)}
-          >
-            <Ionicons
-              name={hidden ? "eye-off-outline" : "eye-outline"}
-              size={24}
-              color="black"
-            />
-          </Pressable>
-        </View>
+        </Pressable>
+      </View>
 
-        <Text style={styles.inputLabel}>New Password</Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter new password"
-            value={newPassword}
-            secureTextEntry={hidden}
-            onChangeText={setNewPassword}
+      <Text style={styles.inputLabel}>New Password</Text>
+      <View style={styles.inputWrapper}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter new password"
+          value={newPassword}
+          secureTextEntry={hidden}
+          onChangeText={setNewPassword}
+        />
+        <Pressable
+          style={styles.hiddenButton}
+          onPress={() => setHidden(!hidden)}
+        >
+          <Ionicons
+            name={hidden ? "eye-off-outline" : "eye-outline"}
+            size={24}
+            color="black"
           />
-          <Pressable
-            style={styles.hiddenButton}
-            onPress={() => setHidden(!hidden)}
-          >
-            <Ionicons
-              name={hidden ? "eye-off-outline" : "eye-outline"}
-              size={24}
-              color="black"
-            />
-          </Pressable>
-        </View>
+        </Pressable>
+      </View>
 
       <View style={styles.buttonContainer}>
         <Button onPress={handleCancel} buttonText="Cancel" />
@@ -140,6 +139,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   topIcons: {
     flexDirection: "row",

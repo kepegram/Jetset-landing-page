@@ -10,6 +10,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Appearance,
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,6 +26,7 @@ type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const ForgotPassword: React.FC = () => {
+  const [theme, setTheme] = useState(Appearance.getColorScheme());
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
@@ -32,12 +34,18 @@ const ForgotPassword: React.FC = () => {
 
   const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
 
+  Appearance.addChangeListener((scheme) => {
+    setTheme(scheme.colorScheme);
+  });
+
   const handlePasswordReset = async () => {
     setLoading(true);
     setFeedbackMessage(null);
     try {
       await sendPasswordResetEmail(auth, email);
-      setFeedbackMessage("Password reset link sent! If email exists in our system, check your email.");
+      setFeedbackMessage(
+        "Password reset link sent! If email exists in our system, check your email."
+      );
       console.log("Password reset link sent to: ", email);
     } catch (err) {
       console.log(err);
@@ -47,53 +55,54 @@ const ForgotPassword: React.FC = () => {
     }
   };
 
+  const currentStyles = theme === "dark" ? darkStyles : styles;
+
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={currentStyles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
-        <View style={styles.container}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <Ionicons name="arrow-back" size={24} color="black" />
+      <ScrollView
+        contentContainerStyle={currentStyles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={currentStyles.topIcons}>
+          <Pressable onPress={() => navigation.navigate("UserAuth")}>
+            <Ionicons
+              name="arrow-back"
+              size={28}
+              color={theme === "dark" ? "white" : "black"}
+            />
           </Pressable>
-
-          <Image
-            source={require("../../../../assets/onboarding-imgs/undraw_Forgot_password_re_hxwm.png")}
-            style={styles.image}
-            resizeMode="contain"
-          />
-
-          <Text style={styles.title}>Forgot Password</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your email"
-            placeholderTextColor="#9f9f9f"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
-          {loading ? (
-            <ActivityIndicator size="large" color="#000" />
-          ) : (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handlePasswordReset}
-            >
-              <Text style={styles.buttonText}>Send Reset Link</Text>
-            </TouchableOpacity>
-          )}
-
-          {feedbackMessage && (
-            <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
-          )}
         </View>
+
+        <Text style={currentStyles.title}>Forgot Password</Text>
+
+        <Text style={currentStyles.inputHeader}>Email</Text>
+        <TextInput
+          style={currentStyles.input}
+          placeholder="Enter your email"
+          placeholderTextColor="#9f9f9f"
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#000" />
+        ) : (
+          <TouchableOpacity
+            style={currentStyles.button}
+            onPress={handlePasswordReset}
+          >
+            <Text style={currentStyles.buttonText}>Send Reset Link</Text>
+          </TouchableOpacity>
+        )}
+
+        {feedbackMessage && (
+          <Text style={currentStyles.feedbackMessage}>{feedbackMessage}</Text>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -105,42 +114,49 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  scrollContainer: {
+    flexGrow: 1,
     padding: 20,
   },
-  backButton: {
+  topIcons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     position: "absolute",
-    top: 60,
-    left: 20,
-    zIndex: 10,
+    marginTop: 60,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginTop: 100,
+    marginBottom: 100,
     color: "#000",
   },
-  image: {
-    width: 450,
-    height: 450,
+  inputHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#000",
   },
   input: {
     width: "100%",
     height: 50,
-    borderRadius: 25,
+    borderRadius: 10,
     paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: "#f0f0f0",
-    color: "#000",
+    marginTop: 20,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#b3b3b3",
   },
   button: {
-    backgroundColor: "#000",
+    backgroundColor: "black",
     width: "100%",
     padding: 15,
     borderRadius: 25,
     alignItems: "center",
     marginBottom: 20,
+    marginTop: 15,
   },
   buttonText: {
     color: "#fff",
@@ -150,12 +166,70 @@ const styles = StyleSheet.create({
   feedbackMessage: {
     marginTop: 10,
     fontSize: 14,
-    color: "#A463FF", // Change color to match your theme
+    color: "white",
     textAlign: "center",
   },
-  loginLink: {
-    color: "#A463FF",
+});
+
+const darkStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#121212",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    padding: 20,
+  },
+  topIcons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    position: "absolute",
+    marginTop: 60,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginTop: 100,
+    marginBottom: 100,
+    color: "#fff",
+  },
+  inputHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  input: {
+    width: "100%",
+    height: 50,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginTop: 20,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#444",
+    backgroundColor: "#1e1e1e",
+    color: "#fff",
+  },
+  button: {
+    backgroundColor: "white",
+    width: "100%",
+    padding: 15,
+    borderRadius: 25,
+    alignItems: "center",
+    marginBottom: 20,
+    marginTop: 15,
+  },
+  buttonText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  feedbackMessage: {
+    marginTop: 10,
     fontSize: 14,
-    textDecorationLine: "underline",
+    color: "white",
+    textAlign: "center",
   },
 });

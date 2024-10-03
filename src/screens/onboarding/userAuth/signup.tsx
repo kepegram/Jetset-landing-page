@@ -6,11 +6,11 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  Image,
   Pressable,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Appearance,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -27,15 +27,22 @@ type SignUpScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const SignUp: React.FC = () => {
+  const [theme, setTheme] = useState(Appearance.getColorScheme());
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const auth = FIREBASE_AUTH;
   const db = FIREBASE_DB;
 
   const navigation = useNavigation<SignUpScreenNavigationProp>();
+
+  Appearance.addChangeListener((scheme) => {
+    setTheme(scheme.colorScheme);
+  });
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
@@ -72,39 +79,44 @@ const SignUp: React.FC = () => {
     }
   };
 
+  const currentStyles = theme === "dark" ? darkStyles : styles;
+
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={currentStyles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
-        <View style={styles.container}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.navigate("UserAuth")}
-          >
-            <Ionicons name="arrow-back" size={24} color="black" />
+      <ScrollView
+        contentContainerStyle={currentStyles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={currentStyles.topIcons}>
+          <Pressable onPress={() => navigation.navigate("UserAuth")}>
+            <Ionicons
+              name="arrow-back"
+              size={28}
+              color={theme === "dark" ? "white" : "black"}
+            />
           </Pressable>
+        </View>
 
-          <Image
-            style={styles.image}
-            source={require("../../../../assets/onboarding-imgs/undraw_Sign_up_n6im.png")}
-          />
+        <Text style={currentStyles.title}>Sign Up</Text>
 
-          <Text style={styles.title}>Sign Up</Text>
-
+        <View style={currentStyles.signUpContainer}>
+          <Text style={currentStyles.inputHeader}>Name</Text>
           <TextInput
-            style={styles.input}
-            placeholder="Name"
+            style={currentStyles.input}
+            placeholder="Jane Doe"
             placeholderTextColor="#9f9f9f"
             value={name}
             onChangeText={setName}
             editable={!loading} // Disable input when loading
           />
 
+          <Text style={currentStyles.inputHeader}>Email</Text>
           <TextInput
-            style={styles.input}
-            placeholder="Email"
+            style={currentStyles.input}
+            placeholder="example@mail.com"
             placeholderTextColor="#9f9f9f"
             value={email}
             onChangeText={setEmail}
@@ -113,39 +125,90 @@ const SignUp: React.FC = () => {
             editable={!loading} // Disable input when loading
           />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#9f9f9f"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            editable={!loading} // Disable input when loading
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            placeholderTextColor="#9f9f9f"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            editable={!loading} // Disable input when loading
-          />
-
-          {!loading ? (
-            <Pressable style={styles.button} onPress={handleSignUp}>
-              <Text style={styles.buttonText}>Sign Up</Text>
+          <Text style={currentStyles.inputHeader}>Password</Text>
+          <View style={currentStyles.passwordContainer}>
+            <TextInput
+              style={currentStyles.input}
+              placeholder="••••••••••"
+              placeholderTextColor="#9f9f9f"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!passwordVisible}
+              autoCapitalize="none"
+              editable={!loading} // Disable input when loading
+            />
+            <Pressable
+              style={currentStyles.eyeIcon}
+              onPress={() => setPasswordVisible(!passwordVisible)}
+            >
+              <Ionicons
+                name={passwordVisible ? "eye-off" : "eye"}
+                size={24}
+                color="grey"
+              />
             </Pressable>
-          ) : (
-            <ActivityIndicator size="large" color="#000" />
-          )}
+          </View>
+
+          <Text style={currentStyles.inputHeader}>Confirm Password</Text>
+          <View style={currentStyles.passwordContainer}>
+            <TextInput
+              style={currentStyles.input}
+              placeholder="••••••••••"
+              placeholderTextColor="#9f9f9f"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!confirmPasswordVisible}
+              autoCapitalize="none"
+              editable={!loading} // Disable input when loading
+            />
+            <Pressable
+              style={currentStyles.eyeIcon}
+              onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+            >
+              <Ionicons
+                name={confirmPasswordVisible ? "eye-off" : "eye"}
+                size={24}
+                color="grey"
+              />
+            </Pressable>
+          </View>
+
+          <Pressable style={currentStyles.button} onPress={handleSignUp}>
+            <Text style={currentStyles.buttonText}>Sign Up</Text>
+          </Pressable>
         </View>
 
+        <View style={currentStyles.dividerContainer}>
+          <View style={currentStyles.divider} />
+          <Text style={currentStyles.dividerText}>or sign up with</Text>
+          <View style={currentStyles.divider} />
+        </View>
+
+        <View style={currentStyles.socialIconsContainer}>
+          <Pressable
+            style={currentStyles.iconButton}
+            onPress={() => Alert.alert("Google Sign-In")}
+          >
+            <Ionicons name="logo-google" size={22} color="grey" />
+          </Pressable>
+
+          <Pressable
+            style={currentStyles.iconButton}
+            onPress={() => Alert.alert("Apple Sign-In")}
+          >
+            <Ionicons name="logo-apple" size={22} color="grey" />
+          </Pressable>
+        </View>
+
+        <Pressable onPress={() => navigation.navigate("UserAuth")}>
+          <Text style={currentStyles.createAccountText}>
+            Already a member?
+            <Text style={currentStyles.loginText}> Log in</Text>
+          </Text>
+        </Pressable>
+
         {loading && (
-          <View style={styles.loadingOverlay}>
+          <View style={currentStyles.loadingOverlay}>
             <ActivityIndicator size="large" color="#A463FF" />
           </View>
         )}
@@ -160,36 +223,49 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  scrollContainer: {
+    flexGrow: 1,
     padding: 20,
   },
-  backButton: {
-    position: "absolute",
-    top: 60,
-    left: 20,
-    zIndex: 10,
-  },
-  image: {
+  topIcons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     width: "100%",
-    height: 250,
-    resizeMode: "contain",
-    marginBottom: 20,
+    position: "absolute",
+    marginTop: 60,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 28,
-    marginBottom: 20,
     fontWeight: "bold",
-    color: "#000",
+    marginTop: 100,
+    color: "#333",
+  },
+  signUpContainer: { marginTop: 40 },
+  inputHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 15,
+    color: "#333",
   },
   input: {
     width: "100%",
     height: 50,
-    borderRadius: 25,
+    borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 15,
-    backgroundColor: "#f0f0f0",
-    color: "#000",
+    borderWidth: 1,
+    borderColor: "#b3b3b3",
+  },
+  passwordContainer: {
+    position: "relative",
+    width: "100%",
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 15,
+    top: 15,
   },
   button: {
     backgroundColor: "#A463FF",
@@ -198,9 +274,50 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: "center",
     marginBottom: 20,
+    marginTop: 15,
   },
   buttonText: {
     color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#ccc",
+  },
+  dividerText: {
+    marginHorizontal: 10,
+    fontSize: 14,
+    color: "#888",
+  },
+  socialIconsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 20,
+  },
+  iconButton: {
+    marginHorizontal: 20,
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#888",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  createAccountText: {
+    color: "#000",
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 5,
+  },
+  loginText: {
+    color: "#A463FF",
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -212,7 +329,124 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.8)", // Optional: semi-transparent background
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    zIndex: 20,
+  },
+});
+
+const darkStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#121212",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    padding: 20,
+  },
+  topIcons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    position: "absolute",
+    marginTop: 60,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginTop: 100,
+    color: "#fff",
+  },
+  signUpContainer: { marginTop: 40 },
+  inputHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 15,
+    color: "#fff",
+  },
+  input: {
+    width: "100%",
+    height: 50,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "#444",
+    backgroundColor: "#1e1e1e",
+    color: "#fff",
+  },
+  passwordContainer: {
+    position: "relative",
+    width: "100%",
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 15,
+    top: 15,
+  },
+  button: {
+    backgroundColor: "#A463FF",
+    width: "100%",
+    padding: 15,
+    borderRadius: 25,
+    alignItems: "center",
+    marginBottom: 20,
+    marginTop: 15,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#ccc",
+  },
+  dividerText: {
+    marginHorizontal: 10,
+    fontSize: 14,
+    color: "#888",
+  },
+  socialIconsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 20,
+  },
+  iconButton: {
+    marginHorizontal: 20,
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#888",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  createAccountText: {
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 5,
+  },
+  loginText: {
+    color: "#A463FF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
     zIndex: 20,
   },
 });

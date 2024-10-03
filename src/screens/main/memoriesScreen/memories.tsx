@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const Memories = () => {
+const Memories: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text>Memories</Text>

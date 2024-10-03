@@ -14,8 +14,8 @@ const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [profilePicture, setProfilePictureState] = useState<string>(
-    "https://via.placeholder.com/150"
+  const [profilePicture, setProfilePictureState] = useState<any>(
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
   );
 
   useEffect(() => {
