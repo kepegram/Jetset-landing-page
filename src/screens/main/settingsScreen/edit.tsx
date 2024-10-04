@@ -6,6 +6,7 @@ import {
   View,
   Image,
   TextInput,
+  Appearance,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -25,12 +26,17 @@ type EditScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Edit: React.FC = () => {
+  const [theme, setTheme] = useState(Appearance.getColorScheme());
   const navigation = useNavigation<EditScreenNavigationProp>();
   const { profilePicture, setProfilePicture } = useProfile();
   const [selectedImage, setSelectedImage] = useState<string | null>(
     profilePicture
   );
   const [userName, setUserName] = useState<string | null>("");
+
+  Appearance.addChangeListener((scheme) => {
+    setTheme(scheme.colorScheme);
+  });
 
   // Fetch user data from Firestore on load
   useEffect(() => {
@@ -113,38 +119,44 @@ const Edit: React.FC = () => {
     navigation.navigate("Settings");
   };
 
+  const currentStyles = theme === "dark" ? darkStyles : styles;
+
   return (
-    <View style={styles.container}>
+    <View style={currentStyles.container}>
       {/* Back button and Settings Icon */}
-      <View style={styles.topIcons}>
+      <View style={currentStyles.topIcons}>
         <Pressable onPress={() => navigation.navigate("Settings")}>
-          <Ionicons name="arrow-back" size={28} color="#000" />
+          <Ionicons
+            name="arrow-back"
+            size={28}
+            color={theme === "dark" ? "white" : "black"}
+          />
         </Pressable>
       </View>
 
-      <Text style={styles.title}>Edit Profile</Text>
+      <Text style={currentStyles.title}>Edit Profile</Text>
 
       {/* Profile Picture */}
-      <View style={styles.profilePictureContainer}>
+      <View style={currentStyles.profilePictureContainer}>
         <Pressable onPress={handlePickImage}>
           <Image
             source={{ uri: selectedImage || profilePicture }}
-            style={styles.profilePicture}
+            style={currentStyles.profilePicture}
           />
           <MaterialIcons
             name="edit"
             size={34}
             color="white"
-            style={styles.editIcon}
+            style={currentStyles.editIcon}
           />
         </Pressable>
       </View>
 
       {/* Name Input with Title */}
-      <Text style={styles.inputLabel}>Name</Text>
-      <View style={styles.inputWrapper}>
+      <Text style={currentStyles.inputLabel}>Name</Text>
+      <View style={currentStyles.inputWrapper}>
         <TextInput
-          style={styles.input}
+          style={currentStyles.input}
           placeholder="Enter your name"
           value={userName || ""}
           onChangeText={setUserName}
@@ -152,7 +164,7 @@ const Edit: React.FC = () => {
       </View>
 
       {/* Save and Cancel Buttons */}
-      <View style={styles.buttonContainer}>
+      <View style={currentStyles.buttonContainer}>
         <Button onPress={handleCancel} buttonText="Cancel" />
         <AltButton onPress={handleSave} buttonText="Save" />
       </View>
@@ -192,8 +204,6 @@ const styles = StyleSheet.create({
     width: 220,
     height: 220,
     borderRadius: 120,
-    borderWidth: 2,
-    borderColor: "#ddd",
   },
   editIcon: {
     position: "absolute",
@@ -217,6 +227,71 @@ const styles = StyleSheet.create({
     width: "90%", // Allow input to take up remaining space
     padding: 15,
     marginVertical: 5,
+    borderColor: "#ddd",
+    borderBottomWidth: 1,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    width: "100%",
+    marginTop: 30,
+  },
+});
+
+const darkStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#121212",
+  },
+  topIcons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    position: "absolute",
+    marginTop: 60,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginTop: 110,
+    marginRight: 200,
+    color: "#fff",
+    marginBottom: 20,
+  },
+  profilePictureContainer: {
+    position: "relative",
+    marginBottom: 20,
+  },
+  profilePicture: {
+    width: 220,
+    height: 220,
+    borderRadius: 120,
+  },
+  editIcon: {
+    position: "absolute",
+    bottom: 5,
+    right: 30,
+    backgroundColor: "#A463FF",
+    borderRadius: 22,
+  },
+  inputLabel: {
+    alignSelf: "flex-start",
+    fontSize: 16,
+    color: "#fff",
+    marginTop: 20,
+    marginLeft: 25,
+  },
+  inputWrapper: {
+    flexDirection: "row", // Align icon and input horizontally
+    alignItems: "center", // Center align vertically
+  },
+  input: {
+    width: "90%", // Allow input to take up remaining space
+    padding: 15,
+    marginVertical: 5,
+    color: "#fff",
     borderColor: "#ddd",
     borderBottomWidth: 1,
   },

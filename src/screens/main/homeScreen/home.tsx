@@ -7,15 +7,14 @@ import {
   FlatList,
   TextInput,
   Alert,
+  Appearance,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useProfile } from "../settingsScreen/profileContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { FIREBASE_DB, FIREBASE_AUTH } from "../../../../firebase.config";
-import { doc, getDoc } from "firebase/firestore";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -23,30 +22,15 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Home: React.FC = () => {
+  const [theme, setTheme] = useState(Appearance.getColorScheme());
   const { profilePicture } = useProfile();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [searchText, setSearchText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("unvisited");
-  const [userName, setUserName] = useState<string | null>(null);
-  const auth = FIREBASE_AUTH;
-  const db = FIREBASE_DB;
 
-  useEffect(() => {
-    const fetchUserName = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-          setUserName(userDoc.data()?.name);
-        } else {
-          console.log("No such document!");
-        }
-      }
-    };
-
-    fetchUserName();
-  }, [auth]);
+  Appearance.addChangeListener((scheme) => {
+    setTheme(scheme.colorScheme);
+  });
 
   const [unvisitedData, setUnvisitedData] = useState([
     {
@@ -145,31 +129,40 @@ const Home: React.FC = () => {
 
   const renderItem = ({ item }) => (
     <Pressable
-      style={styles.card}
+      style={currentStyles.card}
       onPress={() => navigation.navigate("DestinationDetailView", { item })}
     >
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <View style={styles.cardBody}>
-        <Text style={styles.location}>{item.location}</Text>
-        <Text style={styles.address}>{item.address}</Text>
-      </View>
-      <View style={styles.cardFooter}>
-        {selectedCategory === "unvisited" && (
-          <>
-            <Pressable onPress={() => addToVisited(item)}>
-              <Text style={styles.action1Text}>Add to Visited</Text>
+      <Image source={{ uri: item.image }} style={currentStyles.image} />
+
+      <View style={currentStyles.cardBody}>
+        {/* Location and address */}
+        <View style={currentStyles.textContainer}>
+          <View>
+            <Text style={currentStyles.location}>{item.location}</Text>
+            <Text style={currentStyles.address}>{item.address}</Text>
+          </View>
+
+          {/* Actions aligned with the text */}
+          {selectedCategory === "unvisited" && (
+            <View style={currentStyles.actionsContainer}>
+              <Pressable onPress={() => addToVisited(item)}>
+                <Text style={currentStyles.action1Text}>Add to Visited</Text>
+              </Pressable>
+              <Pressable onPress={() => addToBucketList(item)}>
+                <Text style={currentStyles.action2Text}>Add to Planner</Text>
+              </Pressable>
+            </View>
+          )}
+          {selectedCategory === "visited" && (
+            <Pressable onPress={() => deleteVisitedItem(item.id)}>
+              <AntDesign name="delete" size={24} color="red" />
             </Pressable>
-            <Pressable onPress={() => addToBucketList(item)}>
-              <Text style={styles.action2Text}>Add to Planner</Text>
-            </Pressable>
-          </>
-        )}
-        {selectedCategory === "visited" && (
-          <Pressable onPress={() => deleteVisitedItem(item.id)}>
-            <AntDesign name="delete" size={24} color="red" />
-          </Pressable>
-        )}
+          )}
+        </View>
       </View>
+
+      {/* Divider between cards */}
+      <View style={currentStyles.cardDivider}></View>
     </Pressable>
   );
 
@@ -182,21 +175,23 @@ const Home: React.FC = () => {
           item.location.toLowerCase().includes(searchText.toLowerCase())
         );
 
+  const currentStyles = theme === "dark" ? darkStyles : styles;
+  
   return (
-    <View style={styles.container}>
-      <View style={styles.topBar}>
-        <Text style={styles.appName}>Jetset</Text>
+    <View style={currentStyles.container}>
+      <View style={currentStyles.topBar}>
+        <Text style={currentStyles.appName}>Jetset</Text>
         <Pressable onPress={() => navigation.navigate("Profile")}>
           <Image
             source={{ uri: profilePicture }}
-            style={styles.profilePicture}
+            style={currentStyles.profilePicture}
           />
         </Pressable>
       </View>
 
-      <View style={styles.content}>
+      <View style={currentStyles.content}>
         <TextInput
-          style={styles.searchInput}
+          style={currentStyles.searchInput}
           placeholder="Search destinations..."
           placeholderTextColor={"#777"}
           onChangeText={handleSearch}
@@ -204,37 +199,37 @@ const Home: React.FC = () => {
         />
 
         {/* Updated Pressable buttons with divider */}
-        <View style={styles.switchContainer}>
+        <View style={currentStyles.switchContainer}>
           <Pressable
             onPress={() => setSelectedCategory("unvisited")}
             style={[
-              styles.switchButton,
-              selectedCategory === "unvisited" && styles.selectedButton,
+              currentStyles.switchButton,
+              selectedCategory === "unvisited" && currentStyles.selectedButton,
             ]}
           >
             <Text
               style={[
-                styles.switchText,
-                selectedCategory === "unvisited" && styles.selectedText,
+                currentStyles.switchText,
+                selectedCategory === "unvisited" && currentStyles.selectedText,
               ]}
             >
               Unvisited
             </Text>
           </Pressable>
 
-          <View style={styles.divider} />
+          <View style={currentStyles.divider} />
 
           <Pressable
             onPress={() => setSelectedCategory("visited")}
             style={[
-              styles.switchButton,
-              selectedCategory === "visited" && styles.selectedButton,
+              currentStyles.switchButton,
+              selectedCategory === "visited" && currentStyles.selectedButton,
             ]}
           >
             <Text
               style={[
-                styles.switchText,
-                selectedCategory === "visited" && styles.selectedText,
+                currentStyles.switchText,
+                selectedCategory === "visited" && currentStyles.selectedText,
               ]}
             >
               Visited
@@ -279,15 +274,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#ccc",
   },
   content: {
     flex: 1,
     paddingTop: 10,
   },
   searchInput: {
-    backgroundColor: "#fff",
     paddingHorizontal: 10,
     marginBottom: 20,
     fontSize: 16,
@@ -312,23 +304,23 @@ const styles = StyleSheet.create({
     borderBottomColor: "#A463FF",
   },
   selectedText: {
-    color: "#000", // Darker color for selected text
+    color: "#000",
     fontWeight: "bold",
   },
   divider: {
     height: "100%",
     width: 1,
-    backgroundColor: "#CCC", // Subtle divider color
+    backgroundColor: "#888",
   },
   destinationListContainer: {
     paddingBottom: 100,
   },
   card: {
-    backgroundColor: "#fff",
     borderRadius: 12,
     marginBottom: 10,
     elevation: 3,
     overflow: "hidden",
+    backgroundColor: "#fff", // Optional for light theme
   },
   image: {
     width: "100%",
@@ -337,7 +329,12 @@ const styles = StyleSheet.create({
   },
   cardBody: {
     padding: 12,
-    flexGrow: 1, // Allow card body to grow
+    flexGrow: 1,
+  },
+  textContainer: {
+    flexDirection: "row", // Make location, address, and actions inline
+    justifyContent: "space-between", // Spread them out across the container
+    alignItems: "center", // Align them vertically centered
   },
   location: {
     fontSize: 18,
@@ -348,19 +345,138 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#888",
   },
-  cardFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between", // Distribute space evenly
-    padding: 10,
-    alignItems: "center", // Align items vertically centered
+  actionsContainer: {
+    flexDirection: "column", // Stack the actions in a column
+    alignItems: "flex-end", // Align the actions to the right
   },
   action1Text: {
     color: "#A463FF",
     fontSize: 14,
+    marginBottom: 5, // Add spacing between the two actions
   },
   action2Text: {
     color: "#000",
     fontSize: 14,
-    marginLeft: 10,
+  },
+  cardDivider: {
+    height: 1,
+    backgroundColor: "#ddd", // Subtle divider color
+    marginTop: 10,
+  },
+});
+
+const darkStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#121212",
+  },
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 55,
+    paddingBottom: 10,
+    backgroundColor: "#121212",
+    elevation: 3,
+  },
+  appName: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  profilePicture: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  content: {
+    flex: 1,
+    paddingTop: 10,
+  },
+  searchInput: {
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    fontSize: 16,
+    color: "#fff",
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  switchButton: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  switchText: {
+    fontSize: 16,
+    color: "#888",
+  },
+  selectedButton: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#A463FF",
+  },
+  selectedText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  divider: {
+    height: "100%",
+    width: 1,
+    backgroundColor: "#888",
+  },
+  destinationListContainer: {
+    paddingBottom: 100,
+  },
+  card: {
+    borderRadius: 12,
+    marginBottom: 10,
+    elevation: 3,
+    overflow: "hidden",
+    backgroundColor: "#1c1c1e", // Dark background
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    resizeMode: "cover",
+  },
+  cardBody: {
+    padding: 12,
+    flexGrow: 1,
+  },
+  textContainer: {
+    flexDirection: "row", // Make location, address, and actions inline
+    justifyContent: "space-between", // Spread them out across the container
+    alignItems: "center", // Align them vertically centered
+  },
+  location: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  address: {
+    fontSize: 14,
+    color: "#888",
+  },
+  actionsContainer: {
+    flexDirection: "column", // Stack the actions in a column
+    alignItems: "flex-end", // Align the actions to the right
+  },
+  action1Text: {
+    color: "#A463FF",
+    fontSize: 14,
+    marginBottom: 5, // Add spacing between the two actions
+  },
+  action2Text: {
+    color: "#fff",
+    fontSize: 14,
+  },
+  cardDivider: {
+    height: 1,
+    backgroundColor: "#333", // Subtle divider for dark theme
+    marginTop: 10,
   },
 });

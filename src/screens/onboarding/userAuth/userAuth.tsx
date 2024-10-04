@@ -29,7 +29,8 @@ const UserAuth: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // State to track error messages
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const auth = FIREBASE_AUTH;
   const navigation = useNavigation<UserAuthScreenNavigationProp>();
 
@@ -38,7 +39,7 @@ const UserAuth: React.FC = () => {
   });
 
   const handleLogin = async () => {
-    setErrorMessage(null); // Reset error message
+    setErrorMessage(null);
 
     if (email === "" || password === "") {
       setErrorMessage("Please enter both email and password");
@@ -52,25 +53,24 @@ const UserAuth: React.FC = () => {
       navigation.navigate("AppTabNav");
     } catch (err) {
       console.log(err);
-      setErrorMessage("Login failed. Please try again."); // Set error message on login failure
+      setErrorMessage("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const currentStyles = theme === "dark" ? darkStyles : styles; // Determine which styles to use based on theme
+  const currentStyles = theme === "dark" ? darkStyles : styles;
 
   return (
     <KeyboardAvoidingView
-      style={currentStyles.container} // Use currentStyles here
+      style={currentStyles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerStyle={currentStyles.scrollContainer} // Use currentStyles here
+        contentContainerStyle={currentStyles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
         <View style={currentStyles.topIcons}>
-          {/* Use currentStyles here */}
           <Pressable onPress={() => navigation.navigate("Welcome")}>
             <Ionicons
               name="arrow-back"
@@ -82,44 +82,39 @@ const UserAuth: React.FC = () => {
 
         <Text style={currentStyles.title}>Login</Text>
 
-        {/* Email Header and Input */}
         <View style={currentStyles.loginContainer}>
-          {/* Use currentStyles here */}
           <Text style={currentStyles.inputHeader}>Email</Text>
           <TextInput
-            style={currentStyles.input} // Use currentStyles here
+            style={currentStyles.input}
             placeholder="user@example.com"
             placeholderTextColor={"#9f9f9f"}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-            editable={!loading} // Disable input when loading
+            editable={!loading}
           />
-          {/* Forgot Password above Password Input */}
           <Pressable
             onPress={() => navigation.navigate("ForgotPassword")}
-            style={currentStyles.forgotPasswordContainer} // Use currentStyles here
+            style={currentStyles.forgotPasswordContainer}
           >
             <Text style={currentStyles.forgotPassword}>Forgot Password?</Text>
           </Pressable>
-          {/* Password Header and Input with Show/Hide functionality */}
           <Text style={currentStyles.inputHeader}>Password</Text>
           <View style={currentStyles.passwordContainer}>
-            {/* Use currentStyles here */}
             <TextInput
-              style={currentStyles.input} // Use currentStyles here
+              style={currentStyles.input}
               placeholder="••••••••••"
               placeholderTextColor={"#9f9f9f"}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
               autoCapitalize="none"
-              editable={!loading} // Disable input when loading
+              editable={!loading}
             />
             <Pressable
               onPress={() => setPasswordVisible(!passwordVisible)}
-              style={currentStyles.eyeIcon} // Use currentStyles here
+              style={currentStyles.eyeIcon}
             >
               <Ionicons
                 name={passwordVisible ? "eye-off" : "eye"}
@@ -128,34 +123,26 @@ const UserAuth: React.FC = () => {
               />
             </Pressable>
           </View>
-          {/* Login Button */}
           <Pressable style={currentStyles.button} onPress={handleLogin}>
-            {/* Use currentStyles here */}
             <Text style={currentStyles.buttonText}>Login</Text>
           </Pressable>
-          {/* Error Message */}
           {errorMessage && (
             <Text style={currentStyles.errorText}>{errorMessage}</Text>
           )}
-          {/* Use currentStyles here */}
-          {/* Divider with OR SIGN UP WITH */}
           <View style={currentStyles.dividerContainer}>
-            {/* Use currentStyles here */}
             <View style={currentStyles.divider} />
             <Text style={currentStyles.dividerText}>or sign in with</Text>
             <View style={currentStyles.divider} />
           </View>
-          {/* Social Icons for Google and Apple Sign-In */}
           <View style={currentStyles.socialIconsContainer}>
-            {/* Use currentStyles here */}
             <Pressable
-              style={currentStyles.iconButton} // Use currentStyles here
+              style={currentStyles.iconButton}
               onPress={() => console.log("Google Sign-In")}
             >
               <Ionicons name="logo-google" size={22} color="grey" />
             </Pressable>
             <Pressable
-              style={currentStyles.iconButton} // Use currentStyles here
+              style={currentStyles.iconButton}
               onPress={() => console.log("Apple Sign-In")}
             >
               <Ionicons name="logo-apple" size={22} color="grey" />
@@ -163,7 +150,6 @@ const UserAuth: React.FC = () => {
           </View>
         </View>
 
-        {/* Create Account Text */}
         <Pressable onPress={() => navigation.navigate("SignUp")}>
           <Text style={currentStyles.createAccountText}>Create an account</Text>
         </Pressable>
@@ -171,7 +157,6 @@ const UserAuth: React.FC = () => {
 
       {loading && (
         <View style={currentStyles.loadingOverlay}>
-          {/* Use currentStyles here */}
           <ActivityIndicator size="large" color="#A463FF" />
         </View>
       )}
@@ -245,6 +230,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 25,
     alignItems: "center",
+    marginTop: 20,
     marginBottom: 20,
   },
   buttonText: {
@@ -310,7 +296,7 @@ const styles = StyleSheet.create({
 const darkStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#121212", // Dark background color
+    backgroundColor: "#121212",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -328,14 +314,14 @@ const darkStyles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     marginTop: 100,
-    color: "#fff", // Light text color for title
+    color: "#fff",
   },
   loginContainer: { marginTop: 60 },
   inputHeader: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 15,
-    color: "#fff", // Light text color for input header
+    color: "#fff",
   },
   input: {
     width: "100%",
@@ -344,9 +330,8 @@ const darkStyles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: "#444", // Dark border color
-    backgroundColor: "#1e1e1e", // Dark background for input
-    color: "#fff", // Light text color for input
+    borderColor: "#aaa",
+    backgroundColor: "#333",
   },
   forgotPasswordContainer: {
     alignSelf: "flex-end",
@@ -372,6 +357,7 @@ const darkStyles = StyleSheet.create({
     padding: 15,
     borderRadius: 25,
     alignItems: "center",
+    marginTop: 20,
     marginBottom: 20,
   },
   buttonText: {
@@ -392,12 +378,12 @@ const darkStyles = StyleSheet.create({
   divider: {
     flex: 1,
     height: 1,
-    backgroundColor: "#444", // Dark divider color
+    backgroundColor: "#888",
   },
   dividerText: {
     marginHorizontal: 10,
     fontSize: 14,
-    color: "#888", // Light text color for divider text
+    color: "#888",
   },
   socialIconsContainer: {
     flexDirection: "row",
@@ -410,7 +396,7 @@ const darkStyles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     width: 100,
-    borderColor: "#444", // Dark border color
+    borderColor: "#888",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -429,7 +415,7 @@ const darkStyles = StyleSheet.create({
     bottom: 0,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(18, 18, 18, 0.8)", // Dark overlay
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
     zIndex: 20,
   },
 });

@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { Appearance } from "react-native";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ProfileProvider } from "../settingsScreen/profileContext";
@@ -47,8 +49,8 @@ const HomeStack = () => {
           component={DestinationDetailView}
         />
         <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Edit" component={Edit} />
         <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="Edit" component={Edit} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
       </Stack.Navigator>
     </ProfileProvider>
@@ -58,13 +60,19 @@ const HomeStack = () => {
 const Tab = createBottomTabNavigator();
 
 const AppNav: React.FC = () => {
+  const [theme, setTheme] = useState(Appearance.getColorScheme());
+
+  Appearance.addChangeListener((scheme) => {
+    setTheme(scheme.colorScheme);
+  });
+
   return (
     <ProfileProvider>
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: "#fff",
+            backgroundColor: theme === "dark" ? "#121212" : "#fff",
             borderTopWidth: 0,
           },
           tabBarLabelStyle: {
@@ -78,11 +86,25 @@ const AppNav: React.FC = () => {
         <Tab.Screen
           name="Home"
           component={HomeStack}
-          options={{
+          options={({ route }) => ({
+            tabBarStyle: ((route) => {
+              // Check if the current route is one of the screens where the tab bar should be hidden
+              const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+              if (
+                routeName === "Edit" ||
+                routeName === "Settings" ||
+                routeName === "ChangePassword"
+              ) {
+                return { display: "none" };
+              }
+              return {
+                backgroundColor: theme === "dark" ? "#121212" : "#fff",
+              };
+            })(route),
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="home" color={color} size={size} />
             ),
-          }}
+          })}
         />
         <Tab.Screen
           name="Explore"
