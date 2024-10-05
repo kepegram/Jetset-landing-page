@@ -70,6 +70,23 @@ const Settings: React.FC = () => {
 
       {/* Settings Options */}
       <View style={currentStyles.settingsContainer}>
+        {/* Notifications Section Header with Icon */}
+        <View style={currentStyles.sectionHeaderContainer}>
+          <Ionicons name="notifications-outline" size={24} color="#A463FF" />
+          <Text style={currentStyles.sectionHeader}>Notifications</Text>
+        </View>
+        <View style={currentStyles.divider} />
+
+        {/* Notification Settings with Switch */}
+        <View style={currentStyles.switchOption}>
+          <Text style={currentStyles.switchText}>Enable Notifications</Text>
+          <Switch
+            thumbColor={"#f4f3f4"}
+            onValueChange={toggleSwitch}
+            value={notificationsEnabled}
+          />
+        </View>
+
         {/* Account Section Header with Icon */}
         <View style={currentStyles.sectionHeaderContainer}>
           <Ionicons name="person-outline" size={24} color="#A463FF" />
@@ -98,22 +115,13 @@ const Settings: React.FC = () => {
           <MaterialIcons name="chevron-right" size={24} color="#777" />
         </Pressable>
 
-        {/* Notifications Section Header with Icon */}
-        <View style={currentStyles.sectionHeaderContainer}>
-          <Ionicons name="notifications-outline" size={24} color="#A463FF" />
-          <Text style={currentStyles.sectionHeader}>Notifications</Text>
-        </View>
-        <View style={currentStyles.divider} />
-
-        {/* Notification Settings with Switch */}
-        <View style={currentStyles.switchOption}>
-          <Text style={currentStyles.switchText}>Enable Notifications</Text>
-          <Switch
-            thumbColor={"#f4f3f4"}
-            onValueChange={toggleSwitch}
-            value={notificationsEnabled}
-          />
-        </View>
+        <Pressable
+          style={currentStyles.settingOption}
+          onPress={() => navigation.navigate("DeleteAccount")}
+        >
+          <Text style={currentStyles.deleteOptionText}>Delete account</Text>
+          <MaterialIcons name="chevron-right" size={24} color="red" />
+        </Pressable>
       </View>
 
       {/* Logout Button */}
@@ -171,6 +179,10 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 18,
     color: "#777",
+  },
+  deleteOptionText: {
+    fontSize: 18,
+    color: "red",
   },
   divider: {
     height: 1,
@@ -244,6 +256,10 @@ const darkStyles = StyleSheet.create({
   optionText: {
     fontSize: 18,
     color: "#777",
+  },
+  deleteOptionText: {
+    fontSize: 18,
+    color: "red",
   },
   divider: {
     height: 1,

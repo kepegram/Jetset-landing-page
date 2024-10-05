@@ -35,6 +35,7 @@ const SignUp: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const auth = FIREBASE_AUTH;
   const db = FIREBASE_DB;
 
@@ -45,8 +46,17 @@ const SignUp: React.FC = () => {
   });
 
   const handleSignUp = async () => {
+    setErrorMessage(null);
+
+    // Validate required fields
+    if (!name || !email || !password || !confirmPassword) {
+      setErrorMessage("All fields are required");
+      return;
+    }
+
+    // Check if passwords match
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
+      setErrorMessage("Passwords do not match");
       return;
     }
 
@@ -73,7 +83,7 @@ const SignUp: React.FC = () => {
       if (user) {
         await deleteUser(user);
       }
-      Alert.alert("Error", "Sign Up failed. Please try again.");
+      setErrorMessage("Sign up failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -107,7 +117,7 @@ const SignUp: React.FC = () => {
           <TextInput
             style={currentStyles.input}
             placeholder="Jane Doe"
-            placeholderTextColor="#9f9f9f"
+            placeholderTextColor={theme === "dark" ? "#6b6b6b" : "#cdcdcd"}
             value={name}
             onChangeText={setName}
             editable={!loading} // Disable input when loading
@@ -117,7 +127,7 @@ const SignUp: React.FC = () => {
           <TextInput
             style={currentStyles.input}
             placeholder="example@mail.com"
-            placeholderTextColor="#9f9f9f"
+            placeholderTextColor={theme === "dark" ? "#6b6b6b" : "#cdcdcd"}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -130,7 +140,7 @@ const SignUp: React.FC = () => {
             <TextInput
               style={currentStyles.input}
               placeholder="••••••••••"
-              placeholderTextColor="#9f9f9f"
+              placeholderTextColor={theme === "dark" ? "#6b6b6b" : "#cdcdcd"}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
@@ -154,7 +164,7 @@ const SignUp: React.FC = () => {
             <TextInput
               style={currentStyles.input}
               placeholder="••••••••••"
-              placeholderTextColor="#9f9f9f"
+              placeholderTextColor={theme === "dark" ? "#6b6b6b" : "#cdcdcd"}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry={!confirmPasswordVisible}
@@ -176,6 +186,9 @@ const SignUp: React.FC = () => {
           <Pressable style={currentStyles.button} onPress={handleSignUp}>
             <Text style={currentStyles.buttonText}>Sign Up</Text>
           </Pressable>
+          {errorMessage && (
+            <Text style={currentStyles.errorText}>{errorMessage}</Text>
+          )}
         </View>
 
         <View style={currentStyles.dividerContainer}>
@@ -239,7 +252,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 100,
+    marginTop: 80,
     color: "#333",
   },
   signUpContainer: { marginTop: 40 },
@@ -280,6 +293,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginBottom: 10,
   },
   dividerContainer: {
     flexDirection: "row",
@@ -354,7 +372,7 @@ const darkStyles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 100,
+    marginTop: 80,
     color: "#fff",
   },
   signUpContainer: { marginTop: 40 },
@@ -397,6 +415,11 @@ const darkStyles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginBottom: 10,
   },
   dividerContainer: {
     flexDirection: "row",

@@ -18,6 +18,7 @@ import Memories from "../memoriesScreen/memories";
 import Community from "../communityScreen/community";
 import DestinationDetailView from "../homeScreen/destinationDetail";
 import ChangePassword from "../settingsScreen/changePassword";
+import DeleteAccount from "../settingsScreen/deleteAccount";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -34,7 +35,7 @@ export type RootStackParamList = {
   Edit: undefined;
   Settings: undefined;
   ChangePassword: undefined;
-  Memories: undefined;
+  DeleteAccount: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -52,6 +53,7 @@ const HomeStack = () => {
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="Edit" component={Edit} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
+        <Stack.Screen name="DeleteAccount" component={DeleteAccount} />
       </Stack.Navigator>
     </ProfileProvider>
   );

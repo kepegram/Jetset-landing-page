@@ -128,42 +128,41 @@ const Home: React.FC = () => {
   };
 
   const renderItem = ({ item }) => (
-    <Pressable
-      style={currentStyles.card}
-      onPress={() => navigation.navigate("DestinationDetailView", { item })}
-    >
-      <Image source={{ uri: item.image }} style={currentStyles.image} />
+    <View>
+      <Pressable
+        style={currentStyles.card}
+        onPress={() => navigation.navigate("DestinationDetailView", { item })}
+      >
+        <Image source={{ uri: item.image }} style={currentStyles.image} />
 
-      <View style={currentStyles.cardBody}>
-        {/* Location and address */}
-        <View style={currentStyles.textContainer}>
-          <View>
-            <Text style={currentStyles.location}>{item.location}</Text>
-            <Text style={currentStyles.address}>{item.address}</Text>
-          </View>
-
-          {/* Actions aligned with the text */}
-          {selectedCategory === "unvisited" && (
-            <View style={currentStyles.actionsContainer}>
-              <Pressable onPress={() => addToVisited(item)}>
-                <Text style={currentStyles.action1Text}>Add to Visited</Text>
-              </Pressable>
-              <Pressable onPress={() => addToBucketList(item)}>
-                <Text style={currentStyles.action2Text}>Add to Planner</Text>
-              </Pressable>
+        <View style={currentStyles.cardBody}>
+          <View style={currentStyles.textContainer}>
+            <View>
+              <Text style={currentStyles.location}>{item.location}</Text>
+              <Text style={currentStyles.address}>{item.address}</Text>
             </View>
-          )}
-          {selectedCategory === "visited" && (
-            <Pressable onPress={() => deleteVisitedItem(item.id)}>
-              <AntDesign name="delete" size={24} color="red" />
-            </Pressable>
-          )}
-        </View>
-      </View>
 
-      {/* Divider between cards */}
+            {/* Actions aligned with the text */}
+            {selectedCategory === "unvisited" && (
+              <View style={currentStyles.actionsContainer}>
+                <Pressable onPress={() => addToVisited(item)}>
+                  <Text style={currentStyles.action1Text}>Add to Visited</Text>
+                </Pressable>
+                <Pressable onPress={() => addToBucketList(item)}>
+                  <Text style={currentStyles.action2Text}>Add to Planner</Text>
+                </Pressable>
+              </View>
+            )}
+            {selectedCategory === "visited" && (
+              <Pressable onPress={() => deleteVisitedItem(item.id)}>
+                <AntDesign name="delete" size={24} color="red" />
+              </Pressable>
+            )}
+          </View>
+        </View>
+      </Pressable>
       <View style={currentStyles.cardDivider}></View>
-    </Pressable>
+    </View>
   );
 
   const filteredData =
@@ -176,7 +175,7 @@ const Home: React.FC = () => {
         );
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
-  
+
   return (
     <View style={currentStyles.container}>
       <View style={currentStyles.topBar}>
@@ -310,7 +309,7 @@ const styles = StyleSheet.create({
   divider: {
     height: "100%",
     width: 1,
-    backgroundColor: "#888",
+    backgroundColor: "#ddd",
   },
   destinationListContainer: {
     paddingBottom: 100,
@@ -361,7 +360,8 @@ const styles = StyleSheet.create({
   cardDivider: {
     height: 1,
     backgroundColor: "#ddd", // Subtle divider color
-    marginTop: 10,
+    marginBottom: 10,
+    alignSelf: "stretch",
   },
 });
 
@@ -426,7 +426,7 @@ const darkStyles = StyleSheet.create({
   divider: {
     height: "100%",
     width: 1,
-    backgroundColor: "#888",
+    backgroundColor: "#444",
   },
   destinationListContainer: {
     paddingBottom: 100,
@@ -445,6 +445,7 @@ const darkStyles = StyleSheet.create({
   },
   cardBody: {
     padding: 12,
+    paddingBottom: 20, // Add extra padding at the bottom for spacing
     flexGrow: 1,
   },
   textContainer: {
@@ -476,7 +477,8 @@ const darkStyles = StyleSheet.create({
   },
   cardDivider: {
     height: 1,
-    backgroundColor: "#333", // Subtle divider for dark theme
-    marginTop: 10,
+    backgroundColor: "#444", // Adjust this based on the theme
+    marginBottom: 10,
+    alignSelf: "stretch", // Ensures the divider stretches within the card, not the card itself
   },
 });

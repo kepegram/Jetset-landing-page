@@ -87,7 +87,7 @@ const UserAuth: React.FC = () => {
           <TextInput
             style={currentStyles.input}
             placeholder="user@example.com"
-            placeholderTextColor={"#9f9f9f"}
+            placeholderTextColor={theme === "dark" ? "#6b6b6b" : "#cdcdcd"}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -105,7 +105,7 @@ const UserAuth: React.FC = () => {
             <TextInput
               style={currentStyles.input}
               placeholder="••••••••••"
-              placeholderTextColor={"#9f9f9f"}
+              placeholderTextColor={theme === "dark" ? "#6b6b6b" : "#cdcdcd"}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
@@ -330,8 +330,9 @@ const darkStyles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: "#aaa",
-    backgroundColor: "#333",
+    borderColor: "#444",
+    backgroundColor: "#1e1e1e",
+    color: "white",
   },
   forgotPasswordContainer: {
     alignSelf: "flex-end",
