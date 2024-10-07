@@ -1,17 +1,9 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  Pressable,
-  Appearance,
-  Modal,
-} from "react-native";
+import { StyleSheet, View, Text, Image, Pressable, Modal } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
-import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the back button icon
+import { useTheme } from "../profileScreen/themeContext";
 
 type DestinationDetailViewProps = {
   navigation: StackNavigationProp<RootStackParamList, "DestinationDetailView">;
@@ -22,29 +14,14 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   navigation,
   route,
 }) => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const { item } = route.params;
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
   return (
     <View style={currentStyles.container}>
-      <Pressable
-        style={currentStyles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons
-          name="arrow-back"
-          size={28}
-          color={theme === "dark" ? "white" : "black"}
-        />
-      </Pressable>
-
       {/* Confine the Pressable to the exact dimensions of the image */}
       <View style={currentStyles.imageWrapper}>
         <Pressable onPress={() => setModalVisible(true)}>
@@ -86,16 +63,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-  },
-  backButton: {
-    position: "absolute",
-    top: 60,
-    left: 10,
+    justifyContent: "center",
   },
   imageWrapper: {
     width: "100%", // Ensure that the wrapper has the same width as the image
     height: 300, // Same height as the image
-    marginTop: 110,
   },
   image: {
     width: "100%",
@@ -143,16 +115,11 @@ const darkStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#121212",
-  },
-  backButton: {
-    position: "absolute",
-    top: 60,
-    left: 10,
+    justifyContent: "center",
   },
   imageWrapper: {
     width: "100%",
     height: 300,
-    marginTop: 110,
   },
   image: {
     width: "100%",

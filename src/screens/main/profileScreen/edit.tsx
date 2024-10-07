@@ -6,9 +6,8 @@ import {
   View,
   Image,
   TextInput,
-  Appearance,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
@@ -19,6 +18,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore"; // Firestore functions
 import { getAuth } from "firebase/auth"; // Firebase auth
 import { FIREBASE_DB } from "../../../../firebase.config"; // Firebase Firestore configuration
 import { Button, AltButton } from "../../../components/button";
+import { useTheme } from "./themeContext";
 
 type EditScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -26,17 +26,13 @@ type EditScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Edit: React.FC = () => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const { theme } = useTheme();
   const navigation = useNavigation<EditScreenNavigationProp>();
   const { profilePicture, setProfilePicture } = useProfile();
   const [selectedImage, setSelectedImage] = useState<string | null>(
     profilePicture
   );
   const [userName, setUserName] = useState<string | null>("");
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
 
   // Fetch user data from Firestore on load
   useEffect(() => {
@@ -123,19 +119,6 @@ const Edit: React.FC = () => {
 
   return (
     <View style={currentStyles.container}>
-      {/* Back button and Settings Icon */}
-      <View style={currentStyles.topIcons}>
-        <Pressable onPress={() => navigation.navigate("Settings")}>
-          <Ionicons
-            name="arrow-back"
-            size={28}
-            color={theme === "dark" ? "white" : "black"}
-          />
-        </Pressable>
-      </View>
-
-      <Text style={currentStyles.title}>Edit Profile</Text>
-
       {/* Profile Picture */}
       <View style={currentStyles.profilePictureContainer}>
         <Pressable onPress={handlePickImage}>
@@ -180,24 +163,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
   },
-  topIcons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    position: "absolute",
-    marginTop: 60,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 110,
-    marginRight: 200,
-    color: "#333",
-    marginBottom: 20,
-  },
   profilePictureContainer: {
     position: "relative",
+    marginTop: 20,
     marginBottom: 20,
   },
   profilePicture: {
@@ -244,24 +212,9 @@ const darkStyles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#121212",
   },
-  topIcons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    position: "absolute",
-    marginTop: 60,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 110,
-    marginRight: 200,
-    color: "#fff",
-    marginBottom: 20,
-  },
   profilePictureContainer: {
     position: "relative",
+    marginTop: 50,
     marginBottom: 20,
   },
   profilePicture: {

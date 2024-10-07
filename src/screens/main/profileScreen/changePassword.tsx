@@ -1,11 +1,4 @@
-import {
-  Appearance,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { AltButton, Button } from "../../../components/button";
@@ -20,6 +13,7 @@ import { FIREBASE_DB } from "../../../../firebase.config";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
+import { useTheme } from "./themeContext";
 
 type ChangePasswordScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -27,16 +21,12 @@ type ChangePasswordScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const ChangePassword: React.FC = () => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const { theme } = useTheme();
   const [email, setEmail] = useState<string | null>("");
   const [password, setPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [hidden, setHidden] = useState<boolean>(true);
   const navigation = useNavigation<ChangePasswordScreenNavigationProp>();
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -89,18 +79,6 @@ const ChangePassword: React.FC = () => {
 
   return (
     <View style={currentStyles.container}>
-      <View style={currentStyles.topIcons}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Ionicons
-            name="arrow-back"
-            size={28}
-            color={theme === "dark" ? "white" : "black"}
-          />
-        </Pressable>
-      </View>
-
-      <Text style={currentStyles.title}>Change Password</Text>
-
       <Text style={currentStyles.inputLabel}>Old Password</Text>
       <View style={currentStyles.inputWrapper}>
         <TextInput
@@ -161,22 +139,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
   },
-  topIcons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    position: "absolute",
-    marginTop: 60,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 110,
-    marginRight: 100,
-    color: "#333",
-    marginBottom: 20,
-  },
   inputLabel: {
     alignSelf: "flex-start",
     fontSize: 16,
@@ -213,22 +175,6 @@ const darkStyles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "#121212",
-  },
-  topIcons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    position: "absolute",
-    marginTop: 60,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 110,
-    marginRight: 100,
-    color: "#fff",
-    marginBottom: 20,
   },
   inputLabel: {
     alignSelf: "flex-start",

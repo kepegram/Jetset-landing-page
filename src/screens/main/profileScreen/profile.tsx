@@ -6,10 +6,9 @@ import {
   Image,
   Modal,
   Button,
-  Appearance,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { Ionicons, MaterialIcons, AntDesign } from "@expo/vector-icons"; // Ensure Ionicons is imported
+import React, { useState } from "react";
+import { MaterialIcons, AntDesign } from "@expo/vector-icons"; // Ensure Ionicons is imported
 import { doc, getDoc } from "firebase/firestore"; // Firestore functions
 import { getAuth } from "firebase/auth"; // Firebase auth
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -17,6 +16,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useProfile } from "./profileContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
+import { useTheme } from "./themeContext";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -25,16 +25,12 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 
 const Profile: React.FC = () => {
   const { profilePicture } = useProfile();
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const { theme } = useTheme();
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"bucketlists" | "memories">(
     "bucketlists"
   );
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
 
   const navigation = useNavigation<ProfileScreenNavigationProp>();
 
@@ -67,22 +63,6 @@ const Profile: React.FC = () => {
 
   return (
     <View style={currentStyles.container}>
-      <View style={currentStyles.headerContent}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Ionicons
-            name="arrow-back"
-            size={30}
-            color={theme === "dark" ? "white" : "black"}
-          />
-        </Pressable>
-        <Pressable onPress={() => navigation.navigate("Settings")}>
-          <Ionicons
-            name="settings-sharp"
-            size={30}
-            color={theme === "dark" ? "white" : "black"}
-          />
-        </Pressable>
-      </View>
       <View style={currentStyles.profileContainer}>
         <Pressable onPress={() => setModalVisible(true)}>
           <Image
@@ -169,7 +149,11 @@ const Profile: React.FC = () => {
             style={currentStyles.bucketlistButton}
             onPress={() => navigation.navigate("Home")}
           >
-            <AntDesign name="pluscircleo" size={21} color="#999" />
+            <AntDesign
+              name="pluscircleo"
+              size={21}
+              color={theme === "dark" ? "#444" : "#e1e1e1"}
+            />
             <Text style={currentStyles.addButtonText}>Add New Bucketlist</Text>
           </Pressable>
         ) : (
@@ -177,7 +161,11 @@ const Profile: React.FC = () => {
             style={currentStyles.memoryButton}
             onPress={() => navigation.navigate("Memories")}
           >
-            <AntDesign name="pluscircleo" size={21} color="#999" />
+            <AntDesign
+              name="pluscircleo"
+              size={21}
+              color={theme === "dark" ? "#444" : "#e1e1e1"}
+            />
             <Text style={currentStyles.addButtonText}>Add New Memory</Text>
           </Pressable>
         )}
@@ -221,16 +209,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
   },
-  headerContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "90%",
-    position: "absolute",
-    marginTop: 60,
-  },
   profileContainer: {
     alignItems: "center",
-    marginTop: 80,
+    marginTop: 30,
   },
   profilePicture: {
     width: 150,
@@ -291,7 +272,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   addButtonText: {
-    color: "#999",
+    color: "#e1e1e1",
     fontSize: 14,
     fontWeight: "bold",
     textDecorationLine: "underline",
@@ -320,16 +301,9 @@ const darkStyles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#121212",
   },
-  headerContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "90%",
-    position: "absolute",
-    marginTop: 60,
-  },
   profileContainer: {
     alignItems: "center",
-    marginTop: 80,
+    marginTop: 30,
   },
   profilePicture: {
     width: 150,
@@ -391,7 +365,7 @@ const darkStyles = StyleSheet.create({
     justifyContent: "center",
   },
   addButtonText: {
-    color: "#999",
+    color: "#444",
     fontSize: 14,
     fontWeight: "bold",
     textDecorationLine: "underline",

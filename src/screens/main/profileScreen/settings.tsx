@@ -1,19 +1,12 @@
 import React, { useState } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  Switch,
-  Alert,
-  Appearance,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View, Switch, Alert } from "react-native";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
 import { AltButton } from "../../../components/button";
+import { useTheme } from "./themeContext";
 
 type SettingsScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -21,13 +14,9 @@ type SettingsScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Settings: React.FC = () => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const { theme } = useTheme();
   const navigation = useNavigation<SettingsScreenNavigationProp>();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
 
   const toggleSwitch = () => setNotificationsEnabled((prevState) => !prevState);
 
@@ -55,19 +44,6 @@ const Settings: React.FC = () => {
 
   return (
     <View style={currentStyles.container}>
-      {/* Back Button */}
-      <View style={currentStyles.topIcons}>
-        <Pressable onPress={() => navigation.navigate("Profile")}>
-          <Ionicons
-            name="arrow-back"
-            size={28}
-            color={theme === "dark" ? "white" : "black"}
-          />
-        </Pressable>
-      </View>
-
-      <Text style={currentStyles.title}>Settings</Text>
-
       {/* Settings Options */}
       <View style={currentStyles.settingsContainer}>
         {/* Notifications Section Header with Icon */}
@@ -110,6 +86,14 @@ const Settings: React.FC = () => {
           <MaterialIcons name="chevron-right" size={24} color="#777" />
         </Pressable>
 
+        <Pressable
+          style={currentStyles.settingOption}
+          onPress={() => navigation.navigate("AppTheme")}
+        >
+          <Text style={currentStyles.optionText}>App Theme</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#777" />
+        </Pressable>
+
         <Pressable style={currentStyles.settingOption} onPress={() => {}}>
           <Text style={currentStyles.optionText}>Privacy & Security</Text>
           <MaterialIcons name="chevron-right" size={24} color="#777" />
@@ -137,20 +121,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "#fff",
-  },
-  topIcons: {
-    flexDirection: "row",
-    width: "100%",
-    position: "absolute",
-    marginTop: 60,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 110,
-    marginRight: 230,
-    color: "#333",
   },
   settingsContainer: {
     width: "90%",
@@ -215,20 +185,6 @@ const darkStyles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#121212",
   },
-  topIcons: {
-    flexDirection: "row",
-    width: "100%",
-    position: "absolute",
-    marginTop: 60,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 110,
-    marginRight: 230,
-    color: "white",
-  },
   settingsContainer: {
     width: "90%",
     marginTop: 20,
@@ -281,7 +237,7 @@ const darkStyles = StyleSheet.create({
   logoutContainer: {
     position: "absolute",
     alignItems: "center",
-    bottom: 20,
+    bottom: 40,
     width: "100%",
   },
 });

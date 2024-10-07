@@ -4,8 +4,8 @@ import {
   Pressable,
   StyleSheet,
   GestureResponderEvent,
-  Appearance,
 } from "react-native";
+import { useTheme } from "../screens/main/profileScreen/themeContext";
 
 type ButtonProps = {
   buttonText: string;
@@ -13,11 +13,7 @@ type ButtonProps = {
 };
 
 const Button: React.FC<ButtonProps> = ({ buttonText, onPress }) => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
+  const { theme } = useTheme();
 
   return (
     <Pressable style={styles.button} onPress={onPress}>

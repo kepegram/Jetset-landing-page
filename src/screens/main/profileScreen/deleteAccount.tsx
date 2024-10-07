@@ -6,32 +6,19 @@ import {
   Pressable,
   ScrollView,
   Alert,
-  Appearance,
   TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config"; // import your Firebase config
-import { RootStackParamList } from "../tabNavigator/appNav";
 import { doc, setDoc } from "firebase/firestore"; // Firestore method
 import { reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth"; // Re-authentication
-
-type DeleteAccountScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "DeleteAccount"
->;
+import { useTheme } from "./themeContext";
 
 const DeleteAccount: React.FC = () => {
-  const navigation = useNavigation<DeleteAccountScreenNavigationProp>();
+  const { theme } = useTheme();
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [otherReason, setOtherReason] = useState<string>("");
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
   const [password, setPassword] = useState<string>(""); // Input for re-authentication
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
 
   const reasons = [
     "Switching to another app",
@@ -115,18 +102,6 @@ const DeleteAccount: React.FC = () => {
 
   return (
     <View style={currentStyles.container}>
-      {/* Back Button */}
-      <View style={currentStyles.topIcons}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Ionicons
-            name="arrow-back"
-            size={28}
-            color={theme === "dark" ? "white" : "black"}
-          />
-        </Pressable>
-      </View>
-
-      <Text style={currentStyles.title}>Delete Account</Text>
       <Text style={currentStyles.subTitle}>
         Please let us know why you're leaving:
       </Text>
@@ -190,24 +165,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 20,
-  },
-  topIcons: {
-    flexDirection: "row",
-    marginTop: 60,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 80,
-    color: "#333",
+    justifyContent: "center",
   },
   subTitle: {
     fontSize: 18,
     marginVertical: 20,
     color: "#555",
+    textAlign: "center", // Center the subtitle text
   },
   scrollContainer: {
-    paddingBottom: 100,
+    flexGrow: 1, // Ensure content takes the full height of the screen
+    justifyContent: "center", // Center the items vertically
+    paddingBottom: 100, // Adjust this if needed
   },
   radioContainer: {
     flexDirection: "row",
@@ -246,24 +215,18 @@ const darkStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#121212",
     paddingHorizontal: 20,
-  },
-  topIcons: {
-    flexDirection: "row",
-    marginTop: 60,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 60,
-    color: "#fff",
+    justifyContent: "center",
   },
   subTitle: {
     fontSize: 18,
     marginVertical: 20,
     color: "#bbb",
+    textAlign: "center", // Center the subtitle text
   },
   scrollContainer: {
-    paddingBottom: 100,
+    flexGrow: 1, // Ensure content takes the full height of the screen
+    justifyContent: "center", // Center the items vertically
+    paddingBottom: 100, // Adjust this if needed
   },
   radioContainer: {
     flexDirection: "row",

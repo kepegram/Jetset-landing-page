@@ -7,7 +7,6 @@ import {
   FlatList,
   TextInput,
   Alert,
-  Appearance,
 } from "react-native";
 import React, { useState } from "react";
 import { useProfile } from "../profileScreen/profileContext";
@@ -15,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useTheme } from "../profileScreen/themeContext";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -22,15 +22,11 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Home: React.FC = () => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const { theme } = useTheme();
   const { profilePicture } = useProfile();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [searchText, setSearchText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("unvisited");
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
 
   const [unvisitedData, setUnvisitedData] = useState([
     {

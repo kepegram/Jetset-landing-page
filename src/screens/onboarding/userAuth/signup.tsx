@@ -100,16 +100,6 @@ const SignUp: React.FC = () => {
         contentContainerStyle={currentStyles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={currentStyles.topIcons}>
-          <Pressable onPress={() => navigation.navigate("UserAuth")}>
-            <Ionicons
-              name="arrow-back"
-              size={28}
-              color={theme === "dark" ? "white" : "black"}
-            />
-          </Pressable>
-        </View>
-
         <Text style={currentStyles.title}>Sign Up</Text>
 
         <View style={currentStyles.signUpContainer}>
@@ -241,18 +231,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
   },
-  topIcons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    position: "absolute",
-    marginTop: 60,
-    paddingHorizontal: 20,
-  },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 80,
+    marginTop: 20,
     color: "#333",
   },
   signUpContainer: { marginTop: 40 },
@@ -361,18 +343,10 @@ const darkStyles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
   },
-  topIcons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    position: "absolute",
-    marginTop: 60,
-    paddingHorizontal: 20,
-  },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 80,
+    marginTop: 20,
     color: "#fff",
   },
   signUpContainer: { marginTop: 40 },

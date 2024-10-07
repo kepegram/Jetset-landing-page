@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Appearance } from "react-native";
+import React from "react";
+import { LogBox, Pressable } from "react-native";
+import { useTheme } from "../profileScreen/themeContext";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -18,6 +19,7 @@ import Memories from "../memoriesScreen/memories";
 import Community from "../communityScreen/community";
 import DestinationDetailView from "../homeScreen/destinationDetail";
 import ChangePassword from "../profileScreen/changePassword";
+import AppTheme from "../profileScreen/appTheme";
 import DeleteAccount from "../profileScreen/deleteAccount";
 
 export type RootStackParamList = {
@@ -35,25 +37,103 @@ export type RootStackParamList = {
   Edit: undefined;
   Settings: undefined;
   ChangePassword: undefined;
+  AppTheme: undefined;
   DeleteAccount: undefined;
+  Memories: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const HomeStack = () => {
+  const { theme } = useTheme(); // Get current color scheme
+
+  const screenOptions = ({ navigation }: any) => ({
+    headerStyle: {
+      backgroundColor: theme === "dark" ? "#121212" : "#fff",
+      borderBottomWidth: 0, // Remove the bottom border
+      shadowColor: "transparent", // Remove shadow on iOS
+      elevation: 0, // Remove shadow on Android
+    },
+    headerLeft: () => (
+      <Pressable onPress={() => navigation.goBack()}>
+        <Ionicons
+          name="arrow-back"
+          size={28}
+          color={theme === "dark" ? "#fff" : "#000"}
+          style={{ marginLeft: 10 }}
+        />
+      </Pressable>
+    ),
+    headerTitleStyle: {
+      color: theme === "dark" ? "#fff" : "#000", // Change the header font color based on the theme
+      fontSize: 18, // You can also customize the font size
+      fontWeight: "bold", // Customize font weight if needed
+    },
+  });
+
   return (
     <ProfileProvider>
-      <Stack.Navigator screenOptions={{ headerShown: true }}>
-        <Stack.Screen name="Home" component={Home} />
+      <Stack.Navigator>
+        {/* Home screen with headerShown, no back button or custom header style */}
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{ headerShown: false }}
+        />
+
+        {/* Other screens where the custom header with no bottom border is applied */}
         <Stack.Screen
           name="DestinationDetailView"
           component={DestinationDetailView}
+          options={screenOptions}
         />
-        <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Settings" component={Settings} />
-        <Stack.Screen name="Edit" component={Edit} />
-        <Stack.Screen name="ChangePassword" component={ChangePassword} />
-        <Stack.Screen name="DeleteAccount" component={DeleteAccount} />
+
+        {/* Profile screen with an additional settings icon */}
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={({ navigation }) => ({
+            ...screenOptions({ navigation }),
+            headerRight: () => (
+              <Pressable onPress={() => navigation.navigate("Settings")}>
+                <Ionicons
+                  name="settings-sharp"
+                  size={28}
+                  color={theme === "dark" ? "#fff" : "#121212"}
+                  style={{ marginRight: 10 }}
+                />
+              </Pressable>
+            ),
+          })}
+        />
+
+        <Stack.Screen
+          name="Settings"
+          component={Settings}
+          options={screenOptions}
+        />
+        <Stack.Screen name="Edit" component={Edit} options={screenOptions} />
+        <Stack.Screen
+          name="ChangePassword"
+          component={ChangePassword}
+          options={({ navigation }) => ({
+            ...screenOptions({ navigation }),
+            title: "Change Password",
+          })}
+        />
+        <Stack.Screen
+          name="AppTheme"
+          component={AppTheme}
+          options={({ navigation }) => ({
+            ...screenOptions({ navigation }),
+            title: "App Theme",
+          })}
+        />
+        <Stack.Screen
+          name="DeleteAccount"
+          component={DeleteAccount}
+          options={{ ...screenOptions, title: "Delete Account" }}
+        />
       </Stack.Navigator>
     </ProfileProvider>
   );
@@ -62,11 +142,15 @@ const HomeStack = () => {
 const Tab = createBottomTabNavigator();
 
 const AppNav: React.FC = () => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const { theme } = useTheme();
 
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
+  LogBox.ignoreLogs([
+    " WARN  Found screens with the same name nested inside one another.",
+  ]);
+
+  // Appearance.addChangeListener((scheme) => {
+  //   setTheme(scheme.colorScheme);
+  // });
 
   return (
     <ProfileProvider>
@@ -88,25 +172,28 @@ const AppNav: React.FC = () => {
         <Tab.Screen
           name="Home"
           component={HomeStack}
-          options={({ route }) => ({
-            tabBarStyle: ((route) => {
-              // Check if the current route is one of the screens where the tab bar should be hidden
-              const routeName = getFocusedRouteNameFromRoute(route) ?? "";
-              if (
-                routeName === "Edit" ||
-                routeName === "Settings" ||
-                routeName === "ChangePassword"
-              ) {
-                return { display: "none" };
-              }
-              return {
-                backgroundColor: theme === "dark" ? "#121212" : "#fff",
-              };
-            })(route),
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" color={color} size={size} />
-            ),
-          })}
+          options={({ route }) => {
+            // Determine the focused route name
+            const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+
+            // Conditionally hide the tab bar for specific routes
+            const shouldHideTabBar = [
+              "Edit",
+              "Settings",
+              "ChangePassword",
+            ].includes(routeName);
+
+            return {
+              tabBarStyle: shouldHideTabBar
+                ? { display: "none" } // Hide tab bar on specific screens
+                : {
+                    backgroundColor: theme === "dark" ? "#121212" : "#fff",
+                  },
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="home" color={color} size={size} />
+              ),
+            };
+          }}
         />
         <Tab.Screen
           name="Explore"
