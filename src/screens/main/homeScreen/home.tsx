@@ -10,7 +10,7 @@ import {
   Appearance,
 } from "react-native";
 import React, { useState } from "react";
-import { useProfile } from "../settingsScreen/profileContext";
+import { useProfile } from "../profileScreen/profileContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";

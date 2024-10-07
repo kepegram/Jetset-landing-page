@@ -3,22 +3,22 @@ import { Appearance } from "react-native";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { ProfileProvider } from "../settingsScreen/profileContext";
+import { ProfileProvider } from "../profileScreen/profileContext";
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Home from "../homeScreen/home";
 import Explore from "../exploreScreen/explore";
-import Profile from "../settingsScreen/profile";
-import Edit from "../settingsScreen/edit";
-import Settings from "../settingsScreen/settings";
+import Profile from "../profileScreen/profile";
+import Edit from "../profileScreen/edit";
+import Settings from "../profileScreen/settings";
 import Planner from "../plannerScreen/planner";
 import Memories from "../memoriesScreen/memories";
 import Community from "../communityScreen/community";
 import DestinationDetailView from "../homeScreen/destinationDetail";
-import ChangePassword from "../settingsScreen/changePassword";
-import DeleteAccount from "../settingsScreen/deleteAccount";
+import ChangePassword from "../profileScreen/changePassword";
+import DeleteAccount from "../profileScreen/deleteAccount";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -43,7 +43,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const HomeStack = () => {
   return (
     <ProfileProvider>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator screenOptions={{ headerShown: true }}>
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen
           name="DestinationDetailView"
