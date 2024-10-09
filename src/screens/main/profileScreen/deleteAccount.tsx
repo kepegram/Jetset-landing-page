@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1, // Ensure content takes the full height of the screen
     justifyContent: "center", // Center the items vertically
-    paddingBottom: 100, // Adjust this if needed
+    paddingBottom: 200, // Adjust this if needed
   },
   radioContainer: {
     flexDirection: "row",
@@ -226,7 +226,7 @@ const darkStyles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1, // Ensure content takes the full height of the screen
     justifyContent: "center", // Center the items vertically
-    paddingBottom: 100, // Adjust this if needed
+    paddingBottom: 200, // Adjust this if needed
   },
   radioContainer: {
     flexDirection: "row",

@@ -10,7 +10,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Appearance,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,6 +19,7 @@ import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../../App";
+import { useTheme } from "../../main/profileScreen/themeContext";
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -27,7 +27,7 @@ type SignUpScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const SignUp: React.FC = () => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const { theme } = useTheme();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,10 +40,6 @@ const SignUp: React.FC = () => {
   const db = FIREBASE_DB;
 
   const navigation = useNavigation<SignUpScreenNavigationProp>();
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
 
   const handleSignUp = async () => {
     setErrorMessage(null);
