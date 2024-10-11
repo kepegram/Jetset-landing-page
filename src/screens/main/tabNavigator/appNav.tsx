@@ -164,10 +164,7 @@ const TabNavigator: React.FC = () => {
           backgroundColor: theme === "dark" ? "#121212" : "#fff",
           borderTopWidth: 0,
         },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "bold",
-        },
+        tabBarShowLabel: false,
         tabBarActiveTintColor: "#A463FF",
         tabBarInactiveTintColor: "#aaa",
       }}
