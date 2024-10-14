@@ -20,6 +20,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../../App";
 import { useTheme } from "../../main/profileScreen/themeContext";
+import * as Haptics from "expo-haptics";
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -169,7 +170,13 @@ const SignUp: React.FC = () => {
             </Pressable>
           </View>
 
-          <Pressable style={currentStyles.button} onPress={handleSignUp}>
+          <Pressable
+            style={currentStyles.button}
+            onPress={() => {
+              handleSignUp();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            }}
+          >
             <Text style={currentStyles.buttonText}>Sign Up</Text>
           </Pressable>
           {errorMessage && (
@@ -186,14 +193,20 @@ const SignUp: React.FC = () => {
         <View style={currentStyles.socialIconsContainer}>
           <Pressable
             style={currentStyles.iconButton}
-            onPress={() => Alert.alert("Google Sign-In")}
+            onPress={() => {
+              Alert.alert("Google Sign-In");
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            }}
           >
             <Ionicons name="logo-google" size={22} color="grey" />
           </Pressable>
 
           <Pressable
             style={currentStyles.iconButton}
-            onPress={() => Alert.alert("Apple Sign-In")}
+            onPress={() => {
+              Alert.alert("Apple Sign-In");
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            }}
           >
             <Ionicons name="logo-apple" size={22} color="grey" />
           </Pressable>
@@ -230,7 +243,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 20,
     color: "#333",
   },
   signUpContainer: { marginTop: 40 },
@@ -342,7 +354,6 @@ const darkStyles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 20,
     color: "#fff",
   },
   signUpContainer: { marginTop: 40 },

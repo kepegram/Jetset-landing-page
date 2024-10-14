@@ -2,7 +2,9 @@ import {
   Alert,
   FlatList,
   Image,
+  PanResponder,
   Pressable,
+  RefreshControl,
   StyleSheet,
   Text,
   View,
@@ -24,10 +26,12 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 const Home: React.FC = () => {
   const { theme } = useTheme();
   const { profilePicture } = useProfile();
-  const navigation = useNavigation<HomeScreenNavigationProp>();
-  const [selectedCategory, setSelectedCategory] = useState("unvisited");
+  const [selectedCategory, setSelectedCategory] = useState("suggested");
+  const [refreshing, setRefreshing] = useState(false);
 
-  const [unvisitedData, setUnvisitedData] = useState([
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+
+  const [suggestedData, setSuggestedData] = useState([
     {
       id: "1",
       image:
@@ -91,11 +95,11 @@ const Home: React.FC = () => {
 
   const addToVisited = (item) => {
     setVisitedData((prev) => [...prev, item]);
-    setUnvisitedData((prev) => prev.filter((data) => data.id !== item.id));
+    setSuggestedData((prev) => prev.filter((data) => data.id !== item.id));
   };
 
-  const addToBucketList = (item) => {
-    Alert.alert("Bucket List", `${item.location} added to bucket list.`);
+  const addToPlanner = (item) => {
+    Alert.alert("Planner", `${item.location} added to bucket list.`);
   };
 
   const deleteVisitedItem = (id: string) => {
@@ -118,6 +122,15 @@ const Home: React.FC = () => {
     );
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    // Simulate a data fetch or update
+    setTimeout(() => {
+      setRefreshing(false);
+      // You can update the suggestedData or visitedData here if needed
+    }, 2000); // Simulate a 2-second data fetch
+  };
+
   const renderItem = ({ item }) => (
     <View>
       <Pressable
@@ -134,12 +147,12 @@ const Home: React.FC = () => {
             </View>
 
             {/* Actions aligned with the text */}
-            {selectedCategory === "unvisited" && (
+            {selectedCategory === "suggested" && (
               <View style={currentStyles.actionsContainer}>
                 <Pressable onPress={() => addToVisited(item)}>
                   <Text style={currentStyles.action1Text}>Add to Visited</Text>
                 </Pressable>
-                <Pressable onPress={() => addToBucketList(item)}>
+                <Pressable onPress={() => addToPlanner(item)}>
                   <Text style={currentStyles.action2Text}>Add to Planner</Text>
                 </Pressable>
               </View>
@@ -157,12 +170,30 @@ const Home: React.FC = () => {
   );
 
   const filteredData =
-    selectedCategory === "unvisited" ? unvisitedData : visitedData;
+    selectedCategory === "suggested" ? suggestedData : visitedData;
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
+  // Handle swipe gestures using PanResponder
+  const panResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: (_, gestureState) =>
+      Math.abs(gestureState.dx) > 20, // Detect swipe only if horizontal movement is significant
+    onPanResponderRelease: (_, gestureState) => {
+      if (gestureState.dx > 0) {
+        // Right swipe
+        setSelectedCategory("suggested");
+      } else if (gestureState.dx < 0) {
+        // Left swipe
+        setSelectedCategory("visited");
+      }
+    },
+  });
+
   return (
-    <View style={styles.container}>
+    <View
+      style={currentStyles.container}
+      {...panResponder.panHandlers} // Attach pan gesture to the entire view
+    >
       <View style={currentStyles.topBar}>
         <Text style={currentStyles.appName}>Jetset</Text>
         <Pressable onPress={() => navigation.navigate("Profile")}>
@@ -173,22 +204,21 @@ const Home: React.FC = () => {
         </Pressable>
       </View>
 
-      {/* Updated Pressable buttons with divider */}
       <View style={currentStyles.switchContainer}>
         <Pressable
-          onPress={() => setSelectedCategory("unvisited")}
+          onPress={() => setSelectedCategory("suggested")}
           style={[
             currentStyles.switchButton,
-            selectedCategory === "unvisited" && currentStyles.selectedButton,
+            selectedCategory === "suggested" && currentStyles.selectedButton,
           ]}
         >
           <Text
             style={[
               currentStyles.switchText,
-              selectedCategory === "unvisited" && currentStyles.selectedText,
+              selectedCategory === "suggested" && currentStyles.selectedText,
             ]}
           >
-            Unvisited
+            Suggested
           </Text>
         </Pressable>
 
@@ -217,6 +247,9 @@ const Home: React.FC = () => {
         data={filteredData}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </View>
   );
@@ -267,6 +300,7 @@ const styles = StyleSheet.create({
   selectedButton: {
     borderBottomWidth: 2,
     borderBottomColor: "#A463FF",
+    width: "20%",
   },
   selectedText: {
     color: "#000",
@@ -281,7 +315,6 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   card: {
-    borderRadius: 12,
     marginBottom: 10,
     elevation: 3,
     overflow: "hidden",
@@ -372,7 +405,7 @@ const darkStyles = StyleSheet.create({
     color: "#888",
   },
   selectedButton: {
-    borderBottomWidth: 2,
+    borderBottomWidth: 3,
     borderBottomColor: "#A463FF",
   },
   selectedText: {
@@ -388,7 +421,6 @@ const darkStyles = StyleSheet.create({
     paddingBottom: 100,
   },
   card: {
-    borderRadius: 12,
     marginBottom: 10,
     elevation: 3,
     overflow: "hidden",

@@ -3,7 +3,6 @@ import {
   Text,
   View,
   TextInput,
-  TouchableOpacity,
   ActivityIndicator,
   Pressable,
   Image,
@@ -19,6 +18,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { sendPasswordResetEmail } from "firebase/auth";
+import * as Haptics from "expo-haptics";
 
 type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -66,16 +66,6 @@ const ForgotPassword: React.FC = () => {
         contentContainerStyle={currentStyles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={currentStyles.topIcons}>
-          <Pressable onPress={() => navigation.navigate("UserAuth")}>
-            <Ionicons
-              name="arrow-back"
-              size={28}
-              color={theme === "dark" ? "white" : "black"}
-            />
-          </Pressable>
-        </View>
-
         <Text style={currentStyles.title}>Forgot Password</Text>
 
         <Text style={currentStyles.inputHeader}>Email</Text>
@@ -92,12 +82,15 @@ const ForgotPassword: React.FC = () => {
         {loading ? (
           <ActivityIndicator size="large" color="#000" />
         ) : (
-          <TouchableOpacity
+          <Pressable
             style={currentStyles.button}
-            onPress={handlePasswordReset}
+            onPress={() => {
+              handlePasswordReset();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            }}
           >
             <Text style={currentStyles.buttonText}>Send Reset Link</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
 
         {feedbackMessage && (
@@ -119,19 +112,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
   },
-  topIcons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    position: "absolute",
-    marginTop: 60,
-    paddingHorizontal: 20,
-  },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 100,
-    marginBottom: 100,
+    marginBottom: 50,
     color: "#000",
   },
   inputHeader: {
@@ -180,19 +164,11 @@ const darkStyles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
   },
-  topIcons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    position: "absolute",
-    marginTop: 60,
-    paddingHorizontal: 20,
-  },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 100,
-    marginBottom: 100,
+    marginTop: 0,
+    marginBottom: 50,
     color: "#fff",
   },
   inputHeader: {

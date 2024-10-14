@@ -20,7 +20,7 @@ const Planner: React.FC = () => {
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
   return (
-    <View style={styles.container}>
+    <View style={currentStyles.container}>
       <View style={currentStyles.topBar}>
         <Text style={currentStyles.appName}>Jetset</Text>
         <Pressable onPress={() => navigation.navigate("Profile")}>
@@ -60,6 +60,8 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
 });
 
@@ -87,5 +89,7 @@ const darkStyles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
 });

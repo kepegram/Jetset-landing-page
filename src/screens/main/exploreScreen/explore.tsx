@@ -49,7 +49,7 @@ export default Explore;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5", // Softer background for better readability
+    backgroundColor: "#fff", // Softer background for better readability
   },
   topBar: {
     flexDirection: "row",
@@ -59,12 +59,6 @@ const styles = StyleSheet.create({
     paddingTop: 55,
     paddingBottom: 15,
     backgroundColor: "#fff",
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#ddd",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   profilePicture: {
     width: 40,
@@ -92,7 +86,7 @@ const styles = StyleSheet.create({
 const darkStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1c1c1c",
+    backgroundColor: "#121212",
   },
   topBar: {
     flexDirection: "row",
@@ -101,13 +95,7 @@ const darkStyles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 55,
     paddingBottom: 15,
-    backgroundColor: "#1c1c1c",
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#333",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    backgroundColor: "#121212",
   },
   profilePicture: {
     width: 40,

@@ -14,9 +14,11 @@ import SignUp from "./src/screens/onboarding/userAuth/signup";
 import ForgotPassword from "./src/screens/onboarding/userAuth/forgotPassword";
 import AppNav from "./src/screens/main/tabNavigator/appNav";
 import { ThemeProvider } from "./src/screens/main/profileScreen/themeContext";
+import Carousel from "./src/screens/onboarding/carousel/carousel";
 
 export type RootStackParamList = {
   Welcome: undefined;
+  Carousel: undefined;
   UserAuth: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
@@ -107,9 +109,14 @@ const App: React.FC = () => {
                 options={{ headerShown: false }}
               />
               <Stack.Screen
+                name="Carousel"
+                component={Carousel}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
                 name="UserAuth"
                 component={UserAuth}
-                options={screenOptions}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="SignUp"

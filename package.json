@@ -33,7 +33,8 @@
     "expo-web-browser": "~13.0.3",
     "expo-auth-session": "~5.5.2",
     "expo-crypto": "~13.0.2",
-    "expo-splash-screen": "~0.27.6"
+    "expo-splash-screen": "~0.27.6",
+    "expo-haptics": "~13.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

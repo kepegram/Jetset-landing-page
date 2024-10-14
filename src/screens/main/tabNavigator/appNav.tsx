@@ -51,6 +51,107 @@ export type RootStackParamList = {
 // Create the main root stack
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
+const HomeStack = () => {
+  const { theme } = useTheme();
+
+  const screenOptions = ({
+    navigation,
+  }: {
+    navigation: any;
+  }): NativeStackNavigationOptions => ({
+    headerStyle: {
+      backgroundColor: theme === "dark" ? "#121212" : "#fff",
+    },
+    headerLeft: () => (
+      <Pressable onPress={() => navigation.goBack()}>
+        <Ionicons
+          name="arrow-back"
+          size={28}
+          color={theme === "dark" ? "#fff" : "#000"}
+          style={{ marginLeft: 10 }}
+        />
+      </Pressable>
+    ),
+    headerTitleStyle: {
+      color: theme === "dark" ? "#fff" : "#000",
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+  });
+
+  // Custom options for Profile screen
+  const profileScreenOptions = ({
+    navigation,
+  }: {
+    navigation: any;
+  }): NativeStackNavigationOptions => ({
+    ...screenOptions({ navigation }),
+    headerRight: () => (
+      <Pressable onPress={() => navigation.navigate("Settings")}>
+        <Ionicons
+          name="settings-sharp"
+          size={28}
+          color={theme === "dark" ? "#fff" : "#121212"}
+          style={{ marginRight: 10 }}
+        />
+      </Pressable>
+    ),
+  });
+
+  return (
+    <RootStack.Navigator>
+      <RootStack.Screen
+        name="Home"
+        component={Home}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="DestinationDetailView"
+        component={DestinationDetailView}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="Profile"
+        component={Profile}
+        options={profileScreenOptions}
+      />
+      <RootStack.Screen
+        name="Settings"
+        component={Settings}
+        options={screenOptions}
+      />
+      <RootStack.Screen name="Edit" component={Edit} options={screenOptions} />
+      <RootStack.Screen
+        name="ChangePassword"
+        component={ChangePassword}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "Change Password",
+        })}
+      />
+      <RootStack.Screen
+        name="AppTheme"
+        component={AppTheme}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "App Theme",
+        })}
+      />
+      <RootStack.Screen
+        name="DeleteAccount"
+        component={DeleteAccount}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "Delete Account",
+        })}
+      />
+    </RootStack.Navigator>
+  );
+};
+
 // Create the explore stack
 const ExploreStack = () => {
   const { theme } = useTheme();
@@ -150,6 +251,99 @@ const ExploreStack = () => {
   );
 };
 
+const PlannerStack = () => {
+  const { theme } = useTheme();
+
+  const screenOptions = ({
+    navigation,
+  }: {
+    navigation: any;
+  }): NativeStackNavigationOptions => ({
+    headerStyle: {
+      backgroundColor: theme === "dark" ? "#121212" : "#fff",
+    },
+    headerLeft: () => (
+      <Pressable onPress={() => navigation.goBack()}>
+        <Ionicons
+          name="arrow-back"
+          size={28}
+          color={theme === "dark" ? "#fff" : "#000"}
+          style={{ marginLeft: 10 }}
+        />
+      </Pressable>
+    ),
+    headerTitleStyle: {
+      color: theme === "dark" ? "#fff" : "#000",
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+  });
+
+  // Custom options for Profile screen
+  const profileScreenOptions = ({
+    navigation,
+  }: {
+    navigation: any;
+  }): NativeStackNavigationOptions => ({
+    ...screenOptions({ navigation }),
+    headerRight: () => (
+      <Pressable onPress={() => navigation.navigate("Settings")}>
+        <Ionicons
+          name="settings-sharp"
+          size={28}
+          color={theme === "dark" ? "#fff" : "#121212"}
+          style={{ marginRight: 10 }}
+        />
+      </Pressable>
+    ),
+  });
+
+  return (
+    <RootStack.Navigator>
+      <RootStack.Screen
+        name="Planner"
+        component={Planner}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="Profile"
+        component={Profile}
+        options={profileScreenOptions}
+      />
+      <RootStack.Screen
+        name="Settings"
+        component={Settings}
+        options={screenOptions}
+      />
+      <RootStack.Screen name="Edit" component={Edit} options={screenOptions} />
+      <RootStack.Screen
+        name="ChangePassword"
+        component={ChangePassword}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "Change Password",
+        })}
+      />
+      <RootStack.Screen
+        name="AppTheme"
+        component={AppTheme}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "App Theme",
+        })}
+      />
+      <RootStack.Screen
+        name="DeleteAccount"
+        component={DeleteAccount}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "Delete Account",
+        })}
+      />
+    </RootStack.Navigator>
+  );
+};
+
 const Tab = createBottomTabNavigator();
 
 // Tab Navigator Component
@@ -171,10 +365,10 @@ const TabNavigator: React.FC = () => {
     >
       <Tab.Screen
         name="Home"
-        component={Home}
+        component={HomeStack}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome5 name="home" color={color} size={size} />
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 name="home" color={color} size={30} />
           ),
         }}
       />
@@ -182,17 +376,17 @@ const TabNavigator: React.FC = () => {
         name="Explore"
         component={ExploreStack}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="travel-explore" color={color} size={size} />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="travel-explore" color={color} size={30} />
           ),
         }}
       />
       <Tab.Screen
         name="Planner"
-        component={Planner}
+        component={PlannerStack}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome5 name="book" color={color} size={size} />
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 name="book" color={color} size={30} />
           ),
         }}
       />
@@ -200,8 +394,8 @@ const TabNavigator: React.FC = () => {
         name="Memories"
         component={Memories}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="images" color={color} size={size} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="images" color={color} size={30} />
           ),
         }}
       />
@@ -209,8 +403,8 @@ const TabNavigator: React.FC = () => {
         name="Groups"
         component={Community}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="users" color={color} size={size} />
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="users" color={color} size={30} />
           ),
         }}
       />
@@ -222,19 +416,10 @@ const TabNavigator: React.FC = () => {
 const AppNav: React.FC = () => {
   return (
     <ProfileProvider>
-      {/* Wrap everything here */}
       <RootStack.Navigator>
-        {/* Main Tab Navigator */}
         <RootStack.Screen
           name="Main"
           component={TabNavigator}
-          options={{ headerShown: false }}
-        />
-
-        {/* Profile screen available for navigation globally */}
-        <RootStack.Screen
-          name="Profile"
-          component={Profile}
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>

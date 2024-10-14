@@ -17,6 +17,7 @@ import { RootStackParamList } from "../../../../App";
 import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import * as Haptics from "expo-haptics";
 
 type UserAuthScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -127,13 +128,19 @@ const UserAuth: React.FC = () => {
           <View style={currentStyles.socialIconsContainer}>
             <Pressable
               style={currentStyles.iconButton}
-              onPress={() => console.log("Google Sign-In")}
+              onPress={() => {
+                console.log("Google Sign-In");
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              }}
             >
               <Ionicons name="logo-google" size={22} color="grey" />
             </Pressable>
             <Pressable
               style={currentStyles.iconButton}
-              onPress={() => console.log("Apple Sign-In")}
+              onPress={() => {
+                console.log("Apple Sign-In");
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              }}
             >
               <Ionicons name="logo-apple" size={22} color="grey" />
             </Pressable>
@@ -168,7 +175,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 20,
+    marginTop: 100,
     color: "#000",
   },
   loginContainer: { marginTop: 60 },
@@ -287,7 +294,7 @@ const darkStyles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 20,
+    marginTop: 100,
     color: "#fff",
   },
   loginContainer: { marginTop: 60 },
