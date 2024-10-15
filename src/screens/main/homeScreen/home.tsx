@@ -2,104 +2,165 @@ import {
   Alert,
   FlatList,
   Image,
-  PanResponder,
   Pressable,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useProfile } from "../profileScreen/profileContext";
 import { useTheme } from "../profileScreen/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../tabNavigator/appNav"; // Update the import path
+import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
+import { collection, addDoc } from "firebase/firestore";
+import { FIREBASE_DB } from "../../../../firebase.config";
 
-// Define the type for your navigation prop
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "Home" // You can include more if you have other screens to navigate
+  "Home"
 >;
+
+const USERNAME = "kpegra1"; // Your GeoNames username
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
   const { profilePicture } = useProfile();
   const [selectedCategory, setSelectedCategory] = useState("suggested");
   const [refreshing, setRefreshing] = useState(false);
+  const [destinationData, setDestinationData] = useState([]);
+  const [visitedData, setVisitedData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filter, setFilter] = useState<string>("All");
 
+  const ITEMS_PER_PAGE = 20;
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  const [suggestedData, setSuggestedData] = useState([
-    {
-      id: "1",
-      image:
-        "https://plus.unsplash.com/premium_photo-1677829177642-30def98b0963?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location: "Bali, Indonesia",
-      address: "123 Main St",
-    },
-    {
-      id: "2",
-      image:
-        "https://images.unsplash.com/photo-1720747588320-5116a13e5dba?q=80&w=2835&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location: "Aspen, Colorado",
-      address: "456 Oak Ave",
-    },
-    {
-      id: "3",
-      image:
-        "https://plus.unsplash.com/premium_photo-1661963265512-73e8d1053b9a?q=80&w=2910&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location: "Rome, Italy",
-      address: "789 Maple Rd",
-    },
-    {
-      id: "4",
-      image:
-        "https://plus.unsplash.com/premium_photo-1661902398022-762e88ff3f82?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location: "Tokyo, Japan",
-      address: "789 Maple Rd",
-    },
-  ]);
+  useEffect(() => {
+    fetchDestinations();
+  }, []);
 
-  const [visitedData, setVisitedData] = useState([
-    {
-      id: "1",
-      image:
-        "https://images.unsplash.com/photo-1662265955250-76ea201aff0d?q=80&w=2832&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location: "Labadee, Haiti",
-      address: "123 Main St",
-    },
-    {
-      id: "2",
-      image:
-        "https://images.unsplash.com/photo-1559956144-83a135c9872e?q=80&w=2874&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location: "Coco Cay, Bahamas",
-      address: "456 Oak Ave",
-    },
-    {
-      id: "3",
-      image:
-        "https://images.unsplash.com/photo-1515885267349-1fcef6e00fd1?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      location: "Juneau, Alaska",
-      address: "789 Maple Rd",
-    },
-    {
-      id: "4",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/e/e6/Paris_Night.jpg",
-      location: "Paris, France",
-      address: "789 Maple Rd",
-    },
-  ]);
+  const fetchDestinations = async (reset = false) => {
+    try {
+      const response = await fetch(
+        `http://api.geonames.org/countryInfoJSON?username=${USERNAME}`
+      );
+      const data = await response.json();
+
+      if (!data.geonames) {
+        throw new Error("Geonames data not found in response");
+      }
+
+      // Creating a Set to store unique country codes
+      const uniqueCountries = new Set();
+      const formattedData = data.geonames
+        .filter((item) => {
+          if (!uniqueCountries.has(item.countryCode)) {
+            uniqueCountries.add(item.countryCode);
+            return true; // Include this item
+          }
+          return false; // Skip duplicates
+        })
+        .map((item) => ({
+          id: item.countryCode, // Ensure this is unique
+          image: item.image, // Change this if using a placeholder
+          location: item.countryName,
+          address: item.capital,
+        }));
+
+      const shuffledData = formattedData.sort(() => Math.random() - 0.5);
+      const paginatedData = shuffledData.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+      );
+
+      if (reset) {
+        setDestinationData(paginatedData);
+      } else {
+        setDestinationData((prev) => [...prev, ...paginatedData]);
+      }
+    } catch (error) {
+      console.error("Error fetching destination data:", error);
+    }
+  };
+
+  const fetchFilterDestinations = async (reset = false) => {
+    try {
+      const response = await fetch(
+        `http://api.geonames.org/countryInfoJSON?username=${USERNAME}`
+      );
+      const data = await response.json();
+
+      if (!data.geonames) {
+        throw new Error("Geonames data not found in response");
+      }
+
+      const filteredByContinent = data.geonames.filter((item) => {
+        if (filter === "All") return true;
+        return item.continentName === filter;
+      });
+
+      const uniqueCountries = new Set();
+      const formattedData = filteredByContinent
+        .filter((item) => {
+          if (!uniqueCountries.has(item.countryCode)) {
+            uniqueCountries.add(item.countryCode);
+            return true;
+          }
+          return false;
+        })
+        .map((item, index) => ({
+          id: `${item.countryCode}-${index}`, // Ensure unique key by appending index
+          image: "https://via.placeholder.com/400",
+          location: item.countryName,
+          address: item.capital,
+        }));
+
+      const shuffledData = formattedData.sort(() => Math.random() - 0.5);
+      const paginatedData = shuffledData.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+      );
+
+      if (reset) {
+        setDestinationData(paginatedData);
+      } else {
+        setDestinationData((prev) => [...prev, ...paginatedData]);
+      }
+    } catch (error) {
+      console.error("Error fetching destination data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFilterDestinations(true);
+  }, [filter]);
 
   const addToVisited = (item) => {
     setVisitedData((prev) => [...prev, item]);
-    setSuggestedData((prev) => prev.filter((data) => data.id !== item.id));
+    setDestinationData((prev) => prev.filter((data) => data.id !== item.id));
   };
 
-  const addToPlanner = (item) => {
-    Alert.alert("Planner", `${item.location} added to bucket list.`);
+  const addToBucketlist = async (item) => {
+    try {
+      await addDoc(collection(FIREBASE_DB, "bucketlist"), {
+        location: item.location,
+        address: item.address,
+        image: item.image,
+        timestamp: new Date(),
+      });
+
+      setDestinationData((prev) => prev.filter((data) => data.id !== item.id));
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      Alert.alert(
+        "Error",
+        "There was a problem adding the trip to your bucketlist."
+      );
+    }
   };
 
   const deleteVisitedItem = (id: string) => {
@@ -107,10 +168,7 @@ const Home: React.FC = () => {
       "Confirm Deletion",
       "Are you sure you want to delete this visited item?",
       [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
+        { text: "Cancel", style: "cancel" },
         {
           text: "Delete",
           onPress: () => {
@@ -124,11 +182,9 @@ const Home: React.FC = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    // Simulate a data fetch or update
-    setTimeout(() => {
-      setRefreshing(false);
-      // You can update the suggestedData or visitedData here if needed
-    }, 2000); // Simulate a 2-second data fetch
+    setCurrentPage(1); // Reset the page
+    fetchFilterDestinations(true);
+    setRefreshing(false);
   };
 
   const renderItem = ({ item }) => (
@@ -137,23 +193,25 @@ const Home: React.FC = () => {
         style={currentStyles.card}
         onPress={() => navigation.navigate("DestinationDetailView", { item })}
       >
-        <Image source={{ uri: item.image }} style={currentStyles.image} />
-
+        <Image
+          source={require("../../../../assets/placeholder.jpg")}
+          style={currentStyles.image}
+        />
         <View style={currentStyles.cardBody}>
           <View style={currentStyles.textContainer}>
             <View>
-              <Text style={currentStyles.location}>{item.location}</Text>
-              <Text style={currentStyles.address}>{item.address}</Text>
+              <Text style={currentStyles.location}>{item.address}</Text>
+              <Text style={currentStyles.address}>{item.location}</Text>
             </View>
-
-            {/* Actions aligned with the text */}
             {selectedCategory === "suggested" && (
               <View style={currentStyles.actionsContainer}>
                 <Pressable onPress={() => addToVisited(item)}>
                   <Text style={currentStyles.action1Text}>Add to Visited</Text>
                 </Pressable>
-                <Pressable onPress={() => addToPlanner(item)}>
-                  <Text style={currentStyles.action2Text}>Add to Planner</Text>
+                <Pressable onPress={() => addToBucketlist(item)}>
+                  <Text style={currentStyles.action2Text}>
+                    Add to Bucketlist
+                  </Text>
                 </Pressable>
               </View>
             )}
@@ -170,30 +228,11 @@ const Home: React.FC = () => {
   );
 
   const filteredData =
-    selectedCategory === "suggested" ? suggestedData : visitedData;
-
+    selectedCategory === "suggested" ? destinationData : visitedData;
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
-  // Handle swipe gestures using PanResponder
-  const panResponder = PanResponder.create({
-    onMoveShouldSetPanResponder: (_, gestureState) =>
-      Math.abs(gestureState.dx) > 20, // Detect swipe only if horizontal movement is significant
-    onPanResponderRelease: (_, gestureState) => {
-      if (gestureState.dx > 0) {
-        // Right swipe
-        setSelectedCategory("suggested");
-      } else if (gestureState.dx < 0) {
-        // Left swipe
-        setSelectedCategory("visited");
-      }
-    },
-  });
-
   return (
-    <View
-      style={currentStyles.container}
-      {...panResponder.panHandlers} // Attach pan gesture to the entire view
-    >
+    <View style={currentStyles.container}>
       <View style={currentStyles.topBar}>
         <Text style={currentStyles.appName}>Jetset</Text>
         <Pressable onPress={() => navigation.navigate("Profile")}>
@@ -242,14 +281,106 @@ const Home: React.FC = () => {
         </Pressable>
       </View>
 
+      {selectedCategory === "suggested" && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={currentStyles.filterContainer}
+        >
+          <Text style={currentStyles.filterLabel}>Filter by Continent:</Text>
+          <Pressable
+            style={[
+              currentStyles.filterButton,
+              filter === "All" && currentStyles.filterSelectedButton,
+            ]}
+            onPress={() => setFilter("All")}
+          >
+            <Text
+              style={[
+                currentStyles.filterButtonText,
+                filter === "All" && currentStyles.filterSelectedButtonText,
+              ]}
+            >
+              All
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              currentStyles.filterButton,
+              filter === "North America" && currentStyles.filterSelectedButton,
+            ]}
+            onPress={() => setFilter("North America")}
+          >
+            <Text
+              style={[
+                currentStyles.filterButtonText,
+                filter === "North America" &&
+                  currentStyles.filterSelectedButtonText,
+              ]}
+            >
+              North America
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              currentStyles.filterButton,
+              filter === "Europe" && currentStyles.filterSelectedButton,
+            ]}
+            onPress={() => setFilter("Europe")}
+          >
+            <Text
+              style={[
+                currentStyles.filterButtonText,
+                filter === "Europe" && currentStyles.filterSelectedButtonText,
+              ]}
+            >
+              Europe
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              currentStyles.filterButton,
+              filter === "Asia" && currentStyles.filterSelectedButton,
+            ]}
+            onPress={() => setFilter("Asia")}
+          >
+            <Text
+              style={[
+                currentStyles.filterButtonText,
+                filter === "Asia" && currentStyles.filterSelectedButtonText,
+              ]}
+            >
+              Asia
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              currentStyles.filterButton,
+              filter === "Africa" && currentStyles.filterSelectedButton,
+            ]}
+            onPress={() => setFilter("Africa")}
+          >
+            <Text
+              style={[
+                currentStyles.filterButtonText,
+                filter === "Africa" && currentStyles.filterSelectedButtonText,
+              ]}
+            >
+              Africa
+            </Text>
+          </Pressable>
+        </ScrollView>
+      )}
+
       <FlatList
-        contentContainerStyle={styles.destinationListContainer}
         data={filteredData}
-        renderItem={renderItem}
         keyExtractor={(item) => item.id}
+        renderItem={renderItem}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        onEndReachedThreshold={0.5}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );
@@ -311,6 +442,46 @@ const styles = StyleSheet.create({
     width: 1,
     backgroundColor: "#ddd",
   },
+  filterContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
+    height: 45,
+  },
+  filterLabel: {
+    fontSize: 16,
+    marginLeft: 10,
+    marginRight: 10,
+    marginTop: 5,
+    color: "#000",
+  },
+  filterButton: {
+    paddingHorizontal: 15, // Increased horizontal padding
+    paddingVertical: 8, // Adjusted vertical padding for more space
+    marginHorizontal: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#A463FF",
+    height: 33,
+  },
+  filterSelectedButton: {
+    paddingHorizontal: 15, // Increased horizontal padding for consistency
+    paddingVertical: 8, // Adjusted vertical padding for more space
+    backgroundColor: "#A463FF",
+    marginHorizontal: 5,
+    borderRadius: 5,
+  },
+  filterButtonText: {
+    color: "#000",
+    fontWeight: "bold",
+    fontSize: 14, // Reduced font size slightly to fit the container
+    flexShrink: 0,
+  },
+  filterSelectedButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 14, // Reduced font size slightly to fit the container
+    flexShrink: 0,
+  },
   destinationListContainer: {
     paddingBottom: 100,
   },
@@ -361,6 +532,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd", // Subtle divider color
     marginBottom: 10,
     alignSelf: "stretch",
+  },
+  noDataText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#666",
+    marginTop: 20,
   },
 });
 
@@ -417,6 +594,46 @@ const darkStyles = StyleSheet.create({
     width: 1,
     backgroundColor: "#444",
   },
+  filterContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
+    height: 45,
+  },
+  filterLabel: {
+    fontSize: 16,
+    marginLeft: 10,
+    marginRight: 10,
+    marginTop: 5,
+    color: "#fff",
+  },
+  filterButton: {
+    paddingHorizontal: 15, // Increased horizontal padding
+    paddingVertical: 8, // Adjusted vertical padding for more space
+    marginHorizontal: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#A463FF",
+    height: 33,
+  },
+  filterSelectedButton: {
+    paddingHorizontal: 15, // Increased horizontal padding for consistency
+    paddingVertical: 8, // Adjusted vertical padding for more space
+    backgroundColor: "#A463FF",
+    marginHorizontal: 5,
+    borderRadius: 5,
+  },
+  filterButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 14, // Reduced font size slightly to fit the container
+    flexShrink: 0,
+  },
+  filterSelectedButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 14, // Reduced font size slightly to fit the container
+    flexShrink: 0,
+  },
   destinationListContainer: {
     paddingBottom: 100,
   },
@@ -468,5 +685,11 @@ const darkStyles = StyleSheet.create({
     backgroundColor: "#444", // Adjust this based on the theme
     marginBottom: 10,
     alignSelf: "stretch", // Ensures the divider stretches within the card, not the card itself
+  },
+  noDataText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#666",
+    marginTop: 20,
   },
 });

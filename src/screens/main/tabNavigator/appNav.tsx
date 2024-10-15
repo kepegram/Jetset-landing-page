@@ -23,6 +23,7 @@ import DestinationDetailView from "../homeScreen/destinationDetail";
 import ChangePassword from "../profileScreen/changePassword";
 import AppTheme from "../profileScreen/appTheme";
 import DeleteAccount from "../profileScreen/deleteAccount";
+import TripBuilder from "../plannerScreen/tripBuilder";
 
 // Define types for root stack params
 export type RootStackParamList = {
@@ -44,6 +45,7 @@ export type RootStackParamList = {
   AppTheme: undefined;
   DeleteAccount: undefined;
   Planner: undefined;
+  TripBuilder: { tripDetails: any };
   Memories: undefined;
   Main: undefined; // Add Main route
 };
@@ -210,7 +212,10 @@ const ExploreStack = () => {
       <RootStack.Screen
         name="DestinationDetailView"
         component={DestinationDetailView}
-        options={screenOptions}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "",
+        })}
       />
       <RootStack.Screen
         name="Profile"
@@ -306,6 +311,11 @@ const PlannerStack = () => {
         options={{ headerShown: false }}
       />
       <RootStack.Screen
+        name="TripBuilder"
+        component={TripBuilder}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
         name="Profile"
         component={Profile}
         options={profileScreenOptions}
@@ -377,7 +387,7 @@ const TabNavigator: React.FC = () => {
         component={ExploreStack}
         options={{
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="travel-explore" color={color} size={30} />
+            <MaterialIcons name="travel-explore" color={color} size={34} />
           ),
         }}
       />
@@ -386,7 +396,7 @@ const TabNavigator: React.FC = () => {
         component={PlannerStack}
         options={{
           tabBarIcon: ({ color }) => (
-            <FontAwesome5 name="book" color={color} size={30} />
+            <FontAwesome name="plane" color={color} size={34} />
           ),
         }}
       />

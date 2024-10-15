@@ -6,11 +6,12 @@ import {
   Image,
   Modal,
   Button,
+  FlatList,
 } from "react-native";
-import React, { useState } from "react";
-import { MaterialIcons, AntDesign } from "@expo/vector-icons"; // Ensure Ionicons is imported
-import { doc, getDoc } from "firebase/firestore"; // Firestore functions
-import { getAuth } from "firebase/auth"; // Firebase auth
+import React, { useCallback, useState } from "react";
+import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
@@ -28,11 +29,27 @@ const Profile: React.FC = () => {
   const { theme } = useTheme();
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<"bucketlists" | "memories">(
-    "bucketlists"
-  );
+  const [activeTab, setActiveTab] = useState<"trips" | "memories">("trips");
+  const [loading, setLoading] = useState(true);
+  const [tripData, setTripData] = useState<any[]>([]);
 
   const navigation = useNavigation<ProfileScreenNavigationProp>();
+
+  const fetchPlannerData = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(FIREBASE_DB, "bucketlist"));
+      const trips = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setTripData(trips);
+    } catch (error) {
+      console.error("Error fetching planner data: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -52,14 +69,25 @@ const Profile: React.FC = () => {
       };
 
       fetchUserData();
+      fetchPlannerData();
     }, [])
   );
 
-  const handleTabPress = (tab: "bucketlists" | "memories") => {
+  const handleTabPress = (tab: "trips" | "memories") => {
     setActiveTab(tab);
   };
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
+
+  const renderTripItem = ({ item }) => (
+    <View style={currentStyles.tripItem}>
+      <Image source={{ uri: item.image }} style={currentStyles.tripImage} />
+      <View style={currentStyles.tripDetails}>
+        <Text style={currentStyles.tripLocation}>{item.location}</Text>
+        <Text style={currentStyles.tripAddress}>{item.address}</Text>
+      </View>
+    </View>
+  );
 
   return (
     <View style={currentStyles.container}>
@@ -72,18 +100,17 @@ const Profile: React.FC = () => {
         </Pressable>
 
         {userName && <Text style={currentStyles.userName}>{userName}</Text>}
-        <Text style={currentStyles.mottoText}>" "</Text>
       </View>
       <View style={currentStyles.iconsContainer}>
         <Pressable
-          onPress={() => handleTabPress("bucketlists")}
+          onPress={() => handleTabPress("trips")}
           style={currentStyles.iconItem}
         >
-          <MaterialIcons
-            name="list"
+          <FontAwesome
+            name="plane"
             size={30}
             color={
-              activeTab === "bucketlists"
+              activeTab === "trips"
                 ? "#A463FF"
                 : theme === "dark"
                 ? "white"
@@ -95,7 +122,7 @@ const Profile: React.FC = () => {
               currentStyles.iconText,
               {
                 color:
-                  activeTab === "bucketlists"
+                  activeTab === "trips"
                     ? "#A463FF"
                     : theme === "dark"
                     ? "white"
@@ -142,33 +169,23 @@ const Profile: React.FC = () => {
         </Pressable>
       </View>
 
-      {/* Unique Add New Buttons with Plus Icons */}
-      <View style={currentStyles.buttonContainer}>
-        {activeTab === "bucketlists" ? (
-          <Pressable
-            style={currentStyles.bucketlistButton}
-            onPress={() => navigation.navigate("Home")}
-          >
-            <AntDesign
-              name="pluscircleo"
-              size={21}
-              color={theme === "dark" ? "#444" : "#e1e1e1"}
+      {/* FlatList for Trips */}
+      <View style={currentStyles.listContainer}>
+        {loading ? (
+          <Text>Loading...</Text>
+        ) : activeTab === "trips" ? (
+          tripData.length > 0 ? (
+            <FlatList
+              data={tripData}
+              renderItem={renderTripItem}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={currentStyles.flatListContent}
+              showsVerticalScrollIndicator={false}
             />
-            <Text style={currentStyles.addButtonText}>Add New Bucketlist</Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            style={currentStyles.memoryButton}
-            onPress={() => navigation.navigate("Memories")}
-          >
-            <AntDesign
-              name="pluscircleo"
-              size={21}
-              color={theme === "dark" ? "#444" : "#e1e1e1"}
-            />
-            <Text style={currentStyles.addButtonText}>Add New Memory</Text>
-          </Pressable>
-        )}
+          ) : (
+            <Text>No lists available.</Text>
+          )
+        ) : null}
       </View>
 
       <Modal
@@ -206,7 +223,6 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     backgroundColor: "#fff",
   },
   profileContainer: {
@@ -223,10 +239,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 10,
     color: "#333",
-  },
-  mottoText: {
-    fontSize: 16,
-    marginTop: 10,
   },
   iconsContainer: {
     flexDirection: "row",
@@ -247,58 +259,65 @@ const styles = StyleSheet.create({
     backgroundColor: "#333",
     marginHorizontal: 20,
   },
-  buttonContainer: {
+  listContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     width: "100%",
   },
-  bucketlistButton: {
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    alignItems: "center",
-    width: "80%",
-    flexDirection: "row",
-    justifyContent: "center",
+  flatListContent: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
-  memoryButton: {
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    alignItems: "center",
-    width: "80%",
+  tripItem: {
     flexDirection: "row",
-    justifyContent: "center",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    marginBottom: 10,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
   },
-  addButtonText: {
-    color: "#e1e1e1",
-    fontSize: 14,
-    fontWeight: "bold",
-    textDecorationLine: "underline",
+  tripImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  tripDetails: {
+    flex: 1,
     marginLeft: 10,
+    justifyContent: "center",
+  },
+  tripLocation: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  tripAddress: {
+    fontSize: 14,
+    color: "#666",
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    alignItems: "center",
-  },
-  modalImage: {
     width: 300,
     height: 300,
-    borderRadius: 200,
-    marginBottom: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#333",
+    borderRadius: 10,
+  },
+  modalImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
   },
 });
 
 const darkStyles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     backgroundColor: "#121212",
   },
   profileContainer: {
@@ -316,11 +335,6 @@ const darkStyles = StyleSheet.create({
     marginTop: 10,
     color: "#fff",
   },
-  mottoText: {
-    fontSize: 16,
-    marginTop: 10,
-    color: "#fff",
-  },
   iconsContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -333,57 +347,65 @@ const darkStyles = StyleSheet.create({
   iconText: {
     fontSize: 16,
     fontWeight: "bold",
+    textAlign: "center",
   },
   separator: {
     height: 20,
     width: 1,
-    backgroundColor: "#999",
+    backgroundColor: "#777",
     marginHorizontal: 20,
   },
-  buttonContainer: {
+  listContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     width: "100%",
   },
-  bucketlistButton: {
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    alignItems: "center",
-    width: "80%",
-    flexDirection: "row",
-    justifyContent: "center",
+  flatListContent: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
-  memoryButton: {
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    alignItems: "center",
-    width: "80%",
+  tripItem: {
     flexDirection: "row",
-    justifyContent: "center",
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: "#1c1c1e",
+    borderRadius: 10,
   },
-  addButtonText: {
-    color: "#444",
-    fontSize: 14,
-    fontWeight: "bold",
-    textDecorationLine: "underline",
+  tripImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  tripDetails: {
+    flex: 1,
     marginLeft: 10,
+    justifyContent: "center",
+  },
+  tripLocation: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  tripAddress: {
+    fontSize: 14,
+    color: "#888",
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    alignItems: "center",
-  },
-  modalImage: {
     width: 300,
     height: 300,
-    borderRadius: 200,
-    marginBottom: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#333",
+    borderRadius: 10,
+  },
+  modalImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
   },
 });

@@ -46,23 +46,6 @@ const Settings: React.FC = () => {
     <View style={currentStyles.container}>
       {/* Settings Options */}
       <View style={currentStyles.settingsContainer}>
-        {/* Notifications Section Header with Icon */}
-        <View style={currentStyles.sectionHeaderContainer}>
-          <Ionicons name="notifications-outline" size={24} color="#A463FF" />
-          <Text style={currentStyles.sectionHeader}>Notifications</Text>
-        </View>
-        <View style={currentStyles.divider} />
-
-        {/* Notification Settings with Switch */}
-        <View style={currentStyles.switchOption}>
-          <Text style={currentStyles.switchText}>Enable Notifications</Text>
-          <Switch
-            thumbColor={"#f4f3f4"}
-            onValueChange={toggleSwitch}
-            value={notificationsEnabled}
-          />
-        </View>
-
         {/* Account Section Header with Icon */}
         <View style={currentStyles.sectionHeaderContainer}>
           <Ionicons name="person-outline" size={24} color="#A463FF" />

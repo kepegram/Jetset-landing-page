@@ -1,5 +1,13 @@
-import { StyleSheet, View, Image, Pressable, TextInput } from "react-native";
-import React, { useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Image,
+  Pressable,
+  TextInput,
+  FlatList,
+  Text,
+} from "react-native";
+import React, { useState, useEffect } from "react";
 import { useProfile } from "../profileScreen/profileContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -11,15 +19,56 @@ type ExploreScreenNavigationProp = NativeStackNavigationProp<
   "Explore"
 >;
 
+const USERNAME = "kpegra1"; // Replace with your GeoNames username
+
 const Explore: React.FC = () => {
   const { theme } = useTheme();
   const { profilePicture } = useProfile();
   const navigation = useNavigation<ExploreScreenNavigationProp>();
   const [searchText, setSearchText] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearch = (text: string) => {
+  const handleSearch = async (text: string) => {
     setSearchText(text);
+
+    if (text.length > 2) {
+      try {
+        const response = await fetch(
+          `http://api.geonames.org/searchJSON?q=${text}&maxRows=10&username=${USERNAME}`
+        );
+        const data = await response.json();
+
+        if (data.geonames) {
+          const formattedResults = data.geonames.map((item) => ({
+            id: item.geonameId,
+            name: item.toponymName,
+            country: item.countryName,
+          }));
+          setSearchResults(formattedResults);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      }
+    } else {
+      setSearchResults([]);
+    }
   };
+
+  const renderResultItem = ({ item }) => (
+    <Pressable
+      style={currentStyles.resultItem}
+      onPress={() => {
+        console.log("Navigating to DestinationDetailView with item:", item);
+        navigation.navigate("DestinationDetailView", { item });
+      }}
+    >
+      <Text style={currentStyles.resultText}>
+        {item.name}, {item.country}
+      </Text>
+    </Pressable>
+  );
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
@@ -40,6 +89,18 @@ const Explore: React.FC = () => {
           />
         </Pressable>
       </View>
+
+      {/* Display search results */}
+      {searchResults.length > 0 ? (
+        <FlatList
+          data={searchResults}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderResultItem}
+          contentContainerStyle={currentStyles.resultList}
+        />
+      ) : (
+        <Text style={currentStyles.noResultsText}>Start your search now!</Text>
+      )}
     </View>
   );
 };
@@ -64,8 +125,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#ccc", // Subtle border for profile picture
   },
   searchInput: {
     paddingHorizontal: 15,
@@ -80,6 +139,24 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
+  },
+  resultList: {
+    padding: 10,
+  },
+  resultItem: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  resultText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  noResultsText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "#666",
   },
 });
 
@@ -101,8 +178,6 @@ const darkStyles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#444", // Dark mode border for profile picture
   },
   searchInput: {
     paddingHorizontal: 15,
@@ -118,5 +193,23 @@ const darkStyles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
+  },
+  resultList: {
+    padding: 10,
+  },
+  resultItem: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#444",
+  },
+  resultText: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  noResultsText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "#888",
   },
 });
