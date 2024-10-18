@@ -24,6 +24,7 @@ import ChangePassword from "../profileScreen/changePassword";
 import AppTheme from "../profileScreen/appTheme";
 import DeleteAccount from "../profileScreen/deleteAccount";
 import TripBuilder from "../plannerScreen/tripBuilder";
+import { StatusBar } from "expo-status-bar";
 
 // Define types for root stack params
 export type RootStackParamList = {
@@ -34,8 +35,9 @@ export type RootStackParamList = {
       image: string;
       location: string;
       address: string;
-      beds: number;
-      baths: number;
+      population: string;
+      region: string;
+      continent: string;
     };
   };
   Profile: undefined;
@@ -121,6 +123,14 @@ const HomeStack = () => {
         options={profileScreenOptions}
       />
       <RootStack.Screen
+        name="TripBuilder"
+        component={TripBuilder}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
         name="Settings"
         component={Settings}
         options={screenOptions}
@@ -139,7 +149,7 @@ const HomeStack = () => {
         component={AppTheme}
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
-          title: "App Theme",
+          title: "Appearance",
         })}
       />
       <RootStack.Screen
@@ -223,6 +233,14 @@ const ExploreStack = () => {
         options={profileScreenOptions}
       />
       <RootStack.Screen
+        name="TripBuilder"
+        component={TripBuilder}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
         name="Settings"
         component={Settings}
         options={screenOptions}
@@ -241,7 +259,7 @@ const ExploreStack = () => {
         component={AppTheme}
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
-          title: "App Theme",
+          title: "Appearance",
         })}
       />
       <RootStack.Screen
@@ -313,7 +331,10 @@ const PlannerStack = () => {
       <RootStack.Screen
         name="TripBuilder"
         component={TripBuilder}
-        options={{ headerShown: false }}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "",
+        })}
       />
       <RootStack.Screen
         name="Profile"
@@ -339,7 +360,7 @@ const PlannerStack = () => {
         component={AppTheme}
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
-          title: "App Theme",
+          title: "Appearance",
         })}
       />
       <RootStack.Screen
@@ -424,8 +445,10 @@ const TabNavigator: React.FC = () => {
 
 // Root Navigator Component
 const AppNav: React.FC = () => {
+  const { theme } = useTheme();
   return (
     <ProfileProvider>
+      <StatusBar style={theme === "dark" ? "light" : "dark"} />
       <RootStack.Navigator>
         <RootStack.Screen
           name="Main"

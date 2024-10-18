@@ -14,11 +14,8 @@ type SettingsScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Settings: React.FC = () => {
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const navigation = useNavigation<SettingsScreenNavigationProp>();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-
-  const toggleSwitch = () => setNotificationsEnabled((prevState) => !prevState);
 
   const handleLogout = () => {
     Alert.alert(
@@ -32,6 +29,7 @@ const Settings: React.FC = () => {
         {
           text: "OK",
           onPress: () => {
+            toggleTheme("light");
             FIREBASE_AUTH.signOut();
           },
         },

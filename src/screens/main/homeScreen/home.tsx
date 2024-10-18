@@ -16,8 +16,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
+import { getAuth } from "firebase/auth";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -40,55 +41,33 @@ const Home: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
   useEffect(() => {
-    fetchDestinations();
-  }, []);
-
-  const fetchDestinations = async (reset = false) => {
-    try {
-      const response = await fetch(
-        `http://api.geonames.org/countryInfoJSON?username=${USERNAME}`
-      );
-      const data = await response.json();
-
-      if (!data.geonames) {
-        throw new Error("Geonames data not found in response");
-      }
-
-      // Creating a Set to store unique country codes
-      const uniqueCountries = new Set();
-      const formattedData = data.geonames
-        .filter((item) => {
-          if (!uniqueCountries.has(item.countryCode)) {
-            uniqueCountries.add(item.countryCode);
-            return true; // Include this item
-          }
-          return false; // Skip duplicates
-        })
-        .map((item) => ({
-          id: item.countryCode, // Ensure this is unique
-          image: item.image, // Change this if using a placeholder
-          location: item.countryName,
-          address: item.capital,
-        }));
-
-      const shuffledData = formattedData.sort(() => Math.random() - 0.5);
-      const paginatedData = shuffledData.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-      );
-
-      if (reset) {
-        setDestinationData(paginatedData);
-      } else {
-        setDestinationData((prev) => [...prev, ...paginatedData]);
-      }
-    } catch (error) {
-      console.error("Error fetching destination data:", error);
-    }
-  };
+    fetchFilterDestinations(true);
+    fetchUserVisited();
+  }, [filter]);
 
   const fetchFilterDestinations = async (reset = false) => {
     try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      // Ensure the user is logged in
+      if (!user) {
+        console.error("User is not logged in.");
+        return;
+      }
+
+      // Fetch bucketlist and visited data from Firestore
+      const visitedSnapshot = await getDocs(
+        collection(FIREBASE_DB, `users/${user.uid}/visited`)
+      );
+      const bucketlistSnapshot = await getDocs(
+        collection(FIREBASE_DB, `users/${user.uid}/bucketlist`)
+      );
+
+      const visitedItems = visitedSnapshot.docs.map((doc) => doc.data());
+      const bucketlistItems = bucketlistSnapshot.docs.map((doc) => doc.data());
+
+      // Fetch the destination data from GeoNames API
       const response = await fetch(
         `http://api.geonames.org/countryInfoJSON?username=${USERNAME}`
       );
@@ -98,6 +77,7 @@ const Home: React.FC = () => {
         throw new Error("Geonames data not found in response");
       }
 
+      // Filter destinations by continent and exclude items already in bucketlist or visited
       const filteredByContinent = data.geonames.filter((item) => {
         if (filter === "All") return true;
         return item.continentName === filter;
@@ -106,7 +86,22 @@ const Home: React.FC = () => {
       const uniqueCountries = new Set();
       const formattedData = filteredByContinent
         .filter((item) => {
-          if (!uniqueCountries.has(item.countryCode)) {
+          // Exclude already visited or bucketlist items and check for empty location
+          const isVisited = visitedItems.some(
+            (visited) => visited.location === item.countryName
+          );
+          const isInBucketlist = bucketlistItems.some(
+            (bucketlist) => bucketlist.location === item.countryName
+          );
+          if (
+            !isVisited &&
+            !isInBucketlist &&
+            !uniqueCountries.has(item.countryCode) &&
+            item.countryName &&
+            item.countryName.trim() !== "" && // Check if location is not empty
+            item.capital && // Ensure capital is defined
+            item.capital.trim() !== "" // Ensure capital is not empty
+          ) {
             uniqueCountries.add(item.countryCode);
             return true;
           }
@@ -114,11 +109,14 @@ const Home: React.FC = () => {
         })
         .map((item, index) => ({
           id: `${item.countryCode}-${index}`, // Ensure unique key by appending index
-          image: "https://via.placeholder.com/400",
+          image: "https://via.placeholder.com/400", // Placeholder image
           location: item.countryName,
           address: item.capital,
+          population: item.population || "N/A", // Additional information
+          continent: item.continent || "N/A", // Additional information
         }));
 
+      // Shuffle and paginate the data
       const shuffledData = formattedData.sort(() => Math.random() - 0.5);
       const paginatedData = shuffledData.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
@@ -135,31 +133,91 @@ const Home: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchFilterDestinations(true);
-  }, [filter]);
-
-  const addToVisited = (item) => {
-    setVisitedData((prev) => [...prev, item]);
-    setDestinationData((prev) => prev.filter((data) => data.id !== item.id));
-  };
-
-  const addToBucketlist = async (item) => {
+  // Function to add an item to the visited list
+  const addToVisited = async (item) => {
     try {
-      await addDoc(collection(FIREBASE_DB, "bucketlist"), {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        Alert.alert(
+          "Error",
+          "You need to be logged in to add items to the visited list."
+        );
+        return;
+      }
+
+      // Use the user's ID to create a collection specific to that user
+      await addDoc(collection(FIREBASE_DB, `users/${user.uid}/visited`), {
         location: item.location,
         address: item.address,
         image: item.image,
         timestamp: new Date(),
       });
 
+      // Update state to reflect the change
+      setVisitedData((prev) => [...prev, item]);
       setDestinationData((prev) => prev.filter((data) => data.id !== item.id));
     } catch (error) {
       console.error("Error adding document: ", error);
       Alert.alert(
         "Error",
-        "There was a problem adding the trip to your bucketlist."
+        "There was an error adding the trip to your visited items"
       );
+    }
+  };
+
+  // Function to add an item to the bucket list
+  const addToBucketlist = async (item) => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        Alert.alert(
+          "Error",
+          "You need to be logged in to add items to the bucket list."
+        );
+        return;
+      }
+
+      // Use the user's ID to create a collection specific to that user
+      await addDoc(collection(FIREBASE_DB, `users/${user.uid}/bucketlist`), {
+        location: item.location,
+        address: item.address,
+        image: item.image,
+        timestamp: new Date(),
+      });
+
+      // Update state to reflect the change
+      setDestinationData((prev) => prev.filter((data) => data.id !== item.id));
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      Alert.alert(
+        "Error",
+        "There was a problem adding the trip to your bucket list."
+      );
+    }
+  };
+
+  const fetchUserVisited = async () => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (user) {
+        const visitedQuery = query(
+          collection(FIREBASE_DB, `users/${user.uid}/visited`)
+        );
+        const visitedSnapshot = await getDocs(visitedQuery);
+        const visitedList = visitedSnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id, // Use Firestore document ID as the unique ID
+        }));
+        setVisitedData(visitedList);
+      }
+    } catch (error) {
+      console.error("Error fetching visited data:", error);
     }
   };
 
@@ -172,6 +230,7 @@ const Home: React.FC = () => {
         {
           text: "Delete",
           onPress: () => {
+            // Use the unique ID to filter the visited items
             setVisitedData((prev) => prev.filter((item) => item.id !== id));
           },
         },
@@ -369,6 +428,23 @@ const Home: React.FC = () => {
               Africa
             </Text>
           </Pressable>
+          <Pressable
+            style={[
+              currentStyles.filterButton,
+              filter === "South America" && currentStyles.filterSelectedButton,
+            ]}
+            onPress={() => setFilter("South America")}
+          >
+            <Text
+              style={[
+                currentStyles.filterButtonText,
+                filter === "South America" &&
+                  currentStyles.filterSelectedButtonText,
+              ]}
+            >
+              South America
+            </Text>
+          </Pressable>
         </ScrollView>
       )}
 
@@ -445,7 +521,7 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: "row",
     marginBottom: 10,
-    height: 45,
+    height: 48,
   },
   filterLabel: {
     fontSize: 16,
@@ -597,7 +673,7 @@ const darkStyles = StyleSheet.create({
   filterContainer: {
     flexDirection: "row",
     marginBottom: 10,
-    height: 45,
+    height: 48,
   },
   filterLabel: {
     fontSize: 16,

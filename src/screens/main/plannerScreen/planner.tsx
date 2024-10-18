@@ -16,6 +16,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons"; // Importing Ionicons
+import { getAuth } from "firebase/auth";
 
 type PlannerScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -36,8 +37,10 @@ const Planner: React.FC = () => {
   const fetchPlannerData = async () => {
     setLoading(true);
     try {
+      const auth = getAuth();
+      const user = auth.currentUser;
       const querySnapshot = await getDocs(
-        collection(FIREBASE_DB, "bucketlist")
+        collection(FIREBASE_DB, `users/${user.uid}/bucketlist`)
       );
       const trips = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -92,8 +95,8 @@ const Planner: React.FC = () => {
     >
       <Image source={{ uri: item.image }} style={currentStyles.image} />
       <View style={currentStyles.cardBody}>
-        <Text style={currentStyles.location}>{item.location}</Text>
         <Text style={currentStyles.address}>{item.address}</Text>
+        <Text style={currentStyles.location}>{item.location}</Text>
         <View style={currentStyles.buttonContainer}>
           <Pressable
             onPress={() => confirmRemove(item.id)}
@@ -128,6 +131,7 @@ const Planner: React.FC = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={currentStyles.listContainer}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </View>
@@ -173,7 +177,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   listContainer: {
-    padding: 20,
+    padding: 0,
   },
   card: {
     backgroundColor: "#f8f8f8",
@@ -248,7 +252,7 @@ const darkStyles = StyleSheet.create({
     color: "#888",
   },
   listContainer: {
-    padding: 20,
+    padding: 0,
   },
   card: {
     backgroundColor: "#1c1c1e",

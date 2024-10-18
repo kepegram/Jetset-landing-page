@@ -31,6 +31,8 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   const image = item?.image || "https://via.placeholder.com/400"; // Fallback image
   const country = item?.location || "Unknown location";
   const city = item?.address || "No address available";
+  const population = item?.population || "N/A"; // Additional information
+  const continent = item?.continent || "N/A"; // Additional information
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
@@ -68,6 +70,8 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
       <View style={currentStyles.details}>
         <Text style={currentStyles.city}>{city}</Text>
         <Text style={currentStyles.country}>{country}</Text>
+        <Text style={currentStyles.population}>Population: {population}</Text>
+        <Text style={currentStyles.continent}>Continent: {continent}</Text>
       </View>
 
       {/* Add to Planner button */}
@@ -132,6 +136,30 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 5,
   },
+  population: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "center",
+    marginTop: 5,
+  },
+  area: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "center",
+    marginTop: 5,
+  },
+  region: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "center",
+    marginTop: 5,
+  },
+  continent: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "center",
+    marginTop: 5,
+  },
   addButton: {
     marginTop: 20,
     padding: 15,
@@ -154,8 +182,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalImage: {
-    width: 300,
-    height: 300,
+    width: 400,
+    height: 400,
   },
 });
 
@@ -186,6 +214,30 @@ const darkStyles = StyleSheet.create({
     textAlign: "center",
   },
   country: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "center",
+    marginTop: 5,
+  },
+  population: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "center",
+    marginTop: 5,
+  },
+  area: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "center",
+    marginTop: 5,
+  },
+  region: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "center",
+    marginTop: 5,
+  },
+  continent: {
     fontSize: 16,
     color: "#777",
     textAlign: "center",

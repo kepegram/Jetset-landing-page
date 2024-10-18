@@ -18,8 +18,6 @@ const Welcome: React.FC = () => {
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
-  
-
   return (
     <View style={currentStyles.slide}>
       {/* Uncomment the image if needed */}
@@ -51,8 +49,6 @@ const Welcome: React.FC = () => {
           <Text style={currentStyles.buttonText}>Login</Text>
         </Pressable>
       </View>
-
-     
     </View>
   );
 };
@@ -106,7 +102,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  
 });
 
 const darkStyles = StyleSheet.create({

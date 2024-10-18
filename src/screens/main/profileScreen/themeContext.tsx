@@ -13,7 +13,7 @@ import { getAuth } from "firebase/auth"; // Firebase auth
 // Define the context value type
 type ThemeContextType = {
   theme: string;
-  toggleTheme: () => void;
+  toggleTheme: (string) => void;
 };
 
 // Define the prop types for the ThemeProvider component

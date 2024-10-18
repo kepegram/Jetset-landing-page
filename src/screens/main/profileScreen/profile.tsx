@@ -18,6 +18,10 @@ import { RootStackParamList } from "../tabNavigator/appNav";
 import { useProfile } from "./profileContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { useTheme } from "./themeContext";
+import { Dimensions } from "react-native";
+
+// Inside your component
+const { width } = Dimensions.get("window");
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -29,7 +33,9 @@ const Profile: React.FC = () => {
   const { theme } = useTheme();
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<"trips" | "memories">("trips");
+  const [activeTab, setActiveTab] = useState<"bucketlists" | "memories">(
+    "bucketlists"
+  );
   const [loading, setLoading] = useState(true);
   const [tripData, setTripData] = useState<any[]>([]);
 
@@ -38,7 +44,11 @@ const Profile: React.FC = () => {
   const fetchPlannerData = async () => {
     setLoading(true);
     try {
-      const querySnapshot = await getDocs(collection(FIREBASE_DB, "bucketlist"));
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const querySnapshot = await getDocs(
+        collection(FIREBASE_DB, `users/${user.uid}/bucketlist`)
+      );
       const trips = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -73,20 +83,23 @@ const Profile: React.FC = () => {
     }, [])
   );
 
-  const handleTabPress = (tab: "trips" | "memories") => {
+  const handleTabPress = (tab: "bucketlists" | "memories") => {
     setActiveTab(tab);
   };
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
   const renderTripItem = ({ item }) => (
-    <View style={currentStyles.tripItem}>
+    <Pressable
+      style={currentStyles.tripItem}
+      onPress={() => navigation.navigate("TripBuilder", { tripDetails: item })}
+    >
       <Image source={{ uri: item.image }} style={currentStyles.tripImage} />
       <View style={currentStyles.tripDetails}>
         <Text style={currentStyles.tripLocation}>{item.location}</Text>
         <Text style={currentStyles.tripAddress}>{item.address}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 
   return (
@@ -103,14 +116,14 @@ const Profile: React.FC = () => {
       </View>
       <View style={currentStyles.iconsContainer}>
         <Pressable
-          onPress={() => handleTabPress("trips")}
+          onPress={() => handleTabPress("bucketlists")}
           style={currentStyles.iconItem}
         >
           <FontAwesome
             name="plane"
             size={30}
             color={
-              activeTab === "trips"
+              activeTab === "bucketlists"
                 ? "#A463FF"
                 : theme === "dark"
                 ? "white"
@@ -122,7 +135,7 @@ const Profile: React.FC = () => {
               currentStyles.iconText,
               {
                 color:
-                  activeTab === "trips"
+                  activeTab === "bucketlists"
                     ? "#A463FF"
                     : theme === "dark"
                     ? "white"
@@ -169,11 +182,11 @@ const Profile: React.FC = () => {
         </Pressable>
       </View>
 
-      {/* FlatList for Trips */}
+      {/* FlatList for bucketlists */}
       <View style={currentStyles.listContainer}>
         {loading ? (
-          <Text>Loading...</Text>
-        ) : activeTab === "trips" ? (
+          <Text style={currentStyles.loadingText}>Loading...</Text>
+        ) : activeTab === "bucketlists" ? (
           tripData.length > 0 ? (
             <FlatList
               data={tripData}
@@ -183,7 +196,7 @@ const Profile: React.FC = () => {
               showsVerticalScrollIndicator={false}
             />
           ) : (
-            <Text>No lists available.</Text>
+            <Text style={currentStyles.noListsText}>No lists available.</Text>
           )
         ) : null}
       </View>
@@ -198,20 +211,18 @@ const Profile: React.FC = () => {
           style={currentStyles.modalOverlay}
           onPress={() => setModalVisible(false)}
         >
-          <View style={currentStyles.modalContent}>
-            <Image
-              source={{ uri: profilePicture }}
-              style={currentStyles.modalImage}
-            />
-            <Button
-              title="Edit"
-              color={"white"}
-              onPress={() => {
-                setModalVisible(false);
-                navigation.navigate("Edit");
-              }}
-            />
-          </View>
+          <Image
+            source={{ uri: profilePicture }}
+            style={currentStyles.modalImage}
+          />
+          <Button
+            title="Edit"
+            color={theme === "dark" ? "white" : "black"}
+            onPress={() => {
+              setModalVisible(false);
+              navigation.navigate("Edit");
+            }}
+          />
         </Pressable>
       </Modal>
     </View>
@@ -248,23 +259,28 @@ const styles = StyleSheet.create({
   },
   iconItem: {
     alignItems: "center",
+    marginHorizontal: 10, // Spacing between icons
   },
   iconText: {
     fontSize: 16,
     fontWeight: "bold",
+    textAlign: "center",
   },
   separator: {
     height: 20,
     width: 1,
     backgroundColor: "#333",
-    marginHorizontal: 20,
+    marginHorizontal: 10, // Adjust separator spacing
   },
   listContainer: {
     flex: 1,
     width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 20, // Padding for better spacing
   },
   flatListContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
     paddingVertical: 10,
   },
   tripItem: {
@@ -275,6 +291,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: "#f9f9f9",
     borderRadius: 10,
+    width: width * 0.9,
   },
   tripImage: {
     width: 80,
@@ -292,33 +309,37 @@ const styles = StyleSheet.create({
   },
   tripAddress: {
     fontSize: 14,
-    color: "#666",
+    color: "#555",
+  },
+  noListsText: {
+    color: "#777",
+    fontSize: 16,
+    textAlign: "center", // Center the text
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "center", // Center the loading text
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    width: 300,
-    height: 300,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#333",
-    borderRadius: 10,
+    backgroundColor: "#fff", // Semi-transparent background
   },
   modalImage: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    width: 350,
+    height: 350,
+    borderRadius: 200,
+    marginBottom: 15,
   },
 });
 
+// Dark Theme Styles
 const darkStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#121212",
+    backgroundColor: "#000",
   },
   profileContainer: {
     alignItems: "center",
@@ -343,32 +364,40 @@ const darkStyles = StyleSheet.create({
   },
   iconItem: {
     alignItems: "center",
+    marginHorizontal: 10,
   },
   iconText: {
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
+    color: "#fff", // Ensure the text is visible in dark mode
   },
   separator: {
     height: 20,
     width: 1,
-    backgroundColor: "#777",
-    marginHorizontal: 20,
+    backgroundColor: "#fff", // White separator for dark mode
+    marginHorizontal: 10,
   },
   listContainer: {
     flex: 1,
     width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 20,
   },
   flatListContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
     paddingVertical: 10,
   },
   tripItem: {
     flexDirection: "row",
     padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#444", // Darker line for separation
     marginBottom: 10,
-    backgroundColor: "#1c1c1e",
+    backgroundColor: "#222", // Darker background for trip items
     borderRadius: 10,
+    width: width * 0.9,
   },
   tripImage: {
     width: 80,
@@ -383,29 +412,32 @@ const darkStyles = StyleSheet.create({
   tripLocation: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#fff", // Ensure the text is visible in dark mode
   },
   tripAddress: {
     fontSize: 14,
-    color: "#888",
+    color: "#aaa", // Lighter text for address
+  },
+  noListsText: {
+    color: "#bbb", // Lighter text for dark mode
+    fontSize: 16,
+    textAlign: "center",
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#bbb", // Lighter text for loading message
+    textAlign: "center",
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    width: 300,
-    height: 300,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#333",
-    borderRadius: 10,
+    backgroundColor: "#121212",
   },
   modalImage: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 15,
   },
 });
