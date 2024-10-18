@@ -15,6 +15,7 @@ import { WebView } from "react-native-webview"; // Import WebView for Google sea
 
 // Define the type for trip details
 type TripDetails = {
+  image: string;
   location: string;
   address: string;
 };
@@ -26,8 +27,6 @@ const TripBuilder: React.FC = () => {
 
   const [travelCity, setTravelCity] = useState(""); // City input
   const [travelState, setTravelState] = useState(""); // State or country input
-  const [selectedTravelType, setSelectedTravelType] =
-    useState<string>("Flight");
   const [departureDate, setDepartureDate] = useState<Date>(new Date());
   const [returnDate, setReturnDate] = useState<Date>(new Date());
   const [showDeparturePicker, setShowDeparturePicker] =
@@ -37,10 +36,6 @@ const TripBuilder: React.FC = () => {
   const [webViewVisible, setWebViewVisible] = useState<boolean>(false);
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
-
-  const handleSelectOption = (option: string) => {
-    setSelectedTravelType(option);
-  };
 
   const handleDepartureDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || departureDate;
@@ -71,7 +66,6 @@ const TripBuilder: React.FC = () => {
       );
       return; // Prevent proceeding if validation fails
     }
-
     setWebViewVisible(true);
   };
 
@@ -83,7 +77,7 @@ const TripBuilder: React.FC = () => {
           }, ${
             tripDetails.location
           } on ${departureDate.toDateString()} returning ${returnDate.toDateString()}`
-        : `${companyName} Flights from ${travelCity}, ${travelState} to ${
+        : `${companyName} flights from ${travelCity}, ${travelState} to ${
             tripDetails.address
           }, ${
             tripDetails.location
@@ -104,9 +98,7 @@ const TripBuilder: React.FC = () => {
     <ScrollView style={currentStyles.container}>
       {/* Image background */}
       <ImageBackground
-        source={{
-          uri: "https://via.placeholder.com/400",
-        }}
+        source={{ uri: tripDetails.image }}
         style={currentStyles.imageBackground}
       >
         <Text style={currentStyles.city}>{tripDetails.address}</Text>

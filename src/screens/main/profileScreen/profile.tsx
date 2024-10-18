@@ -96,8 +96,8 @@ const Profile: React.FC = () => {
     >
       <Image source={{ uri: item.image }} style={currentStyles.tripImage} />
       <View style={currentStyles.tripDetails}>
-        <Text style={currentStyles.tripLocation}>{item.location}</Text>
-        <Text style={currentStyles.tripAddress}>{item.address}</Text>
+        <Text style={currentStyles.tripLocation}>{item.address}</Text>
+        <Text style={currentStyles.tripAddress}>{item.location}</Text>
       </View>
     </Pressable>
   );

@@ -253,7 +253,7 @@ const Home: React.FC = () => {
         onPress={() => navigation.navigate("DestinationDetailView", { item })}
       >
         <Image
-          source={require("../../../../assets/placeholder.jpg")}
+          source={{uri: item.image}}
           style={currentStyles.image}
         />
         <View style={currentStyles.cardBody}>
@@ -346,7 +346,7 @@ const Home: React.FC = () => {
           showsHorizontalScrollIndicator={false}
           style={currentStyles.filterContainer}
         >
-          <Text style={currentStyles.filterLabel}>Filter by Continent:</Text>
+          <Text style={currentStyles.filterLabel}>Continent:</Text>
           <Pressable
             style={[
               currentStyles.filterButton,
@@ -715,7 +715,8 @@ const darkStyles = StyleSheet.create({
   },
   card: {
     marginBottom: 10,
-    elevation: 3,
+    borderRadius: 10,
+    elevation: 2,
     overflow: "hidden",
     backgroundColor: "#1c1c1e", // Dark background
   },

@@ -15,7 +15,7 @@ import { RootStackParamList } from "../tabNavigator/appNav"; // Update the impor
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { Ionicons } from "@expo/vector-icons"; // Importing Ionicons
+import { AntDesign, Ionicons } from "@expo/vector-icons"; // Importing Ionicons
 import { getAuth } from "firebase/auth";
 
 type PlannerScreenNavigationProp = NativeStackNavigationProp<
@@ -89,24 +89,30 @@ const Planner: React.FC = () => {
 
   // Render each item in the FlatList
   const renderItem = ({ item }) => (
-    <Pressable
-      onPress={() => navigation.navigate("TripBuilder", { tripDetails: item })}
-      style={currentStyles.card}
-    >
-      <Image source={{ uri: item.image }} style={currentStyles.image} />
-      <View style={currentStyles.cardBody}>
-        <Text style={currentStyles.address}>{item.address}</Text>
-        <Text style={currentStyles.location}>{item.location}</Text>
-        <View style={currentStyles.buttonContainer}>
-          <Pressable
-            onPress={() => confirmRemove(item.id)}
-            style={currentStyles.removeButton}
-          >
-            <Ionicons name="trash-outline" size={24} color="#ff4d4d" />
-          </Pressable>
+    <View>
+      <Pressable
+        onPress={() =>
+          navigation.navigate("TripBuilder", { tripDetails: item })
+        }
+        style={currentStyles.card}
+      >
+        <Image source={{ uri: item.image }} style={currentStyles.image} />
+        <View style={currentStyles.cardBody}>
+          <View style={currentStyles.textContainer}>
+            <View>
+              <Text style={currentStyles.location}>{item.address}</Text>
+              <Text style={currentStyles.address}>{item.location}</Text>
+            </View>
+            <Pressable
+              onPress={() => confirmRemove(item.id)}
+              style={currentStyles.trashIconContainer}
+            >
+              <AntDesign name="delete" size={24} color="red" />
+            </Pressable>
+          </View>
         </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 
   return (
@@ -189,28 +195,29 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 200,
+    resizeMode: "cover",
   },
   cardBody: {
-    padding: 15,
-    flexDirection: "row",
-    justifyContent: "space-between", // Aligns location and address to the left and trash icon to the right
-    alignItems: "center",
+    padding: 12,
+    paddingBottom: 20, // Add extra padding at the bottom for spacing
+    flexGrow: 1,
+  },
+  textContainer: {
+    flexDirection: "row", // Make location, address, and actions inline
+    justifyContent: "space-between", // Spread them out across the container
+    alignItems: "center", // Align them vertically centered
   },
   location: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
+    color: "#000",
   },
   address: {
     fontSize: 14,
-    color: "#666",
+    color: "#888",
   },
-  buttonContainer: {
-    flexDirection: "row",
-    alignItems: "center", // Centers the icon vertically
-  },
-  removeButton: {
-    padding: 5, // Add some padding to make the icon more tappable
+  trashIconContainer: {
+    marginLeft: 10, // Adds spacing between the text and the icon
   },
 });
 
@@ -264,12 +271,17 @@ const darkStyles = StyleSheet.create({
   image: {
     width: "100%",
     height: 200,
+    resizeMode: "cover",
   },
   cardBody: {
-    padding: 15,
-    flexDirection: "row",
-    justifyContent: "space-between", // Aligns location and address to the left and trash icon to the right
-    alignItems: "center",
+    padding: 12,
+    paddingBottom: 20, // Add extra padding at the bottom for spacing
+    flexGrow: 1,
+  },
+  textContainer: {
+    flexDirection: "row", // Make location, address, and actions inline
+    justifyContent: "space-between", // Spread them out across the container
+    alignItems: "center", // Align them vertically centered
   },
   location: {
     fontSize: 18,
@@ -280,11 +292,7 @@ const darkStyles = StyleSheet.create({
     fontSize: 14,
     color: "#888",
   },
-  buttonContainer: {
-    flexDirection: "row",
-    alignItems: "center", // Centers the icon vertically
-  },
-  removeButton: {
-    padding: 5, // Add some padding to make the icon more tappable
+  trashIconContainer: {
+    marginLeft: 10, // Adds spacing between the text and the icon
   },
 });
