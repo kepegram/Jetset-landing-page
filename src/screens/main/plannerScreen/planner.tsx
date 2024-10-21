@@ -64,8 +64,11 @@ const Planner: React.FC = () => {
   // Function to handle item deletion
   const handleRemove = async (id: string) => {
     try {
-      // Remove from Firestore
-      await deleteDoc(doc(FIREBASE_DB, "bucketlist", id));
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      // Ensure you are using the correct path with user ID
+      await deleteDoc(doc(FIREBASE_DB, `users/${user.uid}/bucketlist`, id));
 
       // Update the local state to remove the item
       setPlannerData((prevData) => prevData.filter((item) => item.id !== id));

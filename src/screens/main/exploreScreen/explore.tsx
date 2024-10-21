@@ -28,6 +28,31 @@ const Explore: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
+  const fetchPexelsImage = async (countryName) => {
+    const PEXELS_API_KEY =
+      "VpRUFZAwfA3HA4cwIoYVnHO51Lr36RauMaODMYPSTJpPGbRkmtFLa7pX";
+    const url = `https://api.pexels.com/v1/search?query=${countryName}&per_page=1`;
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: PEXELS_API_KEY,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.photos && data.photos.length > 0) {
+        return data.photos[0].src.medium; // Return the first image's URL
+      }
+
+      return null; // Return null if no image is found
+    } catch (error) {
+      console.error("Error fetching image from Pexels: ", error);
+      return null;
+    }
+  };
+
   const handleSearch = async (text: string) => {
     setSearchText(text);
 
@@ -39,11 +64,20 @@ const Explore: React.FC = () => {
         const data = await response.json();
 
         if (data.geonames) {
-          const formattedResults = data.geonames.map((item) => ({
-            id: item.geonameId,
-            name: item.toponymName,
-            country: item.countryName,
-          }));
+          // Fetch Pexels images for each geoname
+          const formattedResults = await Promise.all(
+            data.geonames.map(async (item) => {
+              const pexelsImage = await fetchPexelsImage(item.countryName);
+              return {
+                id: item.geonameId,
+                image: pexelsImage || "https://via.placeholder.com/400",
+                location: item.countryName,
+                address: item.capital,
+                population: item.population || "N/A",
+                continent: item.continent || "N/A",
+              };
+            })
+          );
           setSearchResults(formattedResults);
         } else {
           setSearchResults([]);
@@ -65,7 +99,7 @@ const Explore: React.FC = () => {
       }}
     >
       <Text style={currentStyles.resultText}>
-        {item.name}, {item.country}
+        {item.location}, {item.address}
       </Text>
     </Pressable>
   );

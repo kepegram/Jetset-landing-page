@@ -38,6 +38,8 @@ export type RootStackParamList = {
       population: string;
       region: string;
       continent: string;
+      longitude: number;
+      latitude: number;
     };
   };
   Profile: undefined;

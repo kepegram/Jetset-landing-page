@@ -16,7 +16,14 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
-import { collection, addDoc, query, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  query,
+  getDocs,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { getAuth } from "firebase/auth";
 
@@ -45,18 +52,39 @@ const Home: React.FC = () => {
     fetchUserVisited();
   }, [filter]);
 
+  const fetchCoordinates = async (location, address) => {
+    const API_KEY = "28c0017aba5f471fa18fe9fdb3cd026e"; // Replace with your OpenCage API key
+    const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+      location + ", " + address
+    )}&key=${API_KEY}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.results && data.results.length > 0) {
+        const { lat, lng } = data.results[0].geometry; // Get the latitude and longitude
+        return { latitude: lat, longitude: lng };
+      } else {
+        console.error("No results found for location:", location);
+        return null; // No coordinates found
+      }
+    } catch (error) {
+      console.error("Error fetching coordinates:", error);
+      return null; // Handle error
+    }
+  };
+
   const fetchFilterDestinations = async (reset = false) => {
     try {
       const auth = getAuth();
       const user = auth.currentUser;
 
-      // Ensure the user is logged in
       if (!user) {
         console.error("User is not logged in.");
         return;
       }
 
-      // Fetch bucketlist and visited data from Firestore
       const visitedSnapshot = await getDocs(
         collection(FIREBASE_DB, `users/${user.uid}/visited`)
       );
@@ -67,7 +95,6 @@ const Home: React.FC = () => {
       const visitedItems = visitedSnapshot.docs.map((doc) => doc.data());
       const bucketlistItems = bucketlistSnapshot.docs.map((doc) => doc.data());
 
-      // Fetch the destination data from GeoNames API
       const response = await fetch(
         `http://api.geonames.org/countryInfoJSON?username=${USERNAME}`
       );
@@ -77,47 +104,60 @@ const Home: React.FC = () => {
         throw new Error("Geonames data not found in response");
       }
 
-      // Filter destinations by continent and exclude items already in bucketlist or visited
       const filteredByContinent = data.geonames.filter((item) => {
         if (filter === "All") return true;
         return item.continentName === filter;
       });
 
       const uniqueCountries = new Set();
-      const formattedData = filteredByContinent
-        .filter((item) => {
-          // Exclude already visited or bucketlist items and check for empty location
+      const formattedData = await Promise.all(
+        filteredByContinent.map(async (item, index) => {
           const isVisited = visitedItems.some(
             (visited) => visited.location === item.countryName
           );
           const isInBucketlist = bucketlistItems.some(
             (bucketlist) => bucketlist.location === item.countryName
           );
+
           if (
             !isVisited &&
             !isInBucketlist &&
             !uniqueCountries.has(item.countryCode) &&
             item.countryName &&
-            item.countryName.trim() !== "" && // Check if location is not empty
-            item.capital && // Ensure capital is defined
-            item.capital.trim() !== "" // Ensure capital is not empty
+            item.countryName.trim() !== "" &&
+            item.capital &&
+            item.capital.trim() !== ""
           ) {
             uniqueCountries.add(item.countryCode);
-            return true;
+
+            // Fetch image from Pexels API
+            const pexelsImage = await fetchPexelsImage(item.countryName);
+
+            // Fetch latitude and longitude using the fetchCoordinates function
+            const coordinates = (await fetchCoordinates(
+              item.capital,
+              item.countryName
+            )) || { latitude: 0, longitude: 0 }; // Fallback to 0
+
+            return {
+              id: `${item.countryCode}-${index}`, // Ensure unique key by appending index
+              image: pexelsImage || "https://via.placeholder.com/400",
+              location: item.countryName,
+              address: item.capital,
+              population: item.population || "N/A",
+              continent: item.continent || "N/A",
+              latitude: coordinates.latitude || 0, // Fallback to 0
+              longitude: coordinates.longitude || 0, // Fallback to 0
+            };
           }
-          return false;
+          return null;
         })
-        .map((item, index) => ({
-          id: `${item.countryCode}-${index}`, // Ensure unique key by appending index
-          image: "https://via.placeholder.com/400", // Placeholder image
-          location: item.countryName,
-          address: item.capital,
-          population: item.population || "N/A", // Additional information
-          continent: item.continent || "N/A", // Additional information
-        }));
+      );
+
+      const resolvedData = formattedData.filter((item) => item !== null);
 
       // Shuffle and paginate the data
-      const shuffledData = formattedData.sort(() => Math.random() - 0.5);
+      const shuffledData = resolvedData.sort(() => Math.random() - 0.5);
       const paginatedData = shuffledData.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
@@ -130,6 +170,32 @@ const Home: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching destination data:", error);
+    }
+  };
+
+  // Function to fetch an image from Pexels API based on the country name
+  const fetchPexelsImage = async (countryName) => {
+    const PEXELS_API_KEY =
+      "VpRUFZAwfA3HA4cwIoYVnHO51Lr36RauMaODMYPSTJpPGbRkmtFLa7pX";
+    const url = `https://api.pexels.com/v1/search?query=${countryName}&per_page=1`;
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: PEXELS_API_KEY,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.photos && data.photos.length > 0) {
+        return data.photos[0].src.medium; // Return the first image's URL
+      }
+
+      return null; // Return null if no image is found
+    } catch (error) {
+      console.error("Error fetching image from Pexels: ", error);
+      return null;
     }
   };
 
@@ -221,7 +287,15 @@ const Home: React.FC = () => {
     }
   };
 
-  const deleteVisitedItem = (id: string) => {
+  const deleteVisitedItem = async (id: string) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      Alert.alert("Error", "You need to be logged in to delete items.");
+      return;
+    }
+
     Alert.alert(
       "Confirm Deletion",
       "Are you sure you want to delete this visited item?",
@@ -229,9 +303,23 @@ const Home: React.FC = () => {
         { text: "Cancel", style: "cancel" },
         {
           text: "Delete",
-          onPress: () => {
-            // Use the unique ID to filter the visited items
-            setVisitedData((prev) => prev.filter((item) => item.id !== id));
+          onPress: async () => {
+            try {
+              // Create a reference to the document to delete
+              const docRef = doc(FIREBASE_DB, `users/${user.uid}/visited`, id);
+
+              // Delete the document
+              await deleteDoc(docRef);
+
+              // Update state to reflect the change
+              setVisitedData((prev) => prev.filter((item) => item.id !== id));
+            } catch (error) {
+              console.error("Error deleting document: ", error);
+              Alert.alert(
+                "Error",
+                "There was an error deleting the visited item."
+              );
+            }
           },
         },
       ],
@@ -250,12 +338,17 @@ const Home: React.FC = () => {
     <View>
       <Pressable
         style={currentStyles.card}
-        onPress={() => navigation.navigate("DestinationDetailView", { item })}
+        onPress={() =>
+          navigation.navigate("DestinationDetailView", {
+            item: {
+              ...item,
+              latitude: item.latitude, // Pass latitude
+              longitude: item.longitude, // Pass longitude
+            },
+          })
+        }
       >
-        <Image
-          source={{uri: item.image}}
-          style={currentStyles.image}
-        />
+        <Image source={{ uri: item.image }} style={currentStyles.image} />
         <View style={currentStyles.cardBody}>
           <View style={currentStyles.textContainer}>
             <View>
