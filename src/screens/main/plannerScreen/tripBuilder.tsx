@@ -72,7 +72,7 @@ const TripBuilder: React.FC = () => {
   if (webViewVisible) {
     const searchQuery =
       companyName === "Any"
-        ? `Flights from ${travelCity}, ${travelState} to ${
+        ? `Priceline flights from ${travelCity}, ${travelState} to ${
             tripDetails.address
           }, ${
             tripDetails.location
@@ -101,6 +101,7 @@ const TripBuilder: React.FC = () => {
         source={{ uri: tripDetails.image }}
         style={currentStyles.imageBackground}
       >
+        <View style={currentStyles.overlay} />
         <Text style={currentStyles.city}>{tripDetails.address}</Text>
         <Text style={currentStyles.country}>{tripDetails.location}</Text>
       </ImageBackground>
@@ -216,13 +217,16 @@ export default TripBuilder;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    padding: 20, // Added padding for better layout
   },
   imageBackground: {
     width: "100%",
     height: 200,
     justifyContent: "center",
     alignItems: "center",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject, // Fills the parent container
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent grey
   },
   city: {
     fontSize: 60,
@@ -336,13 +340,16 @@ const styles = StyleSheet.create({
 const darkStyles = StyleSheet.create({
   container: {
     backgroundColor: "#121212",
-    padding: 20, // Added padding for better layout
   },
   imageBackground: {
     width: "100%",
     height: 200,
     justifyContent: "center",
     alignItems: "center",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject, // Fills the parent container
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent grey
   },
   city: {
     fontSize: 60,

@@ -146,7 +146,7 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
                 }}
                 style={currentStyles.map}
                 scrollEnabled={false}
-                zoomEnabled={false}
+                zoomEnabled={true}
                 rotateEnabled={false}
                 pitchEnabled={false}
               >
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 70,
   },
   horizontalScroll: {
     height: 350,

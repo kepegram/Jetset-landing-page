@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   FlatList,
   Image,
@@ -26,6 +27,7 @@ import {
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { getAuth } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -43,17 +45,37 @@ const Home: React.FC = () => {
   const [visitedData, setVisitedData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState<string>("All");
+  const [loading, setLoading] = useState(false); // Loading state
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
   const ITEMS_PER_PAGE = 20;
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
+  // Fetch data when the component mounts and on refresh
   useEffect(() => {
-    fetchFilterDestinations(true);
-    fetchUserVisited();
-  }, [filter]);
+    if (!initialFetchDone) {
+      fetchFilterDestinations(true); // Fetch only once on initial launch
+      setInitialFetchDone(true);
+    }
+    fetchUserVisited(); // Always fetch visited data
+  }, [filter]); // Only run on mount
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setCurrentPage(1); // Reset the page
+    fetchFilterDestinations(true); // Fetch fresh data on refresh
+    setRefreshing(false);
+  };
 
   const fetchCoordinates = async (location, address) => {
     const API_KEY = "28c0017aba5f471fa18fe9fdb3cd026e"; // Replace with your OpenCage API key
+    const cacheKey = `${location}-${address}`; // Unique key for location and address
+    const cachedData = await AsyncStorage.getItem(cacheKey);
+
+    if (cachedData) {
+      return JSON.parse(cachedData); // Return cached data if available
+    }
+
     const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
       location + ", " + address
     )}&key=${API_KEY}`;
@@ -64,9 +86,14 @@ const Home: React.FC = () => {
 
       if (data.results && data.results.length > 0) {
         const { lat, lng } = data.results[0].geometry; // Get the latitude and longitude
-        return { latitude: lat, longitude: lng };
+        const coordinates = { latitude: lat, longitude: lng };
+
+        // Cache the result in AsyncStorage
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(coordinates));
+
+        return coordinates;
       } else {
-        console.error("No results found for location:", location);
+        console.error("No coordinates found for location:", location);
         return null; // No coordinates found
       }
     } catch (error) {
@@ -76,6 +103,7 @@ const Home: React.FC = () => {
   };
 
   const fetchFilterDestinations = async (reset = false) => {
+    setLoading(true); // Start loading
     try {
       const auth = getAuth();
       const user = auth.currentUser;
@@ -83,6 +111,17 @@ const Home: React.FC = () => {
       if (!user) {
         console.error("User is not logged in.");
         return;
+      }
+
+      const cacheKey = `destinations-${user.uid}-${filter}`; // Unique cache key per user and filter
+      if (!reset) {
+        const cachedData = await AsyncStorage.getItem(cacheKey);
+        if (cachedData) {
+          const parsedData = JSON.parse(cachedData);
+          setDestinationData(parsedData); // Load cached data if available
+          setLoading(false); // End loading
+          return;
+        }
       }
 
       const visitedSnapshot = await getDocs(
@@ -155,8 +194,6 @@ const Home: React.FC = () => {
       );
 
       const resolvedData = formattedData.filter((item) => item !== null);
-
-      // Shuffle and paginate the data
       const shuffledData = resolvedData.sort(() => Math.random() - 0.5);
       const paginatedData = shuffledData.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
@@ -168,13 +205,25 @@ const Home: React.FC = () => {
       } else {
         setDestinationData((prev) => [...prev, ...paginatedData]);
       }
+
+      // Cache the result in AsyncStorage
+      await AsyncStorage.setItem(cacheKey, JSON.stringify(paginatedData));
     } catch (error) {
       console.error("Error fetching destination data:", error);
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
   // Function to fetch an image from Pexels API based on the country name
   const fetchPexelsImage = async (countryName) => {
+    const cacheKey = `pexelsImage-${countryName}`; // Unique key for each country
+    const cachedData = await AsyncStorage.getItem(cacheKey);
+
+    if (cachedData) {
+      return JSON.parse(cachedData); // Return cached image URL if available
+    }
+
     const PEXELS_API_KEY =
       "VpRUFZAwfA3HA4cwIoYVnHO51Lr36RauMaODMYPSTJpPGbRkmtFLa7pX";
     const url = `https://api.pexels.com/v1/search?query=${countryName}&per_page=1`;
@@ -189,7 +238,12 @@ const Home: React.FC = () => {
       const data = await response.json();
 
       if (data.photos && data.photos.length > 0) {
-        return data.photos[0].src.medium; // Return the first image's URL
+        const imageUrl = data.photos[0].src.medium;
+
+        // Cache the image URL in AsyncStorage
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(imageUrl));
+
+        return imageUrl;
       }
 
       return null; // Return null if no image is found
@@ -327,13 +381,7 @@ const Home: React.FC = () => {
     );
   };
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    setCurrentPage(1); // Reset the page
-    fetchFilterDestinations(true);
-    setRefreshing(false);
-  };
-
+  // Function to render each item in the list
   const renderItem = ({ item }) => (
     <View>
       <Pressable
@@ -342,8 +390,8 @@ const Home: React.FC = () => {
           navigation.navigate("DestinationDetailView", {
             item: {
               ...item,
-              latitude: item.latitude, // Pass latitude
-              longitude: item.longitude, // Pass longitude
+              latitude: item.latitude,
+              longitude: item.longitude,
             },
           })
         }
@@ -375,7 +423,6 @@ const Home: React.FC = () => {
           </View>
         </View>
       </Pressable>
-      <View style={currentStyles.cardDivider}></View>
     </View>
   );
 
@@ -541,16 +588,22 @@ const Home: React.FC = () => {
         </ScrollView>
       )}
 
-      <FlatList
-        data={filteredData}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        onEndReachedThreshold={0.5}
-        showsVerticalScrollIndicator={false}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="grey" />
+      ) : destinationData.length === 0 ? (
+        <Text style={currentStyles.noDataText}>No destinations found.</Text>
+      ) : (
+        <FlatList
+          data={filteredData}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          onEndReachedThreshold={0.5}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 };
@@ -655,10 +708,11 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   card: {
+    backgroundColor: "#f8f8f8",
     marginBottom: 10,
+    borderRadius: 10,
     elevation: 3,
     overflow: "hidden",
-    backgroundColor: "#fff", // Optional for light theme
   },
   image: {
     width: "100%",
@@ -695,12 +749,6 @@ const styles = StyleSheet.create({
   action2Text: {
     color: "#000",
     fontSize: 14,
-  },
-  cardDivider: {
-    height: 1,
-    backgroundColor: "#ddd", // Subtle divider color
-    marginBottom: 10,
-    alignSelf: "stretch",
   },
   noDataText: {
     textAlign: "center",
@@ -807,11 +855,11 @@ const darkStyles = StyleSheet.create({
     paddingBottom: 100,
   },
   card: {
+    backgroundColor: "#1c1c1e",
     marginBottom: 10,
     borderRadius: 10,
     elevation: 2,
     overflow: "hidden",
-    backgroundColor: "#1c1c1e", // Dark background
   },
   image: {
     width: "100%",
@@ -849,12 +897,6 @@ const darkStyles = StyleSheet.create({
   action2Text: {
     color: "#fff",
     fontSize: 14,
-  },
-  cardDivider: {
-    height: 1,
-    backgroundColor: "#444", // Adjust this based on the theme
-    marginBottom: 10,
-    alignSelf: "stretch", // Ensures the divider stretches within the card, not the card itself
   },
   noDataText: {
     textAlign: "center",
