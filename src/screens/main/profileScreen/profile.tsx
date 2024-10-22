@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
 const darkStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#121212",
   },
   profileContainer: {
     alignItems: "center",

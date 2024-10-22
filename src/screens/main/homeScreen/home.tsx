@@ -8,6 +8,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
@@ -16,7 +17,7 @@ import { useTheme } from "../profileScreen/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import {
   collection,
   addDoc,
@@ -41,12 +42,15 @@ const Home: React.FC = () => {
   const { profilePicture } = useProfile();
   const [selectedCategory, setSelectedCategory] = useState("suggested");
   const [refreshing, setRefreshing] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [destinationData, setDestinationData] = useState([]);
   const [visitedData, setVisitedData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState<string>("All");
   const [loading, setLoading] = useState(false); // Loading state
   const [initialFetchDone, setInitialFetchDone] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false); // Search loading state
 
   const ITEMS_PER_PAGE = 20;
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -66,6 +70,56 @@ const Home: React.FC = () => {
     fetchFilterDestinations(true); // Fetch fresh data on refresh
     setRefreshing(false);
   };
+
+  // Search handler with debouncing
+  const handleSearch = async (text: string) => {
+    setSearchText(text);
+    if (text.length > 2) {
+      setSearchLoading(true); // Start loading
+      try {
+        const response = await fetch(
+          `http://api.geonames.org/searchJSON?q=${text}&maxRows=10&username=${USERNAME}`
+        );
+        const data = await response.json();
+
+        if (data.geonames) {
+          const formattedResults = data.geonames.map((item) => ({
+            id: item.geonameId,
+            name: item.toponymName,
+            country: item.countryName,
+          }));
+          setSearchResults(formattedResults);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false); // End loading
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const renderResultItem = ({ item }) => (
+    <Pressable
+      style={currentStyles.resultItem}
+      onPress={() => {
+        console.log("Navigating to DestinationDetailView with item:", item);
+        navigation.navigate("DestinationDetailView", { item });
+
+        // Clear the search text and results
+        setSearchText(""); // Clear the text input
+        setSearchResults([]); // Clear the results
+      }}
+    >
+      <Text style={currentStyles.resultText}>
+        {item.name}, {item.country}
+      </Text>
+    </Pressable>
+  );
 
   const fetchCoordinates = async (location, address) => {
     const API_KEY = "28c0017aba5f471fa18fe9fdb3cd026e"; // Replace with your OpenCage API key
@@ -172,12 +226,6 @@ const Home: React.FC = () => {
             // Fetch image from Pexels API
             const pexelsImage = await fetchPexelsImage(item.countryName);
 
-            // Fetch latitude and longitude using the fetchCoordinates function
-            const coordinates = (await fetchCoordinates(
-              item.capital,
-              item.countryName
-            )) || { latitude: 0, longitude: 0 }; // Fallback to 0
-
             return {
               id: `${item.countryCode}-${index}`, // Ensure unique key by appending index
               image: pexelsImage || "https://via.placeholder.com/400",
@@ -185,8 +233,6 @@ const Home: React.FC = () => {
               address: item.capital,
               population: item.population || "N/A",
               continent: item.continent || "N/A",
-              latitude: coordinates.latitude || 0, // Fallback to 0
-              longitude: coordinates.longitude || 0, // Fallback to 0
             };
           }
           return null;
@@ -381,20 +427,31 @@ const Home: React.FC = () => {
     );
   };
 
-  // Function to render each item in the list
   const renderItem = ({ item }) => (
     <View>
       <Pressable
         style={currentStyles.card}
-        onPress={() =>
+        onPress={async () => {
+          // Call fetchCoordinates when the user clicks on the item
+          const coordinates = await fetchCoordinates(
+            item.address,
+            item.location
+          );
+
+          console.log("Navigating to DestinationDetailView with item:", {
+            ...item,
+            latitude: coordinates?.latitude || 0, // Fallback to 0 if no coordinates found
+            longitude: coordinates?.longitude || 0, // Fallback to 0 if no coordinates found
+          });
+
           navigation.navigate("DestinationDetailView", {
             item: {
               ...item,
-              latitude: item.latitude,
-              longitude: item.longitude,
+              latitude: coordinates?.latitude || 0,
+              longitude: coordinates?.longitude || 0,
             },
-          })
-        }
+          });
+        }}
       >
         <Image source={{ uri: item.image }} style={currentStyles.image} />
         <View style={currentStyles.cardBody}>
@@ -441,6 +498,32 @@ const Home: React.FC = () => {
           />
         </Pressable>
       </View>
+      <View style={currentStyles.inputContainer}>
+        <View style={currentStyles.iconContainer}>
+          <Ionicons name="search" size={20} color="#888" />
+        </View>
+        <TextInput
+          style={currentStyles.searchInput}
+          placeholder="Search destinations"
+          placeholderTextColor={theme === "dark" ? "#ccc" : "#888"}
+          onChangeText={handleSearch}
+          value={searchText}
+        />
+      </View>
+
+      {/* Display search results */}
+      {searchLoading ? (
+        <ActivityIndicator size="small" color="grey" />
+      ) : searchResults.length > 0 ? (
+        <FlatList
+          data={searchResults}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderResultItem}
+          contentContainerStyle={currentStyles.resultList}
+        />
+      ) : (
+        <Text></Text>
+      )}
 
       <View style={currentStyles.switchContainer}>
         <Pressable
@@ -597,6 +680,7 @@ const Home: React.FC = () => {
           data={filteredData}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: 80 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -635,6 +719,36 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
   },
+  inputContainer: {
+    flexDirection: "row", // Arrange icon and input horizontally
+    alignSelf: "center",
+    alignItems: "center", // Center them vertically
+    width: "90%", // Adjust width as needed
+    backgroundColor: "#eee",
+    borderRadius: 15,
+    height: 45,
+    paddingHorizontal: 15, // Padding for input
+  },
+  iconContainer: {
+    marginRight: 10, // Spacing between icon and input
+  },
+  searchInput: {
+    flex: 1, // Take the remaining space
+    fontSize: 16,
+    color: "#fff", // Adjust color as needed
+  },
+  resultList: {
+    padding: 10,
+  },
+  resultItem: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  resultText: {
+    fontSize: 16,
+    color: "#fff",
+  },
   switchContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -667,7 +781,7 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: "row",
     marginBottom: 10,
-    height: 48,
+    height: 52,
   },
   filterLabel: {
     fontSize: 16,
@@ -680,26 +794,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15, // Increased horizontal padding
     paddingVertical: 8, // Adjusted vertical padding for more space
     marginHorizontal: 5,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#A463FF",
     height: 33,
   },
   filterSelectedButton: {
     paddingHorizontal: 15, // Increased horizontal padding for consistency
     paddingVertical: 8, // Adjusted vertical padding for more space
-    backgroundColor: "#A463FF",
+    borderBottomWidth: 2,
+    borderBottomColor: "#A463FF",
     marginHorizontal: 5,
-    borderRadius: 5,
   },
   filterButtonText: {
-    color: "#000",
+    color: "#888",
     fontWeight: "bold",
     fontSize: 14, // Reduced font size slightly to fit the container
     flexShrink: 0,
   },
   filterSelectedButtonText: {
-    color: "#fff",
+    color: "#000",
     fontWeight: "bold",
     fontSize: 14, // Reduced font size slightly to fit the container
     flexShrink: 0,
@@ -776,12 +887,42 @@ const darkStyles = StyleSheet.create({
   appName: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#fff", // Subtle dark color for modern look
   },
   profilePicture: {
     width: 40,
     height: 40,
     borderRadius: 20,
+  },
+  inputContainer: {
+    flexDirection: "row", // Arrange icon and input horizontally
+    alignSelf: "center",
+    alignItems: "center", // Center them vertically
+    width: "90%", // Adjust width as needed
+    backgroundColor: "#212121",
+    borderRadius: 15,
+    height: 45,
+    paddingHorizontal: 15, // Padding for input
+  },
+  iconContainer: {
+    marginRight: 10, // Spacing between icon and input
+  },
+  searchInput: {
+    flex: 1, // Take the remaining space
+    fontSize: 16,
+    color: "#fff", // Adjust color as needed
+  },
+  resultList: {
+    padding: 10,
+  },
+  resultItem: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  resultText: {
+    fontSize: 16,
+    color: "#fff",
   },
   switchContainer: {
     flexDirection: "row",
@@ -796,11 +937,12 @@ const darkStyles = StyleSheet.create({
   },
   switchText: {
     fontSize: 16,
-    color: "#888",
+    color: "#888", // Lighter color for unselected text
   },
   selectedButton: {
-    borderBottomWidth: 3,
+    borderBottomWidth: 2,
     borderBottomColor: "#A463FF",
+    width: "20%",
   },
   selectedText: {
     color: "#fff",
@@ -809,12 +951,12 @@ const darkStyles = StyleSheet.create({
   divider: {
     height: "100%",
     width: 1,
-    backgroundColor: "#444",
+    backgroundColor: "#ddd",
   },
   filterContainer: {
     flexDirection: "row",
     marginBottom: 10,
-    height: 48,
+    height: 52,
   },
   filterLabel: {
     fontSize: 16,
@@ -827,20 +969,17 @@ const darkStyles = StyleSheet.create({
     paddingHorizontal: 15, // Increased horizontal padding
     paddingVertical: 8, // Adjusted vertical padding for more space
     marginHorizontal: 5,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#A463FF",
     height: 33,
   },
   filterSelectedButton: {
     paddingHorizontal: 15, // Increased horizontal padding for consistency
     paddingVertical: 8, // Adjusted vertical padding for more space
-    backgroundColor: "#A463FF",
+    borderBottomWidth: 2,
+    borderBottomColor: "#A463FF",
     marginHorizontal: 5,
-    borderRadius: 5,
   },
   filterButtonText: {
-    color: "#fff",
+    color: "#707070",
     fontWeight: "bold",
     fontSize: 14, // Reduced font size slightly to fit the container
     flexShrink: 0,
@@ -858,7 +997,7 @@ const darkStyles = StyleSheet.create({
     backgroundColor: "#1c1c1e",
     marginBottom: 10,
     borderRadius: 10,
-    elevation: 2,
+    elevation: 3,
     overflow: "hidden",
   },
   image: {
@@ -868,7 +1007,6 @@ const darkStyles = StyleSheet.create({
   },
   cardBody: {
     padding: 12,
-    paddingBottom: 20, // Add extra padding at the bottom for spacing
     flexGrow: 1,
   },
   textContainer: {

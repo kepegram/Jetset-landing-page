@@ -139,7 +139,10 @@ const Planner: React.FC = () => {
           data={plannerData}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={currentStyles.listContainer}
+          contentContainerStyle={[
+            currentStyles.listContainer,
+            { paddingBottom: 80 },
+          ]}
           showsVerticalScrollIndicator={false}
         />
       )}

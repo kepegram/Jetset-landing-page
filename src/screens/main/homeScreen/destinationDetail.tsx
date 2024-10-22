@@ -272,6 +272,7 @@ const styles = StyleSheet.create({
   details: {
     padding: 20,
     alignItems: "center",
+    marginTop: 30,
   },
   city: {
     fontSize: 28,
@@ -291,10 +292,11 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: "#A463FF",
-    borderRadius: 10,
-    padding: 15,
+    borderRadius: 35,
+    height: 60,
     width: "90%",
     alignItems: "center",
+    top: "8%",
   },
   addButtonText: {
     color: "#fff",
@@ -368,6 +370,7 @@ const darkStyles = StyleSheet.create({
   details: {
     padding: 20,
     alignItems: "center",
+    marginTop: 30,
   },
   city: {
     fontSize: 28,
@@ -391,6 +394,7 @@ const darkStyles = StyleSheet.create({
     padding: 15,
     width: "90%",
     alignItems: "center",
+    top: "8%",
   },
   addButtonText: {
     color: "#fff",

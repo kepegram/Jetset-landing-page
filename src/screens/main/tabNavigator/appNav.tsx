@@ -7,12 +7,8 @@ import {
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
 import { ProfileProvider } from "../profileScreen/profileContext";
-import { Ionicons } from "@expo/vector-icons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import Home from "../homeScreen/home";
-import Explore from "../exploreScreen/explore";
 import Profile from "../profileScreen/profile";
 import Edit from "../profileScreen/edit";
 import Settings from "../profileScreen/settings";
@@ -68,6 +64,7 @@ const HomeStack = () => {
     headerStyle: {
       backgroundColor: theme === "dark" ? "#121212" : "#fff",
     },
+    headerShadowVisible: false,
     headerLeft: () => (
       <Pressable onPress={() => navigation.goBack()}>
         <Ionicons
@@ -166,116 +163,6 @@ const HomeStack = () => {
   );
 };
 
-// Create the explore stack
-const ExploreStack = () => {
-  const { theme } = useTheme();
-
-  const screenOptions = ({
-    navigation,
-  }: {
-    navigation: any;
-  }): NativeStackNavigationOptions => ({
-    headerStyle: {
-      backgroundColor: theme === "dark" ? "#121212" : "#fff",
-    },
-    headerLeft: () => (
-      <Pressable onPress={() => navigation.goBack()}>
-        <Ionicons
-          name="arrow-back"
-          size={28}
-          color={theme === "dark" ? "#fff" : "#000"}
-          style={{ marginLeft: 10 }}
-        />
-      </Pressable>
-    ),
-    headerTitleStyle: {
-      color: theme === "dark" ? "#fff" : "#000",
-      fontSize: 18,
-      fontWeight: "bold",
-    },
-  });
-
-  // Custom options for Profile screen
-  const profileScreenOptions = ({
-    navigation,
-  }: {
-    navigation: any;
-  }): NativeStackNavigationOptions => ({
-    ...screenOptions({ navigation }),
-    headerRight: () => (
-      <Pressable onPress={() => navigation.navigate("Settings")}>
-        <Ionicons
-          name="settings-sharp"
-          size={28}
-          color={theme === "dark" ? "#fff" : "#121212"}
-          style={{ marginRight: 10 }}
-        />
-      </Pressable>
-    ),
-  });
-
-  return (
-    <RootStack.Navigator>
-      <RootStack.Screen
-        name="Explore"
-        component={Explore}
-        options={{ headerShown: false }}
-      />
-      <RootStack.Screen
-        name="DestinationDetailView"
-        component={DestinationDetailView}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
-      />
-      <RootStack.Screen
-        name="Profile"
-        component={Profile}
-        options={profileScreenOptions}
-      />
-      <RootStack.Screen
-        name="TripBuilder"
-        component={TripBuilder}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
-      />
-      <RootStack.Screen
-        name="Settings"
-        component={Settings}
-        options={screenOptions}
-      />
-      <RootStack.Screen name="Edit" component={Edit} options={screenOptions} />
-      <RootStack.Screen
-        name="ChangePassword"
-        component={ChangePassword}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "Change Password",
-        })}
-      />
-      <RootStack.Screen
-        name="AppTheme"
-        component={AppTheme}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "Appearance",
-        })}
-      />
-      <RootStack.Screen
-        name="DeleteAccount"
-        component={DeleteAccount}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "Delete Account",
-        })}
-      />
-    </RootStack.Navigator>
-  );
-};
-
 const PlannerStack = () => {
   const { theme } = useTheme();
 
@@ -287,6 +174,7 @@ const PlannerStack = () => {
     headerStyle: {
       backgroundColor: theme === "dark" ? "#121212" : "#fff",
     },
+    headerShadowVisible: false,
     headerLeft: () => (
       <Pressable onPress={() => navigation.goBack()}>
         <Ionicons
@@ -388,12 +276,17 @@ const TabNavigator: React.FC = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: theme === "dark" ? "#121212" : "#fff",
-          borderTopWidth: 0,
+          backgroundColor: "#A463FF", // Custom color
+          borderTopWidth: 0, // Remove the top border
+          borderRadius: 35, // Makes the bottom bar oval-shaped
+          margin: 20, // Add space around the tab bar for a floating effect
+          height: 60, // Adjust height for a better oval shape
+          paddingBottom: 0, // Add padding for spacing
+          position: "absolute", // Make it float above the screen
         },
         tabBarShowLabel: false,
-        tabBarActiveTintColor: "#A463FF",
-        tabBarInactiveTintColor: "#aaa",
+        tabBarActiveTintColor: "white",
+        tabBarInactiveTintColor: "#c093ff",
       }}
     >
       <Tab.Screen
@@ -401,16 +294,7 @@ const TabNavigator: React.FC = () => {
         component={HomeStack}
         options={{
           tabBarIcon: ({ color }) => (
-            <FontAwesome5 name="home" color={color} size={30} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Explore"
-        component={ExploreStack}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="travel-explore" color={color} size={34} />
+            <AntDesign name="home" color={color} size={30} />
           ),
         }}
       />
@@ -419,7 +303,7 @@ const TabNavigator: React.FC = () => {
         component={PlannerStack}
         options={{
           tabBarIcon: ({ color }) => (
-            <FontAwesome name="plane" color={color} size={34} />
+            <Ionicons name="airplane-outline" color={color} size={34} />
           ),
         }}
       />
@@ -428,7 +312,7 @@ const TabNavigator: React.FC = () => {
         component={Memories}
         options={{
           tabBarIcon: ({ color }) => (
-            <Ionicons name="images" color={color} size={30} />
+            <AntDesign name="picture" color={color} size={30} />
           ),
         }}
       />
@@ -437,7 +321,7 @@ const TabNavigator: React.FC = () => {
         component={Community}
         options={{
           tabBarIcon: ({ color }) => (
-            <FontAwesome name="users" color={color} size={30} />
+            <Ionicons name="people-outline" color={color} size={30} />
           ),
         }}
       />
