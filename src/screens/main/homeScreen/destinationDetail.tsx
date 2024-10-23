@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { Ionicons } from "@expo/vector-icons"; // Import Ionicons
 import { useTheme } from "../profileScreen/themeContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { collection, addDoc } from "firebase/firestore";
@@ -37,6 +36,8 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [extraImages, setExtraImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const scrollViewRef = useRef<ScrollView | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const { item } = route.params ?? {};
   const image = item?.image || "https://via.placeholder.com/400";
@@ -49,7 +50,6 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
-  // Function to fetch images from Pexels API
   const fetchPexelsImages = async (query: string) => {
     const PEXELS_API_KEY =
       "VpRUFZAwfA3HA4cwIoYVnHO51Lr36RauMaODMYPSTJpPGbRkmtFLa7pX";
@@ -78,11 +78,9 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   };
 
   useEffect(() => {
-    // Fetch additional images when component mounts
     const fetchImages = async () => {
       const countryImages = await fetchPexelsImages(item.location);
       const cityImages = await fetchPexelsImages(item.address);
-
       setExtraImages([...countryImages, ...cityImages]);
     };
 
@@ -112,24 +110,38 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
     }
   };
 
+  // Function to render dot indicators
+  const renderDotIndicators = () => {
+    const totalImages = extraImages.length + 1; // +1 for the main image
+    return (
+      <View style={currentStyles.dotsContainer}>
+        {Array.from({ length: totalImages }, (_, index) => (
+          <View
+            key={index}
+            style={[
+              currentStyles.dot,
+              currentIndex === index ? currentStyles.activeDot : {},
+            ]}
+          />
+        ))}
+      </View>
+    );
+  };
+
   return (
     <View style={currentStyles.container}>
-      {/* Scroll Hint */}
-      <View style={currentStyles.scrollHint}>
-        <Text style={currentStyles.scrollHintText}>Swipe to explore</Text>
-        <Ionicons
-          name="arrow-forward"
-          size={24}
-          color={theme === "dark" ? "#ccc" : "#888"}
-        />
-      </View>
-
       <ScrollView contentContainerStyle={currentStyles.scrollContent}>
         <ScrollView
+          ref={scrollViewRef}
           horizontal
           snapToInterval={SNAP_INTERVAL}
           decelerationRate="fast"
           showsHorizontalScrollIndicator={false}
+          onScroll={(event) => {
+            const contentOffsetX = event.nativeEvent.contentOffset.x;
+            const newIndex = Math.round(contentOffsetX / SNAP_INTERVAL);
+            setCurrentIndex(newIndex);
+          }}
           style={currentStyles.horizontalScroll}
           contentContainerStyle={currentStyles.horizontalScrollContent}
         >
@@ -179,6 +191,9 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
           ))}
         </ScrollView>
 
+        {/* Render dot indicators */}
+        {renderDotIndicators()}
+
         <View style={currentStyles.details}>
           <Text style={currentStyles.city}>{city}</Text>
           <Text style={currentStyles.country}>{country}</Text>
@@ -223,23 +238,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  scrollHint: {
-    position: "absolute",
-    top: 10,
-    left: width / 2 - 50,
-    alignItems: "center",
-    zIndex: 1,
-  },
-  scrollHintText: {
-    color: "#888",
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  arrowIcon: {
-    width: 24,
-    height: 24,
-    tintColor: "#888",
-  },
   scrollContent: {
     alignItems: "center",
     marginTop: 70,
@@ -248,10 +246,10 @@ const styles = StyleSheet.create({
     height: 350,
   },
   horizontalScrollContent: {
-    paddingHorizontal: 10, // Add horizontal padding to the content
+    paddingHorizontal: 10,
   },
   scrollItem: {
-    width: width - 40, // Reduce width to account for padding
+    width: width - 40,
     height: 350,
     marginHorizontal: 10,
   },
@@ -262,12 +260,12 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
-    borderRadius: 10, // Add border radius for consistency with images
+    borderRadius: 10,
   },
   image: {
     width: "100%",
     height: "100%",
-    borderRadius: 10, // Add border radius to images
+    borderRadius: 10,
   },
   details: {
     padding: 20,
@@ -290,13 +288,28 @@ const styles = StyleSheet.create({
     color: "#777",
     marginBottom: 5,
   },
+  dotsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 5,
+    backgroundColor: "#ccc",
+    marginHorizontal: 2,
+  },
+  activeDot: {
+    backgroundColor: "#A463FF",
+  },
   addButton: {
     backgroundColor: "#A463FF",
     borderRadius: 35,
     height: 60,
     width: "90%",
     alignItems: "center",
-    top: "8%",
+    top: "5%",
   },
   addButtonText: {
     color: "#fff",
@@ -321,23 +334,6 @@ const darkStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#121212",
   },
-  scrollHint: {
-    position: "absolute",
-    top: 10,
-    left: width / 2 - 50,
-    alignItems: "center",
-    zIndex: 1,
-  },
-  scrollHintText: {
-    color: "#ccc",
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  arrowIcon: {
-    width: 24,
-    height: 24,
-    tintColor: "#ccc",
-  },
   scrollContent: {
     alignItems: "center",
     marginTop: 70,
@@ -346,10 +342,10 @@ const darkStyles = StyleSheet.create({
     height: 350,
   },
   horizontalScrollContent: {
-    paddingHorizontal: 10, // Add horizontal padding to the content
+    paddingHorizontal: 10,
   },
   scrollItem: {
-    width: width - 40, // Reduce width to account for padding
+    width: width - 40,
     height: 350,
     marginHorizontal: 10,
   },
@@ -360,12 +356,12 @@ const darkStyles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
-    borderRadius: 10, // Add border radius for consistency with images
+    borderRadius: 10,
   },
   image: {
     width: "100%",
     height: "100%",
-    borderRadius: 10, // Add border radius to images
+    borderRadius: 10,
   },
   details: {
     padding: 20,
@@ -387,6 +383,21 @@ const darkStyles = StyleSheet.create({
     fontSize: 14,
     color: "#777",
     marginBottom: 5,
+  },
+  dotsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 5,
+    backgroundColor: "#ccc",
+    marginHorizontal: 2,
+  },
+  activeDot: {
+    backgroundColor: "#A463FF",
   },
   addButton: {
     backgroundColor: "#A463FF",

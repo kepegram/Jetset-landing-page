@@ -62,7 +62,11 @@ const Home: React.FC = () => {
       setInitialFetchDone(true);
     }
     fetchUserVisited(); // Always fetch visited data
-  }, [filter]); // Only run on mount
+  }, []);
+
+  useEffect(() => {
+    fetchFilterDestinations(true); // Fetch fresh data based on the selected filter
+  }, [filter]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -785,8 +789,8 @@ const styles = StyleSheet.create({
   },
   filterLabel: {
     fontSize: 16,
-    marginLeft: 10,
-    marginRight: 10,
+    marginLeft: 5,
+    marginRight: 5,
     marginTop: 5,
     color: "#000",
   },
