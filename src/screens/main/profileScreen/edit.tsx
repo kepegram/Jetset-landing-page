@@ -14,9 +14,9 @@ import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useProfile } from "./profileContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { doc, getDoc, setDoc } from "firebase/firestore"; // Firestore functions
-import { getAuth } from "firebase/auth"; // Firebase auth
-import { FIREBASE_DB } from "../../../../firebase.config"; // Firebase Firestore configuration
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { FIREBASE_DB } from "../../../../firebase.config";
 import { Button, AltButton } from "../../../components/button";
 import { useTheme } from "./themeContext";
 
@@ -188,11 +188,11 @@ const styles = StyleSheet.create({
     marginLeft: 25,
   },
   inputWrapper: {
-    flexDirection: "row", // Align icon and input horizontally
-    alignItems: "center", // Center align vertically
+    flexDirection: "row",
+    alignItems: "center",
   },
   input: {
-    width: "90%", // Allow input to take up remaining space
+    width: "90%",
     padding: 15,
     marginVertical: 5,
     borderColor: "#ddd",
@@ -237,11 +237,11 @@ const darkStyles = StyleSheet.create({
     marginLeft: 25,
   },
   inputWrapper: {
-    flexDirection: "row", // Align icon and input horizontally
-    alignItems: "center", // Center align vertically
+    flexDirection: "row",
+    alignItems: "center",
   },
   input: {
-    width: "90%", // Allow input to take up remaining space
+    width: "90%",
     padding: 15,
     marginVertical: 5,
     color: "#fff",

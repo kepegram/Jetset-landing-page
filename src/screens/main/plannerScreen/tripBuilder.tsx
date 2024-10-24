@@ -10,8 +10,8 @@ import {
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { useTheme } from "../profileScreen/themeContext";
-import DateTimePicker from "@react-native-community/datetimepicker"; // Expo DateTimePicker
-import { WebView } from "react-native-webview"; // Import WebView for Google search
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { WebView } from "react-native-webview";
 
 // Define the type for trip details
 type TripDetails = {
@@ -25,8 +25,8 @@ const TripBuilder: React.FC = () => {
   const route = useRoute();
   const { tripDetails } = route.params as { tripDetails: TripDetails };
 
-  const [travelCity, setTravelCity] = useState(""); // City input
-  const [travelState, setTravelState] = useState(""); // State or country input
+  const [travelCity, setTravelCity] = useState("");
+  const [travelState, setTravelState] = useState("");
   const [departureDate, setDepartureDate] = useState<Date>(new Date());
   const [returnDate, setReturnDate] = useState<Date>(new Date());
   const [showDeparturePicker, setShowDeparturePicker] =

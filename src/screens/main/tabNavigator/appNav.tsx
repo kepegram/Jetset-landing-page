@@ -14,7 +14,6 @@ import Edit from "../profileScreen/edit";
 import Settings from "../profileScreen/settings";
 import Planner from "../plannerScreen/planner";
 import Memories from "../memoriesScreen/memories";
-import Community from "../communityScreen/community";
 import DestinationDetailView from "../homeScreen/destinationDetail";
 import ChangePassword from "../profileScreen/changePassword";
 import AppTheme from "../profileScreen/appTheme";
@@ -47,7 +46,7 @@ export type RootStackParamList = {
   Planner: undefined;
   TripBuilder: { tripDetails: any };
   Memories: undefined;
-  Main: undefined; // Add Main route
+  Main: undefined;
 };
 
 // Create the main root stack
@@ -276,13 +275,13 @@ const TabNavigator: React.FC = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#A463FF", // Custom color
-          borderTopWidth: 0, // Remove the top border
-          borderRadius: 35, // Makes the bottom bar oval-shaped
-          margin: 20, // Add space around the tab bar for a floating effect
-          height: 60, // Adjust height for a better oval shape
-          paddingBottom: 0, // Add padding for spacing
-          position: "absolute", // Make it float above the screen
+          backgroundColor: "#A463FF",
+          borderTopWidth: 0,
+          borderRadius: 35,
+          margin: 20,
+          height: 60,
+          paddingBottom: 0,
+          position: "absolute",
         },
         tabBarShowLabel: false,
         tabBarActiveTintColor: "white",
@@ -313,15 +312,6 @@ const TabNavigator: React.FC = () => {
         options={{
           tabBarIcon: ({ color }) => (
             <AntDesign name="picture" color={color} size={30} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Groups"
-        component={Community}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="people-outline" color={color} size={30} />
           ),
         }}
       />

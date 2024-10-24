@@ -6,28 +6,24 @@ import React, {
   ReactNode,
 } from "react";
 import { Appearance } from "react-native";
-import { FIREBASE_DB } from "../../../../firebase.config"; // Firestore setup
-import { doc, setDoc, getDoc } from "firebase/firestore"; // Firestore functions
-import { getAuth } from "firebase/auth"; // Firebase auth
+import { FIREBASE_DB } from "../../../../firebase.config";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
-// Define the context value type
 type ThemeContextType = {
   theme: string;
   toggleTheme: (string) => void;
 };
 
-// Define the prop types for the ThemeProvider component
 type ThemeProviderProps = {
   children: ReactNode;
 };
 
-// Define the ThemeContext with default values
 const ThemeContext = createContext<ThemeContextType>({
   theme: "light",
   toggleTheme: () => {},
 });
 
-// Theme provider
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState(Appearance.getColorScheme());
   const auth = getAuth();

@@ -112,7 +112,7 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
 
   // Function to render dot indicators
   const renderDotIndicators = () => {
-    const totalImages = extraImages.length + 1; // +1 for the main image
+    const totalImages = extraImages.length + 1;
     return (
       <View style={currentStyles.dotsContainer}>
         {Array.from({ length: totalImages }, (_, index) => (

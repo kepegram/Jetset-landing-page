@@ -335,7 +335,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// Dark Theme Styles
 const darkStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -370,12 +369,12 @@ const darkStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#fff", // Ensure the text is visible in dark mode
+    color: "#fff",
   },
   separator: {
     height: 20,
     width: 1,
-    backgroundColor: "#fff", // White separator for dark mode
+    backgroundColor: "#fff",
     marginHorizontal: 10,
   },
   listContainer: {
@@ -393,9 +392,9 @@ const darkStyles = StyleSheet.create({
     flexDirection: "row",
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#444", // Darker line for separation
+    borderBottomColor: "#444",
     marginBottom: 10,
-    backgroundColor: "#222", // Darker background for trip items
+    backgroundColor: "#222",
     borderRadius: 10,
     width: width * 0.9,
   },
@@ -412,20 +411,20 @@ const darkStyles = StyleSheet.create({
   tripLocation: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#fff", // Ensure the text is visible in dark mode
+    color: "#fff",
   },
   tripAddress: {
     fontSize: 14,
-    color: "#aaa", // Lighter text for address
+    color: "#aaa",
   },
   noListsText: {
-    color: "#bbb", // Lighter text for dark mode
+    color: "#bbb",
     fontSize: 16,
     textAlign: "center",
   },
   loadingText: {
     fontSize: 16,
-    color: "#bbb", // Lighter text for loading message
+    color: "#bbb",
     textAlign: "center",
   },
   modalOverlay: {

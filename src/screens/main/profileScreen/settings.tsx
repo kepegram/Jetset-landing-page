@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Pressable, StyleSheet, Text, View, Switch, Alert } from "react-native";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";

@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { doc, getDoc } from "firebase/firestore"; // Firestore functions
-import { getAuth } from "firebase/auth"; // Firebase auth
-import { FIREBASE_DB } from "../../../../firebase.config"; // Firebase config
+import { doc, getDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { FIREBASE_DB } from "../../../../firebase.config";
 
 interface ProfileContextType {
   profilePicture: string;

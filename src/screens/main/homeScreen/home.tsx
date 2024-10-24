@@ -48,9 +48,9 @@ const Home: React.FC = () => {
   const [visitedData, setVisitedData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState<string>("All");
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false); 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false); // Search loading state
+  const [searchLoading, setSearchLoading] = useState(false); 
 
   const ITEMS_PER_PAGE = 20;
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -58,10 +58,10 @@ const Home: React.FC = () => {
   // Fetch data when the component mounts and on refresh
   useEffect(() => {
     if (!initialFetchDone) {
-      fetchFilterDestinations(true); // Fetch only once on initial launch
+      fetchFilterDestinations(true);
       setInitialFetchDone(true);
     }
-    fetchUserVisited(); // Always fetch visited data
+    fetchUserVisited();
   }, []);
 
   useEffect(() => {
@@ -70,8 +70,8 @@ const Home: React.FC = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    setCurrentPage(1); // Reset the page
-    fetchFilterDestinations(true); // Fetch fresh data on refresh
+    setCurrentPage(1); 
+    fetchFilterDestinations(true);
     setRefreshing(false);
   };
 
@@ -79,7 +79,7 @@ const Home: React.FC = () => {
   const handleSearch = async (text: string) => {
     setSearchText(text);
     if (text.length > 2) {
-      setSearchLoading(true); // Start loading
+      setSearchLoading(true);
       try {
         const response = await fetch(
           `http://api.geonames.org/searchJSON?q=${text}&maxRows=10&username=${USERNAME}`
@@ -100,7 +100,7 @@ const Home: React.FC = () => {
         console.error("Error fetching search results:", error);
         setSearchResults([]);
       } finally {
-        setSearchLoading(false); // End loading
+        setSearchLoading(false);
       }
     } else {
       setSearchResults([]);
@@ -114,9 +114,8 @@ const Home: React.FC = () => {
         console.log("Navigating to DestinationDetailView with item:", item);
         navigation.navigate("DestinationDetailView", { item });
 
-        // Clear the search text and results
-        setSearchText(""); // Clear the text input
-        setSearchResults([]); // Clear the results
+        setSearchText("");
+        setSearchResults([]);
       }}
     >
       <Text style={currentStyles.resultText}>
@@ -126,8 +125,8 @@ const Home: React.FC = () => {
   );
 
   const fetchCoordinates = async (location, address) => {
-    const API_KEY = "28c0017aba5f471fa18fe9fdb3cd026e"; // Replace with your OpenCage API key
-    const cacheKey = `${location}-${address}`; // Unique key for location and address
+    const API_KEY = "28c0017aba5f471fa18fe9fdb3cd026e"; 
+    const cacheKey = `${location}-${address}`;
     const cachedData = await AsyncStorage.getItem(cacheKey);
 
     if (cachedData) {
@@ -152,16 +151,16 @@ const Home: React.FC = () => {
         return coordinates;
       } else {
         console.error("No coordinates found for location:", location);
-        return null; // No coordinates found
+        return null;
       }
     } catch (error) {
       console.error("Error fetching coordinates:", error);
-      return null; // Handle error
+      return null; 
     }
   };
 
   const fetchFilterDestinations = async (reset = false) => {
-    setLoading(true); // Start loading
+    setLoading(true); 
     try {
       const auth = getAuth();
       const user = auth.currentUser;
@@ -177,7 +176,7 @@ const Home: React.FC = () => {
         if (cachedData) {
           const parsedData = JSON.parse(cachedData);
           setDestinationData(parsedData); // Load cached data if available
-          setLoading(false); // End loading
+          setLoading(false);
           return;
         }
       }
@@ -444,8 +443,8 @@ const Home: React.FC = () => {
 
           console.log("Navigating to DestinationDetailView with item:", {
             ...item,
-            latitude: coordinates?.latitude || 0, // Fallback to 0 if no coordinates found
-            longitude: coordinates?.longitude || 0, // Fallback to 0 if no coordinates found
+            latitude: coordinates?.latitude || 0, 
+            longitude: coordinates?.longitude || 0, 
           });
 
           navigation.navigate("DestinationDetailView", {
@@ -716,7 +715,7 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#333", // Subtle dark color for modern look
+    color: "#333",
   },
   profilePicture: {
     width: 40,
@@ -724,22 +723,22 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   inputContainer: {
-    flexDirection: "row", // Arrange icon and input horizontally
+    flexDirection: "row", 
     alignSelf: "center",
-    alignItems: "center", // Center them vertically
-    width: "90%", // Adjust width as needed
+    alignItems: "center", 
+    width: "90%", 
     backgroundColor: "#eee",
     borderRadius: 15,
     height: 45,
-    paddingHorizontal: 15, // Padding for input
+    paddingHorizontal: 15, 
   },
   iconContainer: {
-    marginRight: 10, // Spacing between icon and input
+    marginRight: 10,
   },
   searchInput: {
-    flex: 1, // Take the remaining space
+    flex: 1,
     fontSize: 16,
-    color: "#fff", // Adjust color as needed
+    color: "#fff",
   },
   resultList: {
     padding: 10,
@@ -766,7 +765,7 @@ const styles = StyleSheet.create({
   },
   switchText: {
     fontSize: 16,
-    color: "#888", // Lighter color for unselected text
+    color: "#888", 
   },
   selectedButton: {
     borderBottomWidth: 2,
@@ -795,14 +794,14 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   filterButton: {
-    paddingHorizontal: 15, // Increased horizontal padding
-    paddingVertical: 8, // Adjusted vertical padding for more space
+    paddingHorizontal: 15, 
+    paddingVertical: 8, 
     marginHorizontal: 5,
     height: 33,
   },
   filterSelectedButton: {
-    paddingHorizontal: 15, // Increased horizontal padding for consistency
-    paddingVertical: 8, // Adjusted vertical padding for more space
+    paddingHorizontal: 15,
+    paddingVertical: 8, 
     borderBottomWidth: 2,
     borderBottomColor: "#A463FF",
     marginHorizontal: 5,
@@ -810,13 +809,13 @@ const styles = StyleSheet.create({
   filterButtonText: {
     color: "#888",
     fontWeight: "bold",
-    fontSize: 14, // Reduced font size slightly to fit the container
+    fontSize: 14,
     flexShrink: 0,
   },
   filterSelectedButtonText: {
     color: "#000",
     fontWeight: "bold",
-    fontSize: 14, // Reduced font size slightly to fit the container
+    fontSize: 14,
     flexShrink: 0,
   },
   destinationListContainer: {
@@ -839,9 +838,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   textContainer: {
-    flexDirection: "row", // Make location, address, and actions inline
-    justifyContent: "space-between", // Spread them out across the container
-    alignItems: "center", // Align them vertically centered
+    flexDirection: "row",
+    justifyContent: "space-between", 
+    alignItems: "center",
   },
   location: {
     fontSize: 18,
@@ -853,13 +852,13 @@ const styles = StyleSheet.create({
     color: "#888",
   },
   actionsContainer: {
-    flexDirection: "column", // Stack the actions in a column
-    alignItems: "flex-end", // Align the actions to the right
+    flexDirection: "column",
+    alignItems: "flex-end", 
   },
   action1Text: {
     color: "#A463FF",
     fontSize: 14,
-    marginBottom: 5, // Add spacing between the two actions
+    marginBottom: 5,
   },
   action2Text: {
     color: "#000",
@@ -891,7 +890,7 @@ const darkStyles = StyleSheet.create({
   appName: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#fff", // Subtle dark color for modern look
+    color: "#fff",
   },
   profilePicture: {
     width: 40,
@@ -899,22 +898,22 @@ const darkStyles = StyleSheet.create({
     borderRadius: 20,
   },
   inputContainer: {
-    flexDirection: "row", // Arrange icon and input horizontally
+    flexDirection: "row", 
     alignSelf: "center",
-    alignItems: "center", // Center them vertically
-    width: "90%", // Adjust width as needed
+    alignItems: "center", 
+    width: "90%", 
     backgroundColor: "#212121",
     borderRadius: 15,
     height: 45,
-    paddingHorizontal: 15, // Padding for input
+    paddingHorizontal: 15, 
   },
   iconContainer: {
-    marginRight: 10, // Spacing between icon and input
+    marginRight: 10, 
   },
   searchInput: {
-    flex: 1, // Take the remaining space
+    flex: 1, 
     fontSize: 16,
-    color: "#fff", // Adjust color as needed
+    color: "#fff", 
   },
   resultList: {
     padding: 10,
@@ -941,7 +940,7 @@ const darkStyles = StyleSheet.create({
   },
   switchText: {
     fontSize: 16,
-    color: "#888", // Lighter color for unselected text
+    color: "#888", 
   },
   selectedButton: {
     borderBottomWidth: 2,
@@ -970,14 +969,14 @@ const darkStyles = StyleSheet.create({
     color: "#fff",
   },
   filterButton: {
-    paddingHorizontal: 15, // Increased horizontal padding
-    paddingVertical: 8, // Adjusted vertical padding for more space
+    paddingHorizontal: 15,
+    paddingVertical: 8, 
     marginHorizontal: 5,
     height: 33,
   },
   filterSelectedButton: {
-    paddingHorizontal: 15, // Increased horizontal padding for consistency
-    paddingVertical: 8, // Adjusted vertical padding for more space
+    paddingHorizontal: 15, 
+    paddingVertical: 8, 
     borderBottomWidth: 2,
     borderBottomColor: "#A463FF",
     marginHorizontal: 5,
@@ -985,13 +984,13 @@ const darkStyles = StyleSheet.create({
   filterButtonText: {
     color: "#707070",
     fontWeight: "bold",
-    fontSize: 14, // Reduced font size slightly to fit the container
+    fontSize: 14,
     flexShrink: 0,
   },
   filterSelectedButtonText: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 14, // Reduced font size slightly to fit the container
+    fontSize: 14,
     flexShrink: 0,
   },
   destinationListContainer: {
@@ -1014,9 +1013,9 @@ const darkStyles = StyleSheet.create({
     flexGrow: 1,
   },
   textContainer: {
-    flexDirection: "row", // Make location, address, and actions inline
-    justifyContent: "space-between", // Spread them out across the container
-    alignItems: "center", // Align them vertically centered
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   location: {
     fontSize: 18,
@@ -1028,13 +1027,13 @@ const darkStyles = StyleSheet.create({
     color: "#888",
   },
   actionsContainer: {
-    flexDirection: "column", // Stack the actions in a column
-    alignItems: "flex-end", // Align the actions to the right
+    flexDirection: "column", 
+    alignItems: "flex-end", 
   },
   action1Text: {
     color: "#A463FF",
     fontSize: 14,
-    marginBottom: 5, // Add spacing between the two actions
+    marginBottom: 5,
   },
   action2Text: {
     color: "#fff",

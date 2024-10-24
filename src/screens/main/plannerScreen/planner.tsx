@@ -11,11 +11,11 @@ import React, { useCallback, useState } from "react";
 import { useProfile } from "../profileScreen/profileContext";
 import { useTheme } from "../profileScreen/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../tabNavigator/appNav"; // Update the import path
+import { RootStackParamList } from "../tabNavigator/appNav"; 
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { AntDesign, Ionicons } from "@expo/vector-icons"; // Importing Ionicons
+import { AntDesign, Ionicons } from "@expo/vector-icons"; 
 import { getAuth } from "firebase/auth";
 
 type PlannerScreenNavigationProp = NativeStackNavigationProp<
@@ -205,13 +205,13 @@ const styles = StyleSheet.create({
   },
   cardBody: {
     padding: 12,
-    paddingBottom: 20, // Add extra padding at the bottom for spacing
+    paddingBottom: 20, 
     flexGrow: 1,
   },
   textContainer: {
-    flexDirection: "row", // Make location, address, and actions inline
-    justifyContent: "space-between", // Spread them out across the container
-    alignItems: "center", // Align them vertically centered
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
   },
   location: {
     fontSize: 18,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     color: "#888",
   },
   trashIconContainer: {
-    marginLeft: 10, // Adds spacing between the text and the icon
+    marginLeft: 10, 
   },
 });
 
@@ -281,13 +281,13 @@ const darkStyles = StyleSheet.create({
   },
   cardBody: {
     padding: 12,
-    paddingBottom: 20, // Add extra padding at the bottom for spacing
+    paddingBottom: 20, 
     flexGrow: 1,
   },
   textContainer: {
-    flexDirection: "row", // Make location, address, and actions inline
-    justifyContent: "space-between", // Spread them out across the container
-    alignItems: "center", // Align them vertically centered
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center",
   },
   location: {
     fontSize: 18,
@@ -299,6 +299,6 @@ const darkStyles = StyleSheet.create({
     color: "#888",
   },
   trashIconContainer: {
-    marginLeft: 10, // Adds spacing between the text and the icon
+    marginLeft: 10, 
   },
 });

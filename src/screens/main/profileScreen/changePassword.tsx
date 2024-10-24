@@ -8,7 +8,7 @@ import {
   reauthenticateWithCredential,
   updatePassword,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore"; // Firestore functions
+import { doc, getDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   input: {
-    width: "90%", // Allow input to take up remaining space
+    width: "90%",
     padding: 15,
     marginVertical: 5,
     borderColor: "#ddd",
@@ -188,7 +188,7 @@ const darkStyles = StyleSheet.create({
     alignItems: "center",
   },
   input: {
-    width: "90%", // Allow input to take up remaining space
+    width: "90%",
     padding: 15,
     marginVertical: 5,
     borderColor: "#ddd",

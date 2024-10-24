@@ -1,9 +1,9 @@
 import { StyleSheet, Switch, Text, View } from "react-native";
 import React from "react";
-import { useTheme } from "./themeContext"; // Import the custom hook
+import { useTheme } from "./themeContext";
 
 const AppTheme: React.FC = () => {
-  const { theme, toggleTheme } = useTheme(); // Access theme and toggle function from context
+  const { theme, toggleTheme } = useTheme();
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
 

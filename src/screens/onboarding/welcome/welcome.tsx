@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
 import { useTheme } from "../../main/profileScreen/themeContext";
 import * as Haptics from "expo-haptics";
-import { Ionicons } from "@expo/vector-icons"; // Importing Ionicons
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -81,7 +80,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     color: "#737373",
-    marginBottom: 50, // Adjusted to make space for buttons
+    marginBottom: 50,
     paddingHorizontal: 20,
   },
   buttonContainer: {
@@ -90,12 +89,12 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   button: {
-    backgroundColor: "#A463FF", // Button color
-    width: "80%", // Width of the button
+    backgroundColor: "#A463FF",
+    width: "80%",
     padding: 15,
     borderRadius: 30,
     alignItems: "center",
-    marginBottom: 10, // Space between buttons
+    marginBottom: 10,
   },
   buttonText: {
     color: "#fff",
@@ -130,7 +129,7 @@ const darkStyles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     color: "#737373",
-    marginBottom: 50, // Adjusted to make space for buttons
+    marginBottom: 50,
     paddingHorizontal: 20,
   },
   buttonContainer: {
@@ -139,12 +138,12 @@ const darkStyles = StyleSheet.create({
     marginBottom: 30,
   },
   button: {
-    backgroundColor: "#A463FF", // Button color
-    width: "80%", // Width of the button
+    backgroundColor: "#A463FF",
+    width: "80%",
     padding: 15,
     borderRadius: 30,
     alignItems: "center",
-    marginBottom: 10, // Space between buttons
+    marginBottom: 10,
   },
   buttonText: {
     color: "#fff",

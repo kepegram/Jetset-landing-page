@@ -9,16 +9,16 @@ import {
   TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config"; // import your Firebase config
-import { doc, setDoc } from "firebase/firestore"; // Firestore method
-import { reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth"; // Re-authentication
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
+import { doc, setDoc } from "firebase/firestore"; 
+import { reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { useTheme } from "./themeContext";
 
 const DeleteAccount: React.FC = () => {
   const { theme } = useTheme();
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [otherReason, setOtherReason] = useState<string>("");
-  const [password, setPassword] = useState<string>(""); // Input for re-authentication
+  const [password, setPassword] = useState<string>("");
 
   const reasons = [
     "Switching to another app",
@@ -49,7 +49,7 @@ const DeleteAccount: React.FC = () => {
 
     // Step 1: Re-authenticate the user
     const email = user.email;
-    const credential = EmailAuthProvider.credential(email!, password); // Re-auth with entered password
+    const credential = EmailAuthProvider.credential(email!, password);
 
     try {
       await reauthenticateWithCredential(user, credential);
@@ -171,12 +171,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginVertical: 20,
     color: "#555",
-    textAlign: "center", // Center the subtitle text
+    textAlign: "center",
   },
   scrollContainer: {
-    flexGrow: 1, // Ensure content takes the full height of the screen
-    justifyContent: "center", // Center the items vertically
-    paddingBottom: 200, // Adjust this if needed
+    flexGrow: 1, 
+    justifyContent: "center", 
+    paddingBottom: 200, 
   },
   radioContainer: {
     flexDirection: "row",
@@ -221,12 +221,12 @@ const darkStyles = StyleSheet.create({
     fontSize: 18,
     marginVertical: 20,
     color: "#bbb",
-    textAlign: "center", // Center the subtitle text
+    textAlign: "center",
   },
   scrollContainer: {
-    flexGrow: 1, // Ensure content takes the full height of the screen
-    justifyContent: "center", // Center the items vertically
-    paddingBottom: 200, // Adjust this if needed
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 200,
   },
   radioContainer: {
     flexDirection: "row",
