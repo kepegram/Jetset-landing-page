@@ -35,7 +35,7 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
   "Home"
 >;
 
-const USERNAME = "kpegra1"; // Your GeoNames username
+const USERNAME = "kpegra1";
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
