@@ -1,19 +1,22 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; // Removed useEffect import
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  ScrollView,
   ImageBackground,
+  Dimensions,
+  FlatList,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { useTheme } from "../profileScreen/themeContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { WebView } from "react-native-webview";
+import { Dropdown } from "react-native-element-dropdown";
+import SwipeableModal from "../../../components/swipeableModal";
 
-// Define the type for trip details
+const height = Dimensions.get("screen").height;
+
 type TripDetails = {
   image: string;
   location: string;
@@ -26,111 +29,135 @@ const TripBuilder: React.FC = () => {
   const { tripDetails } = route.params as { tripDetails: TripDetails };
 
   const [travelCity, setTravelCity] = useState("");
-  const [travelState, setTravelState] = useState("");
   const [departureDate, setDepartureDate] = useState<Date>(new Date());
   const [returnDate, setReturnDate] = useState<Date>(new Date());
-  const [showDeparturePicker, setShowDeparturePicker] =
-    useState<boolean>(false);
-  const [showReturnPicker, setShowReturnPicker] = useState<boolean>(false);
   const [companyName, setCompanyName] = useState<string>("Any");
   const [webViewVisible, setWebViewVisible] = useState<boolean>(false);
-
-  // New state variables for counters
-  const [adultCount, setAdultCount] = useState<number>(1); // Default to 1 adult
-  const [childCount, setChildCount] = useState<number>(0); // Default to 0 children
+  const [adultCount, setAdultCount] = useState<number>(1);
+  const [childCount, setChildCount] = useState<number>(0);
+  const [fromAirportCode, setFromAirportCode] = useState("");
+  const [toAirportCode, setToAirportCode] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]); // State for airport suggestions
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
+  const handleCityChange = async (city: string, isFromCity = true) => {
+    const accessToken = "gc3WxSoAMGRWIMFsZu6cIWByGtdSPFTV"; // Replace with your Amadeus API key
+    try {
+      const response = await fetch(
+        `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${city}&subType=AIRPORT`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setSuggestions(data.data); // Set suggestions to the response
+      const airportCode = data.data[0]?.iataCode || "";
+      isFromCity
+        ? setFromAirportCode(airportCode)
+        : setToAirportCode(airportCode);
+    } catch (error) {
+      console.error("Error fetching airport code:", error);
+    }
+  };
+
+  const handleSearch = () => {
+    if (!fromAirportCode || !toAirportCode || !departureDate || !returnDate) {
+      alert("Please fill in all fields before proceeding.");
+      return;
+    }
+    setWebViewVisible(true);
+  };
+
+  const handleTravelCityChange = (city: string) => {
+    setTravelCity(city);
+    if (city) {
+      handleCityChange(city, true); // Fetch airport codes as user types
+    } else {
+      setSuggestions([]); // Clear suggestions if input is empty
+    }
+  };
+
+  const handleSelectSuggestion = (airport: any) => {
+    setTravelCity(airport.name); // Set the city name from the suggestion
+    setFromAirportCode(airport.iataCode); // Set the airport code
+    setSuggestions([]); // Clear suggestions after selection
+  };
+
+  const airlineOptions = [
+    { label: "Any", value: "Any" },
+    { label: "Spirit Airlines", value: "Spirit Airlines" },
+    { label: "Delta Airlines", value: "Delta Airlines" },
+    { label: "American Airlines", value: "American Airlines" },
+    { label: "United Airlines", value: "United Airlines" },
+  ];
+
   const handleDepartureDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || departureDate;
-    setShowDeparturePicker(false);
-    setDepartureDate(currentDate);
-
-    // Ensure return date is after the departure date
-    if (returnDate <= currentDate) {
-      setReturnDate(currentDate);
+    if (currentDate >= new Date()) {
+      setDepartureDate(currentDate);
+      if (returnDate <= currentDate) {
+        setReturnDate(currentDate);
+      }
     }
   };
 
   const handleReturnDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || returnDate;
-    setShowReturnPicker(false);
-
-    // Only allow return dates after the departure date
     if (currentDate > departureDate) {
       setReturnDate(currentDate);
     }
   };
 
-  const handleSearch = () => {
-    // Validate required fields
-    if (!travelCity || !travelState || !departureDate || !returnDate) {
-      alert(
-        "Please fill in all fields (City, State, and both dates) before proceeding."
-      );
-      return; // Prevent proceeding if validation fails
-    }
-    setWebViewVisible(true);
-  };
-
   if (webViewVisible) {
-    let searchQueryUrl;
-
-    // Priceline search URL construction when companyName is "Any"
+    let searchQueryUrl: string;
     if (companyName === "Any") {
-      searchQueryUrl = `https://www.priceline.com/flights/#/search/${travelCity}-${travelState}/${
+      searchQueryUrl = `https://www.google.com/flights?hl=en#flt=${travelCity}.${
         tripDetails.address
-      }-${tripDetails.location}/${departureDate.toISOString().split("T")[0]}/${
+      }.${departureDate.toISOString().split("T")[0]}*${
+        tripDetails.address
+      }.${travelCity}.${
         returnDate.toISOString().split("T")[0]
-      }/${adultCount}/${childCount}/economy`;
-    }
-    // Redirect to Spirit Airlines
-    else if (companyName === "Spirit Airlines") {
+      };c:USD;e:1;sc:b;px:${adultCount},${childCount};`;
+    } else if (companyName === "Spirit Airlines") {
       searchQueryUrl = `https://www.spirit.com/book/flights?departureCity=${travelCity}&arrivalCity=${
         tripDetails.address
       }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
         returnDate.toISOString().split("T")[0]
       }&adultPassengers=${adultCount}&childPassengers=${childCount}`;
-    }
-    // Redirect to Delta Airlines
-    else if (companyName === "Delta Airlines") {
+    } else if (companyName === "Delta Airlines") {
       searchQueryUrl = `https://www.delta.com/flight-search/book-a-flight?fromCity=${travelCity}&toCity=${
         tripDetails.address
       }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
         returnDate.toISOString().split("T")[0]
       }&adults=${adultCount}&children=${childCount}`;
-    }
-    // Redirect to American Airlines
-    else if (companyName === "American Airlines") {
+    } else if (companyName === "American Airlines") {
       searchQueryUrl = `https://www.aa.com/booking/flights?origin=${travelCity}&destination=${
         tripDetails.address
       }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
         returnDate.toISOString().split("T")[0]
       }&adults=${adultCount}&children=${childCount}`;
-    }
-    // Redirect to United Airlines
-    else if (companyName === "United Airlines") {
+    } else if (companyName === "United Airlines") {
       searchQueryUrl = `https://www.united.com/en/us/fsr/choose-flights?from=${travelCity}&to=${
         tripDetails.address
       }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
         returnDate.toISOString().split("T")[0]
       }&adultPassengers=${adultCount}&childPassengers=${childCount}`;
     }
-
     return (
-      <View style={{ flex: 1 }}>
-        <TouchableOpacity
-          onPress={() => setWebViewVisible(false)} // Back button action
-          // Styling for the back button
-        >
-          <Text>Back</Text>
-        </TouchableOpacity>
-        <WebView
-          source={{
-            uri: searchQueryUrl,
-          }}
-        />
-      </View>
+      <SwipeableModal
+        visible={webViewVisible}
+        onClose={() => setWebViewVisible(false)}
+        url={searchQueryUrl}
+        height={height - 35}
+      />
     );
   }
 
@@ -154,12 +181,11 @@ const TripBuilder: React.FC = () => {
         imageStyle={{ borderRadius: 10 }}
       >
         <View style={currentStyles.overlay} />
-        <Text style={currentStyles.city}>
-          Let's go to {tripDetails.address}, {tripDetails.location}.
+        <Text style={currentStyles.title}>
+          Let's go to {tripDetails.address}.
         </Text>
       </ImageBackground>
 
-      {/* Traveling From Section */}
       <View style={currentStyles.bookingContainer}>
         <View style={currentStyles.travelFromContainer}>
           <Text style={currentStyles.travelFromHeaderText}>From:</Text>
@@ -167,92 +193,67 @@ const TripBuilder: React.FC = () => {
             style={currentStyles.travelFromInput}
             placeholder="City"
             placeholderTextColor={theme === "dark" ? "#ccc" : "#888"}
-            onChangeText={setTravelCity}
+            onChangeText={handleTravelCityChange} // Update handler
             value={travelCity}
           />
-          <TextInput
-            style={currentStyles.travelFromInput}
-            placeholder="State or Country"
-            placeholderTextColor={theme === "dark" ? "#ccc" : "#888"}
-            onChangeText={setTravelState}
-            value={travelState}
-          />
         </View>
+
+        {/* Suggestions List */}
+        {suggestions.length > 0 && (
+          <FlatList
+            data={suggestions}
+            keyExtractor={(item) => item.iataCode}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={currentStyles.suggestion}
+                onPress={() => handleSelectSuggestion(item)}
+              >
+                <Text style={currentStyles.suggestionText}>
+                  {item.name} ({item.iataCode})
+                </Text>
+              </TouchableOpacity>
+            )}
+            style={currentStyles.suggestionList}
+          />
+        )}
 
         {/* Date Pickers */}
         <View style={currentStyles.datePickersRow}>
           <View style={currentStyles.dateContainer}>
             <Text style={currentStyles.dateText}>Departure:</Text>
-            <TouchableOpacity
-              onPress={() => setShowDeparturePicker(true)}
-              style={currentStyles.dateButton}
-            >
-              <Text style={currentStyles.dateButtonText}>
-                {departureDate.toDateString()}
-              </Text>
-            </TouchableOpacity>
+            <DateTimePicker
+              value={departureDate}
+              mode="date"
+              display="calendar"
+              minimumDate={new Date()}
+              onChange={handleDepartureDateChange}
+            />
           </View>
 
           <View style={currentStyles.dateContainer}>
             <Text style={currentStyles.dateText}>Return:</Text>
-            <TouchableOpacity
-              onPress={() => setShowReturnPicker(true)}
-              style={currentStyles.dateButton}
-            >
-              <Text style={currentStyles.dateButtonText}>
-                {returnDate.toDateString()}
-              </Text>
-            </TouchableOpacity>
+            <DateTimePicker
+              value={returnDate}
+              mode="date"
+              display="calendar"
+              minimumDate={departureDate}
+              onChange={handleReturnDateChange}
+            />
           </View>
         </View>
 
-        {/* DateTimePicker for Departure Date */}
-        {showDeparturePicker && (
-          <DateTimePicker
-            value={departureDate}
-            mode="date"
-            display="calendar"
-            onChange={handleDepartureDateChange}
-          />
-        )}
-
-        {/* DateTimePicker for Return Date */}
-        {showReturnPicker && (
-          <DateTimePicker
-            value={returnDate}
-            mode="date"
-            display="calendar"
-            minimumDate={departureDate} // Ensure the return date is after the departure date
-            onChange={handleReturnDateChange}
-          />
-        )}
-
-        {/* Company Name Selection */}
+        {/* Company Name Dropdown */}
         <View style={currentStyles.companyContainer}>
-          <Text style={currentStyles.companyHeader}>Company Name:</Text>
-          {/* Radio Buttons for Company Name Selection */}
-          <View style={currentStyles.radioGroup}>
-            {[
-              "Any",
-              "Spirit Airlines",
-              "Delta Airlines",
-              "American Airlines",
-              "United Airlines",
-            ].map((option) => (
-              <TouchableOpacity
-                key={option}
-                style={currentStyles.radioButton}
-                onPress={() => setCompanyName(option)}
-              >
-                <View style={currentStyles.radioCircle}>
-                  {companyName === option && (
-                    <View style={currentStyles.selectedRadioCircle} />
-                  )}
-                </View>
-                <Text style={currentStyles.radioText}>{option}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <Text style={currentStyles.companyHeader}>Airline:</Text>
+          <Dropdown
+            style={currentStyles.dropdown}
+            data={airlineOptions}
+            labelField="label"
+            valueField="value"
+            placeholder="Select an airline"
+            value={companyName}
+            onChange={(item) => setCompanyName(item.value)}
+          />
         </View>
 
         {/* Adults and Children Counters */}
@@ -315,6 +316,8 @@ export default TripBuilder;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
   },
   imageBackground: {
     width: "100%",
@@ -324,11 +327,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject, // Fills the parent container
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent grey
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  city: {
-    fontSize: 30,
+  title: {
+    fontSize: 40,
     fontWeight: "bold",
     color: "#fff",
     textShadowColor: "rgba(0, 0, 0, 0.7)",
@@ -339,17 +342,20 @@ const styles = StyleSheet.create({
     marginTop: 5,
     padding: 20,
     borderRadius: 15,
-    shadowOpacity: 30,
-    top: "90%",
-    shadowColor: "grey",
+    top: "80%",
     backgroundColor: "white",
     position: "absolute",
+    width: "90%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   travelFromContainer: {
     width: "100%",
-    flexDirection: "row", // Align inputs in a row
-    justifyContent: "space-between", // Space between inputs
-    alignItems: "center", // Align vertically in the center if needed
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   travelFromHeaderText: {
     fontSize: 16,
@@ -363,29 +369,34 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#A463FF",
     marginBottom: 20,
-    width: "38%", // Adjust width for row alignment
+    width: "100%",
+  },
+  suggestionList: {
+    position: "absolute",
+    backgroundColor: "white",
+    zIndex: 1,
+    width: "100%",
+    maxHeight: 200,
+  },
+  suggestion: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  suggestionText: {
+    color: "#333",
   },
   datePickersRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 5,
   },
-  dateContainer: {
-    width: "48%",
-  },
+  dateContainer: {},
   dateText: {
     fontSize: 16,
     color: "#b8b8b8",
     fontWeight: "bold",
     marginBottom: 5,
-  },
-  dateButton: {
-    alignItems: "center",
-    padding: 10,
-  },
-  dateButtonText: {
-    color: "#000",
-    fontWeight: "bold",
   },
   companyContainer: {
     width: "100%",
@@ -396,50 +407,30 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#b8b8b8",
   },
-  radioGroup: {
-    flexDirection: "row",
-    flexWrap: "wrap", // Allow wrapping to the next line if needed
+  dropdown: {
+    height: 40,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
     marginTop: 10,
     marginBottom: 20,
-  },
-  radioButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 15,
-  },
-  radioCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#A463FF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  selectedRadioCircle: {
-    height: 10,
-    width: 10,
-    borderRadius: 5,
-    backgroundColor: "#A463FF",
-  },
-  radioText: {
-    marginLeft: 5,
-    color: "#000",
   },
   counterContainer: {
     marginBottom: 20,
   },
   countersRow: {
     flexDirection: "row",
-    justifyContent: "space-between", // Space between Adult and Children sections
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   counterSection: {
-    width: "48%", // Adjust width to ensure they fit in the row
+    width: "48%",
   },
   counterHeader: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#b8b8b8",
   },
   counterButtons: {
     flexDirection: "row",
@@ -469,6 +460,15 @@ const styles = StyleSheet.create({
   },
   searchButtonText: {
     fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  closeButton: {
+    padding: 15,
+    backgroundColor: "#333",
+    alignSelf: "center",
+  },
+  closeButtonText: {
     color: "#fff",
     fontWeight: "bold",
   },
@@ -487,11 +487,11 @@ const darkStyles = StyleSheet.create({
     overflow: "hidden",
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject, // Fills the parent container
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent grey
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  city: {
-    fontSize: 30,
+  title: {
+    fontSize: 40,
     fontWeight: "bold",
     color: "#fff",
     textShadowColor: "rgba(0, 0, 0, 0.7)",
@@ -502,17 +502,21 @@ const darkStyles = StyleSheet.create({
     marginTop: 5,
     padding: 20,
     borderRadius: 15,
-    shadowOpacity: 30,
     top: "90%",
-    shadowColor: "grey",
     backgroundColor: "white",
     position: "absolute",
+    width: "50%",
+    shadowColor: "#fff",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   travelFromContainer: {
     width: "100%",
-    flexDirection: "row", // Align inputs in a row
-    justifyContent: "space-between", // Space between inputs
-    alignItems: "center", // Align vertically in the center if needed
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   travelFromHeaderText: {
     fontSize: 16,
@@ -526,29 +530,34 @@ const darkStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#A463FF",
     marginBottom: 20,
-    width: "38%", // Adjust width for row alignment
+    width: "38%",
+  },
+  suggestionList: {
+    position: "absolute",
+    backgroundColor: "white",
+    zIndex: 1,
+    width: "100%",
+    maxHeight: 200,
+  },
+  suggestion: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  suggestionText: {
+    color: "#333",
   },
   datePickersRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 5,
   },
-  dateContainer: {
-    width: "48%",
-  },
+  dateContainer: {},
   dateText: {
     fontSize: 16,
     color: "#b8b8b8",
     fontWeight: "bold",
     marginBottom: 5,
-  },
-  dateButton: {
-    alignItems: "center",
-    padding: 10,
-  },
-  dateButtonText: {
-    color: "#000",
-    fontWeight: "bold",
   },
   companyContainer: {
     width: "100%",
@@ -559,9 +568,16 @@ const darkStyles = StyleSheet.create({
     fontWeight: "bold",
     color: "#b8b8b8",
   },
+  dropdown: {
+    height: 40,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
   radioGroup: {
     flexDirection: "row",
-    flexWrap: "wrap", // Allow wrapping to the next line if needed
+    flexWrap: "wrap",
     marginTop: 10,
     marginBottom: 20,
   },
@@ -594,11 +610,11 @@ const darkStyles = StyleSheet.create({
   },
   countersRow: {
     flexDirection: "row",
-    justifyContent: "space-between", // Space between Adult and Children sections
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   counterSection: {
-    width: "48%", // Adjust width to ensure they fit in the row
+    width: "48%",
   },
   counterHeader: {
     fontSize: 18,
@@ -632,6 +648,15 @@ const darkStyles = StyleSheet.create({
   },
   searchButtonText: {
     fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  closeButton: {
+    padding: 15,
+    backgroundColor: "#333",
+    alignSelf: "center",
+  },
+  closeButtonText: {
     color: "#fff",
     fontWeight: "bold",
   },
