@@ -12,8 +12,8 @@ import {
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useProfile } from "../profileScreen/profileContext";
-import { useTheme } from "../profileScreen/themeContext";
+import { useProfile } from "../../../context/profileContext";
+import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
@@ -48,9 +48,9 @@ const Home: React.FC = () => {
   const [visitedData, setVisitedData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState<string>("All");
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false); 
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const ITEMS_PER_PAGE = 20;
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -70,7 +70,7 @@ const Home: React.FC = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    setCurrentPage(1); 
+    setCurrentPage(1);
     fetchFilterDestinations(true);
     setRefreshing(false);
   };
@@ -125,7 +125,7 @@ const Home: React.FC = () => {
   );
 
   const fetchCoordinates = async (location, address) => {
-    const API_KEY = "28c0017aba5f471fa18fe9fdb3cd026e"; 
+    const API_KEY = "28c0017aba5f471fa18fe9fdb3cd026e";
     const cacheKey = `${location}-${address}`;
     const cachedData = await AsyncStorage.getItem(cacheKey);
 
@@ -155,12 +155,12 @@ const Home: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching coordinates:", error);
-      return null; 
+      return null;
     }
   };
 
   const fetchFilterDestinations = async (reset = false) => {
-    setLoading(true); 
+    setLoading(true);
     try {
       const auth = getAuth();
       const user = auth.currentUser;
@@ -443,8 +443,8 @@ const Home: React.FC = () => {
 
           console.log("Navigating to DestinationDetailView with item:", {
             ...item,
-            latitude: coordinates?.latitude || 0, 
-            longitude: coordinates?.longitude || 0, 
+            latitude: coordinates?.latitude || 0,
+            longitude: coordinates?.longitude || 0,
           });
 
           navigation.navigate("DestinationDetailView", {
@@ -723,14 +723,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   inputContainer: {
-    flexDirection: "row", 
+    flexDirection: "row",
     alignSelf: "center",
-    alignItems: "center", 
-    width: "90%", 
+    alignItems: "center",
+    width: "90%",
     backgroundColor: "#eee",
     borderRadius: 15,
     height: 45,
-    paddingHorizontal: 15, 
+    paddingHorizontal: 15,
   },
   iconContainer: {
     marginRight: 10,
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
   },
   switchText: {
     fontSize: 16,
-    color: "#888", 
+    color: "#888",
   },
   selectedButton: {
     borderBottomWidth: 2,
@@ -794,14 +794,14 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   filterButton: {
-    paddingHorizontal: 15, 
-    paddingVertical: 8, 
+    paddingHorizontal: 15,
+    paddingVertical: 8,
     marginHorizontal: 5,
     height: 33,
   },
   filterSelectedButton: {
     paddingHorizontal: 15,
-    paddingVertical: 8, 
+    paddingVertical: 8,
     borderBottomWidth: 2,
     borderBottomColor: "#A463FF",
     marginHorizontal: 5,
@@ -839,7 +839,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flexDirection: "row",
-    justifyContent: "space-between", 
+    justifyContent: "space-between",
     alignItems: "center",
   },
   location: {
@@ -853,7 +853,7 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     flexDirection: "column",
-    alignItems: "flex-end", 
+    alignItems: "flex-end",
   },
   action1Text: {
     color: "#A463FF",
@@ -898,22 +898,22 @@ const darkStyles = StyleSheet.create({
     borderRadius: 20,
   },
   inputContainer: {
-    flexDirection: "row", 
+    flexDirection: "row",
     alignSelf: "center",
-    alignItems: "center", 
-    width: "90%", 
+    alignItems: "center",
+    width: "90%",
     backgroundColor: "#212121",
     borderRadius: 15,
     height: 45,
-    paddingHorizontal: 15, 
+    paddingHorizontal: 15,
   },
   iconContainer: {
-    marginRight: 10, 
+    marginRight: 10,
   },
   searchInput: {
-    flex: 1, 
+    flex: 1,
     fontSize: 16,
-    color: "#fff", 
+    color: "#fff",
   },
   resultList: {
     padding: 10,
@@ -940,7 +940,7 @@ const darkStyles = StyleSheet.create({
   },
   switchText: {
     fontSize: 16,
-    color: "#888", 
+    color: "#888",
   },
   selectedButton: {
     borderBottomWidth: 2,
@@ -970,13 +970,13 @@ const darkStyles = StyleSheet.create({
   },
   filterButton: {
     paddingHorizontal: 15,
-    paddingVertical: 8, 
+    paddingVertical: 8,
     marginHorizontal: 5,
     height: 33,
   },
   filterSelectedButton: {
-    paddingHorizontal: 15, 
-    paddingVertical: 8, 
+    paddingHorizontal: 15,
+    paddingVertical: 8,
     borderBottomWidth: 2,
     borderBottomColor: "#A463FF",
     marginHorizontal: 5,
@@ -1027,8 +1027,8 @@ const darkStyles = StyleSheet.create({
     color: "#888",
   },
   actionsContainer: {
-    flexDirection: "column", 
-    alignItems: "flex-end", 
+    flexDirection: "column",
+    alignItems: "flex-end",
   },
   action1Text: {
     color: "#A463FF",

@@ -5,8 +5,8 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
-import { AltButton } from "../../../components/button";
-import { useTheme } from "./themeContext";
+import { AltButton } from "../../../ui/button";
+import { useTheme } from "../../../context/themeContext";
 
 type SettingsScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,

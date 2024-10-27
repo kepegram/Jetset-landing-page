@@ -19,7 +19,7 @@ import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../../App";
-import { useTheme } from "../../main/profileScreen/themeContext";
+import { useTheme } from "../../../context/themeContext";
 import * as Haptics from "expo-haptics";
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<
@@ -107,7 +107,7 @@ const SignUp: React.FC = () => {
             placeholderTextColor={theme === "dark" ? "#6b6b6b" : "#cdcdcd"}
             value={name}
             onChangeText={setName}
-            editable={!loading} 
+            editable={!loading}
           />
 
           <Text style={currentStyles.inputHeader}>Email</Text>
@@ -119,7 +119,7 @@ const SignUp: React.FC = () => {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-            editable={!loading} 
+            editable={!loading}
           />
 
           <Text style={currentStyles.inputHeader}>Password</Text>
@@ -132,7 +132,7 @@ const SignUp: React.FC = () => {
               onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
               autoCapitalize="none"
-              editable={!loading} 
+              editable={!loading}
             />
             <Pressable
               style={currentStyles.eyeIcon}
@@ -156,7 +156,7 @@ const SignUp: React.FC = () => {
               onChangeText={setConfirmPassword}
               secureTextEntry={!confirmPasswordVisible}
               autoCapitalize="none"
-              editable={!loading} 
+              editable={!loading}
             />
             <Pressable
               style={currentStyles.eyeIcon}

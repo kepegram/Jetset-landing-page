@@ -10,9 +10,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
-import { doc, setDoc } from "firebase/firestore"; 
+import { doc, setDoc } from "firebase/firestore";
 import { reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
-import { useTheme } from "./themeContext";
+import { useTheme } from "../../../context/themeContext";
 
 const DeleteAccount: React.FC = () => {
   const { theme } = useTheme();
@@ -174,9 +174,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   scrollContainer: {
-    flexGrow: 1, 
-    justifyContent: "center", 
-    paddingBottom: 200, 
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 200,
   },
   radioContainer: {
     flexDirection: "row",

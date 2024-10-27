@@ -18,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import * as Haptics from "expo-haptics";
+import { useTheme } from "../../../context/themeContext";
 
 type UserAuthScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -25,7 +26,7 @@ type UserAuthScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const UserAuth: React.FC = () => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const { theme } = useTheme();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
@@ -34,10 +35,6 @@ const UserAuth: React.FC = () => {
 
   const auth = FIREBASE_AUTH;
   const navigation = useNavigation<UserAuthScreenNavigationProp>();
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
 
   const handleLogin = async () => {
     setErrorMessage(null);

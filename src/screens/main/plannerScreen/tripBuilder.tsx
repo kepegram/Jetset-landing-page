@@ -1,4 +1,4 @@
-import React, { useState } from "react"; // Removed useEffect import
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,10 +10,10 @@ import {
   FlatList,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import { useTheme } from "../profileScreen/themeContext";
+import { useTheme } from "../../../context/themeContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
-import SwipeableModal from "../../../components/swipeableModal";
+import SwipeableModal from "../../../ui/swipeableModal";
 
 const height = Dimensions.get("screen").height;
 
@@ -37,13 +37,72 @@ const TripBuilder: React.FC = () => {
   const [childCount, setChildCount] = useState<number>(0);
   const [fromAirportCode, setFromAirportCode] = useState("");
   const [toAirportCode, setToAirportCode] = useState("");
-  const [suggestions, setSuggestions] = useState<any[]>([]); // State for airport suggestions
+  const [suggestions, setSuggestions] = useState<any[]>([]);
 
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
-  const handleCityChange = async (city: string, isFromCity = true) => {
-    const accessToken = "gc3WxSoAMGRWIMFsZu6cIWByGtdSPFTV"; // Replace with your Amadeus API key
+  useEffect(() => {
+    // Fetch airport code using both location and address
+    fetchAirportCode(tripDetails.address, tripDetails.location);
+  }, [tripDetails.address, tripDetails.location]);
+
+  const fetchAccessToken = async () => {
+    const clientId = "gc3WxSoAMGRWIMFsZu6cIWByGtdSPFTV";
+    const clientSecret = "svyZerXiXew2efAe";
     try {
+      const response = await fetch(
+        "https://test.api.amadeus.com/v1/security/oauth2/token",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+        }
+      );
+      const data = await response.json();
+      return data.access_token;
+    } catch (error) {
+      console.error("Error fetching access token:", error);
+    }
+  };
+
+  const fetchAirportCode = async (
+    addressQuery: string,
+    locationQuery: string
+  ) => {
+    try {
+      console.log(
+        `Fetching airport code with address: ${addressQuery} and location: ${locationQuery}`
+      );
+
+      const accessToken = await fetchAccessToken();
+      const response = await fetch(
+        `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${addressQuery}, ${locationQuery}&subType=AIRPORT`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const airportCode = data.data[0]?.iataCode || "";
+      setToAirportCode(airportCode);
+
+      console.log(`Airport code fetched: ${airportCode}`);
+    } catch (error) {
+      console.error("Error fetching airport code:", error);
+    }
+  };
+
+  const handleCityChange = async (city: string) => {
+    try {
+      const accessToken = await fetchAccessToken(); // Get new token each time
       const response = await fetch(
         `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${city}&subType=AIRPORT`,
         {
@@ -58,37 +117,37 @@ const TripBuilder: React.FC = () => {
       }
 
       const data = await response.json();
-      setSuggestions(data.data); // Set suggestions to the response
+      setSuggestions(data.data);
       const airportCode = data.data[0]?.iataCode || "";
-      isFromCity
-        ? setFromAirportCode(airportCode)
-        : setToAirportCode(airportCode);
+      setFromAirportCode(airportCode);
     } catch (error) {
       console.error("Error fetching airport code:", error);
     }
   };
 
   const handleSearch = () => {
-    if (!fromAirportCode || !toAirportCode || !departureDate || !returnDate) {
+    if (!travelCity || !departureDate || !returnDate) {
       alert("Please fill in all fields before proceeding.");
       return;
+    } else {
+      //setWebViewVisible(true);
+      console.log(fromAirportCode, toAirportCode);
     }
-    setWebViewVisible(true);
   };
 
   const handleTravelCityChange = (city: string) => {
     setTravelCity(city);
     if (city) {
-      handleCityChange(city, true); // Fetch airport codes as user types
+      handleCityChange(city);
     } else {
-      setSuggestions([]); // Clear suggestions if input is empty
+      setSuggestions([]);
     }
   };
 
   const handleSelectSuggestion = (airport: any) => {
-    setTravelCity(airport.name); // Set the city name from the suggestion
-    setFromAirportCode(airport.iataCode); // Set the airport code
-    setSuggestions([]); // Clear suggestions after selection
+    setTravelCity(airport.name);
+    setFromAirportCode(airport.iataCode);
+    setSuggestions([]);
   };
 
   const airlineOptions = [
@@ -119,13 +178,7 @@ const TripBuilder: React.FC = () => {
   if (webViewVisible) {
     let searchQueryUrl: string;
     if (companyName === "Any") {
-      searchQueryUrl = `https://www.google.com/flights?hl=en#flt=${travelCity}.${
-        tripDetails.address
-      }.${departureDate.toISOString().split("T")[0]}*${
-        tripDetails.address
-      }.${travelCity}.${
-        returnDate.toISOString().split("T")[0]
-      };c:USD;e:1;sc:b;px:${adultCount},${childCount};`;
+      searchQueryUrl = `https://www.google.com`;
     } else if (companyName === "Spirit Airlines") {
       searchQueryUrl = `https://www.spirit.com/book/flights?departureCity=${travelCity}&arrivalCity=${
         tripDetails.address
@@ -164,12 +217,12 @@ const TripBuilder: React.FC = () => {
   // Counter Increment/Decrement Functions
   const incrementAdults = () => setAdultCount(adultCount + 1);
   const decrementAdults = () => {
-    if (adultCount > 1) setAdultCount(adultCount - 1); // Prevent negative count
+    if (adultCount > 1) setAdultCount(adultCount - 1);
   };
 
   const incrementChildren = () => setChildCount(childCount + 1);
   const decrementChildren = () => {
-    if (childCount > 0) setChildCount(childCount - 1); // Prevent negative count
+    if (childCount > 0) setChildCount(childCount - 1);
   };
 
   return (
@@ -193,7 +246,7 @@ const TripBuilder: React.FC = () => {
             style={currentStyles.travelFromInput}
             placeholder="City"
             placeholderTextColor={theme === "dark" ? "#ccc" : "#888"}
-            onChangeText={handleTravelCityChange} // Update handler
+            onChangeText={handleTravelCityChange}
             value={travelCity}
           />
         </View>
@@ -375,8 +428,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: "white",
     zIndex: 1,
-    width: "100%",
+    width: "110%",
     maxHeight: 200,
+    top: "20%",
   },
   suggestion: {
     padding: 10,

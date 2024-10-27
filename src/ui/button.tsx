@@ -5,7 +5,7 @@ import {
   StyleSheet,
   GestureResponderEvent,
 } from "react-native";
-import { useTheme } from "../screens/main/profileScreen/themeContext";
+import { useTheme } from "../context/themeContext";
 
 type ButtonProps = {
   buttonText: string;

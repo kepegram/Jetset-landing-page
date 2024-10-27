@@ -9,13 +9,11 @@ import {
 } from "react-native";
 import { WebView } from "react-native-webview";
 
-type ModalHeight = "full" | "large" | "medium" | "small" | number;
-
 interface SwipeableModalProps {
   visible: boolean;
   onClose: () => void;
   url: string;
-  height?: ModalHeight;
+  height?: number;
 }
 
 const SwipeableModal: React.FC<SwipeableModalProps> = ({
@@ -27,23 +25,7 @@ const SwipeableModal: React.FC<SwipeableModalProps> = ({
   const panY = React.useRef(new Animated.Value(0)).current;
   const screenHeight = Dimensions.get("window").height;
 
-  // Convert height prop to actual height value
-  const getModalHeight = (heightProp: ModalHeight): number => {
-    switch (heightProp) {
-      case "full":
-        return screenHeight;
-      case "large":
-        return screenHeight * 0.9;
-      case "medium":
-        return screenHeight * 0.7;
-      case "small":
-        return screenHeight * 0.5;
-      default:
-        return typeof heightProp === "number" ? heightProp : screenHeight * 0.9;
-    }
-  };
-
-  const modalHeight = getModalHeight(height);
+  const modalHeight = height ?? screenHeight * 0.9; // Use provided height or default to 90% of screen
 
   const resetPositionAnim = Animated.timing(panY, {
     toValue: 0,
@@ -104,7 +86,7 @@ const SwipeableModal: React.FC<SwipeableModalProps> = ({
             {
               height: modalHeight,
               transform: [{ translateY }],
-              marginTop: height === "full" ? 0 : screenHeight - modalHeight,
+              marginTop: screenHeight - modalHeight,
             },
           ]}
         >

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { useTheme } from "../profileScreen/themeContext";
+import { useTheme } from "../../../context/themeContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { collection, addDoc } from "firebase/firestore";
 import MapView, { Marker } from "react-native-maps";

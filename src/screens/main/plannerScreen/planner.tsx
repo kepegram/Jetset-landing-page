@@ -8,14 +8,14 @@ import {
   Alert,
 } from "react-native";
 import React, { useCallback, useState } from "react";
-import { useProfile } from "../profileScreen/profileContext";
-import { useTheme } from "../profileScreen/themeContext";
+import { useProfile } from "../../../context/profileContext";
+import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../tabNavigator/appNav"; 
+import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { AntDesign, Ionicons } from "@expo/vector-icons"; 
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 
 type PlannerScreenNavigationProp = NativeStackNavigationProp<
@@ -205,13 +205,13 @@ const styles = StyleSheet.create({
   },
   cardBody: {
     padding: 12,
-    paddingBottom: 20, 
+    paddingBottom: 20,
     flexGrow: 1,
   },
   textContainer: {
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    alignItems: "center", 
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   location: {
     fontSize: 18,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     color: "#888",
   },
   trashIconContainer: {
-    marginLeft: 10, 
+    marginLeft: 10,
   },
 });
 
@@ -281,12 +281,12 @@ const darkStyles = StyleSheet.create({
   },
   cardBody: {
     padding: 12,
-    paddingBottom: 20, 
+    paddingBottom: 20,
     flexGrow: 1,
   },
   textContainer: {
-    flexDirection: "row", 
-    justifyContent: "space-between", 
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
   },
   location: {
@@ -299,6 +299,6 @@ const darkStyles = StyleSheet.create({
     color: "#888",
   },
   trashIconContainer: {
-    marginLeft: 10, 
+    marginLeft: 10,
   },
 });

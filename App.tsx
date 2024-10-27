@@ -13,7 +13,7 @@ import UserAuth from "./src/screens/onboarding/userAuth/userAuth";
 import SignUp from "./src/screens/onboarding/userAuth/signup";
 import ForgotPassword from "./src/screens/onboarding/userAuth/forgotPassword";
 import AppNav from "./src/screens/main/tabNavigator/appNav";
-import { ThemeProvider } from "./src/screens/main/profileScreen/themeContext";
+import { ThemeProvider } from "./src/context/themeContext";
 import Carousel from "./src/screens/onboarding/carousel/carousel";
 
 export type RootStackParamList = {

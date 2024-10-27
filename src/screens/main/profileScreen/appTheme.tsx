@@ -1,6 +1,6 @@
 import { StyleSheet, Switch, Text, View } from "react-native";
 import React from "react";
-import { useTheme } from "./themeContext";
+import { useTheme } from "../../../context/themeContext";
 
 const AppTheme: React.FC = () => {
   const { theme, toggleTheme } = useTheme();

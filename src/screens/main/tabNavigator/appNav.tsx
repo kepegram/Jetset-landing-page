@@ -1,12 +1,12 @@
 import React from "react";
 import { Pressable } from "react-native";
-import { useTheme } from "../profileScreen/themeContext";
+import { useTheme } from "../../../context/themeContext";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
-import { ProfileProvider } from "../profileScreen/profileContext";
+import { ProfileProvider } from "../../../context/profileContext";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import Home from "../homeScreen/home";
 import Profile from "../profileScreen/profile";

@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Appearance } from "react-native";
-import { FIREBASE_DB } from "../../../../firebase.config";
+import { FIREBASE_DB } from "../../firebase.config";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 

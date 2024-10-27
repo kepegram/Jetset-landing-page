@@ -12,13 +12,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import { useProfile } from "./profileContext";
+import { useProfile } from "../../../context/profileContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { Button, AltButton } from "../../../components/button";
-import { useTheme } from "./themeContext";
+import { Button, AltButton } from "../../../ui/button";
+import { useTheme } from "../../../context/themeContext";
 
 type EditScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,

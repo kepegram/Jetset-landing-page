@@ -18,6 +18,7 @@ import { RootStackParamList } from "../../../../App";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { sendPasswordResetEmail } from "firebase/auth";
 import * as Haptics from "expo-haptics";
+import { useTheme } from "../../../context/themeContext";
 
 type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -25,17 +26,13 @@ type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const ForgotPassword: React.FC = () => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const { theme } = useTheme();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const auth = FIREBASE_AUTH;
 
   const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
-
-  Appearance.addChangeListener((scheme) => {
-    setTheme(scheme.colorScheme);
-  });
 
   const handlePasswordReset = async () => {
     setLoading(true);

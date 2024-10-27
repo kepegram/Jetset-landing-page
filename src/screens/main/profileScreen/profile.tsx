@@ -15,9 +15,9 @@ import { getAuth } from "firebase/auth";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../tabNavigator/appNav";
-import { useProfile } from "./profileContext";
+import { useProfile } from "../../../context/profileContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { useTheme } from "./themeContext";
+import { useTheme } from "../../../context/themeContext";
 import { Dimensions } from "react-native";
 
 // Inside your component
