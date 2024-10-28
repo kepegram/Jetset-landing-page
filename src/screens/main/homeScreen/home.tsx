@@ -75,7 +75,6 @@ const Home: React.FC = () => {
     setRefreshing(false);
   };
 
-  // Search handler with debouncing
   const handleSearch = async (text: string) => {
     setSearchText(text);
     if (text.length > 2) {
@@ -124,9 +123,9 @@ const Home: React.FC = () => {
     </Pressable>
   );
 
-  const fetchCoordinates = async (location, address) => {
+  const fetchCoordinates = async (country, city) => {
     const API_KEY = "28c0017aba5f471fa18fe9fdb3cd026e";
-    const cacheKey = `${location}-${address}`;
+    const cacheKey = `${country}-${city}`;
     const cachedData = await AsyncStorage.getItem(cacheKey);
 
     if (cachedData) {
@@ -134,7 +133,7 @@ const Home: React.FC = () => {
     }
 
     const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-      location + ", " + address
+      country + ", " + city
     )}&key=${API_KEY}`;
 
     try {
@@ -150,7 +149,7 @@ const Home: React.FC = () => {
 
         return coordinates;
       } else {
-        console.error("No coordinates found for location:", location);
+        console.error("No coordinates found for country:", country);
         return null;
       }
     } catch (error) {
@@ -207,12 +206,12 @@ const Home: React.FC = () => {
 
       const uniqueCountries = new Set();
       const formattedData = await Promise.all(
-        filteredByContinent.map(async (item, index) => {
+        filteredByContinent.map(async (item, index: number) => {
           const isVisited = visitedItems.some(
-            (visited) => visited.location === item.countryName
+            (visited) => visited.country === item.countryName
           );
           const isInBucketlist = bucketlistItems.some(
-            (bucketlist) => bucketlist.location === item.countryName
+            (bucketlist) => bucketlist.country === item.countryName
           );
 
           if (
@@ -232,8 +231,8 @@ const Home: React.FC = () => {
             return {
               id: `${item.countryCode}-${index}`, // Ensure unique key by appending index
               image: pexelsImage || "https://via.placeholder.com/400",
-              location: item.countryName,
-              address: item.capital,
+              country: item.countryName,
+              city: item.capital,
               population: item.population || "N/A",
               continent: item.continent || "N/A",
             };
@@ -265,7 +264,7 @@ const Home: React.FC = () => {
   };
 
   // Function to fetch an image from Pexels API based on the country name
-  const fetchPexelsImage = async (countryName) => {
+  const fetchPexelsImage = async (countryName: string) => {
     const cacheKey = `pexelsImage-${countryName}`; // Unique key for each country
     const cachedData = await AsyncStorage.getItem(cacheKey);
 
@@ -318,8 +317,8 @@ const Home: React.FC = () => {
 
       // Use the user's ID to create a collection specific to that user
       await addDoc(collection(FIREBASE_DB, `users/${user.uid}/visited`), {
-        location: item.location,
-        address: item.address,
+        country: item.country,
+        city: item.city,
         image: item.image,
         timestamp: new Date(),
       });
@@ -352,8 +351,8 @@ const Home: React.FC = () => {
 
       // Use the user's ID to create a collection specific to that user
       await addDoc(collection(FIREBASE_DB, `users/${user.uid}/bucketlist`), {
-        location: item.location,
-        address: item.address,
+        country: item.country,
+        city: item.city,
         image: item.image,
         timestamp: new Date(),
       });
@@ -436,10 +435,7 @@ const Home: React.FC = () => {
         style={currentStyles.card}
         onPress={async () => {
           // Call fetchCoordinates when the user clicks on the item
-          const coordinates = await fetchCoordinates(
-            item.address,
-            item.location
-          );
+          const coordinates = await fetchCoordinates(item.city, item.country);
 
           console.log("Navigating to DestinationDetailView with item:", {
             ...item,
@@ -460,8 +456,8 @@ const Home: React.FC = () => {
         <View style={currentStyles.cardBody}>
           <View style={currentStyles.textContainer}>
             <View>
-              <Text style={currentStyles.location}>{item.address}</Text>
-              <Text style={currentStyles.address}>{item.location}</Text>
+              <Text style={currentStyles.city}>{item.city}</Text>
+              <Text style={currentStyles.country}>{item.country}</Text>
             </View>
             {selectedCategory === "suggested" && (
               <View style={currentStyles.actionsContainer}>
@@ -842,12 +838,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  location: {
+  city: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#333",
   },
-  address: {
+  country: {
     fontSize: 14,
     color: "#888",
   },
@@ -954,7 +950,7 @@ const darkStyles = StyleSheet.create({
   divider: {
     height: "100%",
     width: 1,
-    backgroundColor: "#ddd",
+    backgroundColor: "#545454",
   },
   filterContainer: {
     flexDirection: "row",
@@ -1017,12 +1013,12 @@ const darkStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  location: {
+  city: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
   },
-  address: {
+  country: {
     fontSize: 14,
     color: "#888",
   },

@@ -103,8 +103,8 @@ const Planner: React.FC = () => {
         <View style={currentStyles.cardBody}>
           <View style={currentStyles.textContainer}>
             <View>
-              <Text style={currentStyles.location}>{item.address}</Text>
-              <Text style={currentStyles.address}>{item.location}</Text>
+              <Text style={currentStyles.city}>{item.city}</Text>
+              <Text style={currentStyles.country}>{item.country}</Text>
             </View>
             <Pressable
               onPress={() => confirmRemove(item.id)}
@@ -213,12 +213,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  location: {
+  city: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#000",
   },
-  address: {
+  country: {
     fontSize: 14,
     color: "#888",
   },
@@ -289,12 +289,12 @@ const darkStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  location: {
+  city: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
   },
-  address: {
+  country: {
     fontSize: 14,
     color: "#888",
   },

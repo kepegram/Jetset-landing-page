@@ -12,7 +12,7 @@ import { getAuth } from "firebase/auth";
 
 type ThemeContextType = {
   theme: string;
-  toggleTheme: (string) => void;
+  toggleTheme: (string: string) => void;
 };
 
 type ThemeProviderProps = {

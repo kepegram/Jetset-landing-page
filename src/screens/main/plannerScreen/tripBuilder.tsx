@@ -19,8 +19,8 @@ const height = Dimensions.get("screen").height;
 
 type TripDetails = {
   image: string;
-  location: string;
-  address: string;
+  country: string;
+  city: string;
 };
 
 const TripBuilder: React.FC = () => {
@@ -42,9 +42,9 @@ const TripBuilder: React.FC = () => {
   const currentStyles = theme === "dark" ? darkStyles : styles;
 
   useEffect(() => {
-    // Fetch airport code using both location and address
-    fetchAirportCode(tripDetails.address, tripDetails.location);
-  }, [tripDetails.address, tripDetails.location]);
+    // Fetch airport code using both country and city
+    fetchAirportCode(tripDetails.city, tripDetails.country);
+  }, [tripDetails.city, tripDetails.country]);
 
   const fetchAccessToken = async () => {
     const clientId = "gc3WxSoAMGRWIMFsZu6cIWByGtdSPFTV";
@@ -68,17 +68,17 @@ const TripBuilder: React.FC = () => {
   };
 
   const fetchAirportCode = async (
-    addressQuery: string,
-    locationQuery: string
+    cityQuery: string,
+    countryQuery: string
   ) => {
     try {
       console.log(
-        `Fetching airport code with address: ${addressQuery} and location: ${locationQuery}`
+        `Fetching airport code with city: ${cityQuery} and country: ${countryQuery}`
       );
 
       const accessToken = await fetchAccessToken();
       const response = await fetch(
-        `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${addressQuery}, ${locationQuery}&subType=AIRPORT`,
+        `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${cityQuery}, ${countryQuery}&subType=AIRPORT`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -181,25 +181,25 @@ const TripBuilder: React.FC = () => {
       searchQueryUrl = `https://www.google.com`;
     } else if (companyName === "Spirit Airlines") {
       searchQueryUrl = `https://www.spirit.com/book/flights?departureCity=${travelCity}&arrivalCity=${
-        tripDetails.address
+        tripDetails.city
       }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
         returnDate.toISOString().split("T")[0]
       }&adultPassengers=${adultCount}&childPassengers=${childCount}`;
     } else if (companyName === "Delta Airlines") {
       searchQueryUrl = `https://www.delta.com/flight-search/book-a-flight?fromCity=${travelCity}&toCity=${
-        tripDetails.address
+        tripDetails.city
       }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
         returnDate.toISOString().split("T")[0]
       }&adults=${adultCount}&children=${childCount}`;
     } else if (companyName === "American Airlines") {
       searchQueryUrl = `https://www.aa.com/booking/flights?origin=${travelCity}&destination=${
-        tripDetails.address
+        tripDetails.city
       }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
         returnDate.toISOString().split("T")[0]
       }&adults=${adultCount}&children=${childCount}`;
     } else if (companyName === "United Airlines") {
       searchQueryUrl = `https://www.united.com/en/us/fsr/choose-flights?from=${travelCity}&to=${
-        tripDetails.address
+        tripDetails.city
       }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
         returnDate.toISOString().split("T")[0]
       }&adultPassengers=${adultCount}&childPassengers=${childCount}`;
@@ -235,7 +235,7 @@ const TripBuilder: React.FC = () => {
       >
         <View style={currentStyles.overlay} />
         <Text style={currentStyles.title}>
-          Let's go to {tripDetails.address}.
+          Let's go to {tripDetails.city}.
         </Text>
       </ImageBackground>
 

@@ -28,8 +28,8 @@ export type RootStackParamList = {
   DestinationDetailView: {
     item: {
       image: string;
-      location: string;
-      address: string;
+      country: string;
+      city: string;
       population: string;
       region: string;
       continent: string;

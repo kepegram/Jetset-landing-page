@@ -41,8 +41,8 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
 
   const { item } = route.params ?? {};
   const image = item?.image || "https://via.placeholder.com/400";
-  const country = item?.location || "Unknown location";
-  const city = item?.address || "No address available";
+  const country = item?.country || "Unknown country";
+  const city = item?.city || "No city available";
   const population = item?.population || "N/A";
   const continent = item?.continent || "N/A";
   const longitude = item?.longitude;
@@ -79,12 +79,12 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
 
   useEffect(() => {
     const fetchImages = async () => {
-      const countryImages = await fetchPexelsImages(item.location);
-      const cityImages = await fetchPexelsImages(item.address);
+      const countryImages = await fetchPexelsImages(item.country);
+      const cityImages = await fetchPexelsImages(item.city);
       setExtraImages([...countryImages, ...cityImages]);
     };
 
-    if (item.location && item.address) {
+    if (item.country && item.city) {
       fetchImages();
     }
   }, [item]);
@@ -92,13 +92,13 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   const addToBucketlist = async (item) => {
     try {
       await addDoc(collection(FIREBASE_DB, "bucketlist"), {
-        location: item.location,
-        address: item.address,
+        country: item.country,
+        city: item.city,
         image: item.image,
         timestamp: new Date(),
       });
 
-      Alert.alert("Bucketlist", `${item.location} added to bucket list.`, [
+      Alert.alert("Bucketlist", `${item.country} added to bucket list.`, [
         { text: "OK", onPress: () => navigation.navigate("Home") },
       ]);
     } catch (error) {

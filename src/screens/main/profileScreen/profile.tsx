@@ -62,7 +62,7 @@ const Profile: React.FC = () => {
   };
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       const fetchUserData = async () => {
         const user = getAuth().currentUser;
         if (user) {
@@ -96,8 +96,8 @@ const Profile: React.FC = () => {
     >
       <Image source={{ uri: item.image }} style={currentStyles.tripImage} />
       <View style={currentStyles.tripDetails}>
-        <Text style={currentStyles.tripLocation}>{item.address}</Text>
-        <Text style={currentStyles.tripAddress}>{item.location}</Text>
+        <Text style={currentStyles.tripCity}>{item.city}</Text>
+        <Text style={currentStyles.tripCountry}>{item.country}</Text>
       </View>
     </Pressable>
   );
@@ -303,11 +303,11 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     justifyContent: "center",
   },
-  tripLocation: {
+  tripCity: {
     fontSize: 18,
     fontWeight: "bold",
   },
-  tripAddress: {
+  tripCountry: {
     fontSize: 14,
     color: "#555",
   },
@@ -408,12 +408,12 @@ const darkStyles = StyleSheet.create({
     marginLeft: 10,
     justifyContent: "center",
   },
-  tripLocation: {
+  tripCity: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
   },
-  tripAddress: {
+  tripCountry: {
     fontSize: 14,
     color: "#aaa",
   },

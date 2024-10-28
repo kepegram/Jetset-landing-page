@@ -218,7 +218,7 @@ const darkStyles = StyleSheet.create({
   logoutContainer: {
     position: "absolute",
     alignItems: "center",
-    bottom: 40,
+    bottom: 100,
     width: "100%",
   },
 });

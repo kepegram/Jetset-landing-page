@@ -19,11 +19,6 @@ const Welcome: React.FC = () => {
 
   return (
     <View style={currentStyles.slide}>
-      {/* Uncomment the image if needed */}
-      {/* <Image
-          style={currentStyles.image}
-          source={require("../../../../assets/onboarding-imgs/undraw_Traveling_yhxq.png")}
-        /> */}
       <Text style={currentStyles.appName}>Jetset</Text>
       <Text style={currentStyles.paragraph}>Discover. Dream. Explore.</Text>
 
