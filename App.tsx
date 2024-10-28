@@ -9,7 +9,7 @@ import { useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as SplashScreen from "expo-splash-screen";
 import Welcome from "./src/screens/onboarding/welcome/welcome";
-import UserAuth from "./src/screens/onboarding/userAuth/userAuth";
+import Login from "./src/screens/onboarding/userAuth/login";
 import SignUp from "./src/screens/onboarding/userAuth/signup";
 import ForgotPassword from "./src/screens/onboarding/userAuth/forgotPassword";
 import AppNav from "./src/screens/main/tabNavigator/appNav";
@@ -19,7 +19,7 @@ import Carousel from "./src/screens/onboarding/carousel/carousel";
 export type RootStackParamList = {
   Welcome: undefined;
   Carousel: undefined;
-  UserAuth: undefined;
+  Login: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
   AppTabNav: undefined;
@@ -110,8 +110,8 @@ const App: React.FC = () => {
                 options={{ headerShown: false }}
               />
               <Stack.Screen
-                name="UserAuth"
-                component={UserAuth}
+                name="Login"
+                component={Login}
                 options={{ headerShown: false }}
               />
               <Stack.Screen

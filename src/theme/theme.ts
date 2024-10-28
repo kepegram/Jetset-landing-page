@@ -1,0 +1,31 @@
+export const lightTheme = {
+  background: "#FFFFFF",
+  primary: "#000",
+  secondary: "#888",
+  alternate: "#f8f8f8",
+  contrast: "#A463FF",
+  textPrimary: "#000000",
+  textSecondary: "#737373",
+  buttonBackground: "#A463FF",
+  buttonText: "#FFFFFF",
+  inactive: "#e8e8e8",
+  icon: "#000",
+  tabIcon: "white",
+  inactiveTabIcon: "#c093ff",
+};
+
+export const darkTheme = {
+  background: "#121212",
+  primary: "#fff",
+  secondary: "#545454",
+  alternate: "#191919",
+  contrast: "#A463FF",
+  textPrimary: "#FFFFFF",
+  textSecondary: "#888",
+  buttonBackground: "#A463FF",
+  buttonText: "#FFFFFF",
+  inactive: "white",
+  icon: "#fff",
+  tabIcon: "white",
+  inactiveTabIcon: "#c093ff",
+};

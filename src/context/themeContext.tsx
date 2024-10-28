@@ -9,10 +9,12 @@ import { Appearance } from "react-native";
 import { FIREBASE_DB } from "../../firebase.config";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { lightTheme, darkTheme } from "../theme/theme";
 
 type ThemeContextType = {
   theme: string;
-  toggleTheme: (string: string) => void;
+  currentTheme: typeof lightTheme | typeof darkTheme;
+  toggleTheme: () => void;
 };
 
 type ThemeProviderProps = {
@@ -21,6 +23,7 @@ type ThemeProviderProps = {
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: "light",
+  currentTheme: lightTheme,
   toggleTheme: () => {},
 });
 
@@ -28,6 +31,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState(Appearance.getColorScheme());
   const auth = getAuth();
   const user = auth.currentUser;
+
+  // Determine the current theme object
+  const currentTheme = theme === "dark" ? darkTheme : lightTheme;
 
   // Function to fetch theme from Firestore
   const fetchUserTheme = async () => {
@@ -78,7 +84,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, currentTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

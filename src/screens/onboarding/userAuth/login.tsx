@@ -9,7 +9,6 @@ import {
   Text,
   TextInput,
   View,
-  Appearance,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -20,13 +19,13 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "../../../context/themeContext";
 
-type UserAuthScreenNavigationProp = NativeStackNavigationProp<
+type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "UserAuth"
+  "Login"
 >;
 
-const UserAuth: React.FC = () => {
-  const { theme } = useTheme();
+const Login: React.FC = () => {
+  const { currentTheme } = useTheme();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
@@ -34,7 +33,7 @@ const UserAuth: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const auth = FIREBASE_AUTH;
-  const navigation = useNavigation<UserAuthScreenNavigationProp>();
+  const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
     setErrorMessage(null);
@@ -57,25 +56,39 @@ const UserAuth: React.FC = () => {
     }
   };
 
-  const currentStyles = theme === "dark" ? darkStyles : styles;
-
   return (
     <KeyboardAvoidingView
-      style={currentStyles.container}
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerStyle={currentStyles.scrollContainer}
+        contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={currentStyles.title}>Login</Text>
+        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+          Login
+        </Text>
+        <Text style={[styles.subTitle, { color: currentTheme.textSecondary }]}>
+          Welcome back, please login below
+        </Text>
 
-        <View style={currentStyles.loginContainer}>
-          <Text style={currentStyles.inputHeader}>Email</Text>
+        <View style={styles.loginContainer}>
+          <Text
+            style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
+          >
+            Email
+          </Text>
           <TextInput
-            style={currentStyles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: currentTheme.background,
+                color: currentTheme.textPrimary,
+                borderColor: currentTheme.alternate,
+              },
+            ]}
             placeholder="user@example.com"
-            placeholderTextColor={theme === "dark" ? "#6b6b6b" : "#cdcdcd"}
+            placeholderTextColor={currentTheme.textSecondary}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -84,16 +97,29 @@ const UserAuth: React.FC = () => {
           />
           <Pressable
             onPress={() => navigation.navigate("ForgotPassword")}
-            style={currentStyles.forgotPasswordContainer}
+            style={styles.forgotPasswordContainer}
           >
-            <Text style={currentStyles.forgotPassword}>Forgot Password?</Text>
+            <Text style={{ color: currentTheme.primary }}>
+              Forgot Password?
+            </Text>
           </Pressable>
-          <Text style={currentStyles.inputHeader}>Password</Text>
-          <View style={currentStyles.passwordContainer}>
+          <Text
+            style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
+          >
+            Password
+          </Text>
+          <View style={styles.passwordContainer}>
             <TextInput
-              style={currentStyles.input}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: currentTheme.background,
+                  color: currentTheme.textPrimary,
+                  borderColor: currentTheme.alternate,
+                },
+              ]}
               placeholder="••••••••••"
-              placeholderTextColor={theme === "dark" ? "#6b6b6b" : "#cdcdcd"}
+              placeholderTextColor={currentTheme.textSecondary}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
@@ -102,68 +128,104 @@ const UserAuth: React.FC = () => {
             />
             <Pressable
               onPress={() => setPasswordVisible(!passwordVisible)}
-              style={currentStyles.eyeIcon}
+              style={styles.eyeIcon}
             >
               <Ionicons
                 name={passwordVisible ? "eye-off" : "eye"}
                 size={24}
-                color="grey"
+                color={currentTheme.icon}
               />
             </Pressable>
           </View>
-          <Pressable style={currentStyles.button} onPress={handleLogin}>
-            <Text style={currentStyles.buttonText}>Login</Text>
+          <Pressable
+            style={[
+              styles.button,
+              { backgroundColor: currentTheme.buttonBackground },
+            ]}
+            onPress={handleLogin}
+          >
+            <Text
+              style={[styles.buttonText, { color: currentTheme.buttonText }]}
+            >
+              Login
+            </Text>
           </Pressable>
           {errorMessage && (
-            <Text style={currentStyles.errorText}>{errorMessage}</Text>
+            <Text style={[styles.errorText, { color: "red" }]}>
+              {errorMessage}
+            </Text>
           )}
-          <View style={currentStyles.dividerContainer}>
-            <View style={currentStyles.divider} />
-            <Text style={currentStyles.dividerText}>or sign in with</Text>
-            <View style={currentStyles.divider} />
+          <View style={styles.dividerContainer}>
+            <View
+              style={[
+                styles.divider,
+                { backgroundColor: currentTheme.alternate },
+              ]}
+            />
+            <Text
+              style={[
+                styles.dividerText,
+                { color: currentTheme.textSecondary },
+              ]}
+            >
+              or sign in with
+            </Text>
+            <View
+              style={[
+                styles.divider,
+                { backgroundColor: currentTheme.alternate },
+              ]}
+            />
           </View>
-          <View style={currentStyles.socialIconsContainer}>
+          <View style={styles.socialIconsContainer}>
             <Pressable
-              style={currentStyles.iconButton}
+              style={styles.iconButton}
               onPress={() => {
                 console.log("Google Sign-In");
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               }}
             >
-              <Ionicons name="logo-google" size={22} color="grey" />
+              <Ionicons
+                name="logo-google"
+                size={22}
+                color={currentTheme.icon}
+              />
             </Pressable>
             <Pressable
-              style={currentStyles.iconButton}
+              style={styles.iconButton}
               onPress={() => {
                 console.log("Apple Sign-In");
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               }}
             >
-              <Ionicons name="logo-apple" size={22} color="grey" />
+              <Ionicons name="logo-apple" size={22} color={currentTheme.icon} />
             </Pressable>
           </View>
         </View>
 
         <Pressable onPress={() => navigation.navigate("SignUp")}>
-          <Text style={currentStyles.createAccountText}>Create an account</Text>
+          <Text
+            style={[styles.createAccountText, { color: currentTheme.primary }]}
+          >
+            Create an account
+          </Text>
         </Pressable>
       </ScrollView>
 
       {loading && (
-        <View style={currentStyles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#A463FF" />
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={currentTheme.primary} />
         </View>
       )}
     </KeyboardAvoidingView>
   );
 };
 
-export default UserAuth;
+export default Login;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -173,14 +235,16 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     marginTop: 100,
-    color: "#000",
   },
-  loginContainer: { marginTop: 60 },
+  subTitle: {
+    fontSize: 16,
+    marginTop: 10,
+  },
+  loginContainer: { marginTop: 30 },
   inputHeader: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 15,
-    color: "#000",
   },
   input: {
     width: "100%",
@@ -189,17 +253,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: "#777",
-    backgroundColor: "#fff",
   },
   forgotPasswordContainer: {
     alignSelf: "flex-end",
     top: 20,
     zIndex: 10,
-  },
-  forgotPassword: {
-    color: "#A463FF",
-    fontSize: 14,
   },
   passwordContainer: {
     position: "relative",
@@ -211,7 +269,6 @@ const styles = StyleSheet.create({
     top: 15,
   },
   button: {
-    backgroundColor: "#A463FF",
     width: "100%",
     padding: 15,
     borderRadius: 25,
@@ -220,12 +277,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
   errorText: {
-    color: "red",
     textAlign: "center",
     marginBottom: 10,
   },
@@ -237,12 +292,10 @@ const styles = StyleSheet.create({
   divider: {
     flex: 1,
     height: 1,
-    backgroundColor: "#888",
   },
   dividerText: {
     marginHorizontal: 10,
     fontSize: 14,
-    color: "#888",
   },
   socialIconsContainer: {
     flexDirection: "row",
@@ -260,127 +313,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   createAccountText: {
-    color: "#A463FF",
-    fontSize: 16,
-    textAlign: "center",
-    fontWeight: "bold",
-    marginTop: 15,
-  },
-  loadingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
-    zIndex: 20,
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#121212",
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 100,
-    color: "#fff",
-  },
-  loginContainer: { marginTop: 60 },
-  inputHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 15,
-    color: "#fff",
-  },
-  input: {
-    width: "100%",
-    height: 50,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: "#444",
-    backgroundColor: "#1e1e1e",
-    color: "white",
-  },
-  forgotPasswordContainer: {
-    alignSelf: "flex-end",
-    top: 20,
-    zIndex: 10,
-  },
-  forgotPassword: {
-    color: "#A463FF",
-    fontSize: 14,
-  },
-  passwordContainer: {
-    position: "relative",
-    width: "100%",
-  },
-  eyeIcon: {
-    position: "absolute",
-    right: 15,
-    top: 15,
-  },
-  button: {
-    backgroundColor: "#A463FF",
-    width: "100%",
-    padding: 15,
-    borderRadius: 25,
-    alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  dividerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 15,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#888",
-  },
-  dividerText: {
-    marginHorizontal: 10,
-    fontSize: 14,
-    color: "#888",
-  },
-  socialIconsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginVertical: 20,
-  },
-  iconButton: {
-    marginHorizontal: 20,
-    padding: 15,
-    borderRadius: 10,
-    borderWidth: 1,
-    width: 100,
-    borderColor: "#888",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  createAccountText: {
-    color: "#A463FF",
     fontSize: 16,
     textAlign: "center",
     fontWeight: "bold",

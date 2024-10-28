@@ -1,38 +1,25 @@
 import {
   StyleSheet,
   Text,
-  View,
   TextInput,
   ActivityIndicator,
   Pressable,
-  Image,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Appearance,
 } from "react-native";
 import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../../App";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { sendPasswordResetEmail } from "firebase/auth";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "../../../context/themeContext";
 
-type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "ForgotPassword"
->;
-
 const ForgotPassword: React.FC = () => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const auth = FIREBASE_AUTH;
-
-  const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
 
   const handlePasswordReset = async () => {
     setLoading(true);
@@ -51,24 +38,33 @@ const ForgotPassword: React.FC = () => {
     }
   };
 
-  const currentStyles = theme === "dark" ? darkStyles : styles;
-
   return (
     <KeyboardAvoidingView
-      style={currentStyles.container}
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerStyle={currentStyles.scrollContainer}
+        contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={currentStyles.title}>Forgot Password</Text>
+        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+          Forgot Password
+        </Text>
 
-        <Text style={currentStyles.inputHeader}>Email</Text>
+        <Text style={[styles.inputHeader, { color: currentTheme.textPrimary }]}>
+          Email
+        </Text>
         <TextInput
-          style={currentStyles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: currentTheme.background,
+              color: currentTheme.textPrimary,
+              borderColor: currentTheme.inactive,
+            },
+          ]}
           placeholder="Enter your email"
-          placeholderTextColor="#9f9f9f"
+          placeholderTextColor={currentTheme.textSecondary}
           value={email}
           onChangeText={(text) => setEmail(text)}
           keyboardType="email-address"
@@ -76,21 +72,35 @@ const ForgotPassword: React.FC = () => {
         />
 
         {loading ? (
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={currentTheme.primary} />
         ) : (
           <Pressable
-            style={currentStyles.button}
+            style={[
+              styles.button,
+              { backgroundColor: currentTheme.buttonBackground },
+            ]}
             onPress={() => {
               handlePasswordReset();
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }}
           >
-            <Text style={currentStyles.buttonText}>Send Reset Link</Text>
+            <Text
+              style={[styles.buttonText, { color: currentTheme.buttonText }]}
+            >
+              Send Reset Link
+            </Text>
           </Pressable>
         )}
 
         {feedbackMessage && (
-          <Text style={currentStyles.feedbackMessage}>{feedbackMessage}</Text>
+          <Text
+            style={[
+              styles.feedbackMessage,
+              { color: currentTheme.textSecondary },
+            ]}
+          >
+            {feedbackMessage}
+          </Text>
         )}
       </ScrollView>
     </KeyboardAvoidingView>
@@ -102,7 +112,6 @@ export default ForgotPassword;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -112,12 +121,10 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 50,
-    color: "#000",
   },
   inputHeader: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#000",
   },
   input: {
     width: "100%",
@@ -127,10 +134,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: "#b3b3b3",
   },
   button: {
-    backgroundColor: "black",
     width: "100%",
     padding: 15,
     borderRadius: 25,
@@ -139,69 +144,12 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   buttonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
   feedbackMessage: {
     marginTop: 10,
     fontSize: 14,
-    color: "white",
-    textAlign: "center",
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#121212",
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 0,
-    marginBottom: 50,
-    color: "#fff",
-  },
-  inputHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  input: {
-    width: "100%",
-    height: 50,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginTop: 20,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: "#444",
-    backgroundColor: "#1e1e1e",
-    color: "#fff",
-  },
-  button: {
-    backgroundColor: "white",
-    width: "100%",
-    padding: 15,
-    borderRadius: 25,
-    alignItems: "center",
-    marginBottom: 20,
-    marginTop: 15,
-  },
-  buttonText: {
-    color: "#000",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  feedbackMessage: {
-    marginTop: 10,
-    fontSize: 14,
-    color: "white",
     textAlign: "center",
   },
 });

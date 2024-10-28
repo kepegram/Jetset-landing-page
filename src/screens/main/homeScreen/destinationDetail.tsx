@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { useTheme } from "../../../context/themeContext";
+import { useTheme } from "../../../context/themeContext"; // Import your theme context
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { collection, addDoc } from "firebase/firestore";
 import MapView, { Marker } from "react-native-maps";
@@ -32,7 +32,7 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   navigation,
   route,
 }) => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme(); // Access currentTheme from context
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [extraImages, setExtraImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -47,8 +47,6 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   const continent = item?.continent || "N/A";
   const longitude = item?.longitude;
   const latitude = item?.latitude;
-
-  const currentStyles = theme === "dark" ? darkStyles : styles;
 
   const fetchPexelsImages = async (query: string) => {
     const PEXELS_API_KEY =
@@ -114,14 +112,11 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   const renderDotIndicators = () => {
     const totalImages = extraImages.length + 1;
     return (
-      <View style={currentStyles.dotsContainer}>
+      <View style={styles.dotsContainer}>
         {Array.from({ length: totalImages }, (_, index) => (
           <View
             key={index}
-            style={[
-              currentStyles.dot,
-              currentIndex === index ? currentStyles.activeDot : {},
-            ]}
+            style={[styles.dot, currentIndex === index ? styles.activeDot : {}]}
           />
         ))}
       </View>
@@ -129,8 +124,10 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   };
 
   return (
-    <View style={currentStyles.container}>
-      <ScrollView contentContainerStyle={currentStyles.scrollContent}>
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <ScrollView
           ref={scrollViewRef}
           horizontal
@@ -142,13 +139,11 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
             const newIndex = Math.round(contentOffsetX / SNAP_INTERVAL);
             setCurrentIndex(newIndex);
           }}
-          style={currentStyles.horizontalScroll}
-          contentContainerStyle={currentStyles.horizontalScrollContent}
+          style={styles.horizontalScroll}
+          contentContainerStyle={styles.horizontalScrollContent}
         >
           {longitude && latitude && (
-            <View
-              style={[currentStyles.scrollItem, currentStyles.mapContainer]}
-            >
+            <View style={[styles.scrollItem, styles.mapContainer]}>
               <MapView
                 initialRegion={{
                   latitude: latitude,
@@ -156,7 +151,7 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
                   latitudeDelta: 0.0922,
                   longitudeDelta: 0.0421,
                 }}
-                style={currentStyles.map}
+                style={styles.map}
                 scrollEnabled={false}
                 zoomEnabled={true}
                 rotateEnabled={false}
@@ -172,9 +167,9 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
               setSelectedImage(image);
               setModalVisible(true);
             }}
-            style={currentStyles.scrollItem}
+            style={styles.scrollItem}
           >
-            <Image source={{ uri: image }} style={currentStyles.image} />
+            <Image source={{ uri: image }} style={styles.image} />
           </Pressable>
 
           {extraImages.map((extraImage, index) => (
@@ -184,9 +179,9 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
                 setSelectedImage(extraImage);
                 setModalVisible(true);
               }}
-              style={currentStyles.scrollItem}
+              style={styles.scrollItem}
             >
-              <Image source={{ uri: extraImage }} style={currentStyles.image} />
+              <Image source={{ uri: extraImage }} style={styles.image} />
             </Pressable>
           ))}
         </ScrollView>
@@ -194,18 +189,30 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
         {/* Render dot indicators */}
         {renderDotIndicators()}
 
-        <View style={currentStyles.details}>
-          <Text style={currentStyles.city}>{city}</Text>
-          <Text style={currentStyles.country}>{country}</Text>
-          <Text style={currentStyles.infoText}>Population: {population}</Text>
-          <Text style={currentStyles.infoText}>Continent: {continent}</Text>
+        <View style={styles.details}>
+          <Text style={[styles.city, { color: currentTheme.textPrimary }]}>
+            {city}
+          </Text>
+          <Text style={[styles.country, { color: currentTheme.textSecondary }]}>
+            {country}
+          </Text>
+          <Text
+            style={[styles.infoText, { color: currentTheme.textSecondary }]}
+          >
+            Population: {population}
+          </Text>
+          <Text
+            style={[styles.infoText, { color: currentTheme.textSecondary }]}
+          >
+            Continent: {continent}
+          </Text>
         </View>
 
         <Pressable
-          style={currentStyles.addButton}
+          style={[styles.addButton, { backgroundColor: currentTheme.primary }]}
           onPress={() => addToBucketlist(item)}
         >
-          <Text style={currentStyles.addButtonText}>Add to Bucket List</Text>
+          <Text style={styles.addButtonText}>Add to Bucket List</Text>
         </Pressable>
       </ScrollView>
 
@@ -216,14 +223,14 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
         onRequestClose={() => setModalVisible(false)}
       >
         <Pressable
-          style={currentStyles.modalOverlay}
+          style={[
+            styles.modalOverlay,
+            { backgroundColor: currentTheme.background },
+          ]}
           onPress={() => setModalVisible(false)}
         >
           {selectedImage && (
-            <Image
-              source={{ uri: selectedImage }}
-              style={currentStyles.modalImage}
-            />
+            <Image source={{ uri: selectedImage }} style={styles.modalImage} />
           )}
         </Pressable>
       </Modal>
@@ -275,17 +282,14 @@ const styles = StyleSheet.create({
   city: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#000",
     marginBottom: 5,
   },
   country: {
     fontSize: 16,
-    color: "#777",
     marginBottom: 5,
   },
   infoText: {
     fontSize: 14,
-    color: "#777",
     marginBottom: 5,
   },
   dotsContainer: {
@@ -304,7 +308,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#A463FF",
   },
   addButton: {
-    backgroundColor: "#A463FF",
     borderRadius: 35,
     height: 60,
     width: "90%",
@@ -318,103 +321,6 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#121212",
-  },
-  scrollContent: {
-    alignItems: "center",
-    marginTop: 70,
-  },
-  horizontalScroll: {
-    height: 350,
-  },
-  horizontalScrollContent: {
-    paddingHorizontal: 10,
-  },
-  scrollItem: {
-    width: width - 40,
-    height: 350,
-    marginHorizontal: 10,
-  },
-  mapContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  map: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 10,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 10,
-  },
-  details: {
-    padding: 20,
-    alignItems: "center",
-    marginTop: 30,
-  },
-  city: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 5,
-  },
-  country: {
-    fontSize: 16,
-    color: "#777",
-    marginBottom: 5,
-  },
-  infoText: {
-    fontSize: 14,
-    color: "#777",
-    marginBottom: 5,
-  },
-  dotsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 5,
-    backgroundColor: "#ccc",
-    marginHorizontal: 2,
-  },
-  activeDot: {
-    backgroundColor: "#A463FF",
-  },
-  addButton: {
-    backgroundColor: "#A463FF",
-    borderRadius: 10,
-    padding: 15,
-    width: "90%",
-    alignItems: "center",
-    top: "8%",
-  },
-  addButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "#121212",
     justifyContent: "center",
     alignItems: "center",
   },

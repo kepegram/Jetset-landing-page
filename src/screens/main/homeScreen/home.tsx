@@ -38,7 +38,7 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 const USERNAME = "kpegra1";
 
 const Home: React.FC = () => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
   const { profilePicture } = useProfile();
   const [selectedCategory, setSelectedCategory] = useState("suggested");
   const [refreshing, setRefreshing] = useState(false);
@@ -108,7 +108,7 @@ const Home: React.FC = () => {
 
   const renderResultItem = ({ item }) => (
     <Pressable
-      style={currentStyles.resultItem}
+      style={styles.resultItem}
       onPress={() => {
         console.log("Navigating to DestinationDetailView with item:", item);
         navigation.navigate("DestinationDetailView", { item });
@@ -117,7 +117,7 @@ const Home: React.FC = () => {
         setSearchResults([]);
       }}
     >
-      <Text style={currentStyles.resultText}>
+      <Text style={[styles.resultText, { color: currentTheme.textPrimary }]}>
         {item.name}, {item.country}
       </Text>
     </Pressable>
@@ -432,17 +432,14 @@ const Home: React.FC = () => {
   const renderItem = ({ item }) => (
     <View>
       <Pressable
-        style={currentStyles.card}
+        style={[styles.card, { backgroundColor: currentTheme.alternate }]}
         onPress={async () => {
-          // Call fetchCoordinates when the user clicks on the item
           const coordinates = await fetchCoordinates(item.city, item.country);
-
           console.log("Navigating to DestinationDetailView with item:", {
             ...item,
             latitude: coordinates?.latitude || 0,
             longitude: coordinates?.longitude || 0,
           });
-
           navigation.navigate("DestinationDetailView", {
             item: {
               ...item,
@@ -452,20 +449,38 @@ const Home: React.FC = () => {
           });
         }}
       >
-        <Image source={{ uri: item.image }} style={currentStyles.image} />
-        <View style={currentStyles.cardBody}>
-          <View style={currentStyles.textContainer}>
+        <Image source={{ uri: item.image }} style={styles.image} />
+        <View style={styles.cardBody}>
+          <View style={styles.textContainer}>
             <View>
-              <Text style={currentStyles.city}>{item.city}</Text>
-              <Text style={currentStyles.country}>{item.country}</Text>
+              <Text style={[styles.city, { color: currentTheme.textPrimary }]}>
+                {item.city}
+              </Text>
+              <Text
+                style={[styles.country, { color: currentTheme.textSecondary }]}
+              >
+                {item.country}
+              </Text>
             </View>
             {selectedCategory === "suggested" && (
-              <View style={currentStyles.actionsContainer}>
+              <View style={styles.actionsContainer}>
                 <Pressable onPress={() => addToVisited(item)}>
-                  <Text style={currentStyles.action1Text}>Add to Visited</Text>
+                  <Text
+                    style={[
+                      styles.action1Text,
+                      { color: currentTheme.primary },
+                    ]}
+                  >
+                    Add to Visited
+                  </Text>
                 </Pressable>
                 <Pressable onPress={() => addToBucketlist(item)}>
-                  <Text style={currentStyles.action2Text}>
+                  <Text
+                    style={[
+                      styles.action2Text,
+                      { color: currentTheme.contrast },
+                    ]}
+                  >
                     Add to Bucketlist
                   </Text>
                 </Pressable>
@@ -484,33 +499,42 @@ const Home: React.FC = () => {
 
   const filteredData =
     selectedCategory === "suggested" ? destinationData : visitedData;
-  const currentStyles = theme === "dark" ? darkStyles : styles;
 
   return (
-    <View style={currentStyles.container}>
-      <View style={currentStyles.topBar}>
-        <Text style={currentStyles.appName}>Jetset</Text>
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
+      <View
+        style={[styles.topBar, { backgroundColor: currentTheme.background }]}
+      >
+        <Text style={[styles.appName, { color: currentTheme.textPrimary }]}>
+          Jetset
+        </Text>
         <Pressable onPress={() => navigation.navigate("Profile")}>
           <Image
             source={{ uri: profilePicture }}
-            style={currentStyles.profilePicture}
+            style={styles.profilePicture}
           />
         </Pressable>
       </View>
-      <View style={currentStyles.inputContainer}>
-        <View style={currentStyles.iconContainer}>
+      <View
+        style={[
+          styles.inputContainer,
+          { backgroundColor: currentTheme.alternate },
+        ]}
+      >
+        <View style={styles.iconContainer}>
           <Ionicons name="search" size={20} color="#888" />
         </View>
         <TextInput
-          style={currentStyles.searchInput}
+          style={[styles.searchInput, { color: currentTheme.textPrimary }]}
           placeholder="Search destinations"
-          placeholderTextColor={theme === "dark" ? "#ccc" : "#888"}
+          placeholderTextColor={currentTheme.secondary}
           onChangeText={handleSearch}
           value={searchText}
         />
       </View>
 
-      {/* Display search results */}
       {searchLoading ? (
         <ActivityIndicator size="small" color="grey" />
       ) : searchResults.length > 0 ? (
@@ -518,43 +542,63 @@ const Home: React.FC = () => {
           data={searchResults}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderResultItem}
-          contentContainerStyle={currentStyles.resultList}
+          contentContainerStyle={styles.resultList}
         />
       ) : (
         <Text></Text>
       )}
 
-      <View style={currentStyles.switchContainer}>
+      <View style={styles.switchContainer}>
         <Pressable
           onPress={() => setSelectedCategory("suggested")}
           style={[
-            currentStyles.switchButton,
-            selectedCategory === "suggested" && currentStyles.selectedButton,
+            styles.switchButton,
+            selectedCategory === "suggested" && [
+              styles.selectedButton,
+              { borderBottomColor: currentTheme.primary },
+            ],
           ]}
         >
           <Text
             style={[
-              currentStyles.switchText,
-              selectedCategory === "suggested" && currentStyles.selectedText,
+              styles.switchText,
+              {
+                color:
+                  selectedCategory === "suggested"
+                    ? currentTheme.textPrimary
+                    : currentTheme.secondary,
+              },
+              selectedCategory === "suggested" && styles.selectedText,
             ]}
           >
             Suggested
           </Text>
         </Pressable>
 
-        <View style={currentStyles.divider} />
+        <View
+          style={[styles.divider, { backgroundColor: currentTheme.secondary }]}
+        />
 
         <Pressable
           onPress={() => setSelectedCategory("visited")}
           style={[
-            currentStyles.switchButton,
-            selectedCategory === "visited" && currentStyles.selectedButton,
+            styles.switchButton,
+            selectedCategory === "visited" && [
+              styles.selectedButton,
+              { borderBottomColor: currentTheme.primary },
+            ],
           ]}
         >
           <Text
             style={[
-              currentStyles.switchText,
-              selectedCategory === "visited" && currentStyles.selectedText,
+              styles.switchText,
+              {
+                color:
+                  selectedCategory === "visited"
+                    ? currentTheme.primary
+                    : currentTheme.secondary,
+              },
+              selectedCategory === "visited" && styles.selectedText,
             ]}
           >
             Visited
@@ -566,102 +610,155 @@ const Home: React.FC = () => {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={currentStyles.filterContainer}
+          style={styles.filterContainer}
         >
-          <Text style={currentStyles.filterLabel}>Continent:</Text>
+          <Text style={[styles.filterLabel, { color: currentTheme.secondary }]}>
+            Continent:
+          </Text>
           <Pressable
             style={[
-              currentStyles.filterButton,
-              filter === "All" && currentStyles.filterSelectedButton,
+              styles.filterButton,
+              filter === "All" && [
+                styles.filterSelectedButton,
+                { borderBottomColor: currentTheme.primary },
+              ],
             ]}
             onPress={() => setFilter("All")}
           >
             <Text
               style={[
-                currentStyles.filterButtonText,
-                filter === "All" && currentStyles.filterSelectedButtonText,
+                styles.filterButtonText,
+                {
+                  color:
+                    filter === "All"
+                      ? currentTheme.textPrimary
+                      : currentTheme.secondary,
+                },
               ]}
             >
               All
             </Text>
           </Pressable>
+
           <Pressable
             style={[
-              currentStyles.filterButton,
-              filter === "North America" && currentStyles.filterSelectedButton,
+              styles.filterButton,
+              filter === "North America" && [
+                styles.filterSelectedButton,
+                { borderBottomColor: currentTheme.primary },
+              ],
             ]}
             onPress={() => setFilter("North America")}
           >
             <Text
               style={[
-                currentStyles.filterButtonText,
-                filter === "North America" &&
-                  currentStyles.filterSelectedButtonText,
+                styles.filterButtonText,
+                {
+                  color:
+                    filter === "North America"
+                      ? currentTheme.textPrimary
+                      : currentTheme.secondary,
+                },
               ]}
             >
               North America
             </Text>
           </Pressable>
+
           <Pressable
             style={[
-              currentStyles.filterButton,
-              filter === "Europe" && currentStyles.filterSelectedButton,
+              styles.filterButton,
+              filter === "Europe" && [
+                styles.filterSelectedButton,
+                { borderBottomColor: currentTheme.primary },
+              ],
             ]}
             onPress={() => setFilter("Europe")}
           >
             <Text
               style={[
-                currentStyles.filterButtonText,
-                filter === "Europe" && currentStyles.filterSelectedButtonText,
+                styles.filterButtonText,
+                {
+                  color:
+                    filter === "Europe"
+                      ? currentTheme.textPrimary
+                      : currentTheme.secondary,
+                },
               ]}
             >
               Europe
             </Text>
           </Pressable>
+
           <Pressable
             style={[
-              currentStyles.filterButton,
-              filter === "Asia" && currentStyles.filterSelectedButton,
+              styles.filterButton,
+              filter === "Asia" && [
+                styles.filterSelectedButton,
+                { borderBottomColor: currentTheme.primary },
+              ],
             ]}
             onPress={() => setFilter("Asia")}
           >
             <Text
               style={[
-                currentStyles.filterButtonText,
-                filter === "Asia" && currentStyles.filterSelectedButtonText,
+                styles.filterButtonText,
+                {
+                  color:
+                    filter === "Asia"
+                      ? currentTheme.textPrimary
+                      : currentTheme.secondary,
+                },
               ]}
             >
               Asia
             </Text>
           </Pressable>
+
           <Pressable
             style={[
-              currentStyles.filterButton,
-              filter === "Africa" && currentStyles.filterSelectedButton,
+              styles.filterButton,
+              filter === "Africa" && [
+                styles.filterSelectedButton,
+                { borderBottomColor: currentTheme.primary },
+              ],
             ]}
             onPress={() => setFilter("Africa")}
           >
             <Text
               style={[
-                currentStyles.filterButtonText,
-                filter === "Africa" && currentStyles.filterSelectedButtonText,
+                styles.filterButtonText,
+                {
+                  color:
+                    filter === "Africa"
+                      ? currentTheme.textPrimary
+                      : currentTheme.secondary,
+                },
               ]}
             >
               Africa
             </Text>
           </Pressable>
+
           <Pressable
             style={[
-              currentStyles.filterButton,
-              filter === "South America" && currentStyles.filterSelectedButton,
+              styles.filterButton,
+              filter === "South America" && [
+                styles.filterSelectedButton,
+                { borderBottomColor: currentTheme.primary },
+              ],
             ]}
             onPress={() => setFilter("South America")}
           >
             <Text
               style={[
-                currentStyles.filterButtonText,
-                filter === "South America" &&
-                  currentStyles.filterSelectedButtonText,
+                styles.filterButtonText,
+                {
+                  color:
+                    filter === "South America"
+                      ? currentTheme.textPrimary
+                      : currentTheme.secondary,
+                },
               ]}
             >
               South America
@@ -673,7 +770,11 @@ const Home: React.FC = () => {
       {loading ? (
         <ActivityIndicator size="large" color="grey" />
       ) : destinationData.length === 0 ? (
-        <Text style={currentStyles.noDataText}>No destinations found.</Text>
+        <Text
+          style={[styles.noDataText, { color: currentTheme.textSecondary }]}
+        >
+          No destinations found.
+        </Text>
       ) : (
         <FlatList
           data={filteredData}
@@ -691,12 +792,9 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   topBar: {
     flexDirection: "row",
@@ -705,13 +803,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 55,
     paddingBottom: 10,
-    backgroundColor: "#fff",
     elevation: 3,
   },
   appName: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#333",
   },
   profilePicture: {
     width: 40,
@@ -723,7 +819,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignItems: "center",
     width: "90%",
-    backgroundColor: "#eee",
     borderRadius: 15,
     height: 45,
     paddingHorizontal: 15,
@@ -734,7 +829,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: "#fff",
   },
   resultList: {
     padding: 10,
@@ -746,7 +840,6 @@ const styles = StyleSheet.create({
   },
   resultText: {
     fontSize: 16,
-    color: "#fff",
   },
   switchContainer: {
     flexDirection: "row",
@@ -761,7 +854,6 @@ const styles = StyleSheet.create({
   },
   switchText: {
     fontSize: 16,
-    color: "#888",
   },
   selectedButton: {
     borderBottomWidth: 2,
@@ -769,13 +861,11 @@ const styles = StyleSheet.create({
     width: "20%",
   },
   selectedText: {
-    color: "#000",
     fontWeight: "bold",
   },
   divider: {
     height: "100%",
     width: 1,
-    backgroundColor: "#ddd",
   },
   filterContainer: {
     flexDirection: "row",
@@ -787,7 +877,6 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
     marginTop: 5,
-    color: "#000",
   },
   filterButton: {
     paddingHorizontal: 15,
@@ -799,17 +888,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderBottomWidth: 2,
-    borderBottomColor: "#A463FF",
     marginHorizontal: 5,
   },
   filterButtonText: {
-    color: "#888",
     fontWeight: "bold",
     fontSize: 14,
     flexShrink: 0,
   },
   filterSelectedButtonText: {
-    color: "#000",
     fontWeight: "bold",
     fontSize: 14,
     flexShrink: 0,
@@ -818,7 +904,6 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   card: {
-    backgroundColor: "#f8f8f8",
     marginBottom: 10,
     borderRadius: 10,
     elevation: 3,
@@ -841,204 +926,26 @@ const styles = StyleSheet.create({
   city: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
   },
   country: {
     fontSize: 14,
-    color: "#888",
   },
   actionsContainer: {
     flexDirection: "column",
     alignItems: "flex-end",
   },
   action1Text: {
-    color: "#A463FF",
     fontSize: 14,
     marginBottom: 5,
   },
   action2Text: {
-    color: "#000",
     fontSize: 14,
   },
   noDataText: {
     textAlign: "center",
     fontSize: 16,
-    color: "#666",
-    marginTop: 20,
+    bottom: "40%",
   },
 });
 
-const darkStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#121212",
-  },
-  topBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 55,
-    paddingBottom: 10,
-    backgroundColor: "#121212",
-    elevation: 3,
-  },
-  appName: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  profilePicture: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignSelf: "center",
-    alignItems: "center",
-    width: "90%",
-    backgroundColor: "#212121",
-    borderRadius: 15,
-    height: 45,
-    paddingHorizontal: 15,
-  },
-  iconContainer: {
-    marginRight: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: "#fff",
-  },
-  resultList: {
-    padding: 10,
-  },
-  resultItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  resultText: {
-    fontSize: 16,
-    color: "#fff",
-  },
-  switchContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  switchButton: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  switchText: {
-    fontSize: 16,
-    color: "#888",
-  },
-  selectedButton: {
-    borderBottomWidth: 2,
-    borderBottomColor: "#A463FF",
-    width: "20%",
-  },
-  selectedText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  divider: {
-    height: "100%",
-    width: 1,
-    backgroundColor: "#545454",
-  },
-  filterContainer: {
-    flexDirection: "row",
-    marginBottom: 10,
-    height: 52,
-  },
-  filterLabel: {
-    fontSize: 16,
-    marginLeft: 10,
-    marginRight: 10,
-    marginTop: 5,
-    color: "#fff",
-  },
-  filterButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    marginHorizontal: 5,
-    height: 33,
-  },
-  filterSelectedButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderBottomWidth: 2,
-    borderBottomColor: "#A463FF",
-    marginHorizontal: 5,
-  },
-  filterButtonText: {
-    color: "#707070",
-    fontWeight: "bold",
-    fontSize: 14,
-    flexShrink: 0,
-  },
-  filterSelectedButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 14,
-    flexShrink: 0,
-  },
-  destinationListContainer: {
-    paddingBottom: 100,
-  },
-  card: {
-    backgroundColor: "#1c1c1e",
-    marginBottom: 10,
-    borderRadius: 10,
-    elevation: 3,
-    overflow: "hidden",
-  },
-  image: {
-    width: "100%",
-    height: 200,
-    resizeMode: "cover",
-  },
-  cardBody: {
-    padding: 12,
-    flexGrow: 1,
-  },
-  textContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  city: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  country: {
-    fontSize: 14,
-    color: "#888",
-  },
-  actionsContainer: {
-    flexDirection: "column",
-    alignItems: "flex-end",
-  },
-  action1Text: {
-    color: "#A463FF",
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  action2Text: {
-    color: "#fff",
-    fontSize: 14,
-  },
-  noDataText: {
-    textAlign: "center",
-    fontSize: 16,
-    color: "#666",
-    marginTop: 20,
-  },
-});
+export default Home;

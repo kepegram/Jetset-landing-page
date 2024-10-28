@@ -53,7 +53,7 @@ export type RootStackParamList = {
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 const HomeStack = () => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
 
   const screenOptions = ({
     navigation,
@@ -61,7 +61,7 @@ const HomeStack = () => {
     navigation: any;
   }): NativeStackNavigationOptions => ({
     headerStyle: {
-      backgroundColor: theme === "dark" ? "#121212" : "#fff",
+      backgroundColor: currentTheme.background,
     },
     headerShadowVisible: false,
     headerLeft: () => (
@@ -69,13 +69,13 @@ const HomeStack = () => {
         <Ionicons
           name="arrow-back"
           size={28}
-          color={theme === "dark" ? "#fff" : "#000"}
+          color={currentTheme.textPrimary}
           style={{ marginLeft: 10 }}
         />
       </Pressable>
     ),
     headerTitleStyle: {
-      color: theme === "dark" ? "#fff" : "#000",
+      color: currentTheme.textPrimary,
       fontSize: 18,
       fontWeight: "bold",
     },
@@ -93,7 +93,7 @@ const HomeStack = () => {
         <Ionicons
           name="settings-sharp"
           size={28}
-          color={theme === "dark" ? "#fff" : "#121212"}
+          color={currentTheme.textPrimary}
           style={{ marginRight: 10 }}
         />
       </Pressable>
@@ -163,7 +163,7 @@ const HomeStack = () => {
 };
 
 const PlannerStack = () => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
 
   const screenOptions = ({
     navigation,
@@ -171,7 +171,7 @@ const PlannerStack = () => {
     navigation: any;
   }): NativeStackNavigationOptions => ({
     headerStyle: {
-      backgroundColor: theme === "dark" ? "#121212" : "#fff",
+      backgroundColor: currentTheme.background,
     },
     headerShadowVisible: false,
     headerLeft: () => (
@@ -179,13 +179,13 @@ const PlannerStack = () => {
         <Ionicons
           name="arrow-back"
           size={28}
-          color={theme === "dark" ? "#fff" : "#000"}
+          color={currentTheme.textPrimary}
           style={{ marginLeft: 10 }}
         />
       </Pressable>
     ),
     headerTitleStyle: {
-      color: theme === "dark" ? "#fff" : "#000",
+      color: currentTheme.textPrimary,
       fontSize: 18,
       fontWeight: "bold",
     },
@@ -203,7 +203,7 @@ const PlannerStack = () => {
         <Ionicons
           name="settings-sharp"
           size={28}
-          color={theme === "dark" ? "#fff" : "#121212"}
+          color={currentTheme.textPrimary}
           style={{ marginRight: 10 }}
         />
       </Pressable>
@@ -266,16 +266,16 @@ const PlannerStack = () => {
 
 const Tab = createBottomTabNavigator();
 
-// Tab Navigator Component
+// Bottom Tab Navigator Component
 const TabNavigator: React.FC = () => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
 
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#A463FF",
+          backgroundColor: currentTheme.contrast,
           borderTopWidth: 0,
           borderRadius: 35,
           margin: 20,
@@ -284,8 +284,8 @@ const TabNavigator: React.FC = () => {
           position: "absolute",
         },
         tabBarShowLabel: false,
-        tabBarActiveTintColor: "white",
-        tabBarInactiveTintColor: "#c093ff",
+        tabBarActiveTintColor: currentTheme.tabIcon,
+        tabBarInactiveTintColor: currentTheme.inactiveTabIcon,
       }}
     >
       <Tab.Screen
