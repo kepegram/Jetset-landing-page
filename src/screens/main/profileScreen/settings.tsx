@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View, Switch, Alert } from "react-native";
+import { Pressable, StyleSheet, Text, View, Alert } from "react-native";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -14,7 +14,7 @@ type SettingsScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Settings: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { currentTheme } = useTheme();
   const navigation = useNavigation<SettingsScreenNavigationProp>();
 
   const handleLogout = () => {
@@ -29,7 +29,6 @@ const Settings: React.FC = () => {
         {
           text: "OK",
           onPress: () => {
-            toggleTheme("light");
             FIREBASE_AUTH.signOut();
           },
         },
@@ -38,59 +37,105 @@ const Settings: React.FC = () => {
     );
   };
 
-  const currentStyles = theme === "dark" ? darkStyles : styles;
-
   return (
-    <View style={currentStyles.container}>
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
       {/* Settings Options */}
-      <View style={currentStyles.settingsContainer}>
+      <View style={styles.settingsContainer}>
         {/* Account Section Header with Icon */}
-        <View style={currentStyles.sectionHeaderContainer}>
-          <Ionicons name="person-outline" size={24} color="#A463FF" />
-          <Text style={currentStyles.sectionHeader}>Account</Text>
+        <View style={styles.sectionHeaderContainer}>
+          <Ionicons name="person-outline" size={24} color={currentTheme.icon} />
+          <Text
+            style={[styles.sectionHeader, { color: currentTheme.textPrimary }]}
+          >
+            Account
+          </Text>
         </View>
-        <View style={currentStyles.divider} />
+        <View
+          style={[styles.divider, { backgroundColor: currentTheme.inactive }]}
+        />
 
         <Pressable
-          style={currentStyles.settingOption}
+          style={styles.settingOption}
           onPress={() => navigation.navigate("Edit")}
         >
-          <Text style={currentStyles.optionText}>Edit Profile</Text>
-          <MaterialIcons name="chevron-right" size={24} color="#777" />
+          <Text
+            style={[styles.optionText, { color: currentTheme.textSecondary }]}
+          >
+            Edit Profile
+          </Text>
+          <MaterialIcons
+            name="chevron-right"
+            size={24}
+            color={currentTheme.icon}
+          />
         </Pressable>
 
         <Pressable
-          style={currentStyles.settingOption}
+          style={styles.settingOption}
           onPress={() => navigation.navigate("ChangePassword")}
         >
-          <Text style={currentStyles.optionText}>Change Password</Text>
-          <MaterialIcons name="chevron-right" size={24} color="#777" />
+          <Text
+            style={[styles.optionText, { color: currentTheme.textSecondary }]}
+          >
+            Change Password
+          </Text>
+          <MaterialIcons
+            name="chevron-right"
+            size={24}
+            color={currentTheme.icon}
+          />
         </Pressable>
 
         <Pressable
-          style={currentStyles.settingOption}
+          style={styles.settingOption}
           onPress={() => navigation.navigate("AppTheme")}
         >
-          <Text style={currentStyles.optionText}>App Theme</Text>
-          <MaterialIcons name="chevron-right" size={24} color="#777" />
+          <Text
+            style={[styles.optionText, { color: currentTheme.textSecondary }]}
+          >
+            App Theme
+          </Text>
+          <MaterialIcons
+            name="chevron-right"
+            size={24}
+            color={currentTheme.icon}
+          />
         </Pressable>
 
-        <Pressable style={currentStyles.settingOption} onPress={() => {}}>
-          <Text style={currentStyles.optionText}>Privacy & Security</Text>
-          <MaterialIcons name="chevron-right" size={24} color="#777" />
+        <Pressable style={styles.settingOption} onPress={() => {}}>
+          <Text
+            style={[styles.optionText, { color: currentTheme.textSecondary }]}
+          >
+            Privacy & Security
+          </Text>
+          <MaterialIcons
+            name="chevron-right"
+            size={24}
+            color={currentTheme.icon}
+          />
         </Pressable>
 
         <Pressable
-          style={currentStyles.settingOption}
+          style={styles.settingOption}
           onPress={() => navigation.navigate("DeleteAccount")}
         >
-          <Text style={currentStyles.deleteOptionText}>Delete account</Text>
-          <MaterialIcons name="chevron-right" size={24} color="red" />
+          <Text
+            style={[styles.deleteOptionText, { color: currentTheme.error }]}
+          >
+            Delete account
+          </Text>
+          <MaterialIcons
+            name="chevron-right"
+            size={24}
+            color={currentTheme.error}
+          />
         </Pressable>
       </View>
 
       {/* Logout Button */}
-      <View style={currentStyles.logoutContainer}>
+      <View style={styles.logoutContainer}>
         <AltButton onPress={handleLogout} buttonText="Sign out" />
       </View>
     </View>
@@ -101,7 +146,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "#fff",
   },
   settingsContainer: {
     width: "90%",
@@ -116,7 +160,6 @@ const styles = StyleSheet.create({
   sectionHeader: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#333",
     marginLeft: 10,
   },
   settingOption: {
@@ -129,96 +172,18 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 18,
-    color: "#777",
   },
   deleteOptionText: {
     fontSize: 18,
-    color: "red",
   },
   divider: {
     height: 1,
-    backgroundColor: "#ccc",
     marginVertical: 5,
-  },
-  switchOption: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  switchText: {
-    fontSize: 18,
-    color: "#777",
   },
   logoutContainer: {
     position: "absolute",
     alignItems: "center",
     bottom: 20,
-    width: "100%",
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: "#121212",
-  },
-  settingsContainer: {
-    width: "90%",
-    marginTop: 20,
-  },
-  sectionHeaderContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 5,
-    marginBottom: 10,
-  },
-  sectionHeader: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "white",
-    marginLeft: 10,
-  },
-  settingOption: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    marginBottom: 5,
-  },
-  optionText: {
-    fontSize: 18,
-    color: "#777",
-  },
-  deleteOptionText: {
-    fontSize: 18,
-    color: "red",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#ccc",
-    marginVertical: 5,
-  },
-  switchOption: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  switchText: {
-    fontSize: 18,
-    color: "#777",
-  },
-  logoutContainer: {
-    position: "absolute",
-    alignItems: "center",
-    bottom: 100,
     width: "100%",
   },
 });

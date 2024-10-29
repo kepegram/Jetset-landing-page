@@ -286,7 +286,7 @@ const Home: React.FC = () => {
       const data = await response.json();
 
       if (data.photos && data.photos.length > 0) {
-        const imageUrl = data.photos[0].src.medium;
+        const imageUrl = data.photos[0].src.original;
 
         // Cache the image URL in AsyncStorage
         await AsyncStorage.setItem(cacheKey, JSON.stringify(imageUrl));
@@ -555,7 +555,7 @@ const Home: React.FC = () => {
             styles.switchButton,
             selectedCategory === "suggested" && [
               styles.selectedButton,
-              { borderBottomColor: currentTheme.primary },
+              { borderBottomColor: currentTheme.contrast },
             ],
           ]}
         >
@@ -585,7 +585,7 @@ const Home: React.FC = () => {
             styles.switchButton,
             selectedCategory === "visited" && [
               styles.selectedButton,
-              { borderBottomColor: currentTheme.primary },
+              { borderBottomColor: currentTheme.contrast },
             ],
           ]}
         >

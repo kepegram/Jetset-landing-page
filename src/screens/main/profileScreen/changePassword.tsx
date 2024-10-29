@@ -21,7 +21,7 @@ type ChangePasswordScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const ChangePassword: React.FC = () => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
   const [email, setEmail] = useState<string | null>("");
   const [password, setPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
@@ -75,55 +75,71 @@ const ChangePassword: React.FC = () => {
     navigation.navigate("Profile");
   };
 
-  const currentStyles = theme === "dark" ? darkStyles : styles;
-
   return (
-    <View style={currentStyles.container}>
-      <Text style={currentStyles.inputLabel}>Old Password</Text>
-      <View style={currentStyles.inputWrapper}>
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
+      <Text style={[styles.inputLabel, { color: currentTheme.textPrimary }]}>
+        Old Password
+      </Text>
+      <View style={styles.inputWrapper}>
         <TextInput
-          style={currentStyles.input}
+          style={[
+            styles.input,
+            {
+              color: currentTheme.textPrimary,
+              borderColor: currentTheme.inactive,
+            },
+          ]}
           placeholder="Enter old password"
-          placeholderTextColor="#777"
+          placeholderTextColor={currentTheme.secondary}
           value={password}
           secureTextEntry={hidden}
           onChangeText={setPassword}
         />
         <Pressable
-          style={currentStyles.hiddenButton}
+          style={styles.hiddenButton}
           onPress={() => setHidden(!hidden)}
         >
           <Ionicons
             name={hidden ? "eye-off-outline" : "eye-outline"}
             size={24}
-            color="#777"
+            color={currentTheme.inactive}
           />
         </Pressable>
       </View>
 
-      <Text style={currentStyles.inputLabel}>New Password</Text>
-      <View style={currentStyles.inputWrapper}>
+      <Text style={[styles.inputLabel, { color: currentTheme.textPrimary }]}>
+        New Password
+      </Text>
+      <View style={styles.inputWrapper}>
         <TextInput
-          style={currentStyles.input}
+          style={[
+            styles.input,
+            {
+              color: currentTheme.textPrimary,
+              borderColor: currentTheme.inactive,
+            },
+          ]}
           placeholder="Enter new password"
-          placeholderTextColor="#777"
+          placeholderTextColor={currentTheme.secondary}
           value={newPassword}
           secureTextEntry={hidden}
           onChangeText={setNewPassword}
         />
         <Pressable
-          style={currentStyles.hiddenButton}
+          style={styles.hiddenButton}
           onPress={() => setHidden(!hidden)}
         >
           <Ionicons
             name={hidden ? "eye-off-outline" : "eye-outline"}
             size={24}
-            color="#777"
+            color={currentTheme.inactive}
           />
         </Pressable>
       </View>
 
-      <View style={currentStyles.buttonContainer}>
+      <View style={styles.buttonContainer}>
         <Button onPress={handleCancel} buttonText="Cancel" />
         <AltButton onPress={handleSave} buttonText="Save" />
       </View>
@@ -137,12 +153,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "#fff",
   },
   inputLabel: {
     alignSelf: "flex-start",
     fontSize: 16,
-    color: "#333",
     marginTop: 20,
     marginLeft: 25,
   },
@@ -154,44 +168,6 @@ const styles = StyleSheet.create({
     width: "90%",
     padding: 15,
     marginVertical: 5,
-    borderColor: "#ddd",
-    borderBottomWidth: 1,
-  },
-  hiddenButton: {
-    padding: 5,
-    left: 320,
-    position: "absolute",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    width: "100%",
-    marginTop: 30,
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: "#121212",
-  },
-  inputLabel: {
-    alignSelf: "flex-start",
-    fontSize: 16,
-    color: "#fff",
-    marginTop: 20,
-    marginLeft: 25,
-  },
-  inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  input: {
-    width: "90%",
-    padding: 15,
-    marginVertical: 5,
-    borderColor: "#ddd",
     borderBottomWidth: 1,
   },
   hiddenButton: {

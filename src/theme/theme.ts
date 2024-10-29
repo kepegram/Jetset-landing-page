@@ -10,8 +10,9 @@ export const lightTheme = {
   buttonText: "#FFFFFF",
   inactive: "#e8e8e8",
   icon: "#000",
-  tabIcon: "white",
-  inactiveTabIcon: "#c093ff",
+  tabIcon: "#A463FF",
+  inactiveTabIcon: "#b9b9b9",
+  error: "red",
 };
 
 export const darkTheme = {
@@ -27,5 +28,6 @@ export const darkTheme = {
   inactive: "white",
   icon: "#fff",
   tabIcon: "white",
-  inactiveTabIcon: "#c093ff",
+  inactiveTabIcon: "#363636",
+  error: "red",
 };

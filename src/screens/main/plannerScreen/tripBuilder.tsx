@@ -24,7 +24,7 @@ type TripDetails = {
 };
 
 const TripBuilder: React.FC = () => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
   const route = useRoute();
   const { tripDetails } = route.params as { tripDetails: TripDetails };
 
@@ -38,8 +38,6 @@ const TripBuilder: React.FC = () => {
   const [fromAirportCode, setFromAirportCode] = useState("");
   const [toAirportCode, setToAirportCode] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
-
-  const currentStyles = theme === "dark" ? darkStyles : styles;
 
   useEffect(() => {
     // Fetch airport code using both country and city
@@ -67,10 +65,7 @@ const TripBuilder: React.FC = () => {
     }
   };
 
-  const fetchAirportCode = async (
-    cityQuery: string,
-    countryQuery: string
-  ) => {
+  const fetchAirportCode = async (cityQuery: string, countryQuery: string) => {
     try {
       console.log(
         `Fetching airport code with city: ${cityQuery} and country: ${countryQuery}`
@@ -102,7 +97,7 @@ const TripBuilder: React.FC = () => {
 
   const handleCityChange = async (city: string) => {
     try {
-      const accessToken = await fetchAccessToken(); // Get new token each time
+      const accessToken = await fetchAccessToken();
       const response = await fetch(
         `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${city}&subType=AIRPORT`,
         {
@@ -226,54 +221,87 @@ const TripBuilder: React.FC = () => {
   };
 
   return (
-    <View style={currentStyles.container}>
-      {/* Image background */}
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
       <ImageBackground
         source={{ uri: tripDetails.image }}
-        style={currentStyles.imageBackground}
+        style={styles.imageBackground}
         imageStyle={{ borderRadius: 10 }}
       >
-        <View style={currentStyles.overlay} />
-        <Text style={currentStyles.title}>
+        <View style={styles.overlay} />
+        <Text style={[styles.title, { color: currentTheme.buttonText }]}>
           Let's go to {tripDetails.city}.
         </Text>
       </ImageBackground>
 
-      <View style={currentStyles.bookingContainer}>
-        <View style={currentStyles.travelFromContainer}>
-          <Text style={currentStyles.travelFromHeaderText}>From:</Text>
+      <View
+        style={[
+          styles.backgroundBelowImage,
+          { backgroundColor: currentTheme.background },
+        ]}
+      />
+
+      <View
+        style={[
+          styles.bookingContainer,
+          { backgroundColor: currentTheme.background },
+        ]}
+      >
+        <View style={styles.travelFromContainer}>
+          <Text
+            style={[
+              styles.travelFromHeaderText,
+              { color: currentTheme.textSecondary },
+            ]}
+          >
+            From:
+          </Text>
           <TextInput
-            style={currentStyles.travelFromInput}
+            style={[
+              styles.travelFromInput,
+              {
+                color: currentTheme.textPrimary,
+                borderBottomColor: currentTheme.primary,
+              },
+            ]}
             placeholder="City"
-            placeholderTextColor={theme === "dark" ? "#ccc" : "#888"}
+            placeholderTextColor={currentTheme.textSecondary}
             onChangeText={handleTravelCityChange}
             value={travelCity}
           />
         </View>
 
-        {/* Suggestions List */}
         {suggestions.length > 0 && (
           <FlatList
             data={suggestions}
             keyExtractor={(item) => item.iataCode}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={currentStyles.suggestion}
+                style={styles.suggestion}
                 onPress={() => handleSelectSuggestion(item)}
               >
-                <Text style={currentStyles.suggestionText}>
+                <Text
+                  style={[
+                    styles.suggestionText,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
                   {item.name} ({item.iataCode})
                 </Text>
               </TouchableOpacity>
             )}
-            style={currentStyles.suggestionList}
+            style={styles.suggestionList}
           />
         )}
 
-        {/* Date Pickers */}
-        <View style={currentStyles.datePickersRow}>
-          <View style={currentStyles.dateContainer}>
-            <Text style={currentStyles.dateText}>Departure:</Text>
+        <View style={styles.datePickersRow}>
+          <View style={styles.dateContainer}>
+            <Text
+              style={[styles.dateText, { color: currentTheme.textSecondary }]}
+            >
+              Departure:
+            </Text>
             <DateTimePicker
               value={departureDate}
               mode="date"
@@ -283,8 +311,12 @@ const TripBuilder: React.FC = () => {
             />
           </View>
 
-          <View style={currentStyles.dateContainer}>
-            <Text style={currentStyles.dateText}>Return:</Text>
+          <View style={styles.dateContainer}>
+            <Text
+              style={[styles.dateText, { color: currentTheme.textSecondary }]}
+            >
+              Return:
+            </Text>
             <DateTimePicker
               value={returnDate}
               mode="date"
@@ -295,57 +327,132 @@ const TripBuilder: React.FC = () => {
           </View>
         </View>
 
-        {/* Company Name Dropdown */}
-        <View style={currentStyles.companyContainer}>
-          <Text style={currentStyles.companyHeader}>Airline:</Text>
+        <View style={styles.companyContainer}>
+          <Text
+            style={[
+              styles.companyHeader,
+              { color: currentTheme.textSecondary },
+            ]}
+          >
+            Airline:
+          </Text>
           <Dropdown
-            style={currentStyles.dropdown}
+            style={[styles.dropdown, { borderColor: currentTheme.primary }]}
             data={airlineOptions}
             labelField="label"
             valueField="value"
             placeholder="Select an airline"
+            placeholderStyle={{ color: currentTheme.textPrimary }}
             value={companyName}
             onChange={(item) => setCompanyName(item.value)}
           />
         </View>
 
         {/* Adults and Children Counters */}
-        <View style={currentStyles.counterContainer}>
-          <View style={currentStyles.countersRow}>
-            <View style={currentStyles.counterSection}>
-              <Text style={currentStyles.counterHeader}>Adults:</Text>
-              <View style={currentStyles.counterButtons}>
+        <View style={styles.counterContainer}>
+          <View style={styles.countersRow}>
+            <View style={styles.counterSection}>
+              <Text
+                style={[
+                  styles.counterHeader,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                Adults:
+              </Text>
+              <View style={styles.counterButtons}>
                 <TouchableOpacity
                   onPress={decrementAdults}
-                  style={currentStyles.counterButton}
+                  style={[
+                    styles.counterButton,
+                    { backgroundColor: currentTheme.contrast },
+                  ]}
                 >
-                  <Text style={currentStyles.counterButtonText}>-</Text>
+                  <Text
+                    style={[
+                      styles.counterButtonText,
+                      { color: currentTheme.textPrimary },
+                    ]}
+                  >
+                    -
+                  </Text>
                 </TouchableOpacity>
-                <Text style={currentStyles.counterText}>{adultCount}</Text>
+                <Text
+                  style={[
+                    styles.counterText,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
+                  {adultCount}
+                </Text>
                 <TouchableOpacity
                   onPress={incrementAdults}
-                  style={currentStyles.counterButton}
+                  style={[
+                    styles.counterButton,
+                    { backgroundColor: currentTheme.contrast },
+                  ]}
                 >
-                  <Text style={currentStyles.counterButtonText}>+</Text>
+                  <Text
+                    style={[
+                      styles.counterButtonText,
+                      { color: currentTheme.textPrimary },
+                    ]}
+                  >
+                    +
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
 
-            <View style={currentStyles.counterSection}>
-              <Text style={currentStyles.counterHeader}>Children:</Text>
-              <View style={currentStyles.counterButtons}>
+            <View style={styles.counterSection}>
+              <Text
+                style={[
+                  styles.counterHeader,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                Children:
+              </Text>
+              <View style={styles.counterButtons}>
                 <TouchableOpacity
                   onPress={decrementChildren}
-                  style={currentStyles.counterButton}
+                  style={[
+                    styles.counterButton,
+                    { backgroundColor: currentTheme.contrast },
+                  ]}
                 >
-                  <Text style={currentStyles.counterButtonText}>-</Text>
+                  <Text
+                    style={[
+                      styles.counterButtonText,
+                      { color: currentTheme.textPrimary },
+                    ]}
+                  >
+                    -
+                  </Text>
                 </TouchableOpacity>
-                <Text style={currentStyles.counterText}>{childCount}</Text>
+                <Text
+                  style={[
+                    styles.counterText,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
+                  {childCount}
+                </Text>
                 <TouchableOpacity
                   onPress={incrementChildren}
-                  style={currentStyles.counterButton}
+                  style={[
+                    styles.counterButton,
+                    { backgroundColor: currentTheme.contrast },
+                  ]}
                 >
-                  <Text style={currentStyles.counterButtonText}>+</Text>
+                  <Text
+                    style={[
+                      styles.counterButtonText,
+                      { color: currentTheme.textPrimary },
+                    ]}
+                  >
+                    +
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -354,10 +461,20 @@ const TripBuilder: React.FC = () => {
 
         {/* Let's Go Button */}
         <TouchableOpacity
-          style={currentStyles.searchButton}
+          style={[
+            styles.searchButton,
+            { backgroundColor: currentTheme.buttonBackground },
+          ]}
           onPress={handleSearch}
         >
-          <Text style={currentStyles.searchButtonText}>Search Flights</Text>
+          <Text
+            style={[
+              styles.searchButtonText,
+              { color: currentTheme.buttonText },
+            ]}
+          >
+            Search Flights
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -368,7 +485,6 @@ export default TripBuilder;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#f0f0f0",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -386,24 +502,28 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 40,
     fontWeight: "bold",
-    color: "#fff",
     textShadowColor: "rgba(0, 0, 0, 0.7)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 5,
   },
+  backgroundBelowImage: {
+    height: Dimensions.get("screen").height - 365,
+    width: "100%",
+  },
   bookingContainer: {
-    marginTop: 5,
+    marginTop: 15,
     padding: 20,
     borderRadius: 15,
-    top: "80%",
-    backgroundColor: "white",
     position: "absolute",
-    width: "90%",
+    top: 150,
+    left: 20,
+    right: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
+    zIndex: 10,
   },
   travelFromContainer: {
     width: "100%",
@@ -413,20 +533,16 @@ const styles = StyleSheet.create({
   travelFromHeaderText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#b8b8b8",
   },
   travelFromInput: {
     height: 40,
     fontSize: 16,
-    color: "#000",
     borderBottomWidth: 1,
-    borderBottomColor: "#A463FF",
     marginBottom: 20,
     width: "100%",
   },
   suggestionList: {
     position: "absolute",
-    backgroundColor: "white",
     zIndex: 1,
     width: "110%",
     maxHeight: 200,
@@ -435,10 +551,9 @@ const styles = StyleSheet.create({
   suggestion: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
   },
   suggestionText: {
-    color: "#333",
+    fontSize: 16,
   },
   datePickersRow: {
     flexDirection: "row",
@@ -448,7 +563,6 @@ const styles = StyleSheet.create({
   dateContainer: {},
   dateText: {
     fontSize: 16,
-    color: "#b8b8b8",
     fontWeight: "bold",
     marginBottom: 5,
   },
@@ -459,205 +573,14 @@ const styles = StyleSheet.create({
   companyHeader: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#b8b8b8",
   },
   dropdown: {
     height: 40,
-    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 8,
     marginTop: 10,
     marginBottom: 20,
-  },
-  counterContainer: {
-    marginBottom: 20,
-  },
-  countersRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  counterSection: {
-    width: "48%",
-  },
-  counterHeader: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#b8b8b8",
-  },
-  counterButtons: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  counterButton: {
-    backgroundColor: "#A463FF",
-    borderRadius: 5,
-    padding: 10,
-    marginHorizontal: 5,
-  },
-  counterButtonText: {
-    color: "white",
-    fontSize: 18,
-  },
-  counterText: {
-    fontSize: 18,
-    width: 40,
-    textAlign: "center",
-  },
-  searchButton: {
-    backgroundColor: "#A463FF",
-    padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  searchButtonText: {
-    fontSize: 18,
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  closeButton: {
-    padding: 15,
-    backgroundColor: "#333",
-    alignSelf: "center",
-  },
-  closeButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-});
-
-// Dark mode styles
-const darkStyles = StyleSheet.create({
-  container: {
-    backgroundColor: "#f0f0f0",
-  },
-  imageBackground: {
-    width: "100%",
-    height: 200,
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  title: {
-    fontSize: 40,
-    fontWeight: "bold",
-    color: "#fff",
-    textShadowColor: "rgba(0, 0, 0, 0.7)",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 5,
-  },
-  bookingContainer: {
-    marginTop: 5,
-    padding: 20,
-    borderRadius: 15,
-    top: "90%",
-    backgroundColor: "white",
-    position: "absolute",
-    width: "50%",
-    shadowColor: "#fff",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  travelFromContainer: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  travelFromHeaderText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#b8b8b8",
-  },
-  travelFromInput: {
-    height: 40,
-    fontSize: 16,
-    color: "#000",
-    borderBottomWidth: 1,
-    borderBottomColor: "#A463FF",
-    marginBottom: 20,
-    width: "38%",
-  },
-  suggestionList: {
-    position: "absolute",
-    backgroundColor: "white",
-    zIndex: 1,
-    width: "100%",
-    maxHeight: 200,
-  },
-  suggestion: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  suggestionText: {
-    color: "#333",
-  },
-  datePickersRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 5,
-  },
-  dateContainer: {},
-  dateText: {
-    fontSize: 16,
-    color: "#b8b8b8",
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  companyContainer: {
-    width: "100%",
-    marginTop: 10,
-  },
-  companyHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#b8b8b8",
-  },
-  dropdown: {
-    height: 40,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
-  radioGroup: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  radioButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 15,
-  },
-  radioCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#A463FF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  selectedRadioCircle: {
-    height: 10,
-    width: 10,
-    borderRadius: 5,
-    backgroundColor: "#A463FF",
-  },
-  radioText: {
-    marginLeft: 5,
-    color: "#000",
   },
   counterContainer: {
     marginBottom: 20,
@@ -680,13 +603,11 @@ const darkStyles = StyleSheet.create({
     marginBottom: 10,
   },
   counterButton: {
-    backgroundColor: "#A463FF",
     borderRadius: 5,
     padding: 10,
     marginHorizontal: 5,
   },
   counterButtonText: {
-    color: "white",
     fontSize: 18,
   },
   counterText: {
@@ -695,23 +616,19 @@ const darkStyles = StyleSheet.create({
     textAlign: "center",
   },
   searchButton: {
-    backgroundColor: "#A463FF",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
   },
   searchButtonText: {
     fontSize: 18,
-    color: "#fff",
     fontWeight: "bold",
   },
   closeButton: {
     padding: 15,
-    backgroundColor: "#333",
     alignSelf: "center",
   },
   closeButtonText: {
-    color: "#fff",
     fontWeight: "bold",
   },
 });

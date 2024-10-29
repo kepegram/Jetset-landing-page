@@ -30,7 +30,7 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 
 const Profile: React.FC = () => {
   const { profilePicture } = useProfile();
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"bucketlists" | "memories">(
@@ -87,59 +87,65 @@ const Profile: React.FC = () => {
     setActiveTab(tab);
   };
 
-  const currentStyles = theme === "dark" ? darkStyles : styles;
-
   const renderTripItem = ({ item }) => (
     <Pressable
-      style={currentStyles.tripItem}
+      style={[styles.tripItem, { backgroundColor: currentTheme.alternate }]}
       onPress={() => navigation.navigate("TripBuilder", { tripDetails: item })}
     >
-      <Image source={{ uri: item.image }} style={currentStyles.tripImage} />
-      <View style={currentStyles.tripDetails}>
-        <Text style={currentStyles.tripCity}>{item.city}</Text>
-        <Text style={currentStyles.tripCountry}>{item.country}</Text>
+      <Image source={{ uri: item.image }} style={styles.tripImage} />
+      <View style={styles.tripDetails}>
+        <Text style={[styles.tripCity, { color: currentTheme.textPrimary }]}>
+          {item.city}
+        </Text>
+        <Text
+          style={[styles.tripCountry, { color: currentTheme.textSecondary }]}
+        >
+          {item.country}
+        </Text>
       </View>
     </Pressable>
   );
 
   return (
-    <View style={currentStyles.container}>
-      <View style={currentStyles.profileContainer}>
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
+      <View style={styles.profileContainer}>
         <Pressable onPress={() => setModalVisible(true)}>
           <Image
             source={{ uri: profilePicture }}
-            style={currentStyles.profilePicture}
+            style={styles.profilePicture}
           />
         </Pressable>
 
-        {userName && <Text style={currentStyles.userName}>{userName}</Text>}
+        {userName && (
+          <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
+            {userName}
+          </Text>
+        )}
       </View>
-      <View style={currentStyles.iconsContainer}>
+      <View style={styles.iconsContainer}>
         <Pressable
           onPress={() => handleTabPress("bucketlists")}
-          style={currentStyles.iconItem}
+          style={styles.iconItem}
         >
           <FontAwesome
             name="plane"
             size={30}
             color={
               activeTab === "bucketlists"
-                ? "#A463FF"
-                : theme === "dark"
-                ? "white"
-                : "black"
+                ? currentTheme.contrast
+                : currentTheme.icon
             }
           />
           <Text
             style={[
-              currentStyles.iconText,
+              styles.iconText,
               {
                 color:
                   activeTab === "bucketlists"
-                    ? "#A463FF"
-                    : theme === "dark"
-                    ? "white"
-                    : "black",
+                    ? currentTheme.contrast
+                    : currentTheme.textSecondary,
               },
             ]}
           >
@@ -147,33 +153,34 @@ const Profile: React.FC = () => {
           </Text>
         </Pressable>
 
-        <View style={currentStyles.separator} />
+        <View
+          style={[
+            styles.separator,
+            { backgroundColor: currentTheme.textSecondary },
+          ]}
+        />
 
         <Pressable
           onPress={() => handleTabPress("memories")}
-          style={currentStyles.iconItem}
+          style={styles.iconItem}
         >
           <MaterialIcons
             name="photo-library"
             size={30}
             color={
               activeTab === "memories"
-                ? "#A463FF"
-                : theme === "dark"
-                ? "white"
-                : "black"
+                ? currentTheme.contrast
+                : currentTheme.icon
             }
           />
           <Text
             style={[
-              currentStyles.iconText,
+              styles.iconText,
               {
                 color:
                   activeTab === "memories"
-                    ? "#A463FF"
-                    : theme === "dark"
-                    ? "white"
-                    : "black",
+                    ? currentTheme.contrast
+                    : currentTheme.icon,
               },
             ]}
           >
@@ -182,21 +189,31 @@ const Profile: React.FC = () => {
         </Pressable>
       </View>
 
-      {/* FlatList for bucketlists */}
-      <View style={currentStyles.listContainer}>
+      <View style={styles.listContainer}>
         {loading ? (
-          <Text style={currentStyles.loadingText}>Loading...</Text>
+          <Text
+            style={[styles.loadingText, { color: currentTheme.textSecondary }]}
+          >
+            Loading...
+          </Text>
         ) : activeTab === "bucketlists" ? (
           tripData.length > 0 ? (
             <FlatList
               data={tripData}
               renderItem={renderTripItem}
               keyExtractor={(item) => item.id}
-              contentContainerStyle={currentStyles.flatListContent}
+              contentContainerStyle={styles.flatListContent}
               showsVerticalScrollIndicator={false}
             />
           ) : (
-            <Text style={currentStyles.noListsText}>No lists available.</Text>
+            <Text
+              style={[
+                styles.noListsText,
+                { color: currentTheme.textSecondary },
+              ]}
+            >
+              No lists available.
+            </Text>
           )
         ) : null}
       </View>
@@ -208,16 +225,16 @@ const Profile: React.FC = () => {
         onRequestClose={() => setModalVisible(false)}
       >
         <Pressable
-          style={currentStyles.modalOverlay}
+          style={[
+            styles.modalOverlay,
+            { backgroundColor: currentTheme.background },
+          ]}
           onPress={() => setModalVisible(false)}
         >
-          <Image
-            source={{ uri: profilePicture }}
-            style={currentStyles.modalImage}
-          />
+          <Image source={{ uri: profilePicture }} style={styles.modalImage} />
           <Button
             title="Edit"
-            color={theme === "dark" ? "white" : "black"}
+            color={currentTheme.primary}
             onPress={() => {
               setModalVisible(false);
               navigation.navigate("Edit");
@@ -234,7 +251,6 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   profileContainer: {
     alignItems: "center",
@@ -249,111 +265,6 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "bold",
     marginTop: 10,
-    color: "#333",
-  },
-  iconsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-  },
-  iconItem: {
-    alignItems: "center",
-    marginHorizontal: 10, // Spacing between icons
-  },
-  iconText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  separator: {
-    height: 20,
-    width: 1,
-    backgroundColor: "#333",
-    marginHorizontal: 10, // Adjust separator spacing
-  },
-  listContainer: {
-    flex: 1,
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 20, // Padding for better spacing
-  },
-  flatListContent: {
-    paddingHorizontal: 0,
-    paddingVertical: 10,
-  },
-  tripItem: {
-    flexDirection: "row",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    marginBottom: 10,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 10,
-    width: width * 0.9,
-  },
-  tripImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-  },
-  tripDetails: {
-    flex: 1,
-    marginLeft: 10,
-    justifyContent: "center",
-  },
-  tripCity: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  tripCountry: {
-    fontSize: 14,
-    color: "#555",
-  },
-  noListsText: {
-    color: "#777",
-    fontSize: 16,
-    textAlign: "center", // Center the text
-  },
-  loadingText: {
-    fontSize: 16,
-    color: "#777",
-    textAlign: "center", // Center the loading text
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff", // Semi-transparent background
-  },
-  modalImage: {
-    width: 350,
-    height: 350,
-    borderRadius: 200,
-    marginBottom: 15,
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#121212",
-  },
-  profileContainer: {
-    alignItems: "center",
-    marginTop: 30,
-  },
-  profilePicture: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-  },
-  userName: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginTop: 10,
-    color: "#fff",
   },
   iconsContainer: {
     flexDirection: "row",
@@ -369,12 +280,10 @@ const darkStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#fff",
   },
   separator: {
     height: 20,
     width: 1,
-    backgroundColor: "#fff",
     marginHorizontal: 10,
   },
   listContainer: {
@@ -391,10 +300,7 @@ const darkStyles = StyleSheet.create({
   tripItem: {
     flexDirection: "row",
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#444",
     marginBottom: 10,
-    backgroundColor: "#222",
     borderRadius: 10,
     width: width * 0.9,
   },
@@ -411,32 +317,27 @@ const darkStyles = StyleSheet.create({
   tripCity: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#fff",
   },
   tripCountry: {
     fontSize: 14,
-    color: "#aaa",
   },
   noListsText: {
-    color: "#bbb",
     fontSize: 16,
     textAlign: "center",
   },
   loadingText: {
     fontSize: 16,
-    color: "#bbb",
     textAlign: "center",
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#121212",
   },
   modalImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 350,
+    height: 350,
+    borderRadius: 200,
     marginBottom: 15,
   },
 });

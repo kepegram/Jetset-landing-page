@@ -275,13 +275,8 @@ const TabNavigator: React.FC = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: currentTheme.contrast,
+          backgroundColor: currentTheme.background,
           borderTopWidth: 0,
-          borderRadius: 35,
-          margin: 20,
-          height: 60,
-          paddingBottom: 0,
-          position: "absolute",
         },
         tabBarShowLabel: false,
         tabBarActiveTintColor: currentTheme.tabIcon,

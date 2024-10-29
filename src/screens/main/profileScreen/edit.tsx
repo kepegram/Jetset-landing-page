@@ -26,7 +26,7 @@ type EditScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Edit: React.FC = () => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
   const navigation = useNavigation<EditScreenNavigationProp>();
   const { profilePicture, setProfilePicture } = useProfile();
   const [selectedImage, setSelectedImage] = useState<string | null>(
@@ -115,39 +115,48 @@ const Edit: React.FC = () => {
     navigation.navigate("Settings");
   };
 
-  const currentStyles = theme === "dark" ? darkStyles : styles;
-
   return (
-    <View style={currentStyles.container}>
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
       {/* Profile Picture */}
-      <View style={currentStyles.profilePictureContainer}>
+      <View style={styles.profilePictureContainer}>
         <Pressable onPress={handlePickImage}>
           <Image
             source={{ uri: selectedImage || profilePicture }}
-            style={currentStyles.profilePicture}
+            style={styles.profilePicture}
           />
           <MaterialIcons
             name="edit"
             size={34}
-            color="white"
-            style={currentStyles.editIcon}
+            color={currentTheme.buttonText}
+            style={[styles.editIcon, { backgroundColor: currentTheme.contrast }]}
           />
         </Pressable>
       </View>
 
       {/* Name Input with Title */}
-      <Text style={currentStyles.inputLabel}>Name</Text>
-      <View style={currentStyles.inputWrapper}>
+      <Text style={[styles.inputLabel, { color: currentTheme.textPrimary }]}>
+        Name
+      </Text>
+      <View style={styles.inputWrapper}>
         <TextInput
-          style={currentStyles.input}
+          style={[
+            styles.input,
+            {
+              color: currentTheme.textPrimary,
+              borderColor: currentTheme.inactive,
+            },
+          ]}
           placeholder="Enter your name"
+          placeholderTextColor={currentTheme.inactive}
           value={userName || ""}
           onChangeText={setUserName}
         />
       </View>
 
       {/* Save and Cancel Buttons */}
-      <View style={currentStyles.buttonContainer}>
+      <View style={styles.buttonContainer}>
         <Button onPress={handleCancel} buttonText="Cancel" />
         <AltButton onPress={handleSave} buttonText="Save" />
       </View>
@@ -161,7 +170,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "#fff",
   },
   profilePictureContainer: {
     position: "relative",
@@ -177,13 +185,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 5,
     right: 30,
-    backgroundColor: "#A463FF",
     borderRadius: 22,
   },
   inputLabel: {
     alignSelf: "flex-start",
     fontSize: 16,
-    color: "#333",
     marginTop: 20,
     marginLeft: 25,
   },
@@ -195,57 +201,6 @@ const styles = StyleSheet.create({
     width: "90%",
     padding: 15,
     marginVertical: 5,
-    borderColor: "#ddd",
-    borderBottomWidth: 1,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    width: "100%",
-    marginTop: 30,
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: "#121212",
-  },
-  profilePictureContainer: {
-    position: "relative",
-    marginTop: 50,
-    marginBottom: 20,
-  },
-  profilePicture: {
-    width: 220,
-    height: 220,
-    borderRadius: 120,
-  },
-  editIcon: {
-    position: "absolute",
-    bottom: 5,
-    right: 30,
-    backgroundColor: "#A463FF",
-    borderRadius: 22,
-  },
-  inputLabel: {
-    alignSelf: "flex-start",
-    fontSize: 16,
-    color: "#fff",
-    marginTop: 20,
-    marginLeft: 25,
-  },
-  inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  input: {
-    width: "90%",
-    padding: 15,
-    marginVertical: 5,
-    color: "#fff",
-    borderColor: "#ddd",
     borderBottomWidth: 1,
   },
   buttonContainer: {

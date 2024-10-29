@@ -15,7 +15,7 @@ import { reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { useTheme } from "../../../context/themeContext";
 
 const DeleteAccount: React.FC = () => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [otherReason, setOtherReason] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -82,7 +82,7 @@ const DeleteAccount: React.FC = () => {
                   "Account Deleted",
                   "Your account has been deleted."
                 );
-                //navigation.navigate("Welcome"); // Navigate to welcome/login screen after deletion
+                // navigation.navigate("Welcome"); // Navigate to welcome/login screen after deletion
               } catch (error) {
                 Alert.alert("Error", error.message);
               }
@@ -98,19 +98,27 @@ const DeleteAccount: React.FC = () => {
     }
   };
 
-  const currentStyles = theme === "dark" ? darkStyles : styles;
-
   return (
-    <View style={currentStyles.container}>
-      <Text style={currentStyles.subTitle}>
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
+      <Text style={[styles.subTitle, { color: currentTheme.textPrimary }]}>
         Please let us know why you're leaving:
       </Text>
 
-      <ScrollView contentContainerStyle={currentStyles.scrollContainer}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         {reasons.map((reason, index) => (
           <Pressable
             key={index}
-            style={currentStyles.radioContainer}
+            style={[
+              styles.radioContainer,
+              {
+                backgroundColor:
+                  selectedReason === reason
+                    ? currentTheme.background
+                    : "transparent",
+              },
+            ]}
             onPress={() => setSelectedReason(reason)}
           >
             <Ionicons
@@ -120,18 +128,32 @@ const DeleteAccount: React.FC = () => {
                   : "radio-button-off"
               }
               size={24}
-              color={selectedReason === reason ? "#A463FF" : "#888"}
+              color={
+                selectedReason === reason
+                  ? currentTheme.contrast
+                  : currentTheme.secondary
+              }
             />
-            <Text style={currentStyles.radioLabel}>{reason}</Text>
+            <Text
+              style={[styles.radioLabel, { color: currentTheme.textPrimary }]}
+            >
+              {reason}
+            </Text>
           </Pressable>
         ))}
 
         {/* TextInput for 'Other' reason */}
         {selectedReason === "Other" && (
           <TextInput
-            style={currentStyles.textInput}
+            style={[
+              styles.textInput,
+              {
+                color: currentTheme.textPrimary,
+                borderColor: currentTheme.inactive,
+              },
+            ]}
             placeholder="Please specify your reason"
-            placeholderTextColor={theme === "dark" ? "#aaa" : "#555"}
+            placeholderTextColor={currentTheme.secondary}
             value={otherReason}
             onChangeText={(text) => setOtherReason(text)}
           />
@@ -139,19 +161,24 @@ const DeleteAccount: React.FC = () => {
 
         {/* Password input for re-authentication */}
         <TextInput
-          style={currentStyles.textInput}
+          style={[
+            styles.textInput,
+            {
+              color: currentTheme.textPrimary,
+              borderColor: currentTheme.inactive,
+            },
+          ]}
           placeholder="Enter password to confirm"
-          placeholderTextColor={theme === "dark" ? "#aaa" : "#555"}
+          placeholderTextColor={currentTheme.secondary}
           value={password}
           onChangeText={(text) => setPassword(text)}
           secureTextEntry
         />
 
-        <Pressable
-          style={currentStyles.deleteButton}
-          onPress={handleDeleteAccount}
-        >
-          <Text style={currentStyles.deleteButtonText}>Delete Account</Text>
+        <Pressable style={styles.deleteButton} onPress={handleDeleteAccount}>
+          <Text style={[styles.deleteButtonText, { color: "red" }]}>
+            Delete Account
+          </Text>
         </Pressable>
       </ScrollView>
     </View>
@@ -163,14 +190,12 @@ export default DeleteAccount;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     paddingHorizontal: 20,
     justifyContent: "center",
   },
   subTitle: {
     fontSize: 18,
     marginVertical: 20,
-    color: "#555",
     textAlign: "center",
   },
   scrollContainer: {
@@ -193,7 +218,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 8,
     fontSize: 16,
   },
@@ -201,62 +225,9 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 5,
   },
   deleteButtonText: {
-    color: "red",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
-
-const darkStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#121212",
-    paddingHorizontal: 20,
-    justifyContent: "center",
-  },
-  subTitle: {
-    fontSize: 18,
-    marginVertical: 20,
-    color: "#bbb",
-    textAlign: "center",
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: "center",
-    paddingBottom: 200,
-  },
-  radioContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-    padding: 10,
-    borderRadius: 8,
-  },
-  radioLabel: {
-    fontSize: 16,
-    marginLeft: 10,
-    color: "#fff",
-  },
-  textInput: {
-    marginTop: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#555",
-    borderRadius: 8,
-    fontSize: 16,
-    color: "#fff",
-  },
-  deleteButton: {
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  deleteButtonText: {
-    color: "red",
     fontSize: 16,
     fontWeight: "bold",
   },
