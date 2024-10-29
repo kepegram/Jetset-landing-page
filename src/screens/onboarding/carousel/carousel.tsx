@@ -21,7 +21,7 @@ const Carousel: React.FC = () => {
       style={styles.wrapper}
       showsButtons={false}
       loop={false}
-      activeDotColor={currentTheme.primary}
+      activeDotColor={currentTheme.contrast}
       dotColor={currentTheme.inactive}
     >
       <View
@@ -65,7 +65,7 @@ const Carousel: React.FC = () => {
           style={[styles.specialTitle, { color: currentTheme.textPrimary }]}
         >
           Become{" "}
-          <Text style={{ fontSize: 50, color: currentTheme.primary }}>
+          <Text style={{ fontSize: 50, color: currentTheme.contrast }}>
             Jetset
           </Text>{" "}
           Today
@@ -83,7 +83,7 @@ const Carousel: React.FC = () => {
           <Pressable
             style={[
               styles.authButton,
-              { backgroundColor: currentTheme.secondary },
+              { backgroundColor: currentTheme.primary },
             ]}
             onPress={() => {
               navigation.navigate("Login");

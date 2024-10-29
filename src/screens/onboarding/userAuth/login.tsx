@@ -84,7 +84,7 @@ const Login: React.FC = () => {
               {
                 backgroundColor: currentTheme.background,
                 color: currentTheme.textPrimary,
-                borderColor: currentTheme.alternate,
+                borderColor: currentTheme.secondary,
               },
             ]}
             placeholder="user@example.com"
@@ -115,7 +115,7 @@ const Login: React.FC = () => {
                 {
                   backgroundColor: currentTheme.background,
                   color: currentTheme.textPrimary,
-                  borderColor: currentTheme.alternate,
+                  borderColor: currentTheme.secondary,
                 },
               ]}
               placeholder="••••••••••"
@@ -159,7 +159,7 @@ const Login: React.FC = () => {
             <View
               style={[
                 styles.divider,
-                { backgroundColor: currentTheme.alternate },
+                { backgroundColor: currentTheme.secondary },
               ]}
             />
             <Text
@@ -173,7 +173,7 @@ const Login: React.FC = () => {
             <View
               style={[
                 styles.divider,
-                { backgroundColor: currentTheme.alternate },
+                { backgroundColor: currentTheme.secondary },
               ]}
             />
           </View>

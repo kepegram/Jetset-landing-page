@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Text,
   Pressable,
@@ -9,20 +9,21 @@ import { useTheme } from "../context/themeContext";
 
 type ButtonProps = {
   buttonText: string;
-  onPress: (event: GestureResponderEvent) => void; // onPress handler required
+  onPress: (event: GestureResponderEvent) => void;
 };
 
 const Button: React.FC<ButtonProps> = ({ buttonText, onPress }) => {
-  const { theme } = useTheme();
+  const { currentTheme } = useTheme();
 
   return (
-    <Pressable style={styles.button} onPress={onPress}>
-      <Text
-        style={[
-          styles.buttonText,
-          { color: theme === "dark" ? "white" : "black" },
-        ]}
-      >
+    <Pressable
+      style={[
+        styles.button,
+        { borderColor: currentTheme.primary },
+      ]}
+      onPress={onPress}
+    >
+      <Text style={[styles.buttonText, { color: currentTheme.textPrimary }]}>
         {buttonText}
       </Text>
     </Pressable>
@@ -30,9 +31,19 @@ const Button: React.FC<ButtonProps> = ({ buttonText, onPress }) => {
 };
 
 const AltButton: React.FC<ButtonProps> = ({ buttonText, onPress }) => {
+  const { currentTheme } = useTheme();
+
   return (
-    <Pressable style={styles.altButton} onPress={onPress}>
-      <Text style={styles.altButtonText}>{buttonText}</Text>
+    <Pressable
+      style={[
+        styles.altButton,
+        { backgroundColor: currentTheme.buttonBackground },
+      ]}
+      onPress={onPress}
+    >
+      <Text style={[styles.altButtonText, { color: currentTheme.buttonText }]}>
+        {buttonText}
+      </Text>
     </Pressable>
   );
 };
@@ -44,7 +55,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     width: 120,
     alignItems: "center",
-    borderColor: "#A463FF",
     borderWidth: 1,
   },
   altButton: {
@@ -53,14 +63,12 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     width: 120,
     alignItems: "center",
-    backgroundColor: "#A463FF",
   },
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
   },
   altButtonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },

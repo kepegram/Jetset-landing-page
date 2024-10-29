@@ -45,13 +45,11 @@ const SignUp: React.FC = () => {
   const handleSignUp = async () => {
     setErrorMessage(null);
 
-    // Validate required fields
     if (!name || !email || !password || !confirmPassword) {
       setErrorMessage("All fields are required");
       return;
     }
 
-    // Check if passwords match
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match");
       return;
@@ -74,13 +72,19 @@ const SignUp: React.FC = () => {
       });
 
       await AsyncStorage.setItem("userName", name);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error signing up:", err);
       const user = auth.currentUser;
       if (user) {
         await deleteUser(user);
       }
-      setErrorMessage("Sign up failed. Please try again.");
+      if (err.code === "auth/weak-password") {
+        setErrorMessage(
+          "Please assure password is at least 6 characters."
+        );
+      } else {
+        setErrorMessage("Sign up failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -108,7 +112,7 @@ const SignUp: React.FC = () => {
               {
                 backgroundColor: currentTheme.background,
                 color: currentTheme.textPrimary,
-                borderColor: currentTheme.inactive,
+                borderColor: currentTheme.secondary,
               },
             ]}
             placeholder="Jane Doe"
@@ -129,7 +133,7 @@ const SignUp: React.FC = () => {
               {
                 backgroundColor: currentTheme.background,
                 color: currentTheme.textPrimary,
-                borderColor: currentTheme.inactive,
+                borderColor: currentTheme.secondary,
               },
             ]}
             placeholder="example@mail.com"
@@ -153,7 +157,7 @@ const SignUp: React.FC = () => {
                 {
                   backgroundColor: currentTheme.background,
                   color: currentTheme.textPrimary,
-                  borderColor: currentTheme.inactive,
+                  borderColor: currentTheme.secondary,
                 },
               ]}
               placeholder="••••••••••"
@@ -188,7 +192,7 @@ const SignUp: React.FC = () => {
                 {
                   backgroundColor: currentTheme.background,
                   color: currentTheme.textPrimary,
-                  borderColor: currentTheme.inactive,
+                  borderColor: currentTheme.secondary,
                 },
               ]}
               placeholder="••••••••••"
@@ -235,13 +239,23 @@ const SignUp: React.FC = () => {
         </View>
 
         <View style={styles.dividerContainer}>
-          <View style={styles.divider} />
+          <View
+            style={[
+              styles.divider,
+              { backgroundColor: currentTheme.secondary },
+            ]}
+          />
           <Text
             style={[styles.dividerText, { color: currentTheme.textSecondary }]}
           >
             or sign up with
           </Text>
-          <View style={styles.divider} />
+          <View
+            style={[
+              styles.divider,
+              { backgroundColor: currentTheme.secondary },
+            ]}
+          />
         </View>
 
         <View style={styles.socialIconsContainer}>
@@ -274,7 +288,7 @@ const SignUp: React.FC = () => {
             ]}
           >
             Already a member?
-            <Text style={[styles.loginText, { color: currentTheme.primary }]}>
+            <Text style={[styles.loginText, { color: currentTheme.contrast }]}>
               {" "}
               Log in
             </Text>
@@ -283,7 +297,7 @@ const SignUp: React.FC = () => {
 
         {loading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#A463FF" />
+            <ActivityIndicator size="large" color="#ffc071" />
           </View>
         )}
       </View>
@@ -352,7 +366,6 @@ const styles = StyleSheet.create({
   divider: {
     flex: 1,
     height: 1,
-    backgroundColor: "#ccc",
   },
   dividerText: {
     marginHorizontal: 10,
@@ -389,7 +402,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
     zIndex: 20,
   },
 });
