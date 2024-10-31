@@ -21,7 +21,7 @@ const Welcome: React.FC = () => {
 
   return (
     <ImageBackground
-      source={require("../../../../assets/onboarding-imgs/jetset-welcome.jpeg")}
+      source={require("../../../assets/onboarding-imgs/jetset-welcome.jpeg")}
       style={styles.backgroundImage}
     >
       <View style={styles.slide}>

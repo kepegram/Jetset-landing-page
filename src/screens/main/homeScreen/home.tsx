@@ -28,7 +28,11 @@ import {
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { getAuth } from "firebase/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  fetchFilterDestinations,
+  fetchCoordinates,
+} from "../../../api/apiService";
+import Toast from "react-native-toast-message";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -52,26 +56,44 @@ const Home: React.FC = () => {
   const [initialFetchDone, setInitialFetchDone] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
 
-  const ITEMS_PER_PAGE = 20;
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  // Fetch data when the component mounts and on refresh
+  // Fetch data when the component mounts and on filter change
   useEffect(() => {
     if (!initialFetchDone) {
-      fetchFilterDestinations(true);
+      fetchFilterDestinations(
+        filter,
+        setDestinationData,
+        setLoading,
+        currentPage,
+        true // reset
+      );
       setInitialFetchDone(true);
     }
     fetchUserVisited();
   }, [initialFetchDone]);
 
   useEffect(() => {
-    fetchFilterDestinations(true); // Fetch fresh data based on the selected filter
+    fetchFilterDestinations(
+      filter,
+      setDestinationData,
+      setLoading,
+      currentPage,
+      true // reset
+    );
   }, [filter]);
 
+  // Refresh handler
   const onRefresh = () => {
     setRefreshing(true);
     setCurrentPage(1);
-    fetchFilterDestinations(true);
+    fetchFilterDestinations(
+      filter,
+      setDestinationData,
+      setLoading,
+      1,
+      true // reset
+    );
     setRefreshing(false);
   };
 
@@ -123,194 +145,18 @@ const Home: React.FC = () => {
     </Pressable>
   );
 
-  const fetchCoordinates = async (country: string, city: string) => {
-    const API_KEY = "28c0017aba5f471fa18fe9fdb3cd026e";
-    const cacheKey = `${country}-${city}`;
-    const cachedData = await AsyncStorage.getItem(cacheKey);
-
-    if (cachedData) {
-      return JSON.parse(cachedData); // Return cached data if available
-    }
-
-    const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-      country + ", " + city
-    )}&key=${API_KEY}`;
-
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.results && data.results.length > 0) {
-        const { lat, lng } = data.results[0].geometry; // Get the latitude and longitude
-        const coordinates = { latitude: lat, longitude: lng };
-
-        // Cache the result in AsyncStorage
-        await AsyncStorage.setItem(cacheKey, JSON.stringify(coordinates));
-
-        return coordinates;
-      } else {
-        console.error("No coordinates found for country:", country);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching coordinates:", error);
-      return null;
-    }
-  };
-
-  const fetchFilterDestinations = async (reset = false) => {
-    setLoading(true);
-    try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-
-      if (!user) {
-        console.error("User is not logged in.");
-        return;
-      }
-
-      const cacheKey = `destinations-${user.uid}-${filter}`; // Unique cache key per user and filter
-      if (!reset) {
-        const cachedData = await AsyncStorage.getItem(cacheKey);
-        if (cachedData) {
-          const parsedData = JSON.parse(cachedData);
-          setDestinationData(parsedData); // Load cached data if available
-          setLoading(false);
-          return;
-        }
-      }
-
-      const visitedSnapshot = await getDocs(
-        collection(FIREBASE_DB, `users/${user.uid}/visited`)
-      );
-      const bucketlistSnapshot = await getDocs(
-        collection(FIREBASE_DB, `users/${user.uid}/bucketlist`)
-      );
-
-      const visitedItems = visitedSnapshot.docs.map((doc) => doc.data());
-      const bucketlistItems = bucketlistSnapshot.docs.map((doc) => doc.data());
-
-      const response = await fetch(
-        `http://api.geonames.org/countryInfoJSON?username=${USERNAME}`
-      );
-      const data = await response.json();
-
-      if (!data.geonames) {
-        throw new Error("Geonames data not found in response");
-      }
-
-      const filteredByContinent = data.geonames.filter((item) => {
-        if (filter === "All") return true;
-        return item.continentName === filter;
-      });
-
-      const uniqueCountries = new Set();
-      const formattedData = await Promise.all(
-        filteredByContinent.map(async (item, index: number) => {
-          const isVisited = visitedItems.some(
-            (visited) => visited.country === item.countryName
-          );
-          const isInBucketlist = bucketlistItems.some(
-            (bucketlist) => bucketlist.country === item.countryName
-          );
-
-          if (
-            !isVisited &&
-            !isInBucketlist &&
-            !uniqueCountries.has(item.countryCode) &&
-            item.countryName &&
-            item.countryName.trim() !== "" &&
-            item.capital &&
-            item.capital.trim() !== ""
-          ) {
-            uniqueCountries.add(item.countryCode);
-
-            // Fetch image from Pexels API
-            const pexelsImage = await fetchPexelsImage(item.countryName);
-
-            return {
-              id: `${item.countryCode}-${index}`, // Ensure unique key by appending index
-              image: pexelsImage || "https://via.placeholder.com/400",
-              country: item.countryName,
-              city: item.capital,
-              population: item.population || "N/A",
-              continent: item.continent || "N/A",
-            };
-          }
-          return null;
-        })
-      );
-
-      const resolvedData = formattedData.filter((item) => item !== null);
-      const shuffledData = resolvedData.sort(() => Math.random() - 0.5);
-      const paginatedData = shuffledData.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-      );
-
-      if (reset) {
-        setDestinationData(paginatedData);
-      } else {
-        setDestinationData((prev) => [...prev, ...paginatedData]);
-      }
-
-      // Cache the result in AsyncStorage
-      await AsyncStorage.setItem(cacheKey, JSON.stringify(paginatedData));
-    } catch (error) {
-      console.error("Error fetching destination data:", error);
-    } finally {
-      setLoading(false); // End loading
-    }
-  };
-
-  const fetchPexelsImage = async (countryName: string) => {
-    const cacheKey = `pexelsImage-${countryName}`;
-    const cachedData = await AsyncStorage.getItem(cacheKey);
-
-    if (cachedData) {
-      return JSON.parse(cachedData); // Return cached image URL if available
-    }
-
-    const PEXELS_API_KEY =
-      "VpRUFZAwfA3HA4cwIoYVnHO51Lr36RauMaODMYPSTJpPGbRkmtFLa7pX";
-    const url = `https://api.pexels.com/v1/search?query=${countryName}&per_page=1`;
-
-    try {
-      const response = await fetch(url, {
-        headers: {
-          Authorization: PEXELS_API_KEY,
-        },
-      });
-
-      const data = await response.json();
-
-      if (data.photos && data.photos.length > 0) {
-        const imageUrl = data.photos[0].src.original;
-
-        // Cache the image URL in AsyncStorage
-        await AsyncStorage.setItem(cacheKey, JSON.stringify(imageUrl));
-
-        return imageUrl;
-      }
-
-      return null; // Return null if no image is found
-    } catch (error) {
-      console.error("Error fetching image from Pexels: ", error);
-      return null;
-    }
-  };
-
-  // Function to add an item to the visited list
   const addToVisited = async (item) => {
     try {
       const auth = getAuth();
       const user = auth.currentUser;
 
       if (!user) {
-        Alert.alert(
-          "Error",
-          "You need to be logged in to add items to the visited list."
-        );
+        Toast.show({
+          type: "error",
+          text1: "Authentication Error",
+          text2: "You need to be logged in to add items to the visited list.",
+          visibilityTime: 3000,
+        });
         return;
       }
 
@@ -322,29 +168,40 @@ const Home: React.FC = () => {
         timestamp: new Date(),
       });
 
+      // Show success toast
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: `${item.city}, ${item.country} added to Visited List!`,
+        visibilityTime: 3000,
+      });
+
       // Update state to reflect the change
       setVisitedData((prev) => [...prev, item]);
       setDestinationData((prev) => prev.filter((data) => data.id !== item.id));
     } catch (error) {
       console.error("Error adding document: ", error);
-      Alert.alert(
-        "Error",
-        "There was an error adding the trip to your visited items"
-      );
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "There was an error adding the trip to your visited items",
+        visibilityTime: 3000,
+      });
     }
   };
 
-  // Function to add an item to the bucket list
   const addToBucketlist = async (item) => {
     try {
       const auth = getAuth();
       const user = auth.currentUser;
 
       if (!user) {
-        Alert.alert(
-          "Error",
-          "You need to be logged in to add items to the bucket list."
-        );
+        Toast.show({
+          type: "error",
+          text1: "Authentication Error",
+          text2: "You need to be logged in to add items to the bucket list.",
+          visibilityTime: 3000,
+        });
         return;
       }
 
@@ -356,14 +213,24 @@ const Home: React.FC = () => {
         timestamp: new Date(),
       });
 
+      // Show success toast
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: `${item.city}, ${item.country} added to Bucket List!`,
+        visibilityTime: 3000,
+      });
+
       // Update state to reflect the change
       setDestinationData((prev) => prev.filter((data) => data.id !== item.id));
     } catch (error) {
       console.error("Error adding document: ", error);
-      Alert.alert(
-        "Error",
-        "There was a problem adding the trip to your bucket list."
-      );
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "There was a problem adding the trip to your bucket list.",
+        visibilityTime: 3000,
+      });
     }
   };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useTheme } from "../../../context/themeContext";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
@@ -20,6 +20,47 @@ import AppTheme from "../profileScreen/appTheme";
 import DeleteAccount from "../profileScreen/deleteAccount";
 import TripBuilder from "../plannerScreen/tripBuilder";
 import { StatusBar } from "expo-status-bar";
+import Toast, { ToastConfig, ToastConfigParams } from "react-native-toast-message";
+import { toastStyles } from "../../../theme/theme";
+
+const toastConfig: ToastConfig = {
+  success: ({ text1, text2 }: ToastConfigParams<any>) => (
+    <View
+      style={{
+        padding: 16,
+        backgroundColor: toastStyles.success.primary,
+        borderRadius: 8,
+      }}
+    >
+      {text1 ? (
+        <Text style={{ color: toastStyles.success.text, fontWeight: "bold" }}>
+          {text1}
+        </Text>
+      ) : null}
+      {text2 ? (
+        <Text style={{ color: toastStyles.success.text }}>{text2}</Text>
+      ) : null}
+    </View>
+  ),
+  error: ({ text1, text2 }: ToastConfigParams<any>) => (
+    <View
+      style={{
+        padding: 16,
+        backgroundColor: toastStyles.error.primary,
+        borderRadius: 8,
+      }}
+    >
+      {text1 ? (
+        <Text style={{ color: toastStyles.error.text, fontWeight: "bold" }}>
+          {text1}
+        </Text>
+      ) : null}
+      {text2 ? (
+        <Text style={{ color: toastStyles.error.text }}>{text2}</Text>
+      ) : null}
+    </View>
+  ),
+};
 
 // Define types for root stack params
 export type RootStackParamList = {
@@ -147,7 +188,7 @@ const HomeStack = () => {
         component={AppTheme}
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
-          title: "Appearance",
+          title: "",
         })}
       />
       <RootStack.Screen
@@ -249,7 +290,7 @@ const PlannerStack = () => {
         component={AppTheme}
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
-          title: "Appearance",
+          title: "",
         })}
       />
       <RootStack.Screen
@@ -327,6 +368,7 @@ const AppNav: React.FC = () => {
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>
+      <Toast config={toastConfig} />
     </ProfileProvider>
   );
 };

@@ -11,10 +11,12 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { lightTheme, darkTheme } from "../theme/theme";
 
+type Theme = "light" | "dark"; // Define a union type for themes
+
 type ThemeContextType = {
-  theme: string;
+  theme: Theme; // Use the union type here
   currentTheme: typeof lightTheme | typeof darkTheme;
-  toggleTheme: () => void;
+  toggleTheme: (newTheme: Theme) => void; // Update here to accept the specific theme type
 };
 
 type ThemeProviderProps = {
@@ -28,7 +30,9 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const [theme, setTheme] = useState<Theme>(
+    Appearance.getColorScheme() as Theme
+  );
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -49,7 +53,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   // Function to update theme in Firestore
-  const saveThemeToFirestore = async (newTheme: string) => {
+  const saveThemeToFirestore = async (newTheme: Theme) => {
     if (user) {
       const userDocRef = doc(FIREBASE_DB, "users", user.uid);
       await setDoc(userDocRef, { theme: newTheme }, { merge: true });
@@ -61,24 +65,23 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const loadTheme = async () => {
       const storedTheme = await fetchUserTheme();
       if (storedTheme) {
-        setTheme(storedTheme); // Use the stored theme
+        setTheme(storedTheme as Theme); // Use the stored theme
       } else {
-        setTheme(Appearance.getColorScheme()); // Use system theme as fallback
+        setTheme(Appearance.getColorScheme() as Theme); // Use system theme as fallback
       }
     };
 
     loadTheme(); // Load theme when the app starts
 
     const listener = Appearance.addChangeListener(({ colorScheme }) => {
-      setTheme(colorScheme);
+      setTheme(colorScheme as Theme);
     });
 
     return () => listener.remove();
   }, []);
 
   // Toggle theme and save it to Firestore
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
+  const toggleTheme = (newTheme: Theme) => {
     setTheme(newTheme);
     saveThemeToFirestore(newTheme); // Save to Firestore
   };

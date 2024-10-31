@@ -33,3 +33,14 @@ export const darkTheme = {
   inactiveTabIcon: "#363636",
   error: "red",
 };
+
+export const toastStyles = {
+  success: {
+    primary: "#4CAF50",
+    text: "#FFFFFF",
+  },
+  error: {
+    primary: "#F44336",
+    text: "#FFFFFF",
+  },
+};

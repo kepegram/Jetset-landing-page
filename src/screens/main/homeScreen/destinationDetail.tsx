@@ -243,11 +243,10 @@ export default DestinationDetailView;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   scrollContent: {
     alignItems: "center",
-    marginTop: 70,
+    marginTop: 20,
   },
   horizontalScroll: {
     height: 350,
@@ -305,17 +304,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
   activeDot: {
-    backgroundColor: "#A463FF",
+    backgroundColor: "#ffc071",
   },
   addButton: {
     borderRadius: 35,
-    height: 60,
-    width: "90%",
+    padding: 15,
     alignItems: "center",
-    top: "5%",
   },
   addButtonText: {
-    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
