@@ -230,7 +230,7 @@ const TripBuilder: React.FC = () => {
         imageStyle={{ borderRadius: 10 }}
       >
         <View style={styles.overlay} />
-        <Text style={[styles.title, { color: currentTheme.buttonText }]}>
+        <Text style={[styles.title, { color: "white" }]}>
           Let's go to {tripDetails.city}.
         </Text>
       </ImageBackground>

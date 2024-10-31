@@ -634,7 +634,9 @@ const Home: React.FC = () => {
       )}
 
       {loading ? (
-        <ActivityIndicator size="large" color="grey" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="grey" />
+        </View>
       ) : destinationData.length === 0 ? (
         <Text
           style={[styles.noDataText, { color: currentTheme.textSecondary }]}
@@ -646,7 +648,6 @@ const Home: React.FC = () => {
           data={filteredData}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 80 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -766,9 +767,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flexShrink: 0,
   },
-  destinationListContainer: {
-    paddingBottom: 100,
-  },
   card: {
     marginBottom: 10,
     borderRadius: 10,
@@ -806,6 +804,11 @@ const styles = StyleSheet.create({
   },
   action2Text: {
     fontSize: 14,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   noDataText: {
     textAlign: "center",

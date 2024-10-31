@@ -86,7 +86,7 @@ const Carousel: React.FC = () => {
               { backgroundColor: currentTheme.primary },
             ]}
             onPress={() => {
-              navigation.navigate("Login");
+              navigation.navigate("SignUp");
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }}
           >

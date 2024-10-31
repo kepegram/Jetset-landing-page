@@ -15,7 +15,7 @@ import { RootStackParamList } from "../tabNavigator/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 
 type PlannerScreenNavigationProp = NativeStackNavigationProp<
@@ -144,7 +144,7 @@ const Planner: React.FC = () => {
           data={plannerData}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={[styles.listContainer, { paddingBottom: 80 }]}
+          contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
         />
       )}
