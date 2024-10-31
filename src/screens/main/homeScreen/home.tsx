@@ -62,7 +62,7 @@ const Home: React.FC = () => {
       setInitialFetchDone(true);
     }
     fetchUserVisited();
-  }, []);
+  }, [initialFetchDone]);
 
   useEffect(() => {
     fetchFilterDestinations(true); // Fetch fresh data based on the selected filter
@@ -123,7 +123,7 @@ const Home: React.FC = () => {
     </Pressable>
   );
 
-  const fetchCoordinates = async (country, city) => {
+  const fetchCoordinates = async (country: string, city: string) => {
     const API_KEY = "28c0017aba5f471fa18fe9fdb3cd026e";
     const cacheKey = `${country}-${city}`;
     const cachedData = await AsyncStorage.getItem(cacheKey);
@@ -263,9 +263,8 @@ const Home: React.FC = () => {
     }
   };
 
-  // Function to fetch an image from Pexels API based on the country name
   const fetchPexelsImage = async (countryName: string) => {
-    const cacheKey = `pexelsImage-${countryName}`; // Unique key for each country
+    const cacheKey = `pexelsImage-${countryName}`;
     const cachedData = await AsyncStorage.getItem(cacheKey);
 
     if (cachedData) {

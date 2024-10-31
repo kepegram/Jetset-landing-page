@@ -9,7 +9,6 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -79,9 +78,7 @@ const SignUp: React.FC = () => {
         await deleteUser(user);
       }
       if (err.code === "auth/weak-password") {
-        setErrorMessage(
-          "Please assure password is at least 6 characters."
-        );
+        setErrorMessage("Please assure password is at least 6 characters.");
       } else {
         setErrorMessage("Sign up failed. Please try again.");
       }

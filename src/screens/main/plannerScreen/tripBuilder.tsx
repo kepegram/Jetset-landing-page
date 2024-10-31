@@ -238,7 +238,7 @@ const TripBuilder: React.FC = () => {
       <View
         style={[
           styles.backgroundBelowImage,
-          { backgroundColor: currentTheme.background },
+          { backgroundColor: currentTheme.accentBackground },
         ]}
       />
 
