@@ -1,27 +1,30 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { useTheme } from "../../../context/themeContext";
+import { useTheme } from "../context/themeContext";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
-import { ProfileProvider } from "../../../context/profileContext";
+import { ProfileProvider } from "../context/profileContext";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import Home from "../homeScreen/home";
-import Profile from "../profileScreen/profile";
-import Edit from "../profileScreen/edit";
-import Settings from "../profileScreen/settings";
-import Planner from "../plannerScreen/planner";
-import Memories from "../memoriesScreen/memories";
-import DestinationDetailView from "../homeScreen/destinationDetail";
-import ChangePassword from "../profileScreen/changePassword";
-import AppTheme from "../profileScreen/appTheme";
-import DeleteAccount from "../profileScreen/deleteAccount";
-import TripBuilder from "../plannerScreen/tripBuilder";
+import { toastStyles } from "../theme/theme";
 import { StatusBar } from "expo-status-bar";
-import Toast, { ToastConfig, ToastConfigParams } from "react-native-toast-message";
-import { toastStyles } from "../../../theme/theme";
+import Toast, {
+  ToastConfig,
+  ToastConfigParams,
+} from "react-native-toast-message";
+import Home from "../screens/main/homeScreen/home";
+import Profile from "../screens/main/profileScreen/profile";
+import Edit from "../screens/main/profileScreen/edit";
+import Settings from "../screens/main/profileScreen/settings";
+import ChangePassword from "../screens/main/profileScreen/changePassword";
+import AppTheme from "../screens/main/profileScreen/appTheme";
+import DeleteAccount from "../screens/main/profileScreen/deleteAccount";
+import Planner from "../screens/main/plannerScreen/planner";
+import Memories from "../screens/main/memoriesScreen/memories";
+import DestinationDetailView from "../screens/main/homeScreen/destinationDetail";
+import TripBuilder from "../screens/main/plannerScreen/tripBuilder";
 
 const toastConfig: ToastConfig = {
   success: ({ text1, text2 }: ToastConfigParams<any>) => (
