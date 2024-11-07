@@ -1,10 +1,4 @@
-import {
-  StyleSheet,
-  View,
-  Animated,
-  Image,
-  Pressable,
-} from "react-native";
+import { StyleSheet, View, Animated, Image, Pressable } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { useTheme } from "../../../context/themeContext";
 
@@ -31,11 +25,6 @@ const AppTheme: React.FC = () => {
     outputRange: ["#000", "#fff"], // Black for light theme, white for dark theme
   });
 
-  const animatedButtonBackgroundColor = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["#fff", "#ffc071"], // White for inactive, yellow for active
-  });
-
   return (
     <Animated.View
       style={[styles.container, { backgroundColor: animatedBackgroundColor }]}
@@ -45,10 +34,12 @@ const AppTheme: React.FC = () => {
           <Animated.Text style={[styles.label, { color: animatedTextColor }]}>
             Light Theme
           </Animated.Text>
-          <Image
-            source={require("../../../assets/app-light.png")}
-            style={styles.image}
-          />
+          <Pressable onPress={() => toggleTheme("light")}>
+            <Image
+              source={require("../../../assets/app-light.png")}
+              style={styles.image}
+            />
+          </Pressable>
           <Pressable
             style={[
               styles.radioButton,
@@ -62,10 +53,12 @@ const AppTheme: React.FC = () => {
           <Animated.Text style={[styles.label, { color: animatedTextColor }]}>
             Dark Theme
           </Animated.Text>
-          <Image
-            source={require("../../../assets/app-dark.png")}
-            style={styles.image}
-          />
+          <Pressable onPress={() => toggleTheme("dark")}>
+            <Image
+              source={require("../../../assets/app-dark.png")}
+              style={styles.image}
+            />
+          </Pressable>
           <Pressable
             style={[
               styles.radioButton,

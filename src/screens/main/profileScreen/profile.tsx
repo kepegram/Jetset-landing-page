@@ -14,7 +14,7 @@ import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../tabNavigator/appNav";
+import { RootStackParamList } from "../../../navigation/appNav";
 import { useProfile } from "../../../context/profileContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { useTheme } from "../../../context/themeContext";
@@ -33,8 +33,8 @@ const Profile: React.FC = () => {
   const { currentTheme } = useTheme();
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<"bucketlists" | "memories">(
-    "bucketlists"
+  const [activeTab, setActiveTab] = useState<"destinations" | "memories">(
+    "destinations"
   );
   const [loading, setLoading] = useState(true);
   const [tripData, setTripData] = useState<any[]>([]);
@@ -83,7 +83,7 @@ const Profile: React.FC = () => {
     }, [])
   );
 
-  const handleTabPress = (tab: "bucketlists" | "memories") => {
+  const handleTabPress = (tab: "destinations" | "memories") => {
     setActiveTab(tab);
   };
 
@@ -126,14 +126,14 @@ const Profile: React.FC = () => {
       </View>
       <View style={styles.iconsContainer}>
         <Pressable
-          onPress={() => handleTabPress("bucketlists")}
+          onPress={() => handleTabPress("destinations")}
           style={styles.iconItem}
         >
           <FontAwesome
             name="plane"
             size={30}
             color={
-              activeTab === "bucketlists"
+              activeTab === "destinations"
                 ? currentTheme.contrast
                 : currentTheme.icon
             }
@@ -143,13 +143,13 @@ const Profile: React.FC = () => {
               styles.iconText,
               {
                 color:
-                  activeTab === "bucketlists"
+                  activeTab === "destinations"
                     ? currentTheme.contrast
-                    : currentTheme.textSecondary,
+                    : currentTheme.icon,
               },
             ]}
           >
-            Bucketlists
+            Destinations
           </Text>
         </Pressable>
 
@@ -196,7 +196,7 @@ const Profile: React.FC = () => {
           >
             Loading...
           </Text>
-        ) : activeTab === "bucketlists" ? (
+        ) : activeTab === "destinations" ? (
           tripData.length > 0 ? (
             <FlatList
               data={tripData}

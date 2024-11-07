@@ -12,11 +12,11 @@ import {
 } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { useTheme } from "../../../context/themeContext"; // Import your theme context
+import { useTheme } from "../../../context/themeContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { collection, addDoc } from "firebase/firestore";
 import MapView, { Marker } from "react-native-maps";
-import { RootStackParamList } from "../tabNavigator/appNav";
+import { RootStackParamList } from "../../../navigation/appNav";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = width - 40;
@@ -32,7 +32,7 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   navigation,
   route,
 }) => {
-  const { currentTheme } = useTheme(); // Access currentTheme from context
+  const { currentTheme } = useTheme();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [extraImages, setExtraImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -40,11 +40,10 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const { item } = route.params ?? {};
-  const image = item?.image || "https://via.placeholder.com/400";
-  const country = item?.country || "Unknown country";
+  const [image, setImage] = useState<string | null>(item?.image || null);
+  const stateOrCountry = item?.state || item?.country || "Unknown location";
   const city = item?.city || "No city available";
   const population = item?.population || "N/A";
-  const continent = item?.continent || "N/A";
   const longitude = item?.longitude;
   const latitude = item?.latitude;
 
@@ -79,7 +78,27 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
     const fetchImages = async () => {
       const countryImages = await fetchPexelsImages(item.country);
       const cityImages = await fetchPexelsImages(item.city);
-      setExtraImages([...countryImages, ...cityImages]);
+
+      // Skip the first image in each set
+      const additionalCountryImages = countryImages.slice(1);
+      const additionalCityImages = cityImages.slice(1);
+
+      // Merge the additional images and use a Set to filter out duplicates
+      const allAdditionalImages = [
+        ...additionalCountryImages,
+        ...additionalCityImages,
+      ];
+      const uniqueImages = Array.from(new Set(allAdditionalImages));
+
+      // Limit the number of images to 4
+      const limitedImages = uniqueImages.slice(0, 4);
+
+      setExtraImages(limitedImages);
+
+      // Set item.image if it's not already set
+      if (!item.image && limitedImages.length > 0) {
+        setImage(limitedImages[0]); // Set the first image from the fetched images as default
+      }
     };
 
     if (item.country && item.city) {
@@ -87,8 +106,13 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
     }
   }, [item]);
 
-  const addToBucketlist = async (item) => {
+  const addToPlanner = async (item) => {
     try {
+      // Check if the image field is undefined
+      if (!item.image) {
+        throw new Error("Image is undefined");
+      }
+
       await addDoc(collection(FIREBASE_DB, "bucketlist"), {
         country: item.country,
         city: item.city,
@@ -96,24 +120,23 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
         timestamp: new Date(),
       });
 
-      Alert.alert("Bucketlist", `${item.country} added to bucket list.`, [
+      Alert.alert("Planner", `${item.country} added to planner.`, [
         { text: "OK", onPress: () => navigation.navigate("Home") },
       ]);
     } catch (error) {
       console.error("Error adding document: ", error);
       Alert.alert(
         "Error",
-        "There was a problem adding the trip to your bucketlist."
+        "There was a problem adding the trip to your planner. " + error.message
       );
     }
   };
 
-  // Function to render dot indicators
   const renderDotIndicators = () => {
-    const totalImages = extraImages.length + 1;
+    const totalItems = 1 + extraImages.length;
     return (
       <View style={styles.dotsContainer}>
-        {Array.from({ length: totalImages }, (_, index) => (
+        {Array.from({ length: totalItems }, (_, index) => (
           <View
             key={index}
             style={[styles.dot, currentIndex === index ? styles.activeDot : {}]}
@@ -162,28 +185,32 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
             </View>
           )}
 
-          <Pressable
-            onPress={() => {
-              setSelectedImage(image);
-              setModalVisible(true);
-            }}
-            style={styles.scrollItem}
-          >
-            <Image source={{ uri: image }} style={styles.image} />
-          </Pressable>
-
-          {extraImages.map((extraImage, index) => (
+          {image && (
             <Pressable
-              key={index}
               onPress={() => {
-                setSelectedImage(extraImage);
+                setSelectedImage(image);
                 setModalVisible(true);
               }}
               style={styles.scrollItem}
             >
-              <Image source={{ uri: extraImage }} style={styles.image} />
+              <Image source={{ uri: image }} style={styles.image} />
             </Pressable>
-          ))}
+          )}
+
+          {extraImages.map((extraImage, index) =>
+            extraImage ? (
+              <Pressable
+                key={index}
+                onPress={() => {
+                  setSelectedImage(extraImage);
+                  setModalVisible(true);
+                }}
+                style={styles.scrollItem}
+              >
+                <Image source={{ uri: extraImage }} style={styles.image} />
+              </Pressable>
+            ) : null
+          )}
         </ScrollView>
 
         {/* Render dot indicators */}
@@ -194,25 +221,20 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
             {city}
           </Text>
           <Text style={[styles.country, { color: currentTheme.textSecondary }]}>
-            {country}
+            {stateOrCountry}
           </Text>
           <Text
             style={[styles.infoText, { color: currentTheme.textSecondary }]}
           >
             Population: {population}
           </Text>
-          <Text
-            style={[styles.infoText, { color: currentTheme.textSecondary }]}
-          >
-            Continent: {continent}
-          </Text>
         </View>
 
         <Pressable
           style={[styles.addButton, { backgroundColor: currentTheme.primary }]}
-          onPress={() => addToBucketlist(item)}
+          onPress={() => addToPlanner(item)}
         >
-          <Text style={styles.addButtonText}>Add to Bucket List</Text>
+          <Text style={styles.addButtonText}>Add to Planner</Text>
         </Pressable>
       </ScrollView>
 

@@ -108,10 +108,15 @@ const Home: React.FC = () => {
         const data = await response.json();
 
         if (data.geonames) {
-          const formattedResults = data.geonames.map((item) => ({
+          const formattedResults = data.geonames.slice(0, 4).map((item) => ({
             id: item.geonameId,
-            name: item.toponymName,
+            city: item.toponymName,
             country: item.countryName,
+            state: item.adminName1,
+            population: item.population,
+            continent: item.continentCode,
+            latitude: item.lat,
+            longitude: item.lng,
           }));
           setSearchResults(formattedResults);
         } else {
@@ -140,7 +145,7 @@ const Home: React.FC = () => {
       }}
     >
       <Text style={[styles.resultText, { color: currentTheme.textPrimary }]}>
-        {item.name}, {item.country}
+        {item.city}, {item.state || item.country}
       </Text>
     </Pressable>
   );
@@ -190,7 +195,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const addToBucketlist = async (item) => {
+  const addToPlanner = async (item) => {
     try {
       const auth = getAuth();
       const user = auth.currentUser;
@@ -340,14 +345,14 @@ const Home: React.FC = () => {
                     Add to Visited
                   </Text>
                 </Pressable>
-                <Pressable onPress={() => addToBucketlist(item)}>
+                <Pressable onPress={() => addToPlanner(item)}>
                   <Text
                     style={[
                       styles.action2Text,
                       { color: currentTheme.contrast },
                     ]}
                   >
-                    Add to Bucketlist
+                    Add to Planner
                   </Text>
                 </Pressable>
               </View>

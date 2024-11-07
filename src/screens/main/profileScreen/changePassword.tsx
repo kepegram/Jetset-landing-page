@@ -11,7 +11,7 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../tabNavigator/appNav";
+import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
 

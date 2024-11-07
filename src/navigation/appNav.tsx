@@ -74,6 +74,7 @@ export type RootStackParamList = {
     item: {
       image: string;
       country: string;
+      state: string;
       city: string;
       population: string;
       region: string;
