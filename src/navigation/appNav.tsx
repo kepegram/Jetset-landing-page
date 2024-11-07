@@ -14,6 +14,7 @@ import Toast, {
   ToastConfig,
   ToastConfigParams,
 } from "react-native-toast-message";
+import * as Haptics from "expo-haptics";
 import Home from "../screens/main/homeScreen/home";
 import Profile from "../screens/main/profileScreen/profile";
 import Edit from "../screens/main/profileScreen/edit";
@@ -334,6 +335,15 @@ const TabNavigator: React.FC = () => {
           tabBarIcon: ({ color }) => (
             <AntDesign name="home" color={color} size={30} />
           ),
+          tabBarButton: (props) => (
+            <Pressable
+              {...props}
+              onPress={(e) => {
+                Haptics.selectionAsync();
+                props.onPress?.(e); // Pass 'e' to props.onPress
+              }}
+            />
+          ),
         }}
       />
       <Tab.Screen
@@ -343,6 +353,15 @@ const TabNavigator: React.FC = () => {
           tabBarIcon: ({ color }) => (
             <Ionicons name="airplane-outline" color={color} size={34} />
           ),
+          tabBarButton: (props) => (
+            <Pressable
+              {...props}
+              onPress={(e) => {
+                Haptics.selectionAsync();
+                props.onPress?.(e);
+              }}
+            />
+          ),
         }}
       />
       <Tab.Screen
@@ -351,6 +370,15 @@ const TabNavigator: React.FC = () => {
         options={{
           tabBarIcon: ({ color }) => (
             <AntDesign name="picture" color={color} size={30} />
+          ),
+          tabBarButton: (props) => (
+            <Pressable
+              {...props}
+              onPress={(e) => {
+                Haptics.selectionAsync();
+                props.onPress?.(e);
+              }}
+            />
           ),
         }}
       />

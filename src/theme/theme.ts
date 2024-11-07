@@ -8,7 +8,7 @@ export const lightTheme = {
   textPrimary: "#000000",
   textSecondary: "#737373",
   buttonBackground: "#ffc071",
-  buttonText: "#FFFFFF",
+  buttonText: "#000",
   inactive: "#e8e8e8",
   icon: "#000",
   tabIcon: "#ffc071",

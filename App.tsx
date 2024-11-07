@@ -6,6 +6,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { FIREBASE_AUTH } from "./firebase.config";
 import { useColorScheme } from "react-native";
+import { ThemeProvider } from "./src/context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 import * as SplashScreen from "expo-splash-screen";
 import Welcome from "./src/screens/onboarding/welcome/welcome";
@@ -13,7 +14,6 @@ import Login from "./src/screens/onboarding/userAuth/login";
 import SignUp from "./src/screens/onboarding/userAuth/signup";
 import ForgotPassword from "./src/screens/onboarding/userAuth/forgotPassword";
 import AppNav from "./src/navigation/appNav";
-import { ThemeProvider } from "./src/context/themeContext";
 import Carousel from "./src/screens/onboarding/carousel/carousel";
 
 export type RootStackParamList = {

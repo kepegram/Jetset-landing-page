@@ -142,7 +142,10 @@ const Login: React.FC = () => {
               styles.button,
               { backgroundColor: currentTheme.buttonBackground },
             ]}
-            onPress={handleLogin}
+            onPress={() => {
+              handleLogin();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            }}
           >
             <Text
               style={[styles.buttonText, { color: currentTheme.buttonText }]}
@@ -203,7 +206,12 @@ const Login: React.FC = () => {
           </View>
         </View>
 
-        <Pressable onPress={() => navigation.navigate("SignUp")}>
+        <Pressable
+          onPress={() => {
+            navigation.navigate("SignUp");
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          }}
+        >
           <Text
             style={[styles.createAccountText, { color: currentTheme.primary }]}
           >

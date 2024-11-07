@@ -31,7 +31,6 @@ const TripBuilder: React.FC = () => {
   const [travelCity, setTravelCity] = useState("");
   const [departureDate, setDepartureDate] = useState<Date>(new Date());
   const [returnDate, setReturnDate] = useState<Date>(new Date());
-  const [companyName, setCompanyName] = useState<string>("Any");
   const [webViewVisible, setWebViewVisible] = useState<boolean>(false);
   const [adultCount, setAdultCount] = useState<number>(1);
   const [childCount, setChildCount] = useState<number>(0);
@@ -72,8 +71,14 @@ const TripBuilder: React.FC = () => {
       );
 
       const accessToken = await fetchAccessToken();
+      if (!accessToken) throw new Error("Failed to retrieve access token");
+
+      // URL encoding to ensure proper formatting
+      const encodedCity = encodeURIComponent(cityQuery);
+
+      // Updated request URL without a comma
       const response = await fetch(
-        `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${cityQuery}, ${countryQuery}&subType=AIRPORT`,
+        `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodedCity}&subType=AIRPORT`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -81,7 +86,10 @@ const TripBuilder: React.FC = () => {
         }
       );
 
+      // Check for non-2xx status and log detailed error if available
       if (!response.ok) {
+        const errorDetails = await response.json();
+        console.error("Amadeus API error details:", errorDetails);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -111,8 +119,17 @@ const TripBuilder: React.FC = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      const rateLimitRemaining = response.headers.get("X-RateLimit-Remaining");
+      const rateLimitReset = response.headers.get("X-RateLimit-Reset");
+
+      if (rateLimitRemaining === "0") {
+        const resetTime = new Date(parseInt(rateLimitReset) * 1000);
+        console.log(`Rate limit exceeded. Try again at ${resetTime}`);
+        return; // Exit function if rate limit is exceeded
+      }
+
       const data = await response.json();
-      setSuggestions(data.data);
+      setSuggestions(data.data.slice(0, 3));
       const airportCode = data.data[0]?.iataCode || "";
       setFromAirportCode(airportCode);
     } catch (error) {
@@ -125,7 +142,7 @@ const TripBuilder: React.FC = () => {
       alert("Please fill in all fields before proceeding.");
       return;
     } else {
-      //setWebViewVisible(true);
+      setWebViewVisible(true);
       console.log(fromAirportCode, toAirportCode);
     }
   };
@@ -144,14 +161,6 @@ const TripBuilder: React.FC = () => {
     setFromAirportCode(airport.iataCode);
     setSuggestions([]);
   };
-
-  const airlineOptions = [
-    { label: "Any", value: "Any" },
-    { label: "Spirit Airlines", value: "Spirit Airlines" },
-    { label: "Delta Airlines", value: "Delta Airlines" },
-    { label: "American Airlines", value: "American Airlines" },
-    { label: "United Airlines", value: "United Airlines" },
-  ];
 
   const handleDepartureDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || departureDate;
@@ -172,33 +181,19 @@ const TripBuilder: React.FC = () => {
 
   if (webViewVisible) {
     let searchQueryUrl: string;
-    if (companyName === "Any") {
-      searchQueryUrl = `https://www.google.com`;
-    } else if (companyName === "Spirit Airlines") {
-      searchQueryUrl = `https://www.spirit.com/book/flights?departureCity=${travelCity}&arrivalCity=${
-        tripDetails.city
-      }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
-        returnDate.toISOString().split("T")[0]
-      }&adultPassengers=${adultCount}&childPassengers=${childCount}`;
-    } else if (companyName === "Delta Airlines") {
-      searchQueryUrl = `https://www.delta.com/flight-search/book-a-flight?fromCity=${travelCity}&toCity=${
-        tripDetails.city
-      }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
-        returnDate.toISOString().split("T")[0]
-      }&adults=${adultCount}&children=${childCount}`;
-    } else if (companyName === "American Airlines") {
-      searchQueryUrl = `https://www.aa.com/booking/flights?origin=${travelCity}&destination=${
-        tripDetails.city
-      }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
-        returnDate.toISOString().split("T")[0]
-      }&adults=${adultCount}&children=${childCount}`;
-    } else if (companyName === "United Airlines") {
-      searchQueryUrl = `https://www.united.com/en/us/fsr/choose-flights?from=${travelCity}&to=${
-        tripDetails.city
-      }&departureDate=${departureDate.toISOString().split("T")[0]}&returnDate=${
-        returnDate.toISOString().split("T")[0]
-      }&adultPassengers=${adultCount}&childPassengers=${childCount}`;
-    }
+
+    const departureDateObj = new Date(departureDate);
+    const returnDateObj = new Date(returnDate);
+
+    const departureDateStr = departureDateObj.toISOString().split("T")[0];
+    const returnDateStr = returnDateObj.toISOString().split("T")[0];
+
+    console.log(
+      `Departure Date: ${departureDateStr}, Return Date: ${returnDateStr}`
+    );
+
+    searchQueryUrl = `https://www.google.com/flights?f=0&q=${fromAirportCode}-${toAirportCode}&departure=${departureDateStr}&return=${returnDateStr}`;
+
     return (
       <SwipeableModal
         visible={webViewVisible}
@@ -278,7 +273,10 @@ const TripBuilder: React.FC = () => {
             keyExtractor={(item) => item.iataCode}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.suggestion}
+                style={[
+                  styles.suggestion,
+                  { backgroundColor: currentTheme.background },
+                ]}
                 onPress={() => handleSelectSuggestion(item)}
               >
                 <Text
@@ -325,27 +323,6 @@ const TripBuilder: React.FC = () => {
               onChange={handleReturnDateChange}
             />
           </View>
-        </View>
-
-        <View style={styles.companyContainer}>
-          <Text
-            style={[
-              styles.companyHeader,
-              { color: currentTheme.textSecondary },
-            ]}
-          >
-            Airline:
-          </Text>
-          <Dropdown
-            style={[styles.dropdown, { borderColor: currentTheme.primary }]}
-            data={airlineOptions}
-            labelField="label"
-            valueField="value"
-            placeholder="Select an airline"
-            placeholderStyle={{ color: currentTheme.textPrimary }}
-            value={companyName}
-            onChange={(item) => setCompanyName(item.value)}
-          />
         </View>
 
         {/* Adults and Children Counters */}
@@ -560,27 +537,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 5,
   },
-  dateContainer: {},
+  dateContainer: { marginBottom: 20 },
   dateText: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
-  },
-  companyContainer: {
-    width: "100%",
-    marginTop: 10,
-  },
-  companyHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  dropdown: {
-    height: 40,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    marginTop: 10,
-    marginBottom: 20,
   },
   counterContainer: {
     marginBottom: 20,
@@ -600,7 +561,6 @@ const styles = StyleSheet.create({
   counterButtons: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
   },
   counterButton: {
     borderRadius: 5,
