@@ -1,6 +1,7 @@
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   FlatList,
   Image,
   Pressable,
@@ -11,7 +12,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useProfile } from "../../../context/profileContext";
 import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -56,6 +57,7 @@ const Home: React.FC = () => {
   const [initialFetchDone, setInitialFetchDone] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
 
+  const scrollY = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
   // Fetch data when the component mounts and on filter change
@@ -368,57 +370,8 @@ const Home: React.FC = () => {
     </View>
   );
 
-  const filteredData =
-    selectedCategory === "suggested" ? destinationData : visitedData;
-
-  return (
-    <View
-      style={[styles.container, { backgroundColor: currentTheme.background }]}
-    >
-      <View
-        style={[styles.topBar, { backgroundColor: currentTheme.background }]}
-      >
-        <Text style={[styles.appName, { color: currentTheme.textPrimary }]}>
-          Jetset
-        </Text>
-        <Pressable onPress={() => navigation.navigate("Profile")}>
-          <Image
-            source={{ uri: profilePicture }}
-            style={styles.profilePicture}
-          />
-        </Pressable>
-      </View>
-      <View
-        style={[
-          styles.inputContainer,
-          { backgroundColor: currentTheme.alternate },
-        ]}
-      >
-        <View style={styles.iconContainer}>
-          <Ionicons name="search" size={20} color="#888" />
-        </View>
-        <TextInput
-          style={[styles.searchInput, { color: currentTheme.textPrimary }]}
-          placeholder="Search destinations"
-          placeholderTextColor={currentTheme.secondary}
-          onChangeText={handleSearch}
-          value={searchText}
-        />
-      </View>
-
-      {searchLoading ? (
-        <ActivityIndicator size="small" color="grey" />
-      ) : searchResults.length > 0 ? (
-        <FlatList
-          data={searchResults}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderResultItem}
-          contentContainerStyle={styles.resultList}
-        />
-      ) : (
-        <Text></Text>
-      )}
-
+  const renderListHeader = () => (
+    <View>
       <View style={styles.switchContainer}>
         <Pressable
           onPress={() => setSelectedCategory("suggested")}
@@ -637,6 +590,91 @@ const Home: React.FC = () => {
           </Pressable>
         </ScrollView>
       )}
+    </View>
+  );
+
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, -80], // Adjust height as needed
+    extrapolate: "clamp",
+  });
+
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [1, 0], // Fade out
+    extrapolate: "clamp",
+  });
+
+  const filteredData =
+    selectedCategory === "suggested" ? destinationData : visitedData;
+
+  return (
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
+      <Animated.View
+        style={[
+          styles.topBar,
+          {
+            transform: [{ translateY: headerTranslateY }],
+            opacity: headerOpacity,
+            backgroundColor: currentTheme.background,
+          },
+        ]}
+      >
+        <Text style={[styles.appName, { color: currentTheme.textPrimary }]}>
+          Jetset
+        </Text>
+        <Pressable onPress={() => navigation.navigate("Profile")}>
+          <Image
+            source={{ uri: profilePicture }}
+            style={styles.profilePicture}
+          />
+        </Pressable>
+      </Animated.View>
+      {selectedCategory === "suggested" && (
+        <Animated.View
+          style={[
+            styles.inputContainer,
+            { backgroundColor: currentTheme.alternate },
+            {
+              transform: [
+                {
+                  translateY: headerTranslateY.interpolate({
+                    inputRange: [-100, 0],
+                    outputRange: [0, 80],
+                    extrapolate: "clamp",
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <View style={styles.iconContainer}>
+            <Ionicons name="search" size={20} color="#888" />
+          </View>
+          <TextInput
+            style={[styles.searchInput, { color: currentTheme.textPrimary }]}
+            placeholder="Search destinations"
+            placeholderTextColor={currentTheme.secondary}
+            onChangeText={handleSearch}
+            value={searchText}
+          />
+        </Animated.View>
+      )}
+
+      {searchLoading ? (
+        <ActivityIndicator size="small" color="grey" />
+      ) : searchResults.length > 0 ? (
+        <FlatList
+          data={searchResults}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderResultItem}
+          contentContainerStyle={styles.resultList}
+        />
+      ) : (
+        <Text></Text>
+      )}
 
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -649,15 +687,20 @@ const Home: React.FC = () => {
           No destinations found.
         </Text>
       ) : (
-        <FlatList
+        <Animated.FlatList
           data={filteredData}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
+          ListHeaderComponent={renderListHeader}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           onEndReachedThreshold={0.5}
           showsVerticalScrollIndicator={false}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true }
+          )}
         />
       )}
     </View>
@@ -674,7 +717,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 55,
-    paddingBottom: 10,
+    paddingBottom: 5,
     elevation: 3,
   },
   appName: {
@@ -692,6 +735,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "90%",
     borderRadius: 15,
+    bottom: "20%",
     height: 45,
     paddingHorizontal: 15,
   },
@@ -717,7 +761,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 10,
   },
   switchButton: {
     flex: 1,
@@ -741,7 +785,6 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     flexDirection: "row",
-    marginBottom: 10,
     height: 52,
   },
   filterLabel: {
