@@ -1,11 +1,15 @@
-import React from "react";
-import { Pressable, Text, View } from "react-native";
+import React, { RefObject, useRef } from "react";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { useTheme } from "../context/themeContext";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import {
+  BottomTabNavigationOptions,
+  createBottomTabNavigator,
+} from "@react-navigation/bottom-tabs";
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { ProfileProvider } from "../context/profileContext";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { toastStyles } from "../theme/theme";
@@ -95,10 +99,14 @@ export type RootStackParamList = {
   Main: undefined;
 };
 
+interface HomeStackProps {
+  flatListRef: RefObject<FlatList<any>>;
+}
+
 // Create the main root stack
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
-const HomeStack = () => {
+const HomeStack: React.FC<HomeStackProps> = ({ flatListRef }) => {
   const { currentTheme } = useTheme();
 
   const screenOptions = ({
@@ -150,7 +158,7 @@ const HomeStack = () => {
     <RootStack.Navigator>
       <RootStack.Screen
         name="Home"
-        component={Home}
+        children={() => <Home flatListRef={flatListRef} />}
         options={{ headerShown: false }}
       />
       <RootStack.Screen
@@ -312,18 +320,29 @@ const PlannerStack = () => {
 
 const Tab = createBottomTabNavigator();
 
-// Bottom Tab Navigator Component
+const getTabBarStyle = (route: any): { display?: string } | undefined => {
+  const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+  if (
+    routeName === "Profile" ||
+    routeName === "Edit" ||
+    routeName === "Settings" ||
+    routeName === "ChangePassword" ||
+    routeName === "AppTheme" ||
+    routeName === "DeleteAccount"
+  ) {
+    return { display: "none" };
+  }
+  return undefined;
+};
+
 const TabNavigator: React.FC = () => {
   const { currentTheme } = useTheme();
+  const flatListRef = useRef<FlatList>(null);
 
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: currentTheme.background,
-          borderTopWidth: 0,
-        },
         tabBarShowLabel: false,
         tabBarActiveTintColor: currentTheme.tabIcon,
         tabBarInactiveTintColor: currentTheme.inactiveTabIcon,
@@ -331,56 +350,91 @@ const TabNavigator: React.FC = () => {
     >
       <Tab.Screen
         name="Home"
-        component={HomeStack}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <AntDesign name="home" color={color} size={30} />
-          ),
-          tabBarButton: (props) => (
-            <Pressable
-              {...props}
-              onPress={(e) => {
-                Haptics.selectionAsync();
-                props.onPress?.(e); // Pass 'e' to props.onPress
-              }}
-            />
-          ),
+        children={() => <HomeStack flatListRef={flatListRef} />}
+        options={({ route }) => {
+          const tabBarStyle = {
+            backgroundColor: currentTheme.background,
+            borderTopWidth: 0, // Remove the top border
+            ...(getTabBarStyle(route) || {}),
+          };
+
+          return {
+            tabBarIcon: ({ color }) => (
+              <AntDesign name="home" color={color} size={30} />
+            ),
+            tabBarStyle,
+            tabBarButton: (props) => (
+              <Pressable
+                {...props}
+                onPress={(e) => {
+                  Haptics.selectionAsync();
+                  if (props.accessibilityState?.selected) {
+                    flatListRef.current?.scrollToOffset({
+                      animated: true,
+                      offset: 0,
+                    });
+                  } else {
+                    props.onPress?.(e);
+                  }
+                }}
+              />
+            ),
+          } as BottomTabNavigationOptions;
         }}
       />
+      {/* Repeat similar modifications for other Tab Screens */}
       <Tab.Screen
         name="Planner"
         component={PlannerStack}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="airplane-outline" color={color} size={34} />
-          ),
-          tabBarButton: (props) => (
-            <Pressable
-              {...props}
-              onPress={(e) => {
-                Haptics.selectionAsync();
-                props.onPress?.(e);
-              }}
-            />
-          ),
+        options={({ route }) => {
+          const tabBarStyle = {
+            backgroundColor: currentTheme.background,
+            borderTopWidth: 0, // Remove the top border
+            ...(getTabBarStyle(route) || {}),
+          };
+
+          return {
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="airplane-outline" color={color} size={34} />
+            ),
+            tabBarStyle,
+            tabBarButton: (props) => (
+              <Pressable
+                {...props}
+                onPress={(e) => {
+                  Haptics.selectionAsync();
+                  props.onPress?.(e);
+                }}
+              />
+            ),
+          } as BottomTabNavigationOptions;
         }}
       />
       <Tab.Screen
         name="Memories"
         component={Memories}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <AntDesign name="picture" color={color} size={30} />
-          ),
-          tabBarButton: (props) => (
-            <Pressable
-              {...props}
-              onPress={(e) => {
-                Haptics.selectionAsync();
-                props.onPress?.(e);
-              }}
-            />
-          ),
+        options={({ route }) => {
+          const tabBarStyle = {
+            backgroundColor: currentTheme.background,
+            borderTopWidth: 0, // Remove the top border
+            ...(getTabBarStyle(route) || {}),
+          };
+
+          return {
+            tabBarIcon: ({ color }) => (
+              <AntDesign name="picture" color={color} size={30} />
+            ),
+            tabBarStyle,
+            tabBarButton: (props) => (
+              <Pressable
+                {...props}
+                onPress={(e) => {
+                  Haptics.selectionAsync();
+                  props.onPress?.(e);
+                }}
+              />
+            ),
+          } as BottomTabNavigationOptions;
         }}
       />
     </Tab.Navigator>

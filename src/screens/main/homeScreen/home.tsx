@@ -12,7 +12,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { RefObject, useEffect, useRef, useState } from "react";
 import { useProfile } from "../../../context/profileContext";
 import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -40,9 +40,13 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
   "Home"
 >;
 
+interface HomeProps {
+  flatListRef: RefObject<FlatList<any>>;
+}
+
 const USERNAME = "kpegra1";
 
-const Home: React.FC = () => {
+const Home: React.FC<HomeProps> = ({ flatListRef }) => {
   const { currentTheme } = useTheme();
   const { profilePicture } = useProfile();
   const [selectedCategory, setSelectedCategory] = useState("suggested");
@@ -632,6 +636,7 @@ const Home: React.FC = () => {
           />
         </Pressable>
       </Animated.View>
+
       {selectedCategory === "suggested" && (
         <Animated.View
           style={[
@@ -688,6 +693,7 @@ const Home: React.FC = () => {
         </Text>
       ) : (
         <Animated.FlatList
+          ref={flatListRef}
           data={filteredData}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}

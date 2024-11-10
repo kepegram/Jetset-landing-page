@@ -234,7 +234,11 @@ const DestinationDetailView: React.FC<DestinationDetailViewProps> = ({
           style={[styles.addButton, { backgroundColor: currentTheme.primary }]}
           onPress={() => addToPlanner(item)}
         >
-          <Text style={styles.addButtonText}>Add to Planner</Text>
+          <Text
+            style={[styles.addButtonText, { color: currentTheme.buttonText }]}
+          >
+            Add to Planner
+          </Text>
         </Pressable>
       </ScrollView>
 
