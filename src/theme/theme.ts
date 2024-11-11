@@ -26,7 +26,7 @@ export const darkTheme = {
   textPrimary: "#FFFFFF",
   textSecondary: "#888",
   buttonBackground: "#ffc071",
-  buttonText: "#fff",
+  buttonText: "#121212",
   inactive: "white",
   icon: "#fff",
   tabIcon: "white",

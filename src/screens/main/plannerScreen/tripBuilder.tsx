@@ -37,13 +37,15 @@ const TripBuilder: React.FC = () => {
   const [fromAirportCode, setFromAirportCode] = useState("");
   const [toAirportCode, setToAirportCode] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch airport code using both country and city
     fetchAirportCode(tripDetails.city, tripDetails.country);
   }, [tripDetails.city, tripDetails.country]);
 
   const fetchAccessToken = async () => {
+    if (accessToken) return accessToken;
+
     const clientId = "gc3WxSoAMGRWIMFsZu6cIWByGtdSPFTV";
     const clientSecret = "svyZerXiXew2efAe";
     try {
@@ -58,6 +60,7 @@ const TripBuilder: React.FC = () => {
         }
       );
       const data = await response.json();
+      setAccessToken(data.access_token);
       return data.access_token;
     } catch (error) {
       console.error("Error fetching access token:", error);
@@ -73,11 +76,12 @@ const TripBuilder: React.FC = () => {
       const accessToken = await fetchAccessToken();
       if (!accessToken) throw new Error("Failed to retrieve access token");
 
-      // URL encoding to ensure proper formatting
+      // URL encoding for safe formatting
       const encodedCity = encodeURIComponent(cityQuery);
+      const encodedCountry = encodeURIComponent(countryQuery);
 
-      // Updated request URL without a comma
-      const response = await fetch(
+      // Initial fetch attempt using both city and country
+      let response = await fetch(
         `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodedCity}&subType=AIRPORT`,
         {
           headers: {
@@ -86,17 +90,42 @@ const TripBuilder: React.FC = () => {
         }
       );
 
-      // Check for non-2xx status and log detailed error if available
+      // Check for success or error
       if (!response.ok) {
         const errorDetails = await response.json();
         console.error("Amadeus API error details:", errorDetails);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      const airportCode = data.data[0]?.iataCode || "";
-      setToAirportCode(airportCode);
+      // Parse response
+      let data = await response.json();
+      let airportCode = data.data[0]?.iataCode || "";
 
+      // Retry with city only if no airport code is found
+      if (!airportCode) {
+        console.log(
+          "No airport found with city and country. Retrying with city only."
+        );
+        response = await fetch(
+          `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodedCity}&subType=AIRPORT`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorDetails = await response.json();
+          console.error("Amadeus API error details:", errorDetails);
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        data = await response.json();
+        airportCode = data.data[0]?.iataCode || "";
+      }
+
+      setToAirportCode(airportCode);
       console.log(`Airport code fetched: ${airportCode}`);
     } catch (error) {
       console.error("Error fetching airport code:", error);
@@ -105,12 +134,14 @@ const TripBuilder: React.FC = () => {
 
   const handleCityChange = async (city: string) => {
     try {
-      const accessToken = await fetchAccessToken();
+      const token = await fetchAccessToken();
+      if (!token) throw new Error("Failed to retrieve access token");
+
       const response = await fetch(
         `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${city}&subType=AIRPORT`,
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -125,13 +156,17 @@ const TripBuilder: React.FC = () => {
       if (rateLimitRemaining === "0") {
         const resetTime = new Date(parseInt(rateLimitReset) * 1000);
         console.log(`Rate limit exceeded. Try again at ${resetTime}`);
-        return; // Exit function if rate limit is exceeded
+        return;
       }
 
       const data = await response.json();
       setSuggestions(data.data.slice(0, 3));
-      const airportCode = data.data[0]?.iataCode || "";
-      setFromAirportCode(airportCode);
+      if (data.data.length > 0) {
+        setFromAirportCode(data.data[0].iataCode);
+      } else {
+        console.warn("No airport code found for the entered city.");
+        setFromAirportCode("");
+      }
     } catch (error) {
       console.error("Error fetching airport code:", error);
     }
@@ -233,16 +268,11 @@ const TripBuilder: React.FC = () => {
       <View
         style={[
           styles.backgroundBelowImage,
-          { backgroundColor: currentTheme.accentBackground },
+          { backgroundColor: currentTheme.background },
         ]}
       />
 
-      <View
-        style={[
-          styles.bookingContainer,
-          { backgroundColor: currentTheme.background },
-        ]}
-      >
+      <View style={[styles.bookingContainer, { backgroundColor: "#181818" }]}>
         <View style={styles.travelFromContainer}>
           <Text
             style={[
