@@ -1,24 +1,19 @@
-import React, { RefObject, useRef } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import React from "react";
+import { Pressable, Text, View } from "react-native";
 import { useTheme } from "../context/themeContext";
-import {
-  BottomTabNavigationOptions,
-  createBottomTabNavigator,
-} from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { ProfileProvider } from "../context/profileContext";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { toastStyles } from "../theme/theme";
 import { StatusBar } from "expo-status-bar";
 import Toast, {
   ToastConfig,
   ToastConfigParams,
 } from "react-native-toast-message";
-import * as Haptics from "expo-haptics";
 import Home from "../screens/main/homeScreen/home";
 import Profile from "../screens/main/profileScreen/profile";
 import Edit from "../screens/main/profileScreen/edit";
@@ -26,10 +21,9 @@ import Settings from "../screens/main/profileScreen/settings";
 import ChangePassword from "../screens/main/profileScreen/changePassword";
 import AppTheme from "../screens/main/profileScreen/appTheme";
 import DeleteAccount from "../screens/main/profileScreen/deleteAccount";
-import Planner from "../screens/main/plannerScreen/planner";
-import Memories from "../screens/main/memoriesScreen/memories";
+import Trips from "../screens/main/tripsScreen/trips";
 import DestinationDetailView from "../screens/main/homeScreen/destinationDetail";
-import TripBuilder from "../screens/main/plannerScreen/tripBuilder";
+import TripBuilder from "../screens/main/tripsScreen/tripBuilder";
 
 const toastConfig: ToastConfig = {
   success: ({ text1, text2 }: ToastConfigParams<any>) => (
@@ -72,8 +66,10 @@ const toastConfig: ToastConfig = {
 
 // Define types for root stack params
 export type RootStackParamList = {
+  Main: undefined;
   Home: undefined;
-  Explore: undefined;
+  Trips: undefined;
+  TripBuilder: { tripDetails: any };
   DestinationDetailView: {
     item: {
       image: string;
@@ -93,20 +89,12 @@ export type RootStackParamList = {
   ChangePassword: undefined;
   AppTheme: undefined;
   DeleteAccount: undefined;
-  Planner: undefined;
-  TripBuilder: { tripDetails: any };
-  Memories: undefined;
-  Main: undefined;
 };
-
-interface HomeStackProps {
-  flatListRef: RefObject<FlatList<any>>;
-}
 
 // Create the main root stack
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
-const HomeStack: React.FC<HomeStackProps> = ({ flatListRef }) => {
+const HomeStack: React.FC = () => {
   const { currentTheme } = useTheme();
 
   const screenOptions = ({
@@ -158,8 +146,16 @@ const HomeStack: React.FC<HomeStackProps> = ({ flatListRef }) => {
     <RootStack.Navigator>
       <RootStack.Screen
         name="Home"
-        children={() => <Home flatListRef={flatListRef} />}
+        component={Home}
         options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="Trips"
+        component={Trips}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "",
+        })}
       />
       <RootStack.Screen
         name="DestinationDetailView"
@@ -216,230 +212,7 @@ const HomeStack: React.FC<HomeStackProps> = ({ flatListRef }) => {
   );
 };
 
-const PlannerStack = () => {
-  const { currentTheme } = useTheme();
-
-  const screenOptions = ({
-    navigation,
-  }: {
-    navigation: any;
-  }): NativeStackNavigationOptions => ({
-    headerStyle: {
-      backgroundColor: currentTheme.background,
-    },
-    headerShadowVisible: false,
-    headerLeft: () => (
-      <Pressable onPress={() => navigation.goBack()}>
-        <Ionicons
-          name="arrow-back"
-          size={28}
-          color={currentTheme.textPrimary}
-          style={{ marginLeft: 10 }}
-        />
-      </Pressable>
-    ),
-    headerTitleStyle: {
-      color: currentTheme.textPrimary,
-      fontSize: 18,
-      fontWeight: "bold",
-    },
-  });
-
-  // Custom options for Profile screen
-  const profileScreenOptions = ({
-    navigation,
-  }: {
-    navigation: any;
-  }): NativeStackNavigationOptions => ({
-    ...screenOptions({ navigation }),
-    headerRight: () => (
-      <Pressable onPress={() => navigation.navigate("Settings")}>
-        <Ionicons
-          name="settings-sharp"
-          size={28}
-          color={currentTheme.textPrimary}
-          style={{ marginRight: 10 }}
-        />
-      </Pressable>
-    ),
-  });
-
-  return (
-    <RootStack.Navigator>
-      <RootStack.Screen
-        name="Planner"
-        component={Planner}
-        options={{ headerShown: false }}
-      />
-      <RootStack.Screen
-        name="TripBuilder"
-        component={TripBuilder}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
-      />
-      <RootStack.Screen
-        name="Profile"
-        component={Profile}
-        options={profileScreenOptions}
-      />
-      <RootStack.Screen
-        name="Settings"
-        component={Settings}
-        options={screenOptions}
-      />
-      <RootStack.Screen name="Edit" component={Edit} options={screenOptions} />
-      <RootStack.Screen
-        name="ChangePassword"
-        component={ChangePassword}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "Change Password",
-        })}
-      />
-      <RootStack.Screen
-        name="AppTheme"
-        component={AppTheme}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
-      />
-      <RootStack.Screen
-        name="DeleteAccount"
-        component={DeleteAccount}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "Delete Account",
-        })}
-      />
-    </RootStack.Navigator>
-  );
-};
-
 const Tab = createBottomTabNavigator();
-
-const getTabBarStyle = (route: any): { display?: string } | undefined => {
-  const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
-  if (
-    routeName === "Profile" ||
-    routeName === "Edit" ||
-    routeName === "Settings" ||
-    routeName === "ChangePassword" ||
-    routeName === "AppTheme" ||
-    routeName === "DeleteAccount"
-  ) {
-    return { display: "none" };
-  }
-  return undefined;
-};
-
-const TabNavigator: React.FC = () => {
-  const { currentTheme } = useTheme();
-  const flatListRef = useRef<FlatList>(null);
-
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: false,
-        tabBarActiveTintColor: currentTheme.tabIcon,
-        tabBarInactiveTintColor: currentTheme.inactiveTabIcon,
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        children={() => <HomeStack flatListRef={flatListRef} />}
-        options={({ route }) => {
-          const tabBarStyle = {
-            backgroundColor: currentTheme.background,
-            borderTopWidth: 0, // Remove the top border
-            ...(getTabBarStyle(route) || {}),
-          };
-
-          return {
-            tabBarIcon: ({ color }) => (
-              <AntDesign name="home" color={color} size={30} />
-            ),
-            tabBarStyle,
-            tabBarButton: (props) => (
-              <Pressable
-                {...props}
-                onPress={(e) => {
-                  Haptics.selectionAsync();
-                  if (props.accessibilityState?.selected) {
-                    flatListRef.current?.scrollToOffset({
-                      animated: true,
-                      offset: 0,
-                    });
-                  } else {
-                    props.onPress?.(e);
-                  }
-                }}
-              />
-            ),
-          } as BottomTabNavigationOptions;
-        }}
-      />
-      {/* Repeat similar modifications for other Tab Screens */}
-      <Tab.Screen
-        name="Planner"
-        component={PlannerStack}
-        options={({ route }) => {
-          const tabBarStyle = {
-            backgroundColor: currentTheme.background,
-            borderTopWidth: 0, // Remove the top border
-            ...(getTabBarStyle(route) || {}),
-          };
-
-          return {
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="airplane-outline" color={color} size={34} />
-            ),
-            tabBarStyle,
-            tabBarButton: (props) => (
-              <Pressable
-                {...props}
-                onPress={(e) => {
-                  Haptics.selectionAsync();
-                  props.onPress?.(e);
-                }}
-              />
-            ),
-          } as BottomTabNavigationOptions;
-        }}
-      />
-      <Tab.Screen
-        name="Memories"
-        component={Memories}
-        options={({ route }) => {
-          const tabBarStyle = {
-            backgroundColor: currentTheme.background,
-            borderTopWidth: 0, // Remove the top border
-            ...(getTabBarStyle(route) || {}),
-          };
-
-          return {
-            tabBarIcon: ({ color }) => (
-              <AntDesign name="picture" color={color} size={30} />
-            ),
-            tabBarStyle,
-            tabBarButton: (props) => (
-              <Pressable
-                {...props}
-                onPress={(e) => {
-                  Haptics.selectionAsync();
-                  props.onPress?.(e);
-                }}
-              />
-            ),
-          } as BottomTabNavigationOptions;
-        }}
-      />
-    </Tab.Navigator>
-  );
-};
 
 // Root Navigator Component
 const AppNav: React.FC = () => {
@@ -450,7 +223,7 @@ const AppNav: React.FC = () => {
       <RootStack.Navigator>
         <RootStack.Screen
           name="Main"
-          component={TabNavigator}
+          component={HomeStack}
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>

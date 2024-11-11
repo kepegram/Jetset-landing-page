@@ -272,7 +272,7 @@ const TripBuilder: React.FC = () => {
         ]}
       />
 
-      <View style={[styles.bookingContainer, { backgroundColor: "#181818" }]}>
+      <View style={[styles.bookingContainer, { backgroundColor: currentTheme.accentBackground }]}>
         <View style={styles.travelFromContainer}>
           <Text
             style={[

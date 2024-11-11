@@ -18,7 +18,11 @@ import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import {
   collection,
   addDoc,
@@ -49,7 +53,7 @@ const USERNAME = "kpegra1";
 const Home: React.FC<HomeProps> = ({ flatListRef }) => {
   const { currentTheme } = useTheme();
   const { profilePicture } = useProfile();
-  const [selectedCategory, setSelectedCategory] = useState("suggested");
+  const [selectedCategory, setSelectedCategory] = useState("explore");
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -339,7 +343,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
                 {item.country}
               </Text>
             </View>
-            {selectedCategory === "suggested" && (
+            {selectedCategory === "explore" && (
               <View style={styles.actionsContainer}>
                 <Pressable onPress={() => addToVisited(item)}>
                   <Text
@@ -376,65 +380,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
 
   const renderListHeader = () => (
     <View>
-      <View style={styles.switchContainer}>
-        <Pressable
-          onPress={() => setSelectedCategory("suggested")}
-          style={[
-            styles.switchButton,
-            selectedCategory === "suggested" && [
-              styles.selectedButton,
-              { borderBottomColor: currentTheme.contrast },
-            ],
-          ]}
-        >
-          <Text
-            style={[
-              styles.switchText,
-              {
-                color:
-                  selectedCategory === "suggested"
-                    ? currentTheme.textPrimary
-                    : currentTheme.secondary,
-              },
-              selectedCategory === "suggested" && styles.selectedText,
-            ]}
-          >
-            Suggested
-          </Text>
-        </Pressable>
-
-        <View
-          style={[styles.divider, { backgroundColor: currentTheme.secondary }]}
-        />
-
-        <Pressable
-          onPress={() => setSelectedCategory("visited")}
-          style={[
-            styles.switchButton,
-            selectedCategory === "visited" && [
-              styles.selectedButton,
-              { borderBottomColor: currentTheme.contrast },
-            ],
-          ]}
-        >
-          <Text
-            style={[
-              styles.switchText,
-              {
-                color:
-                  selectedCategory === "visited"
-                    ? currentTheme.primary
-                    : currentTheme.secondary,
-              },
-              selectedCategory === "visited" && styles.selectedText,
-            ]}
-          >
-            Visited
-          </Text>
-        </Pressable>
-      </View>
-
-      {selectedCategory === "suggested" && (
+      {selectedCategory === "explore" && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -610,7 +556,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
   });
 
   const filteredData =
-    selectedCategory === "suggested" ? destinationData : visitedData;
+    selectedCategory === "explore" ? destinationData : visitedData;
 
   return (
     <View
@@ -622,22 +568,83 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
           {
             transform: [{ translateY: headerTranslateY }],
             opacity: headerOpacity,
-            backgroundColor: currentTheme.background,
+            backgroundColor: currentTheme.contrast,
           },
         ]}
       >
-        <Text style={[styles.appName, { color: currentTheme.textPrimary }]}>
-          Jetset
-        </Text>
-        <Pressable onPress={() => navigation.navigate("Profile")}>
-          <Image
-            source={{ uri: profilePicture }}
-            style={styles.profilePicture}
-          />
-        </Pressable>
+        <View style={styles.topRow}>
+          <Pressable onPress={() => navigation.navigate("Profile")}>
+            <Image
+              source={{ uri: profilePicture }}
+              style={styles.profilePicture}
+            />
+          </Pressable>
+          <Text style={[styles.appName, { color: currentTheme.textPrimary }]}>
+            Jetset
+          </Text>
+
+          <Pressable onPress={() => navigation.navigate("Trips")}>
+            <MaterialCommunityIcons name="airplane" size={30} color="black" />
+          </Pressable>
+        </View>
+
+        {/* Move the switchContainer here */}
+        <View style={styles.switchContainer}>
+          <Pressable
+            onPress={() => setSelectedCategory("explore")}
+            style={[
+              styles.switchButton,
+              selectedCategory === "explore" && [
+                styles.selectedButton,
+                { borderBottomColor: currentTheme.primary },
+              ],
+            ]}
+          >
+            <Text
+              style={[
+                styles.switchText,
+                {
+                  color:
+                    selectedCategory === "explore"
+                      ? currentTheme.textPrimary
+                      : currentTheme.secondary,
+                },
+                selectedCategory === "explore" && styles.selectedText,
+              ]}
+            >
+              Explore
+            </Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => setSelectedCategory("visited")}
+            style={[
+              styles.switchButton,
+              selectedCategory === "visited" && [
+                styles.selectedButton,
+                { borderBottomColor: currentTheme.primary },
+              ],
+            ]}
+          >
+            <Text
+              style={[
+                styles.switchText,
+                {
+                  color:
+                    selectedCategory === "visited"
+                      ? currentTheme.primary
+                      : currentTheme.secondary,
+                },
+                selectedCategory === "visited" && styles.selectedText,
+              ]}
+            >
+              Visited
+            </Text>
+          </Pressable>
+        </View>
       </Animated.View>
 
-      {selectedCategory === "suggested" && (
+      {selectedCategory === "explore" && (
         <Animated.View
           style={[
             styles.inputContainer,
@@ -647,7 +654,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
                 {
                   translateY: headerTranslateY.interpolate({
                     inputRange: [-100, 0],
-                    outputRange: [0, 80],
+                    outputRange: [-50, 80],
                     extrapolate: "clamp",
                   }),
                 },
@@ -655,7 +662,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
             },
           ]}
         >
-          <View style={styles.iconContainer}>
+          <View style={styles.searchIconContainer}>
             <Ionicons name="search" size={20} color="#888" />
           </View>
           <TextInput
@@ -718,57 +725,38 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topBar: {
+    flexDirection: "column",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 45,
+    borderBottomLeftRadius: 30, // Curved bottom left
+    borderBottomRightRadius: 30, // Curved bottom right
+    overflow: "hidden",
+  },
+  topRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 55,
-    paddingBottom: 5,
-    elevation: 3,
+    width: "100%",
+  },
+  iconContainer: {
+    position: "relative",
+    alignItems: "center",
   },
   appName: {
-    fontSize: 32,
+    fontSize: 25,
     fontWeight: "bold",
   },
   profilePicture: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderRadius: 20,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignSelf: "center",
-    alignItems: "center",
-    width: "90%",
-    borderRadius: 15,
-    height: 45,
-    paddingHorizontal: 15,
-    position: "absolute",
-    top: 25,
-  },
-  iconContainer: {
-    marginRight: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-  },
-  resultList: {
-    padding: 10,
-  },
-  resultItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  resultText: {
-    fontSize: 16,
   },
   switchContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 50,
+    marginTop: 10,
     marginBottom: 10,
   },
   switchButton: {
@@ -787,13 +775,39 @@ const styles = StyleSheet.create({
   selectedText: {
     fontWeight: "bold",
   },
-  divider: {
-    height: "100%",
-    width: 1,
+  inputContainer: {
+    flexDirection: "row",
+    alignSelf: "center",
+    alignItems: "center",
+    width: "90%",
+    borderRadius: 15,
+    height: 45,
+    paddingHorizontal: 15,
+    position: "absolute",
+    top: 75,
+  },
+  searchIconContainer: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+  },
+  resultList: {
+    padding: 10,
+  },
+  resultItem: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  resultText: {
+    fontSize: 16,
   },
   filterContainer: {
     flexDirection: "row",
     height: 52,
+    marginTop: 55,
   },
   filterLabel: {
     fontSize: 16,

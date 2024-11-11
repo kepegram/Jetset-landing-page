@@ -6,29 +6,29 @@ import {
   View,
   FlatList,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import React, { useCallback, useState } from "react";
-import { useProfile } from "../../../context/profileContext";
 import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, query } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 
-type PlannerScreenNavigationProp = NativeStackNavigationProp<
+type TripsScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "Planner"
+  "Trips"
 >;
 
-const Planner: React.FC = () => {
+const Trips: React.FC = () => {
   const { currentTheme } = useTheme();
-  const { profilePicture } = useProfile();
-  const navigation = useNavigation<PlannerScreenNavigationProp>();
+  const navigation = useNavigation<TripsScreenNavigationProp>();
 
   const [plannerData, setPlannerData] = useState([]);
+  const [visitedData, setVisitedData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchPlannerData = async () => {
@@ -51,9 +51,31 @@ const Planner: React.FC = () => {
     }
   };
 
+  const fetchUserVisited = async () => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (user) {
+        const visitedQuery = query(
+          collection(FIREBASE_DB, `users/${user.uid}/visited`)
+        );
+        const visitedSnapshot = await getDocs(visitedQuery);
+        const visitedList = visitedSnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        setVisitedData(visitedList);
+      }
+    } catch (error) {
+      console.error("Error fetching user visited data:", error);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       fetchPlannerData();
+      fetchUserVisited();
     }, [])
   );
 
@@ -79,6 +101,34 @@ const Planner: React.FC = () => {
       { cancelable: true }
     );
   };
+
+  const handleAddPicture = (tripId: string) => {
+    Alert.alert("Add Picture", `Add a picture to trip ${tripId}`);
+  };
+
+  const renderTripItem = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      style={[
+        styles.tripContainer,
+        { backgroundColor: currentTheme.secondary },
+      ]}
+    >
+      <Image source={{ uri: item.image }} style={styles.tripImage} />
+      <View style={styles.tripInfo}>
+        <Text style={[styles.tripTitle, { color: currentTheme.textPrimary }]}>
+          {item.destination}
+        </Text>
+        <Text
+          style={[styles.tripLocation, { color: currentTheme.textSecondary }]}
+        >
+          {item.city}, {item.country}
+        </Text>
+      </View>
+      <TouchableOpacity onPress={() => handleAddPicture(item.id)}>
+        <Ionicons name="camera-outline" size={24} color={currentTheme.icon} />
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
 
   const renderItem = ({ item }) => (
     <View>
@@ -117,64 +167,71 @@ const Planner: React.FC = () => {
     <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <View
-        style={[styles.topBar, { backgroundColor: currentTheme.background }]}
-      >
-        <Text style={[styles.appName, { color: currentTheme.textPrimary }]}>
-          Plan Your Trip
-        </Text>
-        <Pressable onPress={() => navigation.navigate("Profile")}>
-          <Image
-            source={{ uri: profilePicture }}
-            style={styles.profilePicture}
-          />
-        </Pressable>
-      </View>
-
       {loading ? (
         <Text style={[styles.loadingText, { color: currentTheme.inactive }]}>
           Loading...
         </Text>
-      ) : plannerData.length === 0 ? (
-        <Text style={[styles.emptyText, { color: currentTheme.inactive }]}>
-          No trips planned yet.
-        </Text>
       ) : (
-        <FlatList
-          data={plannerData}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-        />
+        <>
+          {/* Planner Section */}
+          <Text
+            style={[styles.sectionHeader, { color: currentTheme.textPrimary }]}
+          >
+            Planner
+          </Text>
+          {plannerData.length === 0 ? (
+            <Text style={[styles.emptyText, { color: currentTheme.inactive }]}>
+              No trips planned yet.
+            </Text>
+          ) : (
+            <FlatList
+              data={plannerData}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.listContainer}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            />
+          )}
+
+          {/* Memories Section */}
+          <Text
+            style={[
+              styles.sectionHeader,
+              { color: currentTheme.textPrimary, marginTop: 20 },
+            ]}
+          >
+            Memories
+          </Text>
+          <FlatList
+            data={visitedData}
+            renderItem={renderTripItem}
+            keyExtractor={(item) => item.id}
+            ListEmptyComponent={
+              <Text
+                style={[
+                  styles.emptyText,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                No memories yet. Start adding your trips!
+              </Text>
+            }
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+          />
+        </>
       )}
     </View>
   );
 };
 
-export default Planner;
+export default Trips;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  topBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 55,
-    paddingBottom: 10,
-    elevation: 3,
-  },
-  appName: {
-    fontSize: 32,
-    fontWeight: "bold",
-  },
-  profilePicture: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    padding: 16,
   },
   loadingText: {
     marginTop: 20,
@@ -194,6 +251,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: "hidden",
     elevation: 2,
+    marginRight: 10, // Space between items
+    width: 200, // Adjust the width of the cards
   },
   image: {
     width: "100%",
@@ -219,5 +278,34 @@ const styles = StyleSheet.create({
   },
   trashIconContainer: {
     marginLeft: 10,
+  },
+  tripContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 12,
+    marginRight: 10, // Space between items
+  },
+  tripImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  tripInfo: {
+    flex: 1,
+  },
+  tripTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  tripLocation: {
+    fontSize: 14,
+  },
+  sectionHeader: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
 });
