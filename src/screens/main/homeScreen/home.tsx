@@ -599,7 +599,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
 
   const headerTranslateY = scrollY.interpolate({
     inputRange: [0, 100],
-    outputRange: [0, -80], // Adjust height as needed
+    outputRange: [0, -80],
     extrapolate: "clamp",
   });
 
@@ -741,9 +741,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "90%",
     borderRadius: 15,
-    bottom: "20%",
     height: 45,
     paddingHorizontal: 15,
+    position: "absolute",
+    top: 25,
   },
   iconContainer: {
     marginRight: 10,
@@ -767,6 +768,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    paddingTop: 50,
     marginBottom: 10,
   },
   switchButton: {
