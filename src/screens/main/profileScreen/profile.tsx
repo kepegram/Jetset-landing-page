@@ -38,6 +38,7 @@ const Profile: React.FC = () => {
   );
   const [loading, setLoading] = useState(true);
   const [tripData, setTripData] = useState<any[]>([]);
+  const [memoriesData, setMemoriesData] = useState<any>([]);
 
   const navigation = useNavigation<ProfileScreenNavigationProp>();
 
@@ -56,6 +57,26 @@ const Profile: React.FC = () => {
       setTripData(trips);
     } catch (error) {
       console.error("Error fetching planner data: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchMemoriesData = async () => {
+    setLoading(true);
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const querySnapshot = await getDocs(
+        collection(FIREBASE_DB, `users/${user.uid}/visited`)
+      );
+      const memories = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMemoriesData(memories);
+    } catch (error) {
+      console.error("Error fetching memories data: ", error);
     } finally {
       setLoading(false);
     }
@@ -80,6 +101,7 @@ const Profile: React.FC = () => {
 
       fetchUserData();
       fetchPlannerData();
+      fetchMemoriesData();
     }, [])
   );
 
@@ -91,6 +113,25 @@ const Profile: React.FC = () => {
     <Pressable
       style={[styles.tripItem, { backgroundColor: currentTheme.alternate }]}
       onPress={() => navigation.navigate("TripBuilder", { tripDetails: item })}
+    >
+      <Image source={{ uri: item.image }} style={styles.tripImage} />
+      <View style={styles.tripDetails}>
+        <Text style={[styles.tripCity, { color: currentTheme.textPrimary }]}>
+          {item.city}
+        </Text>
+        <Text
+          style={[styles.tripCountry, { color: currentTheme.textSecondary }]}
+        >
+          {item.country}
+        </Text>
+      </View>
+    </Pressable>
+  );
+
+  const renderMemoriesItem = ({ item }) => (
+    <Pressable
+      style={[styles.tripItem, { backgroundColor: currentTheme.alternate }]}
+      onPress={() => navigation.navigate("Trips")}
     >
       <Image source={{ uri: item.image }} style={styles.tripImage} />
       <View style={styles.tripDetails}>
@@ -215,7 +256,21 @@ const Profile: React.FC = () => {
               No lists available.
             </Text>
           )
-        ) : null}
+        ) : memoriesData.length > 0 ? (
+          <FlatList
+            data={memoriesData}
+            renderItem={renderMemoriesItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.flatListContent}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <Text
+            style={[styles.noListsText, { color: currentTheme.textSecondary }]}
+          >
+            No lists available.
+          </Text>
+        )}
       </View>
 
       <Modal

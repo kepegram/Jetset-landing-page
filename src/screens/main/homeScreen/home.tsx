@@ -579,12 +579,16 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
               style={styles.profilePicture}
             />
           </Pressable>
-          <Text style={[styles.appName, { color: currentTheme.textPrimary }]}>
+          <Text style={[styles.appName, { color: currentTheme.textMatch }]}>
             Jetset
           </Text>
 
           <Pressable onPress={() => navigation.navigate("Trips")}>
-            <MaterialCommunityIcons name="airplane" size={30} color="black" />
+            <MaterialCommunityIcons
+              name="airplane"
+              size={30}
+              color={currentTheme.textMatch}
+            />
           </Pressable>
         </View>
 
@@ -596,7 +600,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
               styles.switchButton,
               selectedCategory === "explore" && [
                 styles.selectedButton,
-                { borderBottomColor: currentTheme.primary },
+                { borderBottomColor: currentTheme.textMatch },
               ],
             ]}
           >
@@ -606,7 +610,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
                 {
                   color:
                     selectedCategory === "explore"
-                      ? currentTheme.textPrimary
+                      ? currentTheme.textMatch
                       : currentTheme.secondary,
                 },
                 selectedCategory === "explore" && styles.selectedText,
@@ -729,8 +733,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 45,
-    borderBottomLeftRadius: 30, // Curved bottom left
-    borderBottomRightRadius: 30, // Curved bottom right
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
     overflow: "hidden",
   },
   topRow: {

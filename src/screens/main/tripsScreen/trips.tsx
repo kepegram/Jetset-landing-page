@@ -6,7 +6,6 @@ import {
   View,
   FlatList,
   Alert,
-  TouchableOpacity,
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import { useTheme } from "../../../context/themeContext";
@@ -106,30 +105,6 @@ const Trips: React.FC = () => {
     Alert.alert("Add Picture", `Add a picture to trip ${tripId}`);
   };
 
-  const renderTripItem = ({ item }: { item: any }) => (
-    <TouchableOpacity
-      style={[
-        styles.tripContainer,
-        { backgroundColor: currentTheme.secondary },
-      ]}
-    >
-      <Image source={{ uri: item.image }} style={styles.tripImage} />
-      <View style={styles.tripInfo}>
-        <Text style={[styles.tripTitle, { color: currentTheme.textPrimary }]}>
-          {item.destination}
-        </Text>
-        <Text
-          style={[styles.tripLocation, { color: currentTheme.textSecondary }]}
-        >
-          {item.city}, {item.country}
-        </Text>
-      </View>
-      <TouchableOpacity onPress={() => handleAddPicture(item.id)}>
-        <Ionicons name="camera-outline" size={24} color={currentTheme.icon} />
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
-
   const renderItem = ({ item }) => (
     <View>
       <Pressable
@@ -163,6 +138,38 @@ const Trips: React.FC = () => {
     </View>
   );
 
+  const renderTripItem = ({ item }: { item: any }) => (
+    <View>
+      <Pressable
+        //onPress={() => navigation.navigate("TripDetail", { tripId: item.id })}
+        style={[styles.card, { backgroundColor: currentTheme.alternate }]}
+      >
+        <Image source={{ uri: item.image }} style={styles.image} />
+        <View style={styles.cardBody}>
+          <View style={styles.textContainer}>
+            <View>
+              <Text style={[styles.city, { color: currentTheme.textPrimary }]}>
+                {item.city}
+              </Text>
+              <Text
+                style={[styles.country, { color: currentTheme.textSecondary }]}
+              >
+                {item.country}
+              </Text>
+            </View>
+            <Pressable onPress={() => handleAddPicture(item.id)}>
+              <Ionicons
+                name="camera-outline"
+                size={24}
+                color={currentTheme.icon}
+              />
+            </Pressable>
+          </View>
+        </View>
+      </Pressable>
+    </View>
+  );
+
   return (
     <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
@@ -188,21 +195,33 @@ const Trips: React.FC = () => {
               data={plannerData}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.listContainer}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             />
           )}
 
           {/* Memories Section */}
-          <Text
-            style={[
-              styles.sectionHeader,
-              { color: currentTheme.textPrimary, marginTop: 20 },
-            ]}
-          >
-            Memories
-          </Text>
+          <View style={styles.headerContainer}>
+            <Text
+              style={[
+                styles.sectionHeader,
+                { color: currentTheme.textPrimary },
+              ]}
+            >
+              Memories
+            </Text>
+            {/* <Pressable onPress={() => navigation.navigate("AddTrip")}> */}
+            <Pressable>
+              <Text
+                style={[
+                  styles.addTripText,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                Add Trip
+              </Text>
+            </Pressable>
+          </View>
           <FlatList
             data={visitedData}
             renderItem={renderTripItem}
@@ -243,16 +262,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
   },
-  listContainer: {
-    padding: 0,
-  },
   card: {
-    marginBottom: 10,
     borderRadius: 10,
     overflow: "hidden",
     elevation: 2,
-    marginRight: 10, // Space between items
-    width: 200, // Adjust the width of the cards
+    marginRight: 10,
+    width: 200,
   },
   image: {
     width: "100%",
@@ -279,33 +294,19 @@ const styles = StyleSheet.create({
   trashIconContainer: {
     marginLeft: 10,
   },
-  tripContainer: {
+  headerContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 12,
-    marginRight: 10, // Space between items
-  },
-  tripImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  tripInfo: {
-    flex: 1,
-  },
-  tripTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  tripLocation: {
-    fontSize: 14,
+    marginTop: 20,
   },
   sectionHeader: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
+  },
+  addTripText: {
+    fontSize: 16,
+    fontWeight: "500",
   },
 });

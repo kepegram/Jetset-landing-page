@@ -129,11 +129,22 @@ const HomeStack: React.FC = () => {
   }: {
     navigation: any;
   }): NativeStackNavigationOptions => ({
+    animation: "slide_from_left",
     ...screenOptions({ navigation }),
-    headerRight: () => (
+    headerLeft: () => (
       <Pressable onPress={() => navigation.navigate("Settings")}>
         <Ionicons
           name="settings-sharp"
+          size={28}
+          color={currentTheme.textPrimary}
+          style={{ marginLeft: 10 }}
+        />
+      </Pressable>
+    ),
+    headerRight: () => (
+      <Pressable onPress={() => navigation.goBack()}>
+        <Ionicons
+          name="arrow-forward-sharp"
           size={28}
           color={currentTheme.textPrimary}
           style={{ marginRight: 10 }}
@@ -181,15 +192,39 @@ const HomeStack: React.FC = () => {
       <RootStack.Screen
         name="Settings"
         component={Settings}
-        options={screenOptions}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          animation: "slide_from_left",
+          headerLeft: () => null,
+          headerBackVisible: false, // This hides the default back button on iOS
+          gestureEnabled: false, // This disables the swipe-back gesture
+          headerRight: () => (
+            <Pressable onPress={() => navigation.goBack()}>
+              <Ionicons
+                name="arrow-forward-sharp"
+                size={28}
+                color={currentTheme.textPrimary}
+                style={{ marginRight: 10 }}
+              />
+            </Pressable>
+          ),
+        })}
       />
-      <RootStack.Screen name="Edit" component={Edit} options={screenOptions} />
+      <RootStack.Screen
+        name="Edit"
+        component={Edit}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          animation: "none",
+        })}
+      />
       <RootStack.Screen
         name="ChangePassword"
         component={ChangePassword}
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
           title: "Change Password",
+          animation: "none",
         })}
       />
       <RootStack.Screen
@@ -198,6 +233,7 @@ const HomeStack: React.FC = () => {
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
           title: "",
+          animation: "none",
         })}
       />
       <RootStack.Screen
@@ -206,6 +242,7 @@ const HomeStack: React.FC = () => {
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
           title: "Delete Account",
+          animation: "none",
         })}
       />
     </RootStack.Navigator>
