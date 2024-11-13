@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View, Alert } from "react-native";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../tabNavigator/appNav";
+import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
 import { AltButton } from "../../../ui/button";
 import { useTheme } from "../../../context/themeContext";
@@ -149,7 +149,6 @@ const styles = StyleSheet.create({
   },
   settingsContainer: {
     width: "90%",
-    marginTop: 20,
   },
   sectionHeaderContainer: {
     flexDirection: "row",

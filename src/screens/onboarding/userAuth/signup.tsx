@@ -285,7 +285,7 @@ const SignUp: React.FC = () => {
             ]}
           >
             Already a member?
-            <Text style={[styles.loginText, { color: currentTheme.contrast }]}>
+            <Text style={[styles.loginText, { color: currentTheme.alternate }]}>
               {" "}
               Log in
             </Text>
@@ -294,7 +294,7 @@ const SignUp: React.FC = () => {
 
         {loading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#ffc071" />
+            <ActivityIndicator size="large" color={currentTheme.alternate} />
           </View>
         )}
       </View>

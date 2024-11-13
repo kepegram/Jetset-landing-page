@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { useTheme } from "../../../context/themeContext";
 
 const AppTheme: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, currentTheme, toggleTheme } = useTheme();
   const isDarkTheme = theme === "dark";
   const animation = useRef(new Animated.Value(0)).current;
 
@@ -22,7 +22,7 @@ const AppTheme: React.FC = () => {
 
   const animatedTextColor = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#000", "#fff"], // Black for light theme, white for dark theme
+    outputRange: ["#000", "#fff"],
   });
 
   return (
@@ -34,12 +34,12 @@ const AppTheme: React.FC = () => {
           <Animated.Text style={[styles.label, { color: animatedTextColor }]}>
             Light Theme
           </Animated.Text>
-          <Pressable onPress={() => toggleTheme("light")}>
+          {/* <Pressable onPress={() => toggleTheme("light")}>
             <Image
               source={require("../../../assets/app-light.png")}
               style={styles.image}
             />
-          </Pressable>
+          </Pressable> */}
           <Pressable
             style={[
               styles.radioButton,
@@ -53,12 +53,12 @@ const AppTheme: React.FC = () => {
           <Animated.Text style={[styles.label, { color: animatedTextColor }]}>
             Dark Theme
           </Animated.Text>
-          <Pressable onPress={() => toggleTheme("dark")}>
+          {/* <Pressable onPress={() => toggleTheme("dark")}>
             <Image
               source={require("../../../assets/app-dark.png")}
               style={styles.image}
             />
-          </Pressable>
+          </Pressable> */}
           <Pressable
             style={[
               styles.radioButton,
@@ -88,17 +88,12 @@ const styles = StyleSheet.create({
   themeOption: {
     alignItems: "center",
     flex: 1,
-    padding: 10, // Added padding to separate the options
+    padding: 10,
   },
   label: {
     fontSize: 16,
     marginBottom: 10,
     fontWeight: "bold",
-  },
-  image: {
-    width: 200,
-    height: 400,
-    marginBottom: 10,
   },
   radioButton: {
     width: 25,
@@ -109,7 +104,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   activeButton: {
-    backgroundColor: "#ffc071",
+    backgroundColor: "#387694",
   },
   inactiveButton: {
     backgroundColor: "transparent",

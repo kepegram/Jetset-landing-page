@@ -21,7 +21,7 @@ const Carousel: React.FC = () => {
       style={styles.wrapper}
       showsButtons={false}
       loop={false}
-      activeDotColor={currentTheme.contrast}
+      activeDotColor={currentTheme.alternate}
       dotColor={currentTheme.inactive}
     >
       <View
@@ -65,7 +65,7 @@ const Carousel: React.FC = () => {
           style={[styles.specialTitle, { color: currentTheme.textPrimary }]}
         >
           Become{" "}
-          <Text style={{ fontSize: 50, color: currentTheme.contrast }}>
+          <Text style={{ fontSize: 50, color: currentTheme.alternate }}>
             Jetset
           </Text>{" "}
           Today

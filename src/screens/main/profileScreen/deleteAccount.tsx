@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
-import { doc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc } from "firebase/firestore";
 import { reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { useTheme } from "../../../context/themeContext";
 
@@ -64,25 +64,29 @@ const DeleteAccount: React.FC = () => {
             text: "Yes, Delete",
             onPress: async () => {
               try {
-                // Save the selected reason to Firestore
                 const userId = user?.uid;
-                const userDocRef = doc(
+
+                // Delete only the specific user's document from the 'users' collection
+                const userDocRef = doc(FIREBASE_DB, "users", userId!);
+                await deleteDoc(userDocRef); // This removes just the user's document
+
+                // Optionally, save the account deletion reason to another collection for reference
+                const deletionDocRef = doc(
                   FIREBASE_DB,
                   "accountDeletions",
                   userId!
                 );
-                await setDoc(userDocRef, {
+                await setDoc(deletionDocRef, {
                   reason: reasonToSubmit,
                   deletedAt: new Date().toISOString(),
                 });
 
-                // Step 3: Delete the user's account
+                // Step 3: Delete the user's account from Firebase Auth
                 await user.delete();
                 Alert.alert(
                   "Account Deleted",
                   "Your account has been deleted."
                 );
-                // navigation.navigate("Welcome"); // Navigate to welcome/login screen after deletion
               } catch (error) {
                 Alert.alert("Error", error.message);
               }
@@ -130,7 +134,7 @@ const DeleteAccount: React.FC = () => {
               size={24}
               color={
                 selectedReason === reason
-                  ? currentTheme.contrast
+                  ? currentTheme.alternate
                   : currentTheme.secondary
               }
             />
@@ -196,17 +200,13 @@ const styles = StyleSheet.create({
   subTitle: {
     fontSize: 18,
     marginVertical: 20,
-    textAlign: "center",
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: "center",
-    paddingBottom: 200,
   },
   radioContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15,
     padding: 10,
     borderRadius: 8,
   },

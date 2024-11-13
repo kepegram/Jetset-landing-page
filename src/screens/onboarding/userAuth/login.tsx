@@ -135,7 +135,7 @@ const Login: React.FC = () => {
               <Ionicons
                 name={passwordVisible ? "eye-off" : "eye"}
                 size={24}
-                color={currentTheme.icon}
+                color="grey"
               />
             </Pressable>
           </View>
@@ -190,11 +190,7 @@ const Login: React.FC = () => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               }}
             >
-              <Ionicons
-                name="logo-google"
-                size={22}
-                color={currentTheme.icon}
-              />
+              <Ionicons name="logo-google" size={22} color="grey" />
             </Pressable>
             <Pressable
               style={styles.iconButton}
@@ -203,7 +199,7 @@ const Login: React.FC = () => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               }}
             >
-              <Ionicons name="logo-apple" size={22} color={currentTheme.icon} />
+              <Ionicons name="logo-apple" size={22} color="grey" />
             </Pressable>
           </View>
         </View>
@@ -215,7 +211,10 @@ const Login: React.FC = () => {
           }}
         >
           <Text
-            style={[styles.createAccountText, { color: currentTheme.primary }]}
+            style={[
+              styles.createAccountText,
+              { color: currentTheme.alternate },
+            ]}
           >
             Create an account
           </Text>
@@ -224,7 +223,7 @@ const Login: React.FC = () => {
 
       {loading && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={currentTheme.primary} />
+          <ActivityIndicator size="large" color={currentTheme.alternate} />
         </View>
       )}
     </KeyboardAvoidingView>

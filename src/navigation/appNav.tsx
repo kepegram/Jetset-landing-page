@@ -5,14 +5,19 @@ import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
+import {
+  BottomTabNavigationOptions,
+  createBottomTabNavigator,
+} from "@react-navigation/bottom-tabs";
 import { ProfileProvider } from "../context/profileContext";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { toastStyles } from "../theme/theme";
 import { StatusBar } from "expo-status-bar";
 import Toast, {
   ToastConfig,
   ToastConfigParams,
 } from "react-native-toast-message";
+import * as Haptics from "expo-haptics";
 import Home from "../screens/main/homeScreen/home";
 import Profile from "../screens/main/profileScreen/profile";
 import Edit from "../screens/main/profileScreen/edit";
@@ -20,9 +25,10 @@ import Settings from "../screens/main/profileScreen/settings";
 import ChangePassword from "../screens/main/profileScreen/changePassword";
 import AppTheme from "../screens/main/profileScreen/appTheme";
 import DeleteAccount from "../screens/main/profileScreen/deleteAccount";
-import Trips from "../screens/main/tripsScreen/trips";
-import DestinationDetailView from "../screens/main/homeScreen/destinationDetail";
-import TripBuilder from "../screens/main/tripsScreen/tripBuilder";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+// import Trips from "../screens/main/tripsScreen/trips";
+// import DestinationDetailView from "../screens/main/homeScreen/destinationDetail";
+// import TripBuilder from "../screens/main/tripsScreen/tripBuilder";
 
 const toastConfig: ToastConfig = {
   success: ({ text1, text2 }: ToastConfigParams<any>) => (
@@ -158,33 +164,9 @@ const AppStack: React.FC = () => {
         options={{ headerShown: false }}
       />
       <RootStack.Screen
-        name="Trips"
-        component={Trips}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
-      />
-      <RootStack.Screen
-        name="DestinationDetailView"
-        component={DestinationDetailView}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
-      />
-      <RootStack.Screen
         name="Profile"
         component={Profile}
         options={profileScreenOptions}
-      />
-      <RootStack.Screen
-        name="TripBuilder"
-        component={TripBuilder}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
       />
       <RootStack.Screen
         name="Settings"
@@ -242,7 +224,90 @@ const AppStack: React.FC = () => {
           animation: "none",
         })}
       />
+      {/* <RootStack.Screen
+        name="Trips"
+        component={Trips}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="DestinationDetailView"
+        component={DestinationDetailView}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "",
+        })}
+      /> */}
+      {/* <RootStack.Screen
+        name="TripBuilder"
+        component={TripBuilder}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "",
+        })}
+      /> */}
     </RootStack.Navigator>
+  );
+};
+
+const Tab = createBottomTabNavigator();
+
+const getTabBarStyle = (route: any): { display?: string } | undefined => {
+  const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+  if (
+    routeName === "Profile" ||
+    routeName === "Edit" ||
+    routeName === "Settings" ||
+    routeName === "ChangePassword" ||
+    routeName === "AppTheme" ||
+    routeName === "DeleteAccount"
+  ) {
+    return { display: "none" };
+  }
+  return undefined;
+};
+
+const TabNavigator: React.FC = () => {
+  const { currentTheme } = useTheme();
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: currentTheme.tabIcon,
+        tabBarInactiveTintColor: currentTheme.inactiveTabIcon,
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={AppStack}
+        options={({ route }) => {
+          const tabBarStyle = {
+            backgroundColor: currentTheme.alternate,
+            borderTopWidth: 0,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            ...(getTabBarStyle(route) || {}),
+          };
+          return {
+            tabBarIcon: ({ color }) => (
+              <AntDesign name="home" color={color} size={30} />
+            ),
+            tabBarStyle,
+            tabBarButton: (props) => (
+              <Pressable
+                {...props}
+                onPress={() => {
+                  Haptics.selectionAsync();
+                }}
+              />
+            ),
+          } as BottomTabNavigationOptions;
+        }}
+      />
+    </Tab.Navigator>
   );
 };
 
@@ -255,7 +320,7 @@ const App: React.FC = () => {
       <RootStack.Navigator>
         <RootStack.Screen
           name="App"
-          component={AppStack}
+          component={TabNavigator}
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>

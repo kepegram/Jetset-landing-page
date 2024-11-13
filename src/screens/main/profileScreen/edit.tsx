@@ -130,7 +130,10 @@ const Edit: React.FC = () => {
             name="edit"
             size={34}
             color={currentTheme.buttonText}
-            style={[styles.editIcon, { backgroundColor: currentTheme.contrast }]}
+            style={[
+              styles.editIcon,
+              { backgroundColor: currentTheme.alternate },
+            ]}
           />
         </Pressable>
       </View>
