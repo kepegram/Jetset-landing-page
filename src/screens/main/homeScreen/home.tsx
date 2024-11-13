@@ -44,13 +44,9 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
   "Home"
 >;
 
-interface HomeProps {
-  flatListRef: RefObject<FlatList<any>>;
-}
-
 const USERNAME = "kpegra1";
 
-const Home: React.FC<HomeProps> = ({ flatListRef }) => {
+const Home: React.FC = () => {
   const { currentTheme } = useTheme();
   const { profilePicture } = useProfile();
   const [selectedCategory, setSelectedCategory] = useState("explore");
@@ -611,7 +607,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
                   color:
                     selectedCategory === "explore"
                       ? currentTheme.textMatch
-                      : currentTheme.secondary,
+                      : currentTheme.accent,
                 },
                 selectedCategory === "explore" && styles.selectedText,
               ]}
@@ -626,7 +622,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
               styles.switchButton,
               selectedCategory === "visited" && [
                 styles.selectedButton,
-                { borderBottomColor: currentTheme.primary },
+                { borderBottomColor: currentTheme.textMatch },
               ],
             ]}
           >
@@ -636,8 +632,8 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
                 {
                   color:
                     selectedCategory === "visited"
-                      ? currentTheme.primary
-                      : currentTheme.secondary,
+                      ? currentTheme.textMatch
+                      : currentTheme.accent,
                 },
                 selectedCategory === "visited" && styles.selectedText,
               ]}
@@ -654,6 +650,7 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
             styles.inputContainer,
             { backgroundColor: currentTheme.alternate },
             {
+              pointerEvents: "auto",
               transform: [
                 {
                   translateY: headerTranslateY.interpolate({
@@ -704,7 +701,6 @@ const Home: React.FC<HomeProps> = ({ flatListRef }) => {
         </Text>
       ) : (
         <Animated.FlatList
-          ref={flatListRef}
           data={filteredData}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
@@ -732,7 +728,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 45,
+    paddingTop: 50,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     overflow: "hidden",
@@ -769,12 +765,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   switchText: {
-    fontSize: 16,
+    fontSize: 18,
   },
   selectedButton: {
     borderBottomWidth: 2,
     borderBottomColor: "#A463FF",
-    width: "20%",
   },
   selectedText: {
     fontWeight: "bold",
@@ -788,7 +783,8 @@ const styles = StyleSheet.create({
     height: 45,
     paddingHorizontal: 15,
     position: "absolute",
-    top: 75,
+    top: 78,
+    zIndex: 1,
   },
   searchIconContainer: {
     marginRight: 10,

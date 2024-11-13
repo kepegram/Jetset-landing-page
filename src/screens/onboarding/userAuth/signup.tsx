@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
   },
-  signUpContainer: { marginTop: 40 },
+  signUpContainer: { marginTop: 20 },
   inputHeader: {
     fontSize: 16,
     fontWeight: "bold",

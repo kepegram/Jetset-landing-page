@@ -50,7 +50,9 @@ const Login: React.FC = () => {
       navigation.navigate("AppTabNav");
     } catch (err) {
       console.log(err);
-      setErrorMessage("Login failed. Please try again.");
+      setErrorMessage(
+        "Login failed. Incorrect username or password. Please try again."
+      );
     } finally {
       setLoading(false);
     }

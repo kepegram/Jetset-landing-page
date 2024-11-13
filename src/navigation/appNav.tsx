@@ -1,7 +1,6 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { useTheme } from "../context/themeContext";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
@@ -66,7 +65,7 @@ const toastConfig: ToastConfig = {
 
 // Define types for root stack params
 export type RootStackParamList = {
-  Main: undefined;
+  App: undefined;
   Home: undefined;
   Trips: undefined;
   TripBuilder: { tripDetails: any };
@@ -77,8 +76,6 @@ export type RootStackParamList = {
       state: string;
       city: string;
       population: string;
-      region: string;
-      continent: string;
       longitude: number;
       latitude: number;
     };
@@ -94,7 +91,7 @@ export type RootStackParamList = {
 // Create the main root stack
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
-const HomeStack: React.FC = () => {
+const AppStack: React.FC = () => {
   const { currentTheme } = useTheme();
 
   const screenOptions = ({
@@ -196,8 +193,8 @@ const HomeStack: React.FC = () => {
           ...screenOptions({ navigation }),
           animation: "slide_from_left",
           headerLeft: () => null,
-          headerBackVisible: false, // This hides the default back button on iOS
-          gestureEnabled: false, // This disables the swipe-back gesture
+          headerBackVisible: false,
+          gestureEnabled: false,
           headerRight: () => (
             <Pressable onPress={() => navigation.goBack()}>
               <Ionicons
@@ -249,18 +246,16 @@ const HomeStack: React.FC = () => {
   );
 };
 
-const Tab = createBottomTabNavigator();
-
 // Root Navigator Component
-const AppNav: React.FC = () => {
+const App: React.FC = () => {
   const { theme } = useTheme();
   return (
     <ProfileProvider>
       <StatusBar style={theme === "dark" ? "light" : "dark"} />
       <RootStack.Navigator>
         <RootStack.Screen
-          name="Main"
-          component={HomeStack}
+          name="App"
+          component={AppStack}
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>
@@ -269,4 +264,4 @@ const AppNav: React.FC = () => {
   );
 };
 
-export default AppNav;
+export default App;

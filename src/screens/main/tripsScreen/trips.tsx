@@ -187,8 +187,10 @@ const Trips: React.FC = () => {
             Planner
           </Text>
           {plannerData.length === 0 ? (
-            <Text style={[styles.emptyText, { color: currentTheme.inactive }]}>
-              No trips planned yet.
+            <Text
+              style={[styles.emptyText, { color: currentTheme.textSecondary }]}
+            >
+              No planned trips yet. Add your trips now!
             </Text>
           ) : (
             <FlatList
@@ -210,8 +212,11 @@ const Trips: React.FC = () => {
             >
               Memories
             </Text>
-            {/* <Pressable onPress={() => navigation.navigate("AddTrip")}> */}
-            <Pressable>
+            <Pressable
+              //onPress={() => navigation.navigate("AddTrip")}
+              style={styles.addTripContainer}
+            >
+              <AntDesign name="plus" size={18} color={currentTheme.icon} />
               <Text
                 style={[
                   styles.addTripText,
@@ -305,8 +310,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
+  addTripContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   addTripText: {
     fontSize: 16,
     fontWeight: "500",
+    marginLeft: 5, // Adds space between icon and text
   },
 });
