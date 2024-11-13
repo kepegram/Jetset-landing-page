@@ -374,6 +374,43 @@ const Home: React.FC = () => {
     </View>
   );
 
+  const renderVisitedItem = ({ item }) => (
+    <View>
+      <Pressable
+        style={[styles.card, { backgroundColor: currentTheme.alternate }]}
+        // onPress={async () => {
+        //   console.log("Navigating to AddImages with item:", {
+        //     ...item,
+        //   });
+        //   navigation.navigate("AddImages", {
+        //     item: {
+        //       ...item,
+        //     },
+        //   });
+        // }}
+      >
+        <Image source={{ uri: item.image }} style={styles.image} />
+        <View style={styles.cardBody}>
+          <View style={styles.textContainer}>
+            <View>
+              <Text style={[styles.city, { color: currentTheme.textPrimary }]}>
+                {item.city}
+              </Text>
+              <Text
+                style={[styles.country, { color: currentTheme.textSecondary }]}
+              >
+                {item.country}
+              </Text>
+            </View>
+            <Pressable onPress={() => deleteVisitedItem(item.id)}>
+              <AntDesign name="delete" size={24} color="red" />
+            </Pressable>
+          </View>
+        </View>
+      </Pressable>
+    </View>
+  );
+
   const renderListHeader = () => (
     <View>
       {selectedCategory === "explore" && (
@@ -703,7 +740,9 @@ const Home: React.FC = () => {
         <Animated.FlatList
           data={filteredData}
           keyExtractor={(item) => item.id}
-          renderItem={renderItem}
+          renderItem={
+            selectedCategory === "visited" ? renderVisitedItem : renderItem
+          }
           ListHeaderComponent={renderListHeader}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
