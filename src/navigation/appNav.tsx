@@ -312,7 +312,7 @@ const TabNavigator: React.FC = () => {
 };
 
 // Root Navigator Component
-const App: React.FC = () => {
+const AppNav: React.FC = () => {
   const { theme } = useTheme();
   return (
     <ProfileProvider>
@@ -329,4 +329,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default AppNav;
