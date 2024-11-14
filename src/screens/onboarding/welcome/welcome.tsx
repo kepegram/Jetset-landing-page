@@ -67,20 +67,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    paddingHorizontal: 10,
     paddingBottom: 40,
   },
   appName: {
     fontSize: 72,
     fontWeight: "bold",
-    bottom: "33%",
+    bottom: "38%",
     color: "white",
   },
   paragraph: {
     fontSize: 16,
     textAlign: "center",
     color: "#4a4a4a",
-    bottom: "33%",
+    bottom: "38%",
     paddingHorizontal: 20,
   },
   exploreText: {
