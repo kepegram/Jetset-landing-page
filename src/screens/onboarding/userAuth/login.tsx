@@ -18,13 +18,20 @@ import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "../../../context/themeContext";
+import { AuthRequestPromptOptions, AuthSessionResult } from "expo-auth-session";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Login"
 >;
 
-const Login: React.FC = () => {
+interface LoginProps {
+  promptAsync: (
+    options?: AuthRequestPromptOptions
+  ) => Promise<AuthSessionResult>;
+}
+
+const Login: React.FC<LoginProps> = ({ promptAsync }) => {
   const { currentTheme } = useTheme();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -186,7 +193,7 @@ const Login: React.FC = () => {
             <Pressable
               style={styles.iconButton}
               onPress={() => {
-                console.log("Google Sign-In");
+                promptAsync();
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               }}
             >

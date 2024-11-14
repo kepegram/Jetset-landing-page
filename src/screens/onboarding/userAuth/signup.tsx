@@ -20,13 +20,20 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../../App";
 import { useTheme } from "../../../context/themeContext";
 import * as Haptics from "expo-haptics";
+import { AuthRequestPromptOptions, AuthSessionResult } from "expo-auth-session";
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "SignUp"
 >;
 
-const SignUp: React.FC = () => {
+interface SignUpProps {
+  promptAsync: (
+    options?: AuthRequestPromptOptions
+  ) => Promise<AuthSessionResult>;
+}
+
+const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
   const { currentTheme } = useTheme();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -36,6 +43,7 @@ const SignUp: React.FC = () => {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const auth = FIREBASE_AUTH;
   const db = FIREBASE_DB;
 
@@ -259,7 +267,7 @@ const SignUp: React.FC = () => {
           <Pressable
             style={styles.iconButton}
             onPress={() => {
-              Alert.alert("Google Sign-In");
+              promptAsync();
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }}
           >
@@ -342,7 +350,7 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     padding: 15,
-    borderRadius: 25,
+    borderRadius: 10,
     alignItems: "center",
     marginBottom: 20,
     marginTop: 15,
@@ -378,6 +386,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     borderWidth: 1,
+    width: 100,
     borderColor: "#888",
     justifyContent: "center",
     alignItems: "center",

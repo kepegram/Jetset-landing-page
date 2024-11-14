@@ -23,7 +23,7 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Profile: React.FC = () => {
-  const { profilePicture } = useProfile();
+  const { profilePicture, displayName } = useProfile();
   const { currentTheme } = useTheme();
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -63,11 +63,9 @@ const Profile: React.FC = () => {
           />
         </Pressable>
 
-        {userName && (
-          <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
-            {userName}
-          </Text>
-        )}
+        <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
+          {displayName || userName}
+        </Text>
       </View>
 
       <Modal

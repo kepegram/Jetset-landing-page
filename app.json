@@ -13,12 +13,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.pegram.jetset"
+      "bundleIdentifier": "com.kpegra1.jetset",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "package": "com.pegram.jetset",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "",
         "backgroundColor": "#ffffff"
       }
     },
@@ -37,6 +39,12 @@
           }
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cf7b3e9e-07c0-457e-b3b0-d4179b54b637"
+      }
+    },
+    "scheme" : "jetset"
   }
 }

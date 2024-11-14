@@ -1,7 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { User, onAuthStateChanged } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  User,
+  onAuthStateChanged,
+  signInWithCredential,
+} from "firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { FIREBASE_AUTH } from "./firebase.config";
@@ -9,6 +14,8 @@ import { useColorScheme } from "react-native";
 import { ThemeProvider } from "./src/context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 import * as SplashScreen from "expo-splash-screen";
+import * as Google from "expo-auth-session/providers/google";
+import * as WebBrowser from "expo-web-browser";
 import Welcome from "./src/screens/onboarding/welcome/welcome";
 import Login from "./src/screens/onboarding/userAuth/login";
 import SignUp from "./src/screens/onboarding/userAuth/signup";
@@ -30,10 +37,41 @@ const Stack = createStackNavigator<RootStackParamList>();
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
+WebBrowser.maybeCompleteAuthSession();
+
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [appIsReady, setAppIsReady] = useState(false);
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId:
+      "500450400417-sqtsj83q075sduha6dsrk3c19c9ac1ci.apps.googleusercontent.com",
+    androidClientId:
+      "500450400417-gg1pf3lqt2k98ov98u85aem2ekc2rsd8.apps.googleusercontent.com",
+  });
+
   const colorScheme = useColorScheme();
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { id_token } = response.params;
+      const credential = GoogleAuthProvider.credential(id_token);
+      signInWithCredential(FIREBASE_AUTH, credential);
+    }
+  }, [response]);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(FIREBASE_AUTH, (user) => {
+      if (user) {
+        console.log(JSON.stringify(user, null, 2));
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     async function prepare() {
@@ -54,13 +92,6 @@ const App: React.FC = () => {
       await SplashScreen.hideAsync();
     }
   }, [appIsReady]);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
-      setUser(user);
-    });
-    return unsubscribe;
-  }, []);
 
   const screenOptions = ({ navigation }: any) => ({
     headerStyle: {
@@ -109,16 +140,12 @@ const App: React.FC = () => {
                 component={Carousel}
                 options={{ headerShown: false }}
               />
-              <Stack.Screen
-                name="Login"
-                component={Login}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="SignUp"
-                component={SignUp}
-                options={screenOptions}
-              />
+              <Stack.Screen name="Login" options={{ headerShown: false }}>
+                {(props) => <Login {...props} promptAsync={promptAsync} />}
+              </Stack.Screen>
+              <Stack.Screen name="SignUp" options={screenOptions}>
+                {(props) => <SignUp {...props} promptAsync={promptAsync} />}
+              </Stack.Screen>
               <Stack.Screen
                 name="ForgotPassword"
                 component={ForgotPassword}
