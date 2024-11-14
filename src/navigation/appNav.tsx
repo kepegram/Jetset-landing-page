@@ -132,6 +132,7 @@ const AppStack: React.FC = () => {
   }: {
     navigation: any;
   }): NativeStackNavigationOptions => ({
+    title: "",
     animation: "slide_from_left",
     ...screenOptions({ navigation }),
     headerLeft: () => (
@@ -224,30 +225,6 @@ const AppStack: React.FC = () => {
           animation: "none",
         })}
       />
-      {/* <RootStack.Screen
-        name="Trips"
-        component={Trips}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
-      />
-      <RootStack.Screen
-        name="DestinationDetailView"
-        component={DestinationDetailView}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
-      /> */}
-      {/* <RootStack.Screen
-        name="TripBuilder"
-        component={TripBuilder}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
-      /> */}
     </RootStack.Navigator>
   );
 };
@@ -287,8 +264,6 @@ const TabNavigator: React.FC = () => {
           const tabBarStyle = {
             backgroundColor: currentTheme.alternate,
             borderTopWidth: 0,
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
             ...(getTabBarStyle(route) || {}),
           };
           return {

@@ -33,7 +33,7 @@ const Home: React.FC = () => {
         style={[
           styles.topBar,
           {
-            backgroundColor: currentTheme.alternate,
+            backgroundColor: currentTheme.background,
           },
         ]}
       >
@@ -42,16 +42,6 @@ const Home: React.FC = () => {
             <Image
               source={{ uri: profilePicture }}
               style={styles.profilePicture}
-            />
-          </Pressable>
-          <Text style={[styles.appName, { color: currentTheme.textMatch }]}>
-            Jetset
-          </Text>
-          <Pressable onPress={() => console.log("Screen made later")}>
-            <Ionicons
-              name="settings-sharp"
-              size={28}
-              color={currentTheme.textMatch}
             />
           </Pressable>
         </View>
@@ -68,9 +58,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 50,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    paddingTop: 60,
     overflow: "hidden",
   },
   topRow: {
