@@ -14,13 +14,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
 import { doc, setDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  deleteUser,
+  OAuthProvider,
+  signInWithCredential,
+} from "firebase/auth";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../../App";
 import { useTheme } from "../../../context/themeContext";
 import * as Haptics from "expo-haptics";
 import { AuthRequestPromptOptions, AuthSessionResult } from "expo-auth-session";
+import * as AppleAuthentication from "expo-apple-authentication";
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -92,6 +98,60 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    setErrorMessage(null);
+
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (credential) {
+        const { identityToken, fullName, email } = credential;
+
+        if (!identityToken) {
+          setErrorMessage("Authentication failed. Please try again.");
+          return;
+        }
+
+        // Create an OAuthProvider for Apple
+        const provider = new OAuthProvider("apple.com");
+
+        // Create the credential
+        const appleCredential = provider.credential({
+          idToken: identityToken,
+        });
+
+        // Sign in with Firebase
+        const authResult = await signInWithCredential(auth, appleCredential);
+
+        // Store user info in Firestore
+        const userRef = doc(db, "users", authResult.user.uid);
+        await setDoc(
+          userRef,
+          {
+            name: fullName?.givenName || "User",
+            email: email || authResult.user.email,
+            createdAt: new Date().toISOString(),
+          },
+          { merge: true } // Merge to avoid overwriting existing data
+        );
+
+        await AsyncStorage.setItem("userName", fullName?.givenName || "User");
+      }
+    } catch (e: any) {
+      if (e.code === "ERR_REQUEST_CANCELED") {
+        setErrorMessage("Cancelled Apple sign-in flow");
+      } else {
+        setErrorMessage("Error authenticating with Apple, please try again.");
+      }
+      console.error("Apple Sign-In Error:", e);
     }
   };
 

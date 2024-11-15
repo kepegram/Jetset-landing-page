@@ -5,6 +5,7 @@ import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import {
   BottomTabNavigationOptions,
   createBottomTabNavigator,
@@ -25,10 +26,6 @@ import Settings from "../screens/main/profileScreen/settings";
 import ChangePassword from "../screens/main/profileScreen/changePassword";
 import AppTheme from "../screens/main/profileScreen/appTheme";
 import DeleteAccount from "../screens/main/profileScreen/deleteAccount";
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
-// import Trips from "../screens/main/tripsScreen/trips";
-// import DestinationDetailView from "../screens/main/homeScreen/destinationDetail";
-// import TripBuilder from "../screens/main/tripsScreen/tripBuilder";
 
 const toastConfig: ToastConfig = {
   success: ({ text1, text2 }: ToastConfigParams<any>) => (

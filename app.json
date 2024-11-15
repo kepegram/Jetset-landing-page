@@ -13,6 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
+      "usesAppleSignIn": true,
       "bundleIdentifier": "com.kpegra1.jetset",
       "googleServicesFile": "./GoogleService-Info.plist"
     },
@@ -31,6 +32,7 @@
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       "@react-native-firebase/crashlytics",
+      "expo-apple-authentication",
       [
         "expo-build-properties",
         {
@@ -45,6 +47,6 @@
         "projectId": "cf7b3e9e-07c0-457e-b3b0-d4179b54b637"
       }
     },
-    "scheme" : "jetset"
+    "scheme": "jetset"
   }
 }
