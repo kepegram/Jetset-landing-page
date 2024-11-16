@@ -12,7 +12,7 @@ export const lightTheme = {
   inactive: "#e8e8e8",
   icon: "#000",
   tabIcon: "#387694",
-  inactiveTabIcon: "#ebebeb",
+  inactiveTabIcon: "#808080",
   error: "red",
 };
 
@@ -30,17 +30,6 @@ export const darkTheme = {
   inactive: "white",
   icon: "#fff",
   tabIcon: "#387694",
-  inactiveTabIcon: "#2c2c2c",
+  inactiveTabIcon: "#808080",
   error: "red",
-};
-
-export const toastStyles = {
-  success: {
-    primary: "#4CAF50",
-    text: "#FFFFFF",
-  },
-  error: {
-    primary: "#F44336",
-    text: "#FFFFFF",
-  },
 };

@@ -2,7 +2,7 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Colors } from "../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { GetPhotoRef } from "../../api/GooglePlaceApi";
+import { GetPhotoRef } from "../../api/googlePlaceApi";
 
 export default function PlaceCard({ place }) {
   const [photoRef, setPhotoRef] = useState();

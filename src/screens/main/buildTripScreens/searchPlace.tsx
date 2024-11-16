@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Pressable, Text } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import "react-native-get-random-values";
-import { v4 as uuidv4 } from "uuid";
-import { CreateTripContext } from "../../../context/CreateTripContext";
+import { CreateTripContext } from "../../../context/createTripContext";
 import { GooglePlaceDetail } from "react-native-google-places-autocomplete";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";

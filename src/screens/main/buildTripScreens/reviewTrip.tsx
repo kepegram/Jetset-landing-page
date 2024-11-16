@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from "react-native";
 import React from "react";
 import { useContext } from "react";
-import { CreateTripContext } from "../../../context/CreateTripContext";
+import { CreateTripContext } from "../../../context/createTripContext";
 import moment from "moment";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
@@ -199,7 +199,7 @@ const ReviewTrip: React.FC = () => {
       </View>
 
       <Pressable
-        // onPress={() => router.replace("/create-trip/generate-trip")}
+        onPress={() => navigation.navigate("GenerateTrip")}
         style={{
           padding: 15,
           backgroundColor: currentTheme.alternate,

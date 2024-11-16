@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
   },
   settingsContainer: {
     width: "90%",
+    marginTop: 20,
   },
   sectionHeaderContainer: {
     flexDirection: "row",

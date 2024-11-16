@@ -2,7 +2,7 @@ import { View, Text, Pressable } from "react-native";
 import React, { useContext, useState } from "react";
 import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
-import { CreateTripContext } from "../../../context/CreateTripContext";
+import { CreateTripContext } from "../../../context/createTripContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";

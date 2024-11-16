@@ -2,7 +2,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import moment from 'moment'
 import { Colors } from '../../constants/Colors'
-import UserTripCard from './UserTripCard'
+import UserTripCard from './userTripCard'
 import { useRouter } from 'expo-router'
 export default function UserTripList({userTrips}) {
     const LatestTrip=JSON.parse(userTrips[0].tripData)

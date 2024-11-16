@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Alert, Image, Pressable, Text } from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
   createNativeStackNavigator,
@@ -10,10 +10,10 @@ import {
   BottomTabNavigationOptions,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
-import { ProfileProvider } from "../context/profileContext";
+import { ProfileProvider, useProfile } from "../context/profileContext";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import * as Haptics from "expo-haptics";
+import { CreateTripContext } from "../context/createTripContext";
 import Home from "../screens/main/homeScreen/home";
 import Profile from "../screens/main/userScreens/profile";
 import Edit from "../screens/main/userScreens/edit";
@@ -22,11 +22,11 @@ import ChangePassword from "../screens/main/userScreens/changePassword";
 import AppTheme from "../screens/main/userScreens/appTheme";
 import DeleteAccount from "../screens/main/userScreens/deleteAccount";
 import SearchPlace from "../screens/main/buildTripScreens/searchPlace";
-import { CreateTripContext } from "../context/CreateTripContext";
 import SelectTraveler from "../screens/main/buildTripScreens/selectTraveler";
 import SelectDates from "../screens/main/buildTripScreens/selectDates";
 import SetBudget from "../screens/main/buildTripScreens/setBudget";
 import ReviewTrip from "../screens/main/buildTripScreens/reviewTrip";
+import GenerateTrip from "../screens/main/buildTripScreens/generateTrip";
 
 // Define types for root stack params
 export type RootStackParamList = {
@@ -37,6 +37,7 @@ export type RootStackParamList = {
   SelectDates: undefined;
   SetBudget: undefined;
   ReviewTrip: undefined;
+  GenerateTrip: undefined;
   Profile: undefined;
   Edit: undefined;
   Settings: undefined;
@@ -48,7 +49,7 @@ export type RootStackParamList = {
 // Create the main root stack
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
-const AppStack: React.FC = () => {
+const HomeStack: React.FC = () => {
   const { currentTheme } = useTheme();
 
   const screenOptions = ({
@@ -77,6 +78,7 @@ const AppStack: React.FC = () => {
     },
   });
 
+  // Custom options for TripBuilder screens
   const tripBuilderScreenOptions = ({
     navigation,
   }: {
@@ -129,37 +131,6 @@ const AppStack: React.FC = () => {
     ),
   });
 
-  // Custom options for Profile screen
-  const profileScreenOptions = ({
-    navigation,
-  }: {
-    navigation: any;
-  }): NativeStackNavigationOptions => ({
-    title: "Your Profile",
-    animation: "slide_from_left",
-    ...screenOptions({ navigation }),
-    headerLeft: () => (
-      <Pressable onPress={() => navigation.navigate("Settings")}>
-        <Ionicons
-          name="settings-sharp"
-          size={28}
-          color={currentTheme.textPrimary}
-          style={{ marginLeft: 10 }}
-        />
-      </Pressable>
-    ),
-    headerRight: () => (
-      <Pressable onPress={() => navigation.goBack()}>
-        <Ionicons
-          name="arrow-forward-sharp"
-          size={28}
-          color={currentTheme.textPrimary}
-          style={{ marginRight: 10 }}
-        />
-      </Pressable>
-    ),
-  });
-
   return (
     <RootStack.Navigator>
       <RootStack.Screen
@@ -208,6 +179,68 @@ const AppStack: React.FC = () => {
         })}
       />
       <RootStack.Screen
+        name="GenerateTrip"
+        component={GenerateTrip}
+        options={{ headerShown: false }}
+      />
+    </RootStack.Navigator>
+  );
+};
+
+const ProfileStack: React.FC = () => {
+  const { currentTheme } = useTheme();
+
+  const screenOptions = ({
+    navigation,
+  }: {
+    navigation: any;
+  }): NativeStackNavigationOptions => ({
+    headerStyle: {
+      backgroundColor: currentTheme.background,
+    },
+    headerShadowVisible: false,
+    headerLeft: () => (
+      <Pressable onPress={() => navigation.goBack()}>
+        <Ionicons
+          name="arrow-back"
+          size={28}
+          color={currentTheme.textPrimary}
+          style={{ marginLeft: 10 }}
+        />
+      </Pressable>
+    ),
+    headerTitleStyle: {
+      color: currentTheme.textPrimary,
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+  });
+
+  // Custom options for Profile screens
+  const profileScreenOptions = ({
+    navigation,
+  }: {
+    navigation: any;
+  }): NativeStackNavigationOptions => ({
+    title: "Your Profile",
+    ...screenOptions({ navigation }),
+    headerRight: () => (
+      <Pressable onPress={() => navigation.navigate("Settings")}>
+        <Ionicons
+          name="settings-sharp"
+          size={28}
+          color={currentTheme.textPrimary}
+          style={{ marginLeft: 10 }}
+        />
+      </Pressable>
+    ),
+    headerLeft: () => null,
+    headerBackVisible: false,
+  });
+
+  return (
+    <RootStack.Navigator>
+      <RootStack.Screen
         name="Profile"
         component={Profile}
         options={profileScreenOptions}
@@ -217,20 +250,6 @@ const AppStack: React.FC = () => {
         component={Settings}
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
-          animation: "slide_from_left",
-          headerLeft: () => null,
-          headerBackVisible: false,
-          gestureEnabled: false,
-          headerRight: () => (
-            <Pressable onPress={() => navigation.goBack()}>
-              <Ionicons
-                name="arrow-forward-sharp"
-                size={28}
-                color={currentTheme.textPrimary}
-                style={{ marginRight: 10 }}
-              />
-            </Pressable>
-          ),
         })}
       />
       <RootStack.Screen
@@ -238,7 +257,6 @@ const AppStack: React.FC = () => {
         component={Edit}
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
-          animation: "none",
         })}
       />
       <RootStack.Screen
@@ -247,7 +265,6 @@ const AppStack: React.FC = () => {
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
           title: "Change Password",
-          animation: "none",
         })}
       />
       <RootStack.Screen
@@ -256,7 +273,6 @@ const AppStack: React.FC = () => {
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
           title: "",
-          animation: "none",
         })}
       />
       <RootStack.Screen
@@ -265,7 +281,6 @@ const AppStack: React.FC = () => {
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
           title: "Delete Account",
-          animation: "none",
         })}
       />
     </RootStack.Navigator>
@@ -282,7 +297,6 @@ const getTabBarStyle = (route: any): { display?: string } | undefined => {
     routeName === "SelectDates" ||
     routeName === "SetBudget" ||
     routeName === "ReviewTrip" ||
-    routeName === "Profile" ||
     routeName === "Edit" ||
     routeName === "Settings" ||
     routeName === "ChangePassword" ||
@@ -296,32 +310,58 @@ const getTabBarStyle = (route: any): { display?: string } | undefined => {
 
 const TabNavigator: React.FC = () => {
   const { currentTheme } = useTheme();
+  const { profilePicture } = useProfile();
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel: false,
         tabBarActiveTintColor: currentTheme.tabIcon,
         tabBarInactiveTintColor: currentTheme.inactiveTabIcon,
       }}
     >
+      {/* Home Tab */}
       <Tab.Screen
         name="Home"
-        component={AppStack}
+        component={HomeStack}
         options={({ route }) => {
           const tabBarStyle = {
             backgroundColor: currentTheme.background,
             ...(getTabBarStyle(route) || {}),
           };
           return {
+            tabBarStyle,
+            headerShown: false,
             tabBarIcon: ({ color }) => (
               <AntDesign name="home" color={color} size={30} />
             ),
+          } as BottomTabNavigationOptions;
+        }}
+      />
+
+      {/* Profile Tab */}
+      <Tab.Screen
+        name="ProfileStack"
+        component={ProfileStack}
+        options={({ route }) => {
+          const tabBarStyle = {
+            backgroundColor: currentTheme.background,
+            ...(getTabBarStyle(route) || {}),
+          };
+          return {
             tabBarStyle,
-            tabBarButton: (props) => (
-              <Pressable
-                {...props}
-                onPress={() => {
-                  Haptics.selectionAsync();
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={{ uri: profilePicture }}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  borderColor: focused
+                    ? currentTheme.alternate
+                    : currentTheme.background,
+                  borderWidth: focused ? 2 : 0,
                 }}
               />
             ),

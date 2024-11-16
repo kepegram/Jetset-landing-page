@@ -1,7 +1,7 @@
 import { View, Text, FlatList, Image } from "react-native";
 import React, { useEffect } from "react";
-import { GetPhotoRef } from "../../api/GooglePlaceApi";
-import HotelCard from "./HotelCard";
+import { GetPhotoRef } from "../../api/googlePlaceApi";
+import HotelCard from "./hotelCard";
 
 export default function HotelList({ hotelList }) {
   return (

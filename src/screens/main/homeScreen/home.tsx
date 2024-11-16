@@ -23,26 +23,8 @@ const Home: React.FC = () => {
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <View
-        style={[
-          styles.topBar,
-          {
-            backgroundColor: currentTheme.background,
-          },
-        ]}
-      >
-        <View style={styles.topRow}>
-          <Pressable onPress={() => navigation.navigate("Profile")}>
-            <Image
-              source={{ uri: profilePicture }}
-              style={styles.profilePicture}
-            />
-          </Pressable>
-        </View>
-      </View>
-      <View
         style={{
           padding: 20,
-          marginTop: 50,
           display: "flex",
           alignItems: "center",
           gap: 25,
@@ -101,6 +83,8 @@ const Home: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   topBar: {
     flexDirection: "column",

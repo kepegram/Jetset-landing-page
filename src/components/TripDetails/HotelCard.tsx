@@ -1,6 +1,6 @@
 import { View, Text, Image } from "react-native";
 import React, { useEffect, useState } from "react";
-import { GetPhotoRef } from "../../api/GooglePlaceApi";
+import { GetPhotoRef } from "../../api/googlePlaceApi";
 
 export default function HotelCard({ item }) {
   const [photoRef, setPhotoRef] = useState();

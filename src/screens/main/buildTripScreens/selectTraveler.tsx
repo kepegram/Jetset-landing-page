@@ -1,8 +1,8 @@
 import { View, Text, FlatList, Pressable, Alert } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { CreateTripContext } from "../../../context/CreateTripContext";
-import { SelectTravelesList } from "../../../constants/Options";
-import OptionCard from "../../../components/CreateTrip/OptionCard";
+import { CreateTripContext } from "../../../context/createTripContext";
+import { SelectTravelesList } from "../../../constants/options";
+import OptionCard from "../../../components/createTrip/optionCard";
 import { useTheme } from "../../../context/themeContext";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";

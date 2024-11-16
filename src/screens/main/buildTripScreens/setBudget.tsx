@@ -1,8 +1,8 @@
 import { View, Text, FlatList, Pressable } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { SetBudgetOptions } from "../../../constants/Options";
-import OptionCard from "../../../components/CreateTrip/OptionCard";
-import { CreateTripContext } from "../../../context/CreateTripContext";
+import { SetBudgetOptions } from "../../../constants/options";
+import OptionCard from "../../../components/createTrip/optionCard";
+import { CreateTripContext } from "../../../context/createTripContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
