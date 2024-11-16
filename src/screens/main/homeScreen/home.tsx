@@ -87,7 +87,7 @@ const Home: React.FC = () => {
             style={{
               color: currentTheme.buttonText,
               fontFamily: "outfit-medium",
-              fontSize: 17,
+              fontSize: 20,
             }}
           >
             Start a new trip
@@ -125,8 +125,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   profilePicture: {
-    width: 32,
-    height: 32,
+    width: 35,
+    height: 35,
     borderRadius: 20,
   },
 });

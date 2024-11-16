@@ -117,7 +117,7 @@ const ReviewTrip: React.FC = () => {
               }}
             >
               {moment(tripData?.startDate).format("MMM DD") +
-                " To " +
+                " - " +
                 moment(tripData.endDate).format("MMM DD") +
                 " "}
               ({tripData?.totalNoOfDays} days)

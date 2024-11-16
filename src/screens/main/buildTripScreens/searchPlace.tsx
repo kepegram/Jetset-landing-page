@@ -27,21 +27,14 @@ type SearchPlaceScreenNavigationProp = NativeStackNavigationProp<
 
 const SearchPlace: React.FC = () => {
   const { currentTheme } = useTheme();
-  const { tripData, setTripData } = useContext(CreateTripContext);
+  const { setTripData } = useContext(CreateTripContext);
   const navigation = useNavigation<SearchPlaceScreenNavigationProp>();
   const [placeSelected, setPlaceSelected] = useState(false); // Track if a place has been selected
-
-  useEffect(() => {
-    console.log(tripData);
-  }, [tripData]);
 
   const handlePlaceSelect = (
     data: any,
     details: ExtendedGooglePlaceDetail | null
   ) => {
-    console.log("Unique ID:", uuidv4());
-    console.log(data, details);
-
     setTripData({
       locationInfo: {
         name: data.description,
