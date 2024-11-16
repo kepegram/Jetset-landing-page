@@ -11,7 +11,11 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
 import { deleteDoc, doc, setDoc } from "firebase/firestore";
-import { reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import {
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  GoogleAuthProvider,
+} from "firebase/auth";
 import { useTheme } from "../../../context/themeContext";
 
 const DeleteAccount: React.FC = () => {
@@ -47,11 +51,32 @@ const DeleteAccount: React.FC = () => {
       return;
     }
 
-    // Step 1: Re-authenticate the user
-    const email = user.email;
-    const credential = EmailAuthProvider.credential(email!, password);
-
     try {
+      // Step 1: Re-authenticate the user
+      let credential;
+
+      // Check if the user is signed in with Google
+      if (
+        user.providerData.some(
+          (provider) => provider.providerId === "google.com"
+        )
+      ) {
+        // Reauthenticate with Google credentials
+        const googleCredential = GoogleAuthProvider.credential(
+          user.refreshToken // Pass the user's refresh token instead of the ID token
+        );
+        credential = googleCredential;
+      } else {
+        // Use email/password credentials for reauthentication
+        if (!password) {
+          Alert.alert("Error", "Please enter your password.");
+          return;
+        }
+        const email = user.email;
+        credential = EmailAuthProvider.credential(email!, password);
+      }
+
+      // Reauthenticate the user
       await reauthenticateWithCredential(user, credential);
 
       // Step 2: Ask for confirmation
@@ -88,19 +113,29 @@ const DeleteAccount: React.FC = () => {
                   "Your account has been deleted."
                 );
               } catch (error) {
-                Alert.alert("Error", error.message);
+                console.error("Error deleting account:", error);
+                Alert.alert(
+                  "Error",
+                  "There was an issue deleting your account."
+                );
               }
             },
           },
         ]
       );
     } catch (error) {
+      console.error("Reauthentication error:", error);
       Alert.alert(
         "Error",
-        "Re-authentication failed. Please enter your password correctly."
+        "Re-authentication failed. Please ensure your credentials are correct."
       );
     }
   };
+
+  // Check if the user is signed in with Google
+  const isGoogleSignIn = FIREBASE_AUTH.currentUser?.providerData.some(
+    (provider) => provider.providerId === "google.com"
+  );
 
   return (
     <View
@@ -163,21 +198,23 @@ const DeleteAccount: React.FC = () => {
           />
         )}
 
-        {/* Password input for re-authentication */}
-        <TextInput
-          style={[
-            styles.textInput,
-            {
-              color: currentTheme.textPrimary,
-              borderColor: currentTheme.inactive,
-            },
-          ]}
-          placeholder="Enter password to confirm"
-          placeholderTextColor={currentTheme.secondary}
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          secureTextEntry
-        />
+        {/* Render password input only if user is NOT signed in with Google */}
+        {!isGoogleSignIn && (
+          <TextInput
+            style={[
+              styles.textInput,
+              {
+                color: currentTheme.textPrimary,
+                borderColor: currentTheme.inactive,
+              },
+            ]}
+            placeholder="Enter password to confirm"
+            placeholderTextColor={currentTheme.secondary}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            secureTextEntry
+          />
+        )}
 
         <Pressable style={styles.deleteButton} onPress={handleDeleteAccount}>
           <Text style={[styles.deleteButtonText, { color: "red" }]}>

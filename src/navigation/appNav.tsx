@@ -1,5 +1,5 @@
-import React from "react";
-import { Pressable, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Alert, Pressable, Text, View } from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
   createNativeStackNavigator,
@@ -12,77 +12,31 @@ import {
 } from "@react-navigation/bottom-tabs";
 import { ProfileProvider } from "../context/profileContext";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { toastStyles } from "../theme/theme";
 import { StatusBar } from "expo-status-bar";
-import Toast, {
-  ToastConfig,
-  ToastConfigParams,
-} from "react-native-toast-message";
 import * as Haptics from "expo-haptics";
 import Home from "../screens/main/homeScreen/home";
-import Profile from "../screens/main/profileScreen/profile";
-import Edit from "../screens/main/profileScreen/edit";
-import Settings from "../screens/main/profileScreen/settings";
-import ChangePassword from "../screens/main/profileScreen/changePassword";
-import AppTheme from "../screens/main/profileScreen/appTheme";
-import DeleteAccount from "../screens/main/profileScreen/deleteAccount";
-
-const toastConfig: ToastConfig = {
-  success: ({ text1, text2 }: ToastConfigParams<any>) => (
-    <View
-      style={{
-        padding: 16,
-        backgroundColor: toastStyles.success.primary,
-        borderRadius: 8,
-      }}
-    >
-      {text1 ? (
-        <Text style={{ color: toastStyles.success.text, fontWeight: "bold" }}>
-          {text1}
-        </Text>
-      ) : null}
-      {text2 ? (
-        <Text style={{ color: toastStyles.success.text }}>{text2}</Text>
-      ) : null}
-    </View>
-  ),
-  error: ({ text1, text2 }: ToastConfigParams<any>) => (
-    <View
-      style={{
-        padding: 16,
-        backgroundColor: toastStyles.error.primary,
-        borderRadius: 8,
-      }}
-    >
-      {text1 ? (
-        <Text style={{ color: toastStyles.error.text, fontWeight: "bold" }}>
-          {text1}
-        </Text>
-      ) : null}
-      {text2 ? (
-        <Text style={{ color: toastStyles.error.text }}>{text2}</Text>
-      ) : null}
-    </View>
-  ),
-};
+import Profile from "../screens/main/userScreens/profile";
+import Edit from "../screens/main/userScreens/edit";
+import Settings from "../screens/main/userScreens/settings";
+import ChangePassword from "../screens/main/userScreens/changePassword";
+import AppTheme from "../screens/main/userScreens/appTheme";
+import DeleteAccount from "../screens/main/userScreens/deleteAccount";
+import SearchPlace from "../screens/main/buildTripScreens/searchPlace";
+import { CreateTripContext } from "../context/CreateTripContext";
+import SelectTraveler from "../screens/main/buildTripScreens/selectTraveler";
+import SelectDates from "../screens/main/buildTripScreens/selectDates";
+import SetBudget from "../screens/main/buildTripScreens/setBudget";
+import ReviewTrip from "../screens/main/buildTripScreens/reviewTrip";
 
 // Define types for root stack params
 export type RootStackParamList = {
   App: undefined;
   Home: undefined;
-  Trips: undefined;
-  TripBuilder: { tripDetails: any };
-  DestinationDetailView: {
-    item: {
-      image: string;
-      country: string;
-      state: string;
-      city: string;
-      population: string;
-      longitude: number;
-      latitude: number;
-    };
-  };
+  SearchPlace: undefined;
+  SelectTraveler: undefined;
+  SelectDates: undefined;
+  SetBudget: undefined;
+  ReviewTrip: undefined;
   Profile: undefined;
   Edit: undefined;
   Settings: undefined;
@@ -123,13 +77,65 @@ const AppStack: React.FC = () => {
     },
   });
 
+  const tripBuilderScreenOptions = ({
+    navigation,
+  }: {
+    navigation: any;
+  }): NativeStackNavigationOptions => ({
+    headerStyle: {
+      backgroundColor: currentTheme.background,
+    },
+    headerShadowVisible: false,
+    headerLeft: () => (
+      <Pressable onPress={() => navigation.goBack()}>
+        <Ionicons
+          name="arrow-back"
+          size={28}
+          color={currentTheme.textPrimary}
+          style={{ marginLeft: 10 }}
+        />
+      </Pressable>
+    ),
+    headerRight: () => (
+      <Pressable
+        onPress={() => {
+          Alert.alert(
+            "Reset",
+            "Are you sure you want to reset your trip? All progress will be lost.",
+            [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              {
+                text: "Confirm",
+                onPress: () => navigation.navigate("Home"),
+              },
+            ]
+          );
+        }}
+      >
+        <Text
+          style={{
+            color: currentTheme.alternate,
+            marginRight: 10,
+            fontSize: 20,
+            textAlign: "center",
+          }}
+        >
+          Reset
+        </Text>
+      </Pressable>
+    ),
+  });
+
   // Custom options for Profile screen
   const profileScreenOptions = ({
     navigation,
   }: {
     navigation: any;
   }): NativeStackNavigationOptions => ({
-    title: "",
+    title: "Your Profile",
     animation: "slide_from_left",
     ...screenOptions({ navigation }),
     headerLeft: () => (
@@ -160,6 +166,46 @@ const AppStack: React.FC = () => {
         name="Home"
         component={Home}
         options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="SearchPlace"
+        component={SearchPlace}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="SelectTraveler"
+        component={SelectTraveler}
+        options={({ navigation }) => ({
+          ...tripBuilderScreenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="SelectDates"
+        component={SelectDates}
+        options={({ navigation }) => ({
+          ...tripBuilderScreenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="SetBudget"
+        component={SetBudget}
+        options={({ navigation }) => ({
+          ...tripBuilderScreenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="ReviewTrip"
+        component={ReviewTrip}
+        options={({ navigation }) => ({
+          ...tripBuilderScreenOptions({ navigation }),
+          title: "",
+        })}
       />
       <RootStack.Screen
         name="Profile"
@@ -231,6 +277,11 @@ const Tab = createBottomTabNavigator();
 const getTabBarStyle = (route: any): { display?: string } | undefined => {
   const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
   if (
+    routeName === "SearchPlace" ||
+    routeName === "SelectTraveler" ||
+    routeName === "SelectDates" ||
+    routeName === "SetBudget" ||
+    routeName === "ReviewTrip" ||
     routeName === "Profile" ||
     routeName === "Edit" ||
     routeName === "Settings" ||
@@ -249,7 +300,6 @@ const TabNavigator: React.FC = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
         tabBarActiveTintColor: currentTheme.tabIcon,
         tabBarInactiveTintColor: currentTheme.inactiveTabIcon,
       }}
@@ -259,8 +309,7 @@ const TabNavigator: React.FC = () => {
         component={AppStack}
         options={({ route }) => {
           const tabBarStyle = {
-            backgroundColor: currentTheme.alternate,
-            borderTopWidth: 0,
+            backgroundColor: currentTheme.background,
             ...(getTabBarStyle(route) || {}),
           };
           return {
@@ -286,17 +335,19 @@ const TabNavigator: React.FC = () => {
 // Root Navigator Component
 const AppNav: React.FC = () => {
   const { theme } = useTheme();
+  const [tripData, setTripData] = useState<any>([]);
   return (
     <ProfileProvider>
-      <StatusBar style={theme === "dark" ? "light" : "dark"} />
-      <RootStack.Navigator>
-        <RootStack.Screen
-          name="App"
-          component={TabNavigator}
-          options={{ headerShown: false }}
-        />
-      </RootStack.Navigator>
-      <Toast config={toastConfig} />
+      <CreateTripContext.Provider value={{ tripData, setTripData }}>
+        <StatusBar style={theme === "dark" ? "light" : "dark"} />
+        <RootStack.Navigator>
+          <RootStack.Screen
+            name="App"
+            component={TabNavigator}
+            options={{ headerShown: false }}
+          />
+        </RootStack.Navigator>
+      </CreateTripContext.Provider>
     </ProfileProvider>
   );
 };

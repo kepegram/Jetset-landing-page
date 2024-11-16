@@ -5,7 +5,7 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
-import { AltButton } from "../../../ui/button";
+import { AltButton } from "../../../components/button";
 import { useTheme } from "../../../context/themeContext";
 
 type SettingsScreenNavigationProp = NativeStackNavigationProp<
@@ -180,10 +180,9 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   logoutContainer: {
-    position: "absolute",
     alignItems: "center",
-    bottom: 20,
     width: "100%",
+    marginTop: 20,
   },
 });
 

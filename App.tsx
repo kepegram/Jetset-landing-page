@@ -54,9 +54,20 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (response?.type === "success") {
-      const { id_token } = response.params;
-      const credential = GoogleAuthProvider.credential(id_token);
-      signInWithCredential(FIREBASE_AUTH, credential);
+      const { id_token } = response.params as { id_token: string }; // Get the id_token from response.params
+      if (id_token) {
+        const credential = GoogleAuthProvider.credential(id_token);
+        signInWithCredential(FIREBASE_AUTH, credential)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            console.log("User signed in: ", user);
+          })
+          .catch((error) => {
+            console.error("Error signing in with Google: ", error);
+          });
+      } else {
+        console.error("No ID token found");
+      }
     }
   }, [response]);
 

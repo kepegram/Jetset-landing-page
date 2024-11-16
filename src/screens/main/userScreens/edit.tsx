@@ -17,7 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { Button, AltButton } from "../../../ui/button";
+import { Button, AltButton } from "../../../components/button";
 import { useTheme } from "../../../context/themeContext";
 
 type EditScreenNavigationProp = NativeStackNavigationProp<

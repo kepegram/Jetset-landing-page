@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { AltButton, Button } from "../../../ui/button";
+import { AltButton, Button } from "../../../components/button";
 import {
   getAuth,
   EmailAuthProvider,

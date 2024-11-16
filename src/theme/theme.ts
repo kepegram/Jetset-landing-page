@@ -11,8 +11,8 @@ export const lightTheme = {
   buttonText: "#fff",
   inactive: "#e8e8e8",
   icon: "#000",
-  tabIcon: "#fff",
-  inactiveTabIcon: "#387694",
+  tabIcon: "#387694",
+  inactiveTabIcon: "#ebebeb",
   error: "red",
 };
 
@@ -26,11 +26,11 @@ export const darkTheme = {
   textSecondary: "#888",
   textMatch: "#121212",
   buttonBackground: "#387694",
-  buttonText: "#121212",
+  buttonText: "#fff",
   inactive: "white",
   icon: "#fff",
-  tabIcon: "#fff",
-  inactiveTabIcon: "#387694",
+  tabIcon: "#387694",
+  inactiveTabIcon: "#2c2c2c",
   error: "red",
 };
 
