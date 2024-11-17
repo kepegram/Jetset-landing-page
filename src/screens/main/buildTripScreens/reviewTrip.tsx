@@ -214,7 +214,7 @@ const ReviewTrip: React.FC = () => {
             fontSize: 20,
           }}
         >
-          Build My trip
+          Build My Trip
         </Text>
       </Pressable>
     </View>

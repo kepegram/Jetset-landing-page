@@ -1,11 +1,15 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
-import { useProfile } from "../../../context/profileContext";
+import React, { useState, useCallback } from "react";
 import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { ScrollView } from "react-native-gesture-handler";
+import UserTripMainCard from "../../../components/myTrips/userTripMainCard";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -14,105 +18,83 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 
 const Home: React.FC = () => {
   const { currentTheme } = useTheme();
-  const { profilePicture } = useProfile();
-
+  const [userTrips, setUserTrips] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
+  const user = FIREBASE_AUTH.currentUser;
+
+  // Fetch trips when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      if (user) GetMyTrips();
+    }, [user])
+  );
+
+  const GetMyTrips = async () => {
+    try {
+      setLoading(true);
+      setUserTrips([]); // Reset trips before loading new data.
+
+      const tripsQuery = query(
+        collection(FIREBASE_DB, `users/${user.uid}/userTrips`),
+        where("userEmail", "==", user.email)
+      );
+
+      const querySnapshot = await getDocs(tripsQuery);
+      const trips = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setUserTrips(trips);
+    } catch (error) {
+      console.error("Error fetching user trips:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <View
-      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    <ScrollView
+      style={{
+        padding: 25,
+        paddingTop: 55,
+        backgroundColor: currentTheme.background,
+        height: "100%",
+      }}
     >
       <View
         style={{
-          padding: 20,
           display: "flex",
-          alignItems: "center",
-          gap: 25,
+          flexDirection: "row",
+          alignContent: "center",
+          justifyContent: "space-between",
         }}
       >
-        <Ionicons
-          name="location-sharp"
-          size={30}
-          color={currentTheme.alternate}
-        />
         <Text
           style={{
-            fontSize: 25,
-            fontFamily: "outfit-medium",
+            fontFamily: "outfit-bold",
+            fontSize: 35,
             color: currentTheme.textPrimary,
           }}
         >
-          No trips planned yet
+          My Trips
         </Text>
-
-        <Text
-          style={{
-            fontSize: 20,
-            fontFamily: "outfit",
-            textAlign: "center",
-            color: "gray",
-          }}
-        >
-          Looks like its time to plan a new travel experinece! Get Started below
-        </Text>
-
-        <Pressable
-          onPress={() => navigation.navigate("SearchPlace")}
-          style={{
-            padding: 15,
-            backgroundColor: currentTheme.alternate,
-            borderRadius: 15,
-            paddingHorizontal: 30,
-          }}
-        >
-          <Text
-            style={{
-              color: currentTheme.buttonText,
-              fontFamily: "outfit-medium",
-              fontSize: 20,
-            }}
-          >
-            Start a new trip
-          </Text>
+        <Pressable onPress={() => navigation.navigate("SearchPlace")}>
+          <Ionicons name="add-circle" size={50} color={currentTheme.icon} />
         </Pressable>
       </View>
-    </View>
+      {loading ? (
+        <ActivityIndicator size="large" color={currentTheme.alternate} />
+      ) : userTrips.length === 0 ? (
+        <StartNewTripCard navigation={navigation} />
+      ) : (
+        <UserTripMainCard userTrips={userTrips} />
+      )}
+      <View style={{ height: 100 }} />
+    </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  topBar: {
-    flexDirection: "column",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    overflow: "hidden",
-  },
-  topRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    marginBottom: 10,
-  },
-  iconContainer: {
-    position: "relative",
-    alignItems: "center",
-  },
-  appName: {
-    fontSize: 25,
-    fontWeight: "bold",
-  },
-  profilePicture: {
-    width: 35,
-    height: 35,
-    borderRadius: 20,
-  },
-});
 
 export default Home;

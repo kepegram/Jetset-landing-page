@@ -107,7 +107,7 @@ const SearchPlace: React.FC = () => {
             alignItems: "center",
             alignSelf: "center",
             position: "absolute",
-            top: 300,
+            top: 400,
           }}
         >
           <Text

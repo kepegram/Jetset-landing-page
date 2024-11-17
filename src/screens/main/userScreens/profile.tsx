@@ -104,12 +104,12 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     alignItems: "center",
-    marginTop: 60,
+    marginTop: 40,
   },
   profilePicture: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
   },
   userName: {
     fontSize: 26,

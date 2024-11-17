@@ -39,65 +39,45 @@ const GenerateTrip: React.FC = () => {
 
     console.log("Generated Prompt:", FINAL_PROMPT);
 
-    const maxRetries = 5; // Increase retries to 5
-    let attempts = 0;
-    let success = false;
+    try {
+      const result = await chatSession.sendMessage(FINAL_PROMPT);
+      const responseText = await result.response.text();
+      console.log("AI Response:", responseText);
 
-    while (attempts < maxRetries && !success) {
-      try {
-        const result = await chatSession.sendMessage(FINAL_PROMPT);
-        const responseText = await result.response.text();
-        console.log("AI Response:", responseText);
+      const tripResp = JSON.parse(responseText);
 
-        const tripResp = JSON.parse(responseText);
+      const docId = Date.now().toString();
+      const userTripRef = doc(
+        FIREBASE_DB,
+        "users",
+        user?.uid || "unknown",
+        "userTrips",
+        docId
+      );
 
-        const docId = Date.now().toString();
-        const userTripRef = doc(
-          FIREBASE_DB,
-          "users",
-          user?.uid || "unknown",
-          "userTrips",
-          docId
-        );
+      const sanitizedTripData = {
+        ...tripData,
+        startDate: tripData.startDate?.format("YYYY-MM-DD") || null,
+        endDate: tripData.endDate?.format("YYYY-MM-DD") || null,
+      };
 
-        const sanitizedTripData = {
-          ...tripData,
-          startDate: tripData.startDate?.format("YYYY-MM-DD") || null,
-          endDate: tripData.endDate?.format("YYYY-MM-DD") || null,
-        };
+      await setDoc(userTripRef, {
+        userEmail: user?.email || "unknown",
+        tripPlan: tripResp,
+        tripData: sanitizedTripData,
+        docId: docId,
+      });
 
-        await setDoc(userTripRef, {
-          userEmail: user?.email || "unknown",
-          tripPlan: tripResp,
-          tripData: sanitizedTripData,
-          docId: docId,
-        });
+      console.log("Firestore Document Updated Successfully with ID:", docId);
 
-        console.log("Trip saved successfully with ID:", docId);
-        success = true; // Mark success to exit the loop
-      } catch (error: any) {
-        attempts++;
-        console.error(`Attempt ${attempts} failed:`, error.message);
-
-        if (error.message.includes("503") && attempts < maxRetries) {
-          console.log(`Retrying... (Attempt ${attempts + 1})`);
-          await new Promise(
-            (resolve) => setTimeout(resolve, 3000 * attempts) // Extended backoff time
-          );
-        } else {
-          console.error("Max retries reached or non-retryable error.");
-          alert(
-            "The AI service is currently overloaded. Please try again later."
-          );
-          break;
-        }
-      }
-    }
-
-    setLoading(false);
-
-    if (success) {
       navigation.navigate("Home");
+    } catch (error: any) {
+      console.error("AI generation failed:", error.message);
+      alert(
+        "An error occurred while generating your trip. Please try again later."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
