@@ -42,7 +42,7 @@ export type RootStackParamList = {
   SetBudget: undefined;
   ReviewTrip: undefined;
   GenerateTrip: undefined;
-  TripDetails: undefined;
+  TripDetails: { trip: string };
   Profile: undefined;
   Edit: undefined;
   Settings: undefined;
