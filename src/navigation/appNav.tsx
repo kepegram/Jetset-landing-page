@@ -5,13 +5,16 @@ import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+import {
+  getFocusedRouteNameFromRoute,
+  useNavigation,
+} from "@react-navigation/native";
 import {
   BottomTabNavigationOptions,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import { ProfileProvider, useProfile } from "../context/profileContext";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { CreateTripContext } from "../context/createTripContext";
 import Home from "../screens/main/homeScreen/home";
@@ -27,6 +30,7 @@ import SelectDates from "../screens/main/buildTripScreens/selectDates";
 import SetBudget from "../screens/main/buildTripScreens/setBudget";
 import ReviewTrip from "../screens/main/buildTripScreens/reviewTrip";
 import GenerateTrip from "../screens/main/buildTripScreens/generateTrip";
+import TripDetails from "../screens/main/tripDetailScreen/tripDetails";
 
 // Define types for root stack params
 export type RootStackParamList = {
@@ -38,6 +42,7 @@ export type RootStackParamList = {
   SetBudget: undefined;
   ReviewTrip: undefined;
   GenerateTrip: undefined;
+  TripDetails: undefined;
   Profile: undefined;
   Edit: undefined;
   Settings: undefined;
@@ -182,6 +187,31 @@ const HomeStack: React.FC = () => {
         name="GenerateTrip"
         component={GenerateTrip}
         options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="TripDetails"
+        component={TripDetails}
+        options={{
+          headerLeft: () => {
+            const navigation = useNavigation();
+            return (
+              <Pressable
+                onPress={() => navigation.goBack()} // Navigate back
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent grey background
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <MaterialIcons name="arrow-back" size={24} color="white" />
+              </Pressable>
+            );
+          },
+          headerShown: false, // Ensure the header is shown
+        }}
       />
     </RootStack.Navigator>
   );

@@ -1,11 +1,25 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Colors } from "../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { GetPhotoRef } from "../../api/googlePlaceApi";
+import { useTheme } from "../../context/themeContext";
 
-export default function PlaceCard({ place }) {
-  const [photoRef, setPhotoRef] = useState();
+// Define an interface for the place prop
+interface Place {
+  placeName: string;
+  placeDetails: string;
+  ticketPricing: string;
+  timeToTravel: string;
+}
+
+interface PlaceCardProps {
+  place: Place;
+}
+
+const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
+  const { currentTheme } = useTheme();
+  const [photoRef, setPhotoRef] = useState<string | undefined>();
+
   useEffect(() => {
     GetGooglePhotoRef();
   }, []);
@@ -14,13 +28,14 @@ export default function PlaceCard({ place }) {
     const result = await GetPhotoRef(place.placeName);
     setPhotoRef(result);
   };
+
   return (
     <View
       style={{
-        backgroundColor: Colors.LIGHT_BLUE,
+        backgroundColor: "blue",
         padding: 10,
         borderRadius: 15,
-        borderColor: Colors.GRAY,
+        borderColor: "gray",
         marginTop: 20,
       }}
     >
@@ -55,7 +70,7 @@ export default function PlaceCard({ place }) {
           style={{
             fontFamily: "outfit",
             fontSize: 14,
-            color: Colors.GRAY,
+            color: currentTheme.textSecondary,
           }}
         >
           {place.placeDetails}
@@ -103,17 +118,19 @@ export default function PlaceCard({ place }) {
               </Text>
             </Text>
           </View>
-          <TouchableOpacity
+          <Pressable
             style={{
-              backgroundColor: Colors.PRIMARY,
+              backgroundColor: currentTheme.alternate,
               padding: 8,
               borderRadius: 7,
             }}
           >
             <Ionicons name="navigate" size={20} color="white" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </View>
   );
-}
+};
+
+export default PlaceCard;

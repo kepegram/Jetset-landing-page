@@ -1,9 +1,21 @@
 import { View, Text, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { GetPhotoRef } from "../../api/googlePlaceApi";
+import { useTheme } from "../../context/themeContext";
 
-export default function HotelCard({ item }) {
-  const [photoRef, setPhotoRef] = useState();
+// Define the interface for the 'item' prop
+interface HotelCardProps {
+  item: {
+    hotelName: string;
+    rating: number;
+    price: number;
+  };
+}
+
+const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
+  const { currentTheme } = useTheme();
+  const [photoRef, setPhotoRef] = useState<string | undefined>();
+
   useEffect(() => {
     GetGooglePhotoRef();
   }, []);
@@ -11,7 +23,9 @@ export default function HotelCard({ item }) {
   const GetGooglePhotoRef = async () => {
     const result = await GetPhotoRef(item.hotelName);
     setPhotoRef(result);
+    console.log("RESULT", result);
   };
+
   return (
     <View
       style={{
@@ -42,6 +56,7 @@ export default function HotelCard({ item }) {
           style={{
             fontFamily: "outfit-medium",
             fontSize: 17,
+            color: currentTheme.textPrimary,
           }}
         >
           {item.hotelName}
@@ -57,19 +72,23 @@ export default function HotelCard({ item }) {
           <Text
             style={{
               fontFamily: "outfit",
+              color: currentTheme.textPrimary,
             }}
           >
-            ⭐ {item.rating}
+            Rating: {item.rating}
           </Text>
           <Text
             style={{
               fontFamily: "outfit",
+              color: currentTheme.textPrimary,
             }}
           >
-            💰 {item.price}
+            Price: {item.price}
           </Text>
         </View>
       </View>
     </View>
   );
-}
+};
+
+export default HotelCard;

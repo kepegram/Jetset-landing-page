@@ -1,19 +1,31 @@
-import { View, Text, FlatList, Image } from "react-native";
-import React, { useEffect } from "react";
-import { GetPhotoRef } from "../../api/googlePlaceApi";
+import { View, Text, FlatList } from "react-native";
+import React from "react";
 import HotelCard from "./hotelCard";
+import { useTheme } from "../../context/themeContext";
 
-export default function HotelList({ hotelList }) {
+// Define the interface for the 'hotelList' prop
+interface HotelListProps {
+  hotelList: Array<{
+    hotelName: string;
+    rating: number;
+    price: number;
+  }>;
+}
+
+const HotelList: React.FC<HotelListProps> = ({ hotelList }) => {
+  const { currentTheme } = useTheme();
+
   return (
     <View
       style={{
-        marginTop: 20,
+        marginTop: 10,
       }}
     >
       <Text
         style={{
           fontFamily: "outfit-bold",
           fontSize: 20,
+          color: currentTheme.textPrimary,
         }}
       >
         🏨 Hotel Recommendation
@@ -26,8 +38,10 @@ export default function HotelList({ hotelList }) {
         }}
         showsHorizontalScrollIndicator={false}
         horizontal={true}
-        renderItem={({ item, index }) => <HotelCard item={item} />}
+        renderItem={({ item }) => <HotelCard item={item} />}
       />
     </View>
   );
-}
+};
+
+export default HotelList;

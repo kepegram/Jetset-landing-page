@@ -3,6 +3,14 @@ import React from "react";
 import moment from "moment";
 import { useTheme } from "../../context/themeContext";
 import UserTripListCard from "./userTripListCard";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/appNav";
+import { useNavigation } from "@react-navigation/native";
+
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "TripDetails"
+>;
 
 interface UserTripMainCardProps {
   userTrips: Array<{
@@ -12,6 +20,7 @@ interface UserTripMainCardProps {
 
 const UserTripMainCard: React.FC<UserTripMainCardProps> = ({ userTrips }) => {
   const { currentTheme } = useTheme();
+  const navigation = useNavigation<NavigationProp>();
 
   if (!userTrips || userTrips.length === 0) return null;
 
@@ -33,7 +42,13 @@ const UserTripMainCard: React.FC<UserTripMainCardProps> = ({ userTrips }) => {
   return (
     <View style={{ marginTop: 20 }}>
       {LatestTrip?.locationInfo?.photoRef ? (
-        <Pressable onPress={() => console.log("ROUTE TO TRIP DETAILS")}>
+        <Pressable
+          onPress={() =>
+            navigation.navigate("TripDetails", {
+              trip: JSON.stringify(LatestTrip),
+            })
+          }
+        >
           <Image
             source={{
               uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${LatestTrip.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
