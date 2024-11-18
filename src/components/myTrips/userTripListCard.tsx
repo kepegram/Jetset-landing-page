@@ -4,7 +4,7 @@ import moment from "moment";
 import { useTheme } from "../../context/themeContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/appNav"; // Ensure correct path
+import { RootStackParamList } from "../../navigation/appNav";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -13,7 +13,8 @@ type NavigationProp = NativeStackNavigationProp<
 
 interface UserTripListCardProps {
   trip: {
-    tripData: string; // Assuming tripData is a JSON string
+    tripData: string;
+    tripPlan: string;
   };
 }
 
@@ -26,7 +27,7 @@ const UserTripListCard: React.FC<UserTripListCardProps> = ({ trip }) => {
       try {
         return JSON.parse(data);
       } catch (error) {
-        console.error("Error parsing tripData:", error);
+        console.error("Error parsing data:", error);
         return {};
       }
     }
@@ -34,11 +35,17 @@ const UserTripListCard: React.FC<UserTripListCardProps> = ({ trip }) => {
   };
 
   const tripData = formatData(trip.tripData);
+  const tripPlan = formatData(trip.tripPlan);
 
   return (
     <Pressable
       onPress={() => {
-        navigation.navigate("TripDetails", { trip: JSON.stringify(tripData) });
+        navigation.navigate("TripDetails", {
+          trip: JSON.stringify({
+            ...tripData,
+            travelPlan: tripPlan?.travelPlan || {},
+          }),
+        });
       }}
       style={{
         marginTop: 20,
@@ -60,6 +67,7 @@ const UserTripListCard: React.FC<UserTripListCardProps> = ({ trip }) => {
         }}
       />
       <View>
+        {/* Trip Data */}
         <Text
           style={{
             fontFamily: "outfit-medium",
@@ -79,15 +87,6 @@ const UserTripListCard: React.FC<UserTripListCardProps> = ({ trip }) => {
           {tripData.startDate
             ? moment(tripData.startDate).format("MMM DD yyyy")
             : "No Start Date"}
-        </Text>
-        <Text
-          style={{
-            fontFamily: "outfit",
-            fontSize: 14,
-            color: currentTheme.textSecondary,
-          }}
-        >
-          Traveling: {tripData.traveler?.title || "Unknown"}
         </Text>
       </View>
     </Pressable>

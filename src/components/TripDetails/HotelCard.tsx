@@ -23,7 +23,6 @@ const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
   const GetGooglePhotoRef = async () => {
     const result = await GetPhotoRef(item.hotelName);
     setPhotoRef(result);
-    console.log("RESULT", result);
   };
 
   return (
@@ -58,6 +57,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
             fontSize: 17,
             color: currentTheme.textPrimary,
           }}
+          numberOfLines={1}
         >
           {item.hotelName}
         </Text>
@@ -65,25 +65,25 @@ const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
         <View
           style={{
             display: "flex",
-            flexDirection: "row",
+            flexDirection: "column",
             justifyContent: "space-between",
           }}
         >
           <Text
             style={{
               fontFamily: "outfit",
-              color: currentTheme.textPrimary,
+              color: currentTheme.textSecondary,
             }}
           >
-            Rating: {item.rating}
+            Rating: {item.rating} ⭐
           </Text>
           <Text
             style={{
               fontFamily: "outfit",
-              color: currentTheme.textPrimary,
+              color: currentTheme.textSecondary,
             }}
           >
-            Price: {item.price}
+            Price: ${item.price}
           </Text>
         </View>
       </View>

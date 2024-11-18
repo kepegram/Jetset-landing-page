@@ -124,6 +124,7 @@ const GenerateTrip: React.FC = () => {
           width: "100%",
           height: 200,
           resizeMode: "contain",
+          marginTop: 40,
         }}
       />
 
@@ -133,7 +134,7 @@ const GenerateTrip: React.FC = () => {
           color: currentTheme.textSecondary,
           fontSize: 20,
           textAlign: "center",
-          marginTop: 20,
+          marginTop: 30,
         }}
       >
         Do not go back

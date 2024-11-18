@@ -2,7 +2,7 @@ import { View, Text, Image, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../navigation/appNav"; // Ensure correct path
+import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import moment from "moment";
 import FlightInfo from "../../../components/tripDetails/flightInfo";
@@ -33,8 +33,6 @@ const TripDetails: React.FC = () => {
       headerTitle: "",
     });
 
-    console.log("TRIP-------", trip);
-
     // Parse trip details from JSON
     try {
       setTripDetails(JSON.parse(trip));
@@ -45,8 +43,21 @@ const TripDetails: React.FC = () => {
 
   if (!tripDetails) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ fontFamily: "outfit-medium", fontSize: 18 }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: currentTheme.background,
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "outfit-medium",
+            fontSize: 18,
+            color: currentTheme.textPrimary,
+          }}
+        >
           Loading trip details...
         </Text>
       </View>
@@ -85,13 +96,7 @@ const TripDetails: React.FC = () => {
         >
           {tripDetails?.locationInfo?.name || "Unknown Location"}
         </Text>
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 5,
-            marginTop: 5,
-          }}
-        >
+        <View style={{ flexDirection: "row", gap: 5, marginTop: 5 }}>
           <Text
             style={{
               fontFamily: "outfit",
@@ -119,11 +124,12 @@ const TripDetails: React.FC = () => {
             color: currentTheme.textSecondary,
           }}
         >
-          Traveling: {tripDetails?.traveler?.title || "Unknown"}
+          Traveling as: {tripDetails?.traveler?.title || "Unknown"}
         </Text>
 
-        {/* Flight Info */}
-        <FlightInfo flightData={tripDetails?.travelPlan?.flights || []} />
+        {tripDetails?.travelPlan?.flights?.map((flight, index) => (
+          <FlightInfo key={index} flightData={flight} />
+        ))}
 
         {/* Hotels List */}
         <HotelList hotelList={tripDetails?.travelPlan?.hotels || []} />

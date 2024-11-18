@@ -32,11 +32,11 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
   return (
     <View
       style={{
-        backgroundColor: "blue",
+        backgroundColor: currentTheme.accentBackground,
         padding: 10,
         borderRadius: 15,
         borderColor: "gray",
-        marginTop: 20,
+        marginBottom: 20,
       }}
     >
       <Image
@@ -62,6 +62,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
           style={{
             fontFamily: "outfit-bold",
             fontSize: 20,
+            color: currentTheme.textPrimary,
           }}
         >
           {place?.placeName}
@@ -89,12 +90,14 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
                 fontFamily: "outfit",
                 fontSize: 17,
                 marginTop: 5,
+                color: currentTheme.textSecondary,
               }}
             >
               🎟️ Ticket Price:
               <Text
                 style={{
                   fontFamily: "outfit-bold",
+                  color: currentTheme.textSecondary,
                 }}
               >
                 {" "}
@@ -106,12 +109,14 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
                 fontFamily: "outfit",
                 fontSize: 17,
                 marginTop: 5,
+                color: currentTheme.textSecondary,
               }}
             >
               ⏱️ Time to Travel:{" "}
               <Text
                 style={{
                   fontFamily: "outfit-bold",
+                  color: currentTheme.textSecondary,
                 }}
               >
                 {place?.timeToTravel}

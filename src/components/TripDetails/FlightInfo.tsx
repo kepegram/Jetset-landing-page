@@ -1,11 +1,12 @@
-import { View, Text, Pressable } from "react-native";
-import React from "react";
+import { View, Text, Pressable, Linking } from "react-native";
+import React, { useEffect } from "react";
 import { useTheme } from "../../context/themeContext";
 
 // Define an interface for flightData
 interface FlightData {
   price: number;
   airline: string;
+  bookingUrl: string; // Add bookingUrl property
 }
 
 interface FlightInfoProps {
@@ -14,6 +15,16 @@ interface FlightInfoProps {
 
 const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
   const { currentTheme } = useTheme();
+
+  // Handle "Book Here" button click
+  const handleBookClick = () => {
+    if (flightData.bookingUrl) {
+      Linking.openURL(flightData.bookingUrl);
+      console.log(flightData.bookingUrl);
+    } else {
+      alert("Invalid url");
+    }
+  };
 
   return (
     <View
@@ -40,6 +51,7 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
           ✈️ Flights
         </Text>
         <Pressable
+          onPress={handleBookClick}
           style={{
             backgroundColor: currentTheme.alternate,
             padding: 5,
@@ -77,7 +89,7 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
           color: currentTheme.textSecondary,
         }}
       >
-        Price: {flightData.price}
+        Price: ${flightData.price}
       </Text>
     </View>
   );

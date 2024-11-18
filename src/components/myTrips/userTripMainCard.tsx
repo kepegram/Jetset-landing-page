@@ -14,7 +14,8 @@ type NavigationProp = NativeStackNavigationProp<
 
 interface UserTripMainCardProps {
   userTrips: Array<{
-    tripData: string; // Assuming tripData is stored as a JSON string
+    tripData: string;
+    tripPlan: string;
   }>;
 }
 
@@ -24,20 +25,21 @@ const UserTripMainCard: React.FC<UserTripMainCardProps> = ({ userTrips }) => {
 
   if (!userTrips || userTrips.length === 0) return null;
 
-  // Safely parse tripData only if it's a string
-  const parseTripData = (tripData: string) => {
-    if (typeof tripData === "string") {
+  // Safely parse tripData and tripPlan
+  const parseData = (data: string) => {
+    if (typeof data === "string") {
       try {
-        return JSON.parse(tripData);
+        return JSON.parse(data);
       } catch (error) {
-        console.error("Failed to parse tripData:", error);
-        return {}; // Return a fallback empty object
+        console.error("Failed to parse data:", error);
+        return {}; // Return fallback object
       }
     }
-    return tripData; // Already an object
+    return data; // Already an object
   };
 
-  const LatestTrip = parseTripData(userTrips[userTrips.length - 1]?.tripData);
+  const LatestTrip = parseData(userTrips[userTrips.length - 1]?.tripData);
+  const LatestPlan = parseData(userTrips[userTrips.length - 1]?.tripPlan);
 
   return (
     <View style={{ marginTop: 20 }}>
@@ -45,7 +47,10 @@ const UserTripMainCard: React.FC<UserTripMainCardProps> = ({ userTrips }) => {
         <Pressable
           onPress={() =>
             navigation.navigate("TripDetails", {
-              trip: JSON.stringify(LatestTrip),
+              trip: JSON.stringify({
+                ...LatestTrip,
+                travelPlan: LatestPlan?.travelPlan || {}, // Combine LatestPlan details
+              }),
             })
           }
         >
@@ -98,31 +103,58 @@ const UserTripMainCard: React.FC<UserTripMainCardProps> = ({ userTrips }) => {
               ? moment(LatestTrip.startDate).format("MMM DD yyyy")
               : "No Start Date"}
           </Text>
-          <Text
-            style={{
-              fontFamily: "outfit",
-              fontSize: 17,
-              color: currentTheme.textSecondary,
-            }}
-          >
-            Traveling: {LatestTrip?.traveler?.title || "Unknown"}
-          </Text>
         </View>
-        <Text
+        <View
           style={{
-            color: currentTheme.textSecondary,
-            textAlign: "center",
-            fontFamily: "outfit-medium",
-            fontSize: 15,
+            flexDirection: "row",
+            alignItems: "center",
             marginTop: 20,
           }}
         >
-          All your plans
-        </Text>
+          <View
+            style={{
+              flex: 1,
+              height: 1,
+              backgroundColor: currentTheme.textSecondary,
+              marginHorizontal: 10,
+            }}
+          />
+          <Text
+            style={{
+              color: currentTheme.textSecondary,
+              textAlign: "center",
+              fontFamily: "outfit-medium",
+              fontSize: 15,
+            }}
+          >
+            All your plans
+          </Text>
+          <View
+            style={{
+              flex: 1,
+              height: 1,
+              backgroundColor: currentTheme.textSecondary,
+              marginHorizontal: 10,
+            }}
+          />
+        </View>
       </View>
-      {userTrips.map(({ tripData }: { tripData: string }, index: number) => (
-        <UserTripListCard trip={{ tripData }} key={index} />
-      ))}
+      {userTrips.map((trip, index) => {
+        if (!trip || !trip.tripData || !trip.tripPlan) {
+          console.warn(`Skipping invalid trip at index ${index}:`, trip);
+          return null;
+        }
+
+        return (
+          <UserTripListCard
+            trip={{
+              tripData: trip.tripData,
+              tripPlan: trip.tripPlan,
+            }}
+            key={index}
+          />
+        );
+      })}
     </View>
   );
 };

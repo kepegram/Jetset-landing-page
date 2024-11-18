@@ -28,13 +28,13 @@ const HotelList: React.FC<HotelListProps> = ({ hotelList }) => {
           color: currentTheme.textPrimary,
         }}
       >
-        🏨 Hotel Recommendation
+        🏨 Hotel Recommendations
       </Text>
 
       <FlatList
         data={hotelList}
         style={{
-          marginTop: 8,
+          marginTop: 10,
         }}
         showsHorizontalScrollIndicator={false}
         horizontal={true}

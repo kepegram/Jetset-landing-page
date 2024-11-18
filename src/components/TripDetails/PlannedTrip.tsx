@@ -14,21 +14,20 @@ interface PlannedTripProps {
         timeToTravel: string;
       }[];
     };
-  } | null; // Allow null or undefined for safety
+  } | null;
 }
 
 const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
   const { currentTheme } = useTheme();
 
   if (!details || typeof details !== "object") {
-    // Handle cases where details is null, undefined, or not an object
     return (
       <View>
         <Text
           style={{
             fontSize: 18,
             fontFamily: "outfit",
-            color: "red", // Optional styling to indicate missing data
+            color: "red",
           }}
         >
           No Plan Details Available
@@ -46,6 +45,7 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
       <Text
         style={{
           fontSize: 20,
+          marginBottom: 10,
           fontFamily: "outfit-bold",
           color: currentTheme.textPrimary,
         }}
@@ -61,7 +61,9 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
               style={{
                 fontFamily: "outfit-medium",
                 fontSize: 20,
-                marginTop: 20,
+                marginTop: 10,
+                marginBottom: 10,
+                color: currentTheme.textPrimary,
               }}
             >
               {day.charAt(0).toUpperCase() + day.slice(1)}
