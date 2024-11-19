@@ -94,6 +94,7 @@ const GenerateTrip: React.FC = () => {
         paddingTop: 75,
         backgroundColor: currentTheme.background,
         height: "100%",
+        justifyContent: "center",
       }}
     >
       <Text

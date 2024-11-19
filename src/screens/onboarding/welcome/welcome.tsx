@@ -27,7 +27,7 @@ const Welcome: React.FC = () => {
       <View style={styles.slide}>
         <Text style={styles.appName}>Jetset</Text>
         <Text style={styles.paragraph}>
-          Discover. Dream. <Text style={styles.exploreText}>Explore.</Text>
+          Dream. Discover. <Text style={styles.exploreText}>Explore.</Text>
         </Text>
 
         {/* Buttons */}

@@ -4,11 +4,11 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
+import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
 import UserTripMainCard from "../../../components/myTrips/userTripMainCard";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
@@ -82,7 +82,11 @@ const Home: React.FC = () => {
           My Trips
         </Text>
         <Pressable onPress={() => navigation.navigate("SearchPlace")}>
-          <Ionicons name="add-circle" size={50} color={currentTheme.icon} />
+          <Ionicons
+            name="add-circle"
+            size={50}
+            color={currentTheme.alternate}
+          />
         </Pressable>
       </View>
       {loading ? (
