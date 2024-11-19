@@ -1,7 +1,7 @@
 import { View, Text, FlatList, Pressable, Alert } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { CreateTripContext } from "../../../context/createTripContext";
-import { SelectTravelesList } from "../../../constants/options";
+import { SelectTravelersList } from "../../../constants/options";
 import OptionCard from "../../../components/createTrip/optionCard";
 import { useTheme } from "../../../context/themeContext";
 import { RootStackParamList } from "../../../navigation/appNav";
@@ -57,7 +57,7 @@ const SelectTraveler: React.FC = () => {
         }}
       >
         <FlatList
-          data={SelectTravelesList}
+          data={SelectTravelersList}
           renderItem={({ item, index }) => (
             <Pressable
               onPress={() => setSelectedTraveler(item)}

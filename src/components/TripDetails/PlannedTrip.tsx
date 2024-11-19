@@ -53,26 +53,28 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
         🏕️ Plan Details
       </Text>
 
-      {Object.entries(details)
-        .reverse()
-        .map(([day, { plan }]) => (
-          <View key={day}>
-            <Text
-              style={{
-                fontFamily: "outfit-medium",
-                fontSize: 20,
-                marginTop: 10,
-                marginBottom: 10,
-                color: currentTheme.textPrimary,
-              }}
-            >
-              {day.charAt(0).toUpperCase() + day.slice(1)}
-            </Text>
-            {plan.map((place, index) => (
-              <PlaceCard key={index} place={place} />
-            ))}
-          </View>
-        ))}
+      {Object.entries(details).map(([day, { plan }]) => (
+        <View key={day}>
+          <Text
+            style={{
+              fontFamily: "outfit-medium",
+              fontSize: 20,
+              marginTop: 10,
+              marginBottom: 10,
+              color: currentTheme.textPrimary,
+            }}
+          >
+            Day {parseInt(day) + 1}
+          </Text>
+          {Array.isArray(plan) && plan.length > 0 ? ( // Check if plan is an array and has items
+            plan.map((place, index) => <PlaceCard key={index} place={place} />)
+          ) : (
+            <Text style={{ color: "red" }}>
+              No places planned for this day.
+            </Text> // Handle case where plan is empty or undefined
+          )}
+        </View>
+      ))}
     </View>
   );
 };

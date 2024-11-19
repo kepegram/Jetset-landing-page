@@ -83,7 +83,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
               color: currentTheme.textSecondary,
             }}
           >
-            Price: ${item.price}
+            Price: ${item.price}/night
           </Text>
         </View>
       </View>

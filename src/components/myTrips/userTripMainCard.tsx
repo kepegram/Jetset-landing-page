@@ -1,4 +1,4 @@
-import { View, Text, Image, Pressable } from "react-native";
+import { View, Text, Image, Pressable, Alert } from "react-native";
 import React from "react";
 import moment from "moment";
 import { useTheme } from "../../context/themeContext";
@@ -6,6 +6,9 @@ import UserTripListCard from "./userTripListCard";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../../firebase.config";
+import { doc, deleteDoc } from "firebase/firestore";
+import { AntDesign } from "@expo/vector-icons";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -16,12 +19,19 @@ interface UserTripMainCardProps {
   userTrips: Array<{
     tripData: string;
     tripPlan: string;
+    id: string; // Added trip ID to the interface
   }>;
+  onTripDeleted: () => void;
 }
 
-const UserTripMainCard: React.FC<UserTripMainCardProps> = ({ userTrips }) => {
+const UserTripMainCard: React.FC<UserTripMainCardProps> = ({
+  userTrips,
+  onTripDeleted,
+}) => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
+
+  const user = FIREBASE_AUTH.currentUser;
 
   if (!userTrips || userTrips.length === 0) return null;
 
@@ -40,6 +50,29 @@ const UserTripMainCard: React.FC<UserTripMainCardProps> = ({ userTrips }) => {
 
   const LatestTrip = parseData(userTrips[userTrips.length - 1]?.tripData);
   const LatestPlan = parseData(userTrips[userTrips.length - 1]?.tripPlan);
+
+  const deleteTrip = async (tripId: string) => {
+    try {
+      Alert.alert("Delete Trip", "Are you sure you want to delete this trip?", [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            const tripDocRef = doc(
+              FIREBASE_DB,
+              `users/${user.uid}/userTrips/${tripId}`
+            ); // Update path
+            await deleteDoc(tripDocRef);
+            console.log(`Trip with ID ${tripId} deleted successfully.`);
+            onTripDeleted(); // Call the onTripDeleted callback to refresh the trip list
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error("Failed to delete trip:", error);
+    }
+  };
 
   return (
     <View style={{ marginTop: 20 }}>
@@ -88,8 +121,8 @@ const UserTripMainCard: React.FC<UserTripMainCardProps> = ({ userTrips }) => {
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "space-between",
             marginTop: 5,
+            alignItems: "center", // Align items vertically centered
           }}
         >
           <Text
@@ -101,8 +134,30 @@ const UserTripMainCard: React.FC<UserTripMainCardProps> = ({ userTrips }) => {
           >
             {LatestTrip?.startDate
               ? moment(LatestTrip.startDate).format("MMM DD yyyy")
+              : "No Start Date"}{" "}
+            -{" "}
+          </Text>
+          <Text
+            style={{
+              fontFamily: "outfit",
+              fontSize: 17,
+              color: currentTheme.textSecondary,
+            }}
+          >
+            {LatestTrip?.startDate
+              ? moment(LatestTrip.endDate).format("MMM DD yyyy")
               : "No Start Date"}
           </Text>
+          <Pressable
+            onPress={() => deleteTrip(userTrips[userTrips.length - 1]?.id)} // Use the ID of the latest trip
+            style={{
+              padding: 5,
+              borderRadius: 20,
+              marginLeft: "auto", // Push the icon to the end
+            }}
+          >
+            <AntDesign name="delete" size={24} color="red" />
+          </Pressable>
         </View>
         <View
           style={{
@@ -150,8 +205,10 @@ const UserTripMainCard: React.FC<UserTripMainCardProps> = ({ userTrips }) => {
             trip={{
               tripData: trip.tripData,
               tripPlan: trip.tripPlan,
+              id: trip.id, // Pass the trip ID to the list card
             }}
             key={index}
+            deleteTrip={deleteTrip} // Pass deleteTrip function to UserTripListCard
           />
         );
       })}

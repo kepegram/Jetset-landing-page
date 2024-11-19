@@ -1,4 +1,4 @@
-export const SelectTravelesList = [
+export const SelectTravelersList = [
   {
     id: 1,
     title: "Just Me",
@@ -50,5 +50,29 @@ export const SetBudgetOptions = [
   },
 ];
 
-export const AI_PROMPT =
-  "Generate Travel Plan for Location : {location}, for {totalDays} Days and {totalNight} Nights for {traveler} with a {budget} budget with a Flight details , Flight Price with Booking url, Hotels options list with HotelName, Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and suggest itinerary with placeName, Place Details, Place Image Url, Geo Coordinates, ticket Pricing, Time to travel to each of the locations for {totalDays} days and {totalNight} night with each day plan with best time to visit in JSON format.";
+export const AI_PROMPT = `
+  Generate Travel Plan to {location}, for {totalDays} Days and {totalNight} Nights.
+  It will be for {traveler} with a {budget} budget.
+  
+  Give me Flight details, Flight Price with a real airline url to the airlines website.
+  
+  Also give me a Hotel options list with:
+  - HotelName
+  - Hotel address 
+  - Price
+  - hotel image url
+  - geo coordinates
+  - rating
+  - descriptions
+  
+  Also suggest an itinerary with:
+  - placeName
+  - Place Details  
+  - Place Image Url
+  - Geo Coordinates
+  - Ticket Price
+  - Time to travel
+  
+  For {totalDays} days and {totalNight} nights.
+  Give me with a plan for each day with best time to visit all in JSON format.
+`;

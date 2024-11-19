@@ -363,8 +363,12 @@ const TabNavigator: React.FC = () => {
           return {
             tabBarStyle,
             headerShown: false,
-            tabBarIcon: ({ color }) => (
-              <AntDesign name="home" color={color} size={30} />
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "home" : "home-outline"}
+                color={color}
+                size={30}
+              />
             ),
           } as BottomTabNavigationOptions;
         }}

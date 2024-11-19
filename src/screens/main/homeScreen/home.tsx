@@ -82,11 +82,7 @@ const Home: React.FC = () => {
           My Trips
         </Text>
         <Pressable onPress={() => navigation.navigate("SearchPlace")}>
-          <Ionicons
-            name="add-circle"
-            size={50}
-            color={currentTheme.alternate}
-          />
+          <Ionicons name="add-circle" size={50} color={currentTheme.icon} />
         </Pressable>
       </View>
       {loading ? (
@@ -94,7 +90,7 @@ const Home: React.FC = () => {
       ) : userTrips.length === 0 ? (
         <StartNewTripCard navigation={navigation} />
       ) : (
-        <UserTripMainCard userTrips={userTrips} />
+        <UserTripMainCard userTrips={userTrips} onTripDeleted={GetMyTrips} />
       )}
       <View style={{ height: 100 }} />
     </ScrollView>
