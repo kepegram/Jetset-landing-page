@@ -5,8 +5,6 @@ import { useTheme } from "../../context/themeContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/appNav";
-import { AntDesign } from "@expo/vector-icons";
-import { Swipeable } from "react-native-gesture-handler";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -19,13 +17,9 @@ interface UserTripListCardProps {
     tripPlan: string;
     id: string;
   };
-  deleteTrip: (tripId: string) => void;
 }
 
-const UserTripListCard: React.FC<UserTripListCardProps> = ({
-  trip,
-  deleteTrip,
-}) => {
+const UserTripListCard: React.FC<UserTripListCardProps> = ({ trip }) => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
 
@@ -43,25 +37,11 @@ const UserTripListCard: React.FC<UserTripListCardProps> = ({
 
   const tripData = formatData(trip.tripData);
   const tripPlan = formatData(trip.tripPlan);
+  const startDate = tripData.startDate ? moment(tripData.startDate) : null;
 
-  const renderRightActions = () => (
-    <Pressable
-      onPress={() => deleteTrip(trip.id)}
-      style={{
-        backgroundColor: "red",
-        justifyContent: "center",
-        alignItems: "center", // Center the icon horizontally
-        width: 100,
-        borderRadius: 15,
-        margin: 5,
-      }}
-    >
-      <AntDesign name="delete" size={24} color="white" />
-    </Pressable>
-  );
-
-  return (
-    <Swipeable renderRightActions={renderRightActions}>
+  // Check if the trip is in the past
+  if (startDate && startDate.isBefore(moment())) {
+    return (
       <Pressable
         onPress={() => {
           navigation.navigate("TripDetails", {
@@ -136,7 +116,23 @@ const UserTripListCard: React.FC<UserTripListCardProps> = ({
           </View>
         </View>
       </Pressable>
-    </Swipeable>
+    );
+  }
+
+  // If no past trips, show message
+  return (
+    <View style={{ marginTop: 20 }}>
+      <Text
+        style={{
+          fontFamily: "outfit-medium",
+          fontSize: 18,
+          color: currentTheme.textPrimary,
+          textAlign: "center",
+        }}
+      >
+        Start Booking Today!
+      </Text>
+    </View>
   );
 };
 

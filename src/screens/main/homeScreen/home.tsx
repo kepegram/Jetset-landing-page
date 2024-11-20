@@ -5,11 +5,20 @@ import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { doc, getDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  Text,
+  View,
+  FlatList,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { ScrollView } from "react-native-gesture-handler";
 import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
 import UserTripMainCard from "../../../components/myTrips/userTripMainCard";
+import UserTripListCard from "../../../components/myTrips/userTripListCard"; // Import UserTripListCard
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -18,11 +27,33 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 
 const Home: React.FC = () => {
   const { currentTheme } = useTheme();
-  const [userTrips, setUserTrips] = useState([]);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [userTrips, setUserTrips] = useState<any[]>([]); // Specify type for userTrips
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
   const user = FIREBASE_AUTH.currentUser;
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUserData = async () => {
+        const user = getAuth().currentUser;
+        if (user) {
+          try {
+            const userDoc = await getDoc(doc(FIREBASE_DB, "users", user.uid));
+            if (userDoc.exists()) {
+              const data = userDoc.data();
+              setUserName(data?.name || "");
+            }
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+          }
+        }
+      };
+
+      fetchUserData();
+    }, [])
+  );
 
   // Fetch trips when screen is focused
   useFocusEffect(
@@ -55,8 +86,15 @@ const Home: React.FC = () => {
     }
   };
 
+  // Sort trips by date
+  const sortedTrips = userTrips.sort((a, b) => {
+    const dateA = new Date(JSON.parse(a.tripData).startDate).getTime();
+    const dateB = new Date(JSON.parse(b.tripData).startDate).getTime();
+    return dateA - dateB;
+  });
+
   return (
-    <ScrollView
+    <View
       style={{
         padding: 25,
         paddingTop: 55,
@@ -79,21 +117,73 @@ const Home: React.FC = () => {
             color: currentTheme.textPrimary,
           }}
         >
-          My Trips
+          {userName}'s Trips
         </Text>
-        <Pressable onPress={() => navigation.navigate("SearchPlace")}>
-          <Ionicons name="add-circle" size={50} color={currentTheme.icon} />
-        </Pressable>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Pressable onPress={() => console.log("TODO")}>
+            <Ionicons name="search" size={40} color={currentTheme.icon} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate("SearchPlace")}>
+            <Ionicons name="add-circle" size={40} color={currentTheme.icon} />
+          </Pressable>
+        </View>
       </View>
       {loading ? (
         <ActivityIndicator size="large" color={currentTheme.alternate} />
-      ) : userTrips.length === 0 ? (
+      ) : sortedTrips.length === 0 ? (
         <StartNewTripCard navigation={navigation} />
       ) : (
-        <UserTripMainCard userTrips={userTrips} onTripDeleted={GetMyTrips} />
+        <View>
+          <Text
+            style={{
+              fontFamily: "outfit-bold",
+              fontSize: 24,
+              color: currentTheme.textPrimary,
+              marginTop: 20,
+            }}
+          >
+            Current Trip
+          </Text>
+          <FlatList
+            data={sortedTrips}
+            horizontal
+            renderItem={({ item }) => (
+              <UserTripMainCard userTrips={[item]} onTripDeleted={GetMyTrips} />
+            )}
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+          />
+
+          <Text
+            style={{
+              fontFamily: "outfit-bold",
+              fontSize: 24,
+              color: currentTheme.textPrimary,
+              marginTop: 20,
+            }}
+          >
+            Past Trips
+          </Text>
+          {sortedTrips.map((trip, index) => {
+            if (!trip || !trip.tripData || !trip.tripPlan) {
+              console.warn(`Skipping invalid trip at index ${index}:`, trip);
+              return null;
+            }
+
+            return (
+              <UserTripListCard
+                trip={{
+                  tripData: trip.tripData,
+                  tripPlan: trip.tripPlan,
+                  id: trip.id,
+                }}
+                key={index}
+              />
+            );
+          })}
+        </View>
       )}
-      <View style={{ height: 100 }} />
-    </ScrollView>
+    </View>
   );
 };
 

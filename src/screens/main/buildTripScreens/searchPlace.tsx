@@ -6,6 +6,9 @@ import { CreateTripContext } from "../../../context/createTripContext";
 import { GooglePlaceDetail } from "react-native-google-places-autocomplete";
 import { useTheme } from "../../../context/themeContext";
 import SetOrigin from "./setOrigin";
+import { useNavigation } from "@react-navigation/native"; // Import useNavigation
+import { RootStackParamList } from "../../../navigation/appNav";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 // Extend GooglePlaceDetail to include 'photos'
 interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
@@ -17,10 +20,16 @@ interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
   }>;
 }
 
+type SearchPlaceNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "SearchPlace"
+>;
+
 const SearchPlace: React.FC = () => {
   const { currentTheme } = useTheme();
   const { setTripData } = useContext(CreateTripContext);
   const [placeSelected, setPlaceSelected] = useState(false);
+  const navigation = useNavigation<SearchPlaceNavigationProp>(); // Initialize navigation
 
   const handlePlaceSelect = (
     data: any,
@@ -35,6 +44,7 @@ const SearchPlace: React.FC = () => {
       },
     });
     setPlaceSelected(true);
+    // navigation.navigate("BuildTrip");
   };
 
   return (
@@ -86,7 +96,6 @@ const SearchPlace: React.FC = () => {
           },
         }}
       />
-
       {placeSelected && (
         <View style={{ marginTop: 20 }}>
           <SetOrigin />

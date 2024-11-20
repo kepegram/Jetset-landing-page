@@ -14,7 +14,7 @@ import {
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import { ProfileProvider, useProfile } from "../context/profileContext";
-import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { CreateTripContext } from "../context/createTripContext";
 import Home from "../screens/main/homeScreen/home";
@@ -31,12 +31,14 @@ import SetBudget from "../screens/main/buildTripScreens/setBudget";
 import ReviewTrip from "../screens/main/buildTripScreens/reviewTrip";
 import GenerateTrip from "../screens/main/buildTripScreens/generateTrip";
 import TripDetails from "../screens/main/tripDetailScreen/tripDetails";
+import BuildTrip from "../screens/main/buildTripScreens/buildTrip";
 
 // Define types for root stack params
 export type RootStackParamList = {
   App: undefined;
   Home: undefined;
   SearchPlace: undefined;
+  BuildTrip: undefined;
   SelectTraveler: undefined;
   SelectDates: undefined;
   SetBudget: undefined;
@@ -150,6 +152,31 @@ const HomeStack: React.FC = () => {
           ...screenOptions({ navigation }),
           title: "",
         })}
+      />
+      <RootStack.Screen
+        name="BuildTrip"
+        component={BuildTrip}
+        options={{
+          headerLeft: () => {
+            const navigation = useNavigation();
+            return (
+              <Pressable
+                onPress={() => navigation.goBack()} // Navigate back
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent grey background
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <MaterialIcons name="arrow-back" size={24} color="white" />
+              </Pressable>
+            );
+          },
+          headerShown: false, // Ensure the header is shown
+        }}
       />
       <RootStack.Screen
         name="SelectTraveler"
@@ -323,10 +350,12 @@ const getTabBarStyle = (route: any): { display?: string } | undefined => {
   const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
   if (
     routeName === "SearchPlace" ||
+    routeName === "BuildTrip" ||
     routeName === "SelectTraveler" ||
     routeName === "SelectDates" ||
     routeName === "SetBudget" ||
     routeName === "ReviewTrip" ||
+    routeName === "GenerateTrip" ||
     routeName === "Edit" ||
     routeName === "Settings" ||
     routeName === "ChangePassword" ||

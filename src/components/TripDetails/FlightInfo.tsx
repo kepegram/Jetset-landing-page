@@ -1,5 +1,5 @@
 import { View, Text, Pressable, Linking } from "react-native";
-import React, { useEffect } from "react";
+import React from "react";
 import { useTheme } from "../../context/themeContext";
 
 // Define an interface for flightData

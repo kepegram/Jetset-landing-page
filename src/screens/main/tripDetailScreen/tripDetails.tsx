@@ -1,9 +1,12 @@
-import { View, Text, Image, ScrollView } from "react-native";
+import { View, Text, Image, ScrollView, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { doc, deleteDoc } from "firebase/firestore";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
+import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import FlightInfo from "../../../components/tripDetails/flightInfo";
 import HotelList from "../../../components/tripDetails/hotelList";
@@ -15,7 +18,7 @@ type NavigationProp = NativeStackNavigationProp<
 >;
 
 interface RouteParams {
-  trip: string; // Trip data passed as a JSON string
+  trip: string;
 }
 
 const TripDetails: React.FC = () => {
@@ -25,6 +28,8 @@ const TripDetails: React.FC = () => {
   const { trip } = route.params as RouteParams;
 
   const [tripDetails, setTripDetails] = useState<any>(null);
+
+  const user = FIREBASE_AUTH.currentUser;
 
   useEffect(() => {
     navigation.setOptions({
@@ -40,6 +45,29 @@ const TripDetails: React.FC = () => {
       console.error("Error parsing trip details:", error);
     }
   }, [trip, navigation]);
+
+  const deleteTrip = async (tripId: string) => {
+    try {
+      Alert.alert("Delete Trip", "Are you sure you want to delete this trip?", [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            const tripDocRef = doc(
+              FIREBASE_DB,
+              `users/${user.uid}/userTrips/${tripId}`
+            ); // Update path
+            await deleteDoc(tripDocRef);
+            console.log(`Trip with ID ${tripId} deleted successfully.`);
+            navigation.navigate("Home"); // Navigate to Home after deletion
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error("Failed to delete trip:", error);
+    }
+  };
 
   if (!tripDetails) {
     return (
@@ -87,15 +115,24 @@ const TripDetails: React.FC = () => {
           borderTopRightRadius: 30,
         }}
       >
-        <Text
-          style={{
-            fontSize: 25,
-            fontFamily: "outfit-bold",
-            color: currentTheme.textPrimary,
-          }}
-        >
-          {tripDetails?.locationInfo?.name || "Unknown Location"}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text
+            style={{
+              fontSize: 25,
+              fontFamily: "outfit-bold",
+              color: currentTheme.textPrimary,
+            }}
+          >
+            {tripDetails?.locationInfo?.name || "Unknown Location"}
+          </Text>
+          <Ionicons
+            name="trash-bin-outline"
+            size={24}
+            color={currentTheme.textSecondary}
+            onPress={() => deleteTrip(tripDetails.id)} // Call deleteTrip on icon press
+            style={{ marginLeft: 10 }}
+          />
+        </View>
         <View style={{ flexDirection: "row", gap: 5, marginTop: 5 }}>
           <Text
             style={{
@@ -113,7 +150,7 @@ const TripDetails: React.FC = () => {
               color: currentTheme.textSecondary,
             }}
           >
-            {" - "}
+            {"- "}
             {moment(tripDetails?.endDate).format("MMM DD yyyy")}
           </Text>
         </View>
