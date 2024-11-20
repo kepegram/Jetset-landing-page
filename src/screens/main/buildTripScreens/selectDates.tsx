@@ -52,13 +52,13 @@ const SelectDates: React.FC = () => {
       totalNoOfDays: totalNoOfDays + 1,
     });
 
-    navigation.navigate("SetBudget");
+    navigation.navigate("SelectTraveler");
   };
 
   return (
     <View
       style={{
-        padding: 25,
+        marginTop: 30,
         backgroundColor: currentTheme.background,
         height: "100%",
       }}
@@ -74,7 +74,7 @@ const SelectDates: React.FC = () => {
 
       <View
         style={{
-          marginTop: 30,
+          marginTop: 10,
         }}
       >
         <CalendarPicker

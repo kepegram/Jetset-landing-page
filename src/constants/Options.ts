@@ -51,7 +51,7 @@ export const SetBudgetOptions = [
 ];
 
 export const AI_PROMPT = `
-  Generate Travel Plan to {location}, for {totalDays} Days and {totalNight} Nights.
+  Generate Travel Plan to {location}, from {locationFrom}, for {totalDays} Days and {totalNight} Nights.
   It will be for {traveler} with a {budget} budget.
   
   Give me Flight details, Flight Price with a real airline url to the airlines website.

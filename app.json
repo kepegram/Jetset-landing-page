@@ -1,9 +1,10 @@
 {
   "expo": {
-    "name": "jetset",
+    "name": "Jetset",
     "slug": "jetset",
     "version": "1.0.0",
     "orientation": "portrait",
+    "sdkVersion": "52.0.0",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {

@@ -1,46 +1,31 @@
 import React, { useContext, useState } from "react";
 import { View, Text } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import "react-native-get-random-values";
 import { CreateTripContext } from "../../../context/createTripContext";
-import { GooglePlaceDetail } from "react-native-google-places-autocomplete";
 import { useTheme } from "../../../context/themeContext";
-import SetOrigin from "./setOrigin";
+import SelectDates from "./selectDates";
 
-// Extend GooglePlaceDetail to include 'photos'
-interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
-  photos?: Array<{
-    photo_reference: string;
-    height: number;
-    width: number;
-    html_attributions: string[];
-  }>;
-}
-
-const SearchPlace: React.FC = () => {
+const SetOrigin: React.FC = () => {
   const { currentTheme } = useTheme();
-  const { setTripData } = useContext(CreateTripContext);
-  const [placeSelected, setPlaceSelected] = useState(false);
+  const { setTripData, tripData } = useContext(CreateTripContext);
+  const [originSelected, setOriginSelected] = useState(false);
 
-  const handlePlaceSelect = (
-    data: any,
-    details: ExtendedGooglePlaceDetail | null
-  ) => {
+  const handleOriginSelect = (data: any, details: any | null) => {
     setTripData({
-      locationInfo: {
+      ...tripData,
+      locationFromInfo: {
         name: data.description,
         coordinates: details?.geometry.location,
-        photoRef: details?.photos?.[0]?.photo_reference,
         url: details?.url,
       },
     });
-    setPlaceSelected(true);
+    setOriginSelected(true);
   };
 
   return (
     <View
       style={{
-        padding: 30,
+        marginTop: 30,
         backgroundColor: currentTheme.background,
         height: "100%",
       }}
@@ -51,16 +36,16 @@ const SearchPlace: React.FC = () => {
           color: currentTheme.textPrimary,
         }}
       >
-        Where to?
+        From?
       </Text>
       <GooglePlacesAutocomplete
-        placeholder="Search Destinations"
+        placeholder="Search Origins"
         textInputProps={{
           placeholderTextColor: currentTheme.textSecondary,
           returnKeyType: "search",
         }}
         fetchDetails={true}
-        onPress={handlePlaceSelect}
+        onPress={handleOriginSelect}
         query={{
           key: process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
           language: "en",
@@ -87,13 +72,13 @@ const SearchPlace: React.FC = () => {
         }}
       />
 
-      {placeSelected && (
+      {originSelected && (
         <View style={{ marginTop: 20 }}>
-          <SetOrigin />
+          <SelectDates />
         </View>
       )}
     </View>
   );
 };
 
-export default SearchPlace;
+export default SetOrigin;

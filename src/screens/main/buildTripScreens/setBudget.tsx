@@ -24,7 +24,6 @@ type SetBudgetScreenNavigationProp = NativeStackNavigationProp<
 const SetBudget: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<SetBudgetScreenNavigationProp>();
-  // Type selectedOption as BudgetOption or undefined
   const [selectedOption, setSelectedOption] = useState<
     BudgetOption | undefined
   >();
@@ -71,7 +70,7 @@ const SetBudget: React.FC = () => {
       >
         <FlatList
           data={SetBudgetOptions}
-          renderItem={({ item, index }) => (
+          renderItem={({ item }) => (
             <Pressable
               style={{ marginVertical: 10 }}
               onPress={() => setSelectedOption(item)}

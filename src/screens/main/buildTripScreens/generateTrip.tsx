@@ -30,6 +30,7 @@ const GenerateTrip: React.FC = () => {
       "{location}",
       tripData?.locationInfo?.name || ""
     )
+      .replace("{locationFrom}", tripData?.locationFromInfo?.name || "")
       .replace("{totalDays}", tripData.totalNoOfDays?.toString() || "0")
       .replace("{totalNight}", (tripData.totalNoOfDays - 1).toString() || "0")
       .replace("{traveler}", tripData.traveler?.title || "")

@@ -78,7 +78,7 @@ const SelectTraveler: React.FC = () => {
           borderRadius: 15,
           marginTop: 20,
         }}
-        onPress={() => navigation.navigate("SelectDates")}
+        onPress={() => navigation.navigate("SetBudget")}
       >
         <Text
           style={{
@@ -87,7 +87,7 @@ const SelectTraveler: React.FC = () => {
             textAlign: "center",
           }}
         >
-          Proceed to select date
+          Proceed to set budget
         </Text>
       </Pressable>
     </View>

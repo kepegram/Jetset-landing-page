@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { useContext } from "react";
 import { CreateTripContext } from "../../../context/createTripContext";
 import moment from "moment";
@@ -17,6 +17,10 @@ const ReviewTrip: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<ReviewTripScreenNavigationProp>();
   const { tripData, setTripData } = useContext(CreateTripContext);
+
+  useEffect(() => {
+    console.log(tripData?.locationInfo?.name);
+  }, [tripData]);
 
   return (
     <View
@@ -85,6 +89,42 @@ const ReviewTrip: React.FC = () => {
           </View>
         </View>
 
+        {/* Origin Info */}
+        <View
+          style={{
+            marginTop: 25,
+            display: "flex",
+            flexDirection: "row",
+            gap: 20,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 30,
+            }}
+          >
+            🌍
+          </Text>
+          <View>
+            <Text
+              style={{
+                fontSize: 17,
+                color: currentTheme.textSecondary,
+              }}
+            >
+              Origin
+            </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                color: currentTheme.textPrimary,
+              }}
+            >
+              {tripData?.locationFromInfo?.name}
+            </Text>
+          </View>
+        </View>
+
         {/* Date Selected Info  */}
         <View
           style={{
@@ -125,7 +165,7 @@ const ReviewTrip: React.FC = () => {
           </View>
         </View>
 
-        {/* Traveles Info  */}
+        {/* Travelers Info  */}
         <View
           style={{
             marginTop: 25,

@@ -44,7 +44,7 @@ if (getRNMinorVersion() >= 75) {
   }
 }
 
-rootProject.name = 'jetset'
+rootProject.name = 'Jetset'
 
 dependencyResolutionManagement {
   versionCatalogs {

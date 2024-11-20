@@ -83,7 +83,7 @@ const Carousel: React.FC = () => {
           <Pressable
             style={[
               styles.authButton,
-              { backgroundColor: currentTheme.primary },
+              { backgroundColor: currentTheme.buttonBackground },
             ]}
             onPress={() => {
               navigation.navigate("SignUp");
