@@ -10,7 +10,7 @@ interface PlannedTripProps {
       plan: {
         placeName: string;
         placeDetails: string;
-        ticketPricing: string;
+        ticketPricing?: string; // Made ticketPricing optional
         timeToTravel: string;
       }[];
     };
@@ -58,7 +58,7 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
           <Text
             style={{
               fontFamily: "outfit-medium",
-              fontSize: 20,
+              fontSize: 17,
               marginTop: 10,
               marginBottom: 10,
               color: currentTheme.textPrimary,
@@ -66,8 +66,16 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
           >
             Day {parseInt(day) + 1}
           </Text>
-          {Array.isArray(plan) && plan.length > 0 ? ( // Check if plan is an array and has items
-            plan.map((place, index) => <PlaceCard key={index} place={place} />)
+          {Array.isArray(plan) && plan.length > 0 ? (
+            plan.map((place, index) => (
+              <PlaceCard
+                key={index}
+                place={{
+                  ...place,
+                  ticketPricing: place.ticketPricing || "N/A", // Check for ticketPricing
+                }}
+              />
+            ))
           ) : (
             <Text style={{ color: "red" }}>
               No places planned for this day.

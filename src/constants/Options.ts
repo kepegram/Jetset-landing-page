@@ -71,7 +71,6 @@ export const AI_PROMPT = `
   - Place Image Url
   - Geo Coordinates
   - Ticket Price
-  - Time to travel
   
   For {totalDays} days and {totalNight} nights.
   Give me with a plan for each day with best time to visit all in JSON format.

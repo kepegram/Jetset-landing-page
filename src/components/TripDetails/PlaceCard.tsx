@@ -104,24 +104,6 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
                 {place?.ticketPricing}
               </Text>
             </Text>
-            <Text
-              style={{
-                fontFamily: "outfit",
-                fontSize: 17,
-                marginTop: 5,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              ⏱️ Time to Travel:{" "}
-              <Text
-                style={{
-                  fontFamily: "outfit-bold",
-                  color: currentTheme.textSecondary,
-                }}
-              >
-                {place?.timeToTravel}
-              </Text>
-            </Text>
           </View>
           <Pressable
             style={{

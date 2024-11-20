@@ -1,5 +1,5 @@
-import React, { useContext, useState, useCallback } from "react";
-import { View, Text, Image } from "react-native";
+import React, { useContext, useState, useCallback, useRef } from "react";
+import { View, Text, Image, Alert } from "react-native";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { AI_PROMPT } from "../../../constants/options";
 import { chatSession } from "../../../../aiModal";
@@ -20,10 +20,11 @@ const GenerateTrip: React.FC = () => {
   const navigation = useNavigation<GenerateTripScreenNavigationProp>();
   const { tripData } = useContext(CreateTripContext);
   const [loading, setLoading] = useState(false);
+  const isMounted = useRef(true); // Track if the component is mounted
 
   const user = FIREBASE_AUTH.currentUser;
 
-  const GenerateAiTrip = async () => {
+  const GenerateAiTrip = async (retryCount = 0) => {
     setLoading(true);
 
     const FINAL_PROMPT = AI_PROMPT.replace(
@@ -41,6 +42,7 @@ const GenerateTrip: React.FC = () => {
     console.log("Generated Prompt:", FINAL_PROMPT);
 
     try {
+      console.log(`Attempt ${retryCount + 1} to generate AI trip...`);
       const result = await chatSession.sendMessage(FINAL_PROMPT);
       const responseText = await result.response.text();
       console.log("AI Response:", responseText);
@@ -74,17 +76,41 @@ const GenerateTrip: React.FC = () => {
       navigation.navigate("Home");
     } catch (error: any) {
       console.error("AI generation failed:", error.message);
-      alert(
-        "An error occurred while generating your trip. Please try again later."
-      );
+      if (retryCount < 3 && isMounted.current) {
+        const waitTime = Math.pow(2, retryCount) * 1000; // Exponential backoff
+        console.log(`Retrying in ${waitTime / 1000} seconds...`);
+        setTimeout(() => {
+          if (isMounted.current) {
+            GenerateAiTrip(retryCount + 1); // Retry with incremented count
+          }
+        }, waitTime);
+      } else {
+        Alert.alert(
+          "Error",
+          "An error occurred while generating your trip. Please try again later.",
+          [
+            {
+              text: "OK",
+              onPress: () => navigation.navigate("Home"),
+            },
+          ]
+        );
+      }
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
   };
 
   useFocusEffect(
     useCallback(() => {
+      isMounted.current = true; // Component is mounted
       GenerateAiTrip();
+
+      return () => {
+        isMounted.current = false; // Cleanup function to set mounted to false
+      };
     }, []) // Empty dependency array ensures it only runs when the screen gains focus
   );
 
