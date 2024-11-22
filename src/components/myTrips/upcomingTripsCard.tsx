@@ -1,53 +1,65 @@
-import { View, Text, Image, Pressable, Alert } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import React from "react";
 import moment from "moment";
 import { useTheme } from "../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../../../firebase.config";
-import { doc, deleteDoc } from "firebase/firestore";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "TripDetails"
 >;
 
-interface CurrentTripsCardProps {
+interface UpcomingTripsCardProps {
   userTrips: Array<{
     tripData: string;
     tripPlan: string;
-    id: string; // Added trip ID to the interface
+    id: string;
   }>;
-  onTripDeleted: () => void;
 }
 
-const CurrentTripsCard: React.FC<CurrentTripsCardProps> = ({
-  userTrips,
-  onTripDeleted,
-}) => {
+const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
 
-  const user = FIREBASE_AUTH.currentUser;
-
   if (!userTrips || userTrips.length === 0) return null;
 
-  // Safely parse tripData and tripPlan
   const parseData = (data: string) => {
     if (typeof data === "string") {
       try {
         return JSON.parse(data);
       } catch (error) {
         console.error("Failed to parse data:", error);
-        return {}; // Return fallback object
+        return {};
       }
     }
-    return data; // Already an object
+    return data;
   };
 
-  const LatestTrip = parseData(userTrips[userTrips.length - 1]?.tripData);
-  const LatestPlan = parseData(userTrips[userTrips.length - 1]?.tripPlan);
+  const today = moment().startOf("day");
+
+  const sortedTrips = userTrips
+    .map((trip) => ({
+      ...trip,
+      parsedTripData: parseData(trip.tripData),
+      parsedTripPlan: parseData(trip.tripPlan),
+    }))
+    .sort((a, b) => {
+      const dateA = moment(a.parsedTripData.startDate);
+      const dateB = moment(b.parsedTripData.startDate);
+      return dateA.diff(today) - dateB.diff(today);
+    });
+
+  const LatestTrip = sortedTrips[0]?.parsedTripData;
+  const LatestPlan = sortedTrips[0]?.parsedTripPlan;
+
+  if (
+    LatestTrip?.startDate &&
+    moment(LatestTrip.startDate).isSame(today, "day")
+  ) {
+    return null;
+  }
 
   return (
     <View style={{ marginVertical: 20, width: 250 }}>
@@ -57,7 +69,7 @@ const CurrentTripsCard: React.FC<CurrentTripsCardProps> = ({
             navigation.navigate("TripDetails", {
               trip: JSON.stringify({
                 ...LatestTrip,
-                travelPlan: LatestPlan?.travelPlan || {}, // Combine LatestPlan details
+                travelPlan: LatestPlan?.travelPlan || {},
               }),
             })
           }
@@ -97,7 +109,7 @@ const CurrentTripsCard: React.FC<CurrentTripsCardProps> = ({
           style={{
             flexDirection: "row",
             marginTop: 5,
-            alignItems: "center", // Align items vertically centered
+            alignItems: "center",
           }}
         >
           <Text
@@ -129,4 +141,4 @@ const CurrentTripsCard: React.FC<CurrentTripsCardProps> = ({
   );
 };
 
-export default CurrentTripsCard;
+export default UpcomingTripsCard;

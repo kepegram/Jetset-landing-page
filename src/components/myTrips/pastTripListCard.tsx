@@ -39,8 +39,8 @@ const PastTripListCard: React.FC<PastTripListCardProps> = ({ trip }) => {
   const tripPlan = formatData(trip.tripPlan);
   const startDate = tripData.startDate ? moment(tripData.startDate) : null;
 
-  // Check if the trip is in the past
-  if (startDate && startDate.isBefore(moment())) {
+  // Only display the trip if the start date is in the past
+  if (startDate && startDate.isBefore(moment(), 'day')) {
     return (
       <Pressable
         onPress={() => {

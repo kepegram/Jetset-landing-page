@@ -13,11 +13,14 @@ import {
   Text,
   View,
   FlatList,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
-import CurrentTripsCard from "../../../components/myTrips/currentTripsCard";
-import PastTripListCard from "../../../components/myTrips/pastTripListCard"; // Import UserTripListCard
+import CurrentTripsCard from "../../../components/myTrips/currentTripCard";
+import UpcomingTripsCard from "../../../components/myTrips/upcomingTripsCard";
+import PastTripListCard from "../../../components/myTrips/pastTripListCard";
+import moment from "moment";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -27,7 +30,7 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 const Home: React.FC = () => {
   const { currentTheme } = useTheme();
   const [userName, setUserName] = useState<string | null>(null);
-  const [userTrips, setUserTrips] = useState<any[]>([]); // Specify type for userTrips
+  const [userTrips, setUserTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
@@ -54,7 +57,6 @@ const Home: React.FC = () => {
     }, [])
   );
 
-  // Fetch trips when screen is focused
   useFocusEffect(
     useCallback(() => {
       if (user) GetMyTrips();
@@ -64,11 +66,10 @@ const Home: React.FC = () => {
   const GetMyTrips = async () => {
     try {
       setLoading(true);
-      setUserTrips([]); // Reset trips before loading new data.
+      setUserTrips([]);
 
       const tripsQuery = query(
-        collection(FIREBASE_DB, `users/${user.uid}/userTrips`),
-        where("userEmail", "==", user.email)
+        collection(FIREBASE_DB, `users/${user.uid}/userTrips`)
       );
 
       const querySnapshot = await getDocs(tripsQuery);
@@ -85,20 +86,21 @@ const Home: React.FC = () => {
     }
   };
 
-  // Sort trips by date
-  const sortedTrips = userTrips.sort((a, b) => {
-    const dateA = new Date(JSON.parse(a.tripData).startDate).getTime();
-    const dateB = new Date(JSON.parse(b.tripData).startDate).getTime();
-    return dateA - dateB;
+  const today = moment().startOf("day");
+
+  const currentTrip = userTrips.find((trip) => {
+    const startDate = moment(trip.tripData.startDate).startOf("day");
+    const endDate = moment(trip.tripData.endDate).endOf("day");
+    return startDate.isSame(today) && today.isBefore(endDate);
   });
 
   return (
-    <View
-      style={{
+    <ScrollView
+      contentContainerStyle={{
         padding: 25,
         paddingTop: 55,
         backgroundColor: currentTheme.background,
-        height: "100%",
+        flexGrow: 1,
       }}
     >
       <View
@@ -133,10 +135,29 @@ const Home: React.FC = () => {
       </View>
       {loading ? (
         <ActivityIndicator size="large" color={currentTheme.alternate} />
-      ) : sortedTrips.length === 0 ? (
+      ) : userTrips.length === 0 ? (
         <StartNewTripCard navigation={navigation} />
       ) : (
         <View>
+          {currentTrip && (
+            <>
+              <Text
+                style={{
+                  fontFamily: "outfit-bold",
+                  fontSize: 24,
+                  color: currentTheme.textPrimary,
+                  marginTop: 20,
+                  textAlign: "left",
+                }}
+              >
+                Current Trip
+              </Text>
+              <View style={{ alignItems: "center" }}>
+                <CurrentTripsCard userTrips={[currentTrip]} />
+              </View>
+            </>
+          )}
+
           <Text
             style={{
               fontFamily: "outfit-bold",
@@ -145,13 +166,15 @@ const Home: React.FC = () => {
               marginTop: 20,
             }}
           >
-            Current Trip
+            Upcoming Trips
           </Text>
           <FlatList
-            data={sortedTrips}
+            data={userTrips}
             horizontal
             renderItem={({ item }) => (
-              <CurrentTripsCard userTrips={[item]} onTripDeleted={GetMyTrips} />
+              <View style={{ marginRight: 10 }}>
+                <UpcomingTripsCard userTrips={[item]} />
+              </View>
             )}
             keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
@@ -167,12 +190,11 @@ const Home: React.FC = () => {
           >
             Past Trips
           </Text>
-          {sortedTrips.map((trip, index) => {
+          {userTrips.map((trip, index) => {
             if (!trip || !trip.tripData || !trip.tripPlan) {
               console.warn(`Skipping invalid trip at index ${index}:`, trip);
               return null;
             }
-
             return (
               <PastTripListCard
                 trip={{
@@ -186,7 +208,7 @@ const Home: React.FC = () => {
           })}
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 };
 

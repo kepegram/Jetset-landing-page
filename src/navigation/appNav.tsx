@@ -52,32 +52,6 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 const HomeStack: React.FC = () => {
   const { currentTheme } = useTheme();
 
-  const screenOptions = ({
-    navigation,
-  }: {
-    navigation: any;
-  }): NativeStackNavigationOptions => ({
-    headerStyle: {
-      backgroundColor: currentTheme.background,
-    },
-    headerShadowVisible: false,
-    headerLeft: () => (
-      <Pressable onPress={() => navigation.goBack()}>
-        <Ionicons
-          name="arrow-back"
-          size={28}
-          color={currentTheme.textPrimary}
-          style={{ marginLeft: 10 }}
-        />
-      </Pressable>
-    ),
-    headerTitleStyle: {
-      color: currentTheme.textPrimary,
-      fontSize: 18,
-      fontWeight: "bold",
-    },
-  });
-
   // Custom options for TripBuilder screens
   const tripBuilderScreenOptions = ({
     navigation,
@@ -152,6 +126,8 @@ const HomeStack: React.FC = () => {
                   setTripData({}); // Clear all tripData from context
                   await AsyncStorage.removeItem("startDate"); // Clear startDate from AsyncStorage
                   await AsyncStorage.removeItem("endDate"); // Clear endDate from AsyncStorage
+                  await AsyncStorage.removeItem("tripName"); // Clear tripName from AsyncStorage
+                  await AsyncStorage.removeItem("whoIsGoing"); // Clear whoIsGoing from AsyncStorage
                   navigation.goBack(); // Navigate back
                 }}
                 style={{

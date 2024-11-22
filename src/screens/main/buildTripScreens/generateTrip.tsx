@@ -1,7 +1,7 @@
 import React, { useContext, useState, useCallback, useRef } from "react";
 import { View, Text, Image, Alert } from "react-native";
 import { CreateTripContext } from "../../../context/createTripContext";
-import { AI_PROMPT } from "../../../constants/options";
+import { AI_PROMPT } from "../../../api/ai-prompt";
 import { chatSession } from "../../../../aiModal";
 import { doc, setDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
@@ -9,6 +9,7 @@ import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type GenerateTripScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -20,7 +21,7 @@ const GenerateTrip: React.FC = () => {
   const navigation = useNavigation<GenerateTripScreenNavigationProp>();
   const { tripData } = useContext(CreateTripContext);
   const [loading, setLoading] = useState(false);
-  const isMounted = useRef(true); // Track if the component is mounted
+  const isMounted = useRef(true);
 
   const user = FIREBASE_AUTH.currentUser;
 
@@ -73,15 +74,18 @@ const GenerateTrip: React.FC = () => {
 
       console.log("Firestore Document Updated Successfully with ID:", docId);
 
-      navigation.navigate("Home");
+      await AsyncStorage.clear();
+      console.log("AsyncStorage cleared successfully.");
+
+      navigation.navigate("HomeMain");
     } catch (error: any) {
       console.error("AI generation failed:", error.message);
       if (retryCount < 3 && isMounted.current) {
-        const waitTime = Math.pow(2, retryCount) * 1000; // Exponential backoff
+        const waitTime = Math.pow(2, retryCount) * 1000;
         console.log(`Retrying in ${waitTime / 1000} seconds...`);
         setTimeout(() => {
           if (isMounted.current) {
-            GenerateAiTrip(retryCount + 1); // Retry with incremented count
+            GenerateAiTrip(retryCount + 1);
           }
         }, waitTime);
       } else {
@@ -91,7 +95,7 @@ const GenerateTrip: React.FC = () => {
           [
             {
               text: "OK",
-              onPress: () => navigation.navigate("Home"),
+              onPress: () => navigation.navigate("HomeMain"),
             },
           ]
         );
@@ -105,13 +109,13 @@ const GenerateTrip: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      isMounted.current = true; // Component is mounted
+      isMounted.current = true;
       GenerateAiTrip();
 
       return () => {
-        isMounted.current = false; // Cleanup function to set mounted to false
+        isMounted.current = false;
       };
-    }, []) // Empty dependency array ensures it only runs when the screen gains focus
+    }, [])
   );
 
   return (
@@ -143,7 +147,7 @@ const GenerateTrip: React.FC = () => {
           color: currentTheme.textSecondary,
         }}
       >
-        We are working to generate your dream trip
+        We are working on generating your dream trip
       </Text>
 
       <Image
@@ -165,7 +169,7 @@ const GenerateTrip: React.FC = () => {
           marginTop: 30,
         }}
       >
-        Do not go back
+        Please do not go back
       </Text>
     </View>
   );

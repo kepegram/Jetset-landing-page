@@ -60,7 +60,7 @@ const TripDetails: React.FC = () => {
             ); // Update path
             await deleteDoc(tripDocRef);
             console.log(`Trip with ID ${tripId} deleted successfully.`);
-            navigation.navigate("Home"); // Navigate to Home after deletion
+            navigation.navigate("HomeMain"); // Navigate to Home after deletion
           },
         },
       ]);

@@ -39,7 +39,7 @@ const Welcome: React.FC = () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }}
           >
-            <Text style={styles.buttonText}>Continue</Text>
+            <Text style={styles.buttonText}>Sign Up</Text>
           </Pressable>
 
           <Pressable

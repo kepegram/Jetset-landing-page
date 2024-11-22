@@ -4,11 +4,13 @@ import {
   Pressable,
   Text,
   ImageBackground,
+  StyleSheet,
 } from "react-native";
 import { useTheme } from "../../../context/themeContext";
 import React, { useState, useContext, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Dropdown } from "react-native-element-dropdown";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -41,8 +43,27 @@ const BuildTrip: React.FC = () => {
   const [startDate, setStartDate] = useState<Moment | undefined>();
   const [endDate, setEndDate] = useState<Moment | undefined>();
   const [tripName, setTripName] = useState<string>("");
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showSelectDates, setShowSelectDates] = useState(false);
+  const [items] = useState([
+    {
+      label: "Cheap",
+      desc: "Stay conscious of costs",
+      icon: "💵",
+      value: "Cheap",
+    },
+    {
+      label: "Moderate",
+      desc: "Keep cost on the average side",
+      icon: "💰",
+      value: "Moderate",
+    },
+    {
+      label: "Lavish",
+      desc: "Dont worry about cost",
+      icon: "💸",
+      value: "Lavish",
+    },
+  ]);
   const navigation = useNavigation<BuildTripNavigationProp>();
 
   useEffect(() => {
@@ -53,28 +74,60 @@ const BuildTrip: React.FC = () => {
     });
   }, [navigation]);
 
-  const isFormValid =
-    tripData.locationInfo && tripName && selectedOption !== null;
-
   useEffect(() => {
-    const loadDates = async () => {
+    const loadDatesAndTripName = async () => {
       const storedStartDate = await AsyncStorage.getItem("startDate");
       const storedEndDate = await AsyncStorage.getItem("endDate");
+      const storedTripName = await AsyncStorage.getItem("tripName");
       if (storedStartDate) {
         setStartDate(moment(storedStartDate));
       }
       if (storedEndDate) {
         setEndDate(moment(storedEndDate));
       }
+      if (storedTripName) {
+        setTripName(storedTripName);
+        setTripData({
+          ...tripData,
+          tripName: storedTripName,
+        });
+      }
     };
-    loadDates();
+    loadDatesAndTripName();
   }, []);
 
-  const handleOptionPress = (option: number) => {
-    if (option === 2) {
-      setShowSelectDates(true); // Show SelectDates component when option 2 is pressed
+  const handlePlaceSelect = (
+    data: any,
+    details: ExtendedGooglePlaceDetail | null
+  ) => {
+    setTripData({
+      locationInfo: {
+        name: data.description,
+        coordinates: details?.geometry.location,
+        photoRef: details?.photos?.[0]?.photo_reference,
+        url: details?.url,
+      },
+    });
+    console.log(tripData.locationInfo);
+  };
+
+  const handleTripNameChange = async (text: string) => {
+    setTripName(text);
+    setTripData({
+      ...tripData,
+      tripName: tripName,
+    });
+    await AsyncStorage.setItem("tripName", text);
+  };
+
+  const handleBudgetChoice = (option: string) => {
+    if (option === "Moderate") {
+      setShowSelectDates(true); // Show SelectDates component when option "Moderate" is pressed
     } else {
-      setSelectedOption(option);
+      setTripData({
+        ...tripData,
+        budget: option,
+      });
     }
   };
 
@@ -115,37 +168,29 @@ const BuildTrip: React.FC = () => {
     setShowSelectDates(false);
   };
 
-  const handleTripNameChange = async (text: string) => {
-    setTripName(text);
-    console.log(text);
-    await AsyncStorage.setItem("tripName", text);
-  };
-
-  const handleWhoIsGoingPress = (option: number) => {
-    setSelectedOption(option);
+  const handleWhoIsGoingPress = (option: string) => {
+    setTripData({
+      ...tripData,
+      whoIsGoing: option,
+    });
     console.log(
-      option === 1
+      option === "Solo"
         ? "Solo selected"
-        : option === 2
+        : option === "Couple"
         ? "Couple selected"
         : "Group selected"
     );
   };
 
-  const handlePlaceSelect = (
-    data: any,
-    details: ExtendedGooglePlaceDetail | null
-  ) => {
-    setTripData({
-      locationInfo: {
-        name: data.description,
-        coordinates: details?.geometry.location,
-        photoRef: details?.photos?.[0]?.photo_reference,
-        url: details?.url,
-      },
-    });
-    console.log(tripData.locationInfo);
-  };
+  const isFormValid =
+    tripData.locationInfo &&
+    tripName &&
+    tripData.budget !== null &&
+    startDate &&
+    endDate &&
+    tripData.whoIsGoing !== null;
+
+  const isPlaceSelected = !!tripData.locationInfo;
 
   return (
     <View style={{ flex: 1, backgroundColor: currentTheme.background }}>
@@ -215,8 +260,7 @@ const BuildTrip: React.FC = () => {
           },
           listView: {
             backgroundColor: currentTheme.background, // Ensure dropdown matches theme
-            zIndex: 1,
-            paddingLeft: 20,
+            zIndex: 99,
           },
         }}
       />
@@ -304,6 +348,45 @@ const BuildTrip: React.FC = () => {
           }}
         >
           <View style={{ width: "100%" }}>
+            {!isPlaceSelected && (
+              <View
+                style={[
+                  StyleSheet.absoluteFill,
+                  {
+                    backgroundColor: currentTheme.background,
+                    zIndex: 1,
+                  },
+                ]}
+              />
+            )}
+            <View style={{ width: "100%", marginBottom: 20 }}>
+              <Ionicons
+                name="map-outline"
+                size={20}
+                color={currentTheme.textSecondary}
+                style={{ position: "absolute", left: 10, top: 10 }}
+              />
+              <TextInput
+                placeholder="Trip Name"
+                placeholderTextColor={currentTheme.textSecondary}
+                onChangeText={handleTripNameChange}
+                onFocus={() => setFocusedInput(4)}
+                onBlur={() => setFocusedInput(null)}
+                style={{
+                  height: 50,
+                  borderBottomColor:
+                    focusedInput === 4
+                      ? currentTheme.alternate
+                      : currentTheme.accentBackground,
+                  borderBottomWidth: focusedInput === 4 ? 2 : 1,
+                  paddingLeft: 40, // Adjusted padding to avoid overlap with the icon
+                  width: "100%",
+                  color: currentTheme.textSecondary,
+                }}
+                editable={isPlaceSelected} // Disable input if place is not selected
+                value={tripName} // Ensure the trip name persists
+              />
+            </View>
             <View style={{ width: "100%", marginBottom: 20 }}>
               <Ionicons
                 name="calendar-outline"
@@ -326,15 +409,17 @@ const BuildTrip: React.FC = () => {
                   paddingLeft: 40,
                   width: "100%",
                   position: "relative",
+                  color: currentTheme.textSecondary,
                 }}
                 value={
                   startDate && endDate
                     ? `${startDate.format("MM/DD/YYYY")} - ${endDate.format(
                         "MM/DD/YYYY"
                       )}`
-                    : undefined
+                    : ""
                 } // Set the input value for startDate-endDate
-                onPress={() => handleOptionPress(2)} // Handle press for option 2
+                onPress={() => handleBudgetChoice("Moderate")} // Handle press for option "Moderate"
+                editable={isPlaceSelected} // Disable input if place is not selected
               />
             </View>
             <View style={{ width: "100%", marginBottom: 20 }}>
@@ -342,100 +427,195 @@ const BuildTrip: React.FC = () => {
                 name="wallet-outline"
                 size={20}
                 color={currentTheme.textSecondary}
-                style={{ position: "absolute", left: 10, top: 10 }}
+                style={{ position: "absolute", left: 10, top: 10, zIndex: 99 }}
               />
-              <TextInput
+              <Dropdown
+                data={items}
+                labelField="label"
+                valueField="value"
                 placeholder="Budget?"
-                placeholderTextColor={currentTheme.textSecondary}
-                onFocus={() => setFocusedInput(3)}
-                onBlur={() => setFocusedInput(null)}
                 style={{
-                  height: 50,
                   borderBottomColor:
                     focusedInput === 3
                       ? currentTheme.alternate
                       : currentTheme.accentBackground,
                   borderBottomWidth: focusedInput === 3 ? 2 : 1,
-                  paddingLeft: 40,
-                  width: "100%",
-                  position: "relative",
+                  paddingBottom: 10,
                 }}
-              />
-            </View>
-            <View style={{ width: "100%", marginBottom: 20 }}>
-              <TextInput
-                placeholder="Trip Name"
-                placeholderTextColor={currentTheme.textSecondary}
-                onChangeText={handleTripNameChange}
-                onFocus={() => setFocusedInput(4)}
-                onBlur={() => setFocusedInput(null)}
-                style={{
-                  height: 50,
+                placeholderStyle={{
+                  color: currentTheme.textSecondary,
+                  fontSize: 13,
+                  paddingLeft: 40,
+                  paddingTop: 12,
+                  paddingBottom: 10,
+                }}
+                value={
+                  items.find((item) => item.value === tripData.budget) || null
+                } // Find the item object
+                onChange={(item) => {
+                  setTripData({
+                    ...tripData,
+                    budget: item.value,
+                  });
+                  setFocusedInput(null);
+                }}
+                containerStyle={{
+                  width: "100%",
+                  backgroundColor: currentTheme.background,
                   borderBottomColor:
-                    focusedInput === 4
+                    focusedInput === 3
                       ? currentTheme.alternate
                       : currentTheme.accentBackground,
-                  borderBottomWidth: focusedInput === 4 ? 2 : 1,
-                  paddingLeft: 10,
-                  width: "100%",
+                  borderBottomWidth: focusedInput === 3 ? 2 : 1,
+                  borderWidth: 0, // Remove other borders
                 }}
+                selectedTextStyle={{
+                  color: currentTheme.textSecondary,
+                  fontSize: 13,
+                  paddingLeft: 40,
+                  paddingTop: 12,
+                  paddingBottom: 10,
+                }}
+                itemTextStyle={{
+                  color: currentTheme.textSecondary,
+                  paddingTop: 12,
+                }}
+                onFocus={() => setFocusedInput(3)}
+                onBlur={() => setFocusedInput(null)}
+                disable={!isPlaceSelected} // Use 'disable' instead of 'disabled'
               />
             </View>
-            <Text
-              style={{
-                color: currentTheme.textPrimary,
-                marginBottom: 20,
-                alignSelf: "flex-start",
-              }}
-            >
-              Who's going?
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                alignSelf: "center",
-                justifyContent: "space-between",
-                width: "80%",
-                marginBottom: 20,
-              }}
-            >
-              {[1, 2, 3].map((option) => (
+
+            <View style={{ width: "100%", marginBottom: 20 }}>
+              <Ionicons
+                name="people-outline"
+                size={20}
+                color={currentTheme.textSecondary}
+                style={{ position: "absolute", left: 10, top: 10 }}
+              />
+              <Text
+                style={{
+                  color: currentTheme.textSecondary,
+                  marginBottom: 30,
+                  alignSelf: "flex-start",
+                  paddingLeft: 40,
+                  paddingTop: 10,
+                }}
+              >
+                Who's going?
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignSelf: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
                 <Pressable
-                  key={option}
-                  onPress={() => handleWhoIsGoingPress(option)} // Use the new handler
+                  onPress={() => handleWhoIsGoingPress("Solo")}
                   style={{
                     borderColor: currentTheme.alternate,
                     borderWidth: 1,
                     paddingVertical: 8,
                     borderRadius: 5,
                     backgroundColor:
-                      selectedOption === option
+                      tripData.whoIsGoing === "Solo"
                         ? currentTheme.alternate
                         : currentTheme.background,
                     flex: 1,
                     marginHorizontal: 5,
                   }}
+                  disabled={!isPlaceSelected} // Disable button if place is not selected
                 >
                   <Text
                     style={{
                       color:
-                        selectedOption === option
+                        tripData.whoIsGoing === "Solo"
                           ? "white"
                           : currentTheme.textPrimary,
                       textAlign: "center",
                     }}
                   >
-                    {option === 1
-                      ? "Solo"
-                      : option === 2
-                      ? "Couple"
-                      : "Group (3+)"}
+                    Solo
                   </Text>
                 </Pressable>
-              ))}
+                <Pressable
+                  onPress={() => handleWhoIsGoingPress("Couple")}
+                  style={{
+                    borderColor: currentTheme.alternate,
+                    borderWidth: 1,
+                    paddingVertical: 8,
+                    borderRadius: 5,
+                    backgroundColor:
+                      tripData.whoIsGoing === "Couple"
+                        ? currentTheme.alternate
+                        : currentTheme.background,
+                    flex: 1,
+                    marginHorizontal: 5,
+                  }}
+                  disabled={!isPlaceSelected} // Disable button if place is not selected
+                >
+                  <Text
+                    style={{
+                      color:
+                        tripData.whoIsGoing === "Couple"
+                          ? "white"
+                          : currentTheme.textPrimary,
+                      textAlign: "center",
+                    }}
+                  >
+                    Couple
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => handleWhoIsGoingPress("Group")}
+                  style={{
+                    borderColor: currentTheme.alternate,
+                    borderWidth: 1,
+                    paddingVertical: 8,
+                    borderRadius: 5,
+                    backgroundColor:
+                      tripData.whoIsGoing === "Group"
+                        ? currentTheme.alternate
+                        : currentTheme.background,
+                    flex: 1,
+                    marginHorizontal: 5,
+                  }}
+                  disabled={!isPlaceSelected} // Disable button if place is not selected
+                >
+                  <Text
+                    style={{
+                      color:
+                        tripData.whoIsGoing === "Group"
+                          ? "white"
+                          : currentTheme.textPrimary,
+                      textAlign: "center",
+                    }}
+                  >
+                    Group (3+)
+                  </Text>
+                </Pressable>
+              </View>
             </View>
             <Pressable
-              onPress={() => navigation.navigate("ReviewTrip")}
+              onPress={() => {
+                navigation.navigate("ReviewTrip");
+                console.log(
+                  "LOCATION",
+                  tripData.locationInfo,
+                  "TRIP NAME",
+                  tripData.tripName,
+                  "START DATE",
+                  tripData.startDate,
+                  "END DATE",
+                  tripData.endDate,
+                  "BUDGET",
+                  tripData.budget,
+                  "WHO IS GOING",
+                  tripData.whoIsGoing
+                );
+              }}
               style={{
                 backgroundColor: isFormValid
                   ? currentTheme.alternate

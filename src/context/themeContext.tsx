@@ -9,7 +9,7 @@ import { Appearance } from "react-native";
 import { FIREBASE_DB } from "../../firebase.config";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { lightTheme, darkTheme } from "../constants/theme";
+import { lightTheme, darkTheme } from "../theme/theme";
 
 type Theme = "light" | "dark"; // Define a union type for themes
 

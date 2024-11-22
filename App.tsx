@@ -1,3 +1,4 @@
+import "react-native-get-random-values";
 import React, { useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import { StatusBar } from "expo-status-bar";
