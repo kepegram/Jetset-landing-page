@@ -89,7 +89,7 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
           color: currentTheme.textSecondary,
         }}
       >
-        Price: ${flightData.price}
+        Price: ${flightData.price} (approx.)
       </Text>
     </View>
   );

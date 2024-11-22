@@ -16,11 +16,7 @@ type ReviewTripScreenNavigationProp = NativeStackNavigationProp<
 const ReviewTrip: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<ReviewTripScreenNavigationProp>();
-  const { tripData, setTripData } = useContext(CreateTripContext);
-
-  useEffect(() => {
-    console.log(tripData?.locationInfo?.name);
-  }, [tripData]);
+  const { tripData } = useContext(CreateTripContext);
 
   return (
     <View
@@ -85,42 +81,6 @@ const ReviewTrip: React.FC = () => {
               }}
             >
               {tripData?.locationInfo?.name}
-            </Text>
-          </View>
-        </View>
-
-        {/* Origin Info */}
-        <View
-          style={{
-            marginTop: 25,
-            display: "flex",
-            flexDirection: "row",
-            gap: 20,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 30,
-            }}
-          >
-            🌍
-          </Text>
-          <View>
-            <Text
-              style={{
-                fontSize: 17,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              Origin
-            </Text>
-            <Text
-              style={{
-                fontSize: 20,
-                color: currentTheme.textPrimary,
-              }}
-            >
-              {tripData?.locationFromInfo?.name}
             </Text>
           </View>
         </View>

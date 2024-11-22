@@ -3,9 +3,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { SetBudgetOptions } from "../../../constants/options";
 import OptionCard from "../../../components/createTrip/optionCard";
 import { CreateTripContext } from "../../../context/createTripContext";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../navigation/appNav";
-import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
 
 // Define the type for each item in the SetBudgetOptions
@@ -16,14 +13,8 @@ interface BudgetOption {
   icon: string;
 }
 
-type SetBudgetScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "SetBudget"
->;
-
 const SetBudget: React.FC = () => {
   const { currentTheme } = useTheme();
-  const navigation = useNavigation<SetBudgetScreenNavigationProp>();
   const [selectedOption, setSelectedOption] = useState<
     BudgetOption | undefined
   >();
@@ -43,7 +34,6 @@ const SetBudget: React.FC = () => {
       alert("Select Your Budget");
       return;
     }
-    navigation.navigate("ReviewTrip");
   };
 
   return (

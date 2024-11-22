@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Alert, Image, Pressable, Text } from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
@@ -24,24 +24,17 @@ import Settings from "../screens/main/userScreens/settings";
 import ChangePassword from "../screens/main/userScreens/changePassword";
 import AppTheme from "../screens/main/userScreens/appTheme";
 import DeleteAccount from "../screens/main/userScreens/deleteAccount";
-import SearchPlace from "../screens/main/buildTripScreens/searchPlace";
-import SelectTraveler from "../screens/main/buildTripScreens/selectTraveler";
-import SelectDates from "../screens/main/buildTripScreens/selectDates";
-import SetBudget from "../screens/main/buildTripScreens/setBudget";
+import BuildTrip from "../screens/main/buildTripScreens/buildTrip";
 import ReviewTrip from "../screens/main/buildTripScreens/reviewTrip";
 import GenerateTrip from "../screens/main/buildTripScreens/generateTrip";
 import TripDetails from "../screens/main/tripDetailScreen/tripDetails";
-import BuildTrip from "../screens/main/buildTripScreens/buildTrip";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Define types for root stack params
 export type RootStackParamList = {
   App: undefined;
-  Home: undefined;
-  SearchPlace: undefined;
+  HomeMain: undefined;
   BuildTrip: undefined;
-  SelectTraveler: undefined;
-  SelectDates: undefined;
-  SetBudget: undefined;
   ReviewTrip: undefined;
   GenerateTrip: undefined;
   TripDetails: { trip: string };
@@ -118,7 +111,7 @@ const HomeStack: React.FC = () => {
               },
               {
                 text: "Confirm",
-                onPress: () => navigation.navigate("Home"),
+                onPress: () => navigation.navigate("HomeMain"),
               },
             ]
           );
@@ -141,17 +134,9 @@ const HomeStack: React.FC = () => {
   return (
     <RootStack.Navigator>
       <RootStack.Screen
-        name="Home"
+        name="HomeMain"
         component={Home}
         options={{ headerShown: false }}
-      />
-      <RootStack.Screen
-        name="SearchPlace"
-        component={SearchPlace}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "",
-        })}
       />
       <RootStack.Screen
         name="BuildTrip"
@@ -159,9 +144,16 @@ const HomeStack: React.FC = () => {
         options={{
           headerLeft: () => {
             const navigation = useNavigation();
+            const { setTripData } = useContext(CreateTripContext); // Import the context
+
             return (
               <Pressable
-                onPress={() => navigation.goBack()} // Navigate back
+                onPress={async () => {
+                  setTripData({}); // Clear all tripData from context
+                  await AsyncStorage.removeItem("startDate"); // Clear startDate from AsyncStorage
+                  await AsyncStorage.removeItem("endDate"); // Clear endDate from AsyncStorage
+                  navigation.goBack(); // Navigate back
+                }}
                 style={{
                   width: 40,
                   height: 40,
@@ -177,30 +169,6 @@ const HomeStack: React.FC = () => {
           },
           headerShown: false, // Ensure the header is shown
         }}
-      />
-      <RootStack.Screen
-        name="SelectTraveler"
-        component={SelectTraveler}
-        options={({ navigation }) => ({
-          ...tripBuilderScreenOptions({ navigation }),
-          title: "",
-        })}
-      />
-      <RootStack.Screen
-        name="SelectDates"
-        component={SelectDates}
-        options={({ navigation }) => ({
-          ...tripBuilderScreenOptions({ navigation }),
-          title: "",
-        })}
-      />
-      <RootStack.Screen
-        name="SetBudget"
-        component={SetBudget}
-        options={({ navigation }) => ({
-          ...tripBuilderScreenOptions({ navigation }),
-          title: "",
-        })}
       />
       <RootStack.Screen
         name="ReviewTrip"
@@ -382,7 +350,7 @@ const TabNavigator: React.FC = () => {
     >
       {/* Home Tab */}
       <Tab.Screen
-        name="Home"
+        name="HomeTab"
         component={HomeStack}
         options={({ route }) => {
           const tabBarStyle = {

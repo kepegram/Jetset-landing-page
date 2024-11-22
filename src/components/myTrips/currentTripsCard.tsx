@@ -13,7 +13,7 @@ type NavigationProp = NativeStackNavigationProp<
   "TripDetails"
 >;
 
-interface UserTripMainCardProps {
+interface CurrentTripsCardProps {
   userTrips: Array<{
     tripData: string;
     tripPlan: string;
@@ -22,7 +22,7 @@ interface UserTripMainCardProps {
   onTripDeleted: () => void;
 }
 
-const UserTripMainCard: React.FC<UserTripMainCardProps> = ({
+const CurrentTripsCard: React.FC<CurrentTripsCardProps> = ({
   userTrips,
   onTripDeleted,
 }) => {
@@ -129,4 +129,4 @@ const UserTripMainCard: React.FC<UserTripMainCardProps> = ({
   );
 };
 
-export default UserTripMainCard;
+export default CurrentTripsCard;

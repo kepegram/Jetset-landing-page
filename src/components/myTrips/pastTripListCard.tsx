@@ -11,7 +11,7 @@ type NavigationProp = NativeStackNavigationProp<
   "TripDetails"
 >;
 
-interface UserTripListCardProps {
+interface PastTripListCardProps {
   trip: {
     tripData: string;
     tripPlan: string;
@@ -19,7 +19,7 @@ interface UserTripListCardProps {
   };
 }
 
-const UserTripListCard: React.FC<UserTripListCardProps> = ({ trip }) => {
+const PastTripListCard: React.FC<PastTripListCardProps> = ({ trip }) => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
 
@@ -126,14 +126,16 @@ const UserTripListCard: React.FC<UserTripListCardProps> = ({ trip }) => {
         style={{
           fontFamily: "outfit-medium",
           fontSize: 18,
-          color: currentTheme.textPrimary,
+          color: currentTheme.textSecondary,
           textAlign: "center",
         }}
       >
+        None.
+        {"\n"}
         Start Booking Today!
       </Text>
     </View>
   );
 };
 
-export default UserTripListCard;
+export default PastTripListCard;

@@ -9,7 +9,6 @@ import { doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   Text,
   View,
@@ -17,12 +16,12 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
-import UserTripMainCard from "../../../components/myTrips/userTripMainCard";
-import UserTripListCard from "../../../components/myTrips/userTripListCard"; // Import UserTripListCard
+import CurrentTripsCard from "../../../components/myTrips/currentTripsCard";
+import PastTripListCard from "../../../components/myTrips/pastTripListCard"; // Import UserTripListCard
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "Home"
+  "HomeMain"
 >;
 
 const Home: React.FC = () => {
@@ -121,10 +120,14 @@ const Home: React.FC = () => {
         </Text>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Pressable onPress={() => console.log("TODO")}>
-            <Ionicons name="search" size={40} color={currentTheme.icon} />
+            <Ionicons
+              name="search-circle-sharp"
+              size={55}
+              color={currentTheme.icon}
+            />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate("SearchPlace")}>
-            <Ionicons name="add-circle" size={40} color={currentTheme.icon} />
+          <Pressable onPress={() => navigation.navigate("BuildTrip")}>
+            <Ionicons name="add-circle" size={50} color={currentTheme.icon} />
           </Pressable>
         </View>
       </View>
@@ -148,7 +151,7 @@ const Home: React.FC = () => {
             data={sortedTrips}
             horizontal
             renderItem={({ item }) => (
-              <UserTripMainCard userTrips={[item]} onTripDeleted={GetMyTrips} />
+              <CurrentTripsCard userTrips={[item]} onTripDeleted={GetMyTrips} />
             )}
             keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
@@ -171,7 +174,7 @@ const Home: React.FC = () => {
             }
 
             return (
-              <UserTripListCard
+              <PastTripListCard
                 trip={{
                   tripData: trip.tripData,
                   tripPlan: trip.tripPlan,
