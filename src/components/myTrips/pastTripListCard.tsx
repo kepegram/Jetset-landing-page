@@ -119,23 +119,8 @@ const PastTripListCard: React.FC<PastTripListCardProps> = ({ trip }) => {
     );
   }
 
-  // If no past trips, show message
-  return (
-    <View style={{ marginTop: 20 }}>
-      <Text
-        style={{
-          fontFamily: "outfit-medium",
-          fontSize: 18,
-          color: currentTheme.textSecondary,
-          textAlign: "center",
-        }}
-      >
-        None.
-        {"\n"}
-        Start Booking Today!
-      </Text>
-    </View>
-  );
+  // If no past trips, display nothing
+  return null;
 };
 
 export default PastTripListCard;

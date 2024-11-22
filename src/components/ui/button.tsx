@@ -5,7 +5,7 @@ import {
   StyleSheet,
   GestureResponderEvent,
 } from "react-native";
-import { useTheme } from "../context/themeContext";
+import { useTheme } from "../../context/themeContext";
 
 type ButtonProps = {
   buttonText: string;
@@ -17,10 +17,7 @@ const Button: React.FC<ButtonProps> = ({ buttonText, onPress }) => {
 
   return (
     <Pressable
-      style={[
-        styles.button,
-        { borderColor: currentTheme.primary },
-      ]}
+      style={[styles.button, { borderColor: currentTheme.primary }]}
       onPress={onPress}
     >
       <Text style={[styles.buttonText, { color: currentTheme.textPrimary }]}>

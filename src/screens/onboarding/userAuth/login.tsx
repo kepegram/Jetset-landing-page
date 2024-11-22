@@ -54,7 +54,6 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
       console.log(response);
-      navigation.navigate("AppTabNav");
     } catch (err) {
       console.log(err);
       setErrorMessage(

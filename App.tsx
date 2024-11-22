@@ -30,7 +30,7 @@ export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
-  AppTabNav: undefined;
+  AppNav: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -136,7 +136,7 @@ const App: React.FC = () => {
         <Stack.Navigator initialRouteName="Welcome">
           {user ? (
             <Stack.Screen
-              name="AppTabNav"
+              name="AppNav"
               component={AppNav}
               options={{ headerShown: false }}
             />

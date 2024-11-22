@@ -161,7 +161,7 @@ const TripDetails: React.FC = () => {
             color: currentTheme.textSecondary,
           }}
         >
-          Traveling as: {tripDetails?.traveler?.title || "Unknown"}
+          Traveling as: {tripDetails?.whoIsGoing || "Unknown"}
         </Text>
 
         {tripDetails?.travelPlan?.flights?.map((flight, index) => (
@@ -172,7 +172,7 @@ const TripDetails: React.FC = () => {
         <HotelList hotelList={tripDetails?.travelPlan?.hotels || []} />
 
         {/* Planned Trip */}
-        <PlannedTrip details={tripDetails?.travelPlan?.itinerary || {}} />
+        <PlannedTrip details={tripDetails?.travelPlan || {}} />
       </View>
     </ScrollView>
   );

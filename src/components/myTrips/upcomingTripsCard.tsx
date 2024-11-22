@@ -48,7 +48,7 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
     .sort((a, b) => {
       const dateA = moment(a.parsedTripData.startDate);
       const dateB = moment(b.parsedTripData.startDate);
-      return dateA.diff(today) - dateB.diff(today);
+      return dateA.diff(dateB);
     });
 
   const LatestTrip = sortedTrips[0]?.parsedTripData;
@@ -103,7 +103,17 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
             color: currentTheme.textPrimary,
           }}
         >
-          {LatestTrip?.locationInfo?.name || "No Location Available"}
+          {LatestTrip?.tripName || "No Location Available"}
+        </Text>
+        <Text
+          style={{
+            fontFamily: "outfit",
+            fontSize: 20,
+            color: currentTheme.textSecondary,
+            marginTop: 5,
+          }}
+        >
+          {LatestTrip?.locationInfo?.name || "No Location Name"}
         </Text>
         <View
           style={{

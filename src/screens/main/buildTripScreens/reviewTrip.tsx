@@ -239,7 +239,7 @@ const ReviewTrip: React.FC = () => {
         style={{
           padding: 15,
           backgroundColor: currentTheme.alternate,
-          borderRadius: 15,
+          borderRadius: 5,
           marginTop: 50,
         }}
       >

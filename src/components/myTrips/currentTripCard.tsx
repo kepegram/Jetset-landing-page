@@ -38,8 +38,19 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
     return data; // Already an object
   };
 
-  const CurrentTrip = parseData(userTrips[userTrips.length - 1]?.tripData);
-  const CurrentPlan = parseData(userTrips[userTrips.length - 1]?.tripPlan);
+  const today = moment().startOf("day");
+
+  const currentTrip = userTrips.find((trip) => {
+    const tripData = parseData(trip.tripData);
+    const startDate = moment(tripData.startDate).startOf("day");
+    const endDate = moment(tripData.endDate).endOf("day");
+    return startDate.isSame(today) && today.isBefore(endDate);
+  });
+
+  if (!currentTrip) return null;
+
+  const CurrentTrip = parseData(currentTrip.tripData);
+  const CurrentPlan = parseData(currentTrip.tripPlan);
 
   return (
     <View style={{ marginVertical: 20, width: "100%" }}>

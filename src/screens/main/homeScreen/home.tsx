@@ -94,6 +94,11 @@ const Home: React.FC = () => {
     return startDate.isSame(today) && today.isBefore(endDate);
   });
 
+  const pastTrips = userTrips.filter((trip) => {
+    const endDate = moment(trip.tripData.endDate).endOf("day");
+    return endDate.isBefore(today);
+  });
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -102,6 +107,7 @@ const Home: React.FC = () => {
         backgroundColor: currentTheme.background,
         flexGrow: 1,
       }}
+      showsVerticalScrollIndicator={false}
     >
       <View
         style={{
@@ -180,32 +186,36 @@ const Home: React.FC = () => {
             showsHorizontalScrollIndicator={false}
           />
 
-          <Text
-            style={{
-              fontFamily: "outfit-bold",
-              fontSize: 24,
-              color: currentTheme.textPrimary,
-              marginTop: 20,
-            }}
-          >
-            Past Trips
-          </Text>
-          {userTrips.map((trip, index) => {
-            if (!trip || !trip.tripData || !trip.tripPlan) {
-              console.warn(`Skipping invalid trip at index ${index}:`, trip);
-              return null;
-            }
-            return (
-              <PastTripListCard
-                trip={{
-                  tripData: trip.tripData,
-                  tripPlan: trip.tripPlan,
-                  id: trip.id,
+          {pastTrips.length > 0 && (
+            <>
+              <Text
+                style={{
+                  fontFamily: "outfit-bold",
+                  fontSize: 24,
+                  color: currentTheme.textPrimary,
+                  marginTop: 20,
                 }}
-                key={index}
-              />
-            );
-          })}
+              >
+                Past Trips
+              </Text>
+              {pastTrips.map((trip, index) => {
+                if (!trip || !trip.tripData || !trip.tripPlan) {
+                  console.warn(`Skipping invalid trip at index ${index}:`, trip);
+                  return null;
+                }
+                return (
+                  <PastTripListCard
+                    trip={{
+                      tripData: trip.tripData,
+                      tripPlan: trip.tripPlan,
+                      id: trip.id,
+                    }}
+                    key={index}
+                  />
+                );
+              })}
+            </>
+          )}
         </View>
       )}
     </ScrollView>

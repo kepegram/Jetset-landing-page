@@ -51,7 +51,7 @@ const StartNewTripCard: React.FC<StartNewTripCardProps> = ({ navigation }) => {
         </Text>
 
         <Pressable
-          onPress={() => navigation.navigate("SearchPlace")}
+          onPress={() => navigation.navigate("BuildTrip")}
           style={{
             padding: 15,
             backgroundColor: currentTheme.alternate,

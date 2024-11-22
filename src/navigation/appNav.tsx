@@ -30,7 +30,6 @@ import GenerateTrip from "../screens/main/buildTripScreens/generateTrip";
 import TripDetails from "../screens/main/tripDetailScreen/tripDetails";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Define types for root stack params
 export type RootStackParamList = {
   App: undefined;
   HomeMain: undefined;
@@ -46,13 +45,11 @@ export type RootStackParamList = {
   DeleteAccount: undefined;
 };
 
-// Create the main root stack
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 const HomeStack: React.FC = () => {
   const { currentTheme } = useTheme();
 
-  // Custom options for TripBuilder screens
   const tripBuilderScreenOptions = ({
     navigation,
   }: {
@@ -85,7 +82,10 @@ const HomeStack: React.FC = () => {
               },
               {
                 text: "Confirm",
-                onPress: () => navigation.navigate("HomeMain"),
+                onPress: async () => {
+                  await AsyncStorage.clear();
+                  navigation.navigate("BuildTrip");
+                },
               },
             ]
           );
@@ -118,23 +118,20 @@ const HomeStack: React.FC = () => {
         options={{
           headerLeft: () => {
             const navigation = useNavigation();
-            const { setTripData } = useContext(CreateTripContext); // Import the context
+            const { setTripData } = useContext(CreateTripContext);
 
             return (
               <Pressable
                 onPress={async () => {
-                  setTripData({}); // Clear all tripData from context
-                  await AsyncStorage.removeItem("startDate"); // Clear startDate from AsyncStorage
-                  await AsyncStorage.removeItem("endDate"); // Clear endDate from AsyncStorage
-                  await AsyncStorage.removeItem("tripName"); // Clear tripName from AsyncStorage
-                  await AsyncStorage.removeItem("whoIsGoing"); // Clear whoIsGoing from AsyncStorage
-                  navigation.goBack(); // Navigate back
+                  setTripData({});
+                  await AsyncStorage.clear();
+                  navigation.goBack();
                 }}
                 style={{
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent grey background
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
@@ -143,7 +140,7 @@ const HomeStack: React.FC = () => {
               </Pressable>
             );
           },
-          headerShown: false, // Ensure the header is shown
+          headerShown: false,
         }}
       />
       <RootStack.Screen
@@ -167,12 +164,12 @@ const HomeStack: React.FC = () => {
             const navigation = useNavigation();
             return (
               <Pressable
-                onPress={() => navigation.goBack()} // Navigate back
+                onPress={() => navigation.goBack()}
                 style={{
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent grey background
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
@@ -181,7 +178,7 @@ const HomeStack: React.FC = () => {
               </Pressable>
             );
           },
-          headerShown: false, // Ensure the header is shown
+          headerShown: false,
         }}
       />
     </RootStack.Navigator>
@@ -217,7 +214,6 @@ const ProfileStack: React.FC = () => {
     },
   });
 
-  // Custom options for Profile screens
   const profileScreenOptions = ({
     navigation,
   }: {
@@ -324,7 +320,6 @@ const TabNavigator: React.FC = () => {
         tabBarInactiveTintColor: currentTheme.inactiveTabIcon,
       }}
     >
-      {/* Home Tab */}
       <Tab.Screen
         name="HomeTab"
         component={HomeStack}
@@ -346,8 +341,6 @@ const TabNavigator: React.FC = () => {
           } as BottomTabNavigationOptions;
         }}
       />
-
-      {/* Profile Tab */}
       <Tab.Screen
         name="ProfileStack"
         component={ProfileStack}
@@ -379,7 +372,6 @@ const TabNavigator: React.FC = () => {
   );
 };
 
-// Root Navigator Component
 const AppNav: React.FC = () => {
   const { theme } = useTheme();
   const [tripData, setTripData] = useState<any>([]);

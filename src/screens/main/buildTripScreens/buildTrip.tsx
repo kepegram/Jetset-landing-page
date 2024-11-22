@@ -44,6 +44,7 @@ const BuildTrip: React.FC = () => {
   const [endDate, setEndDate] = useState<Moment | undefined>();
   const [tripName, setTripName] = useState<string>("");
   const [showSelectDates, setShowSelectDates] = useState(false);
+  const [photoRef, setPhotoRef] = useState<string | null>(null);
   const [items] = useState([
     {
       label: "Cheap",
@@ -79,6 +80,7 @@ const BuildTrip: React.FC = () => {
       const storedStartDate = await AsyncStorage.getItem("startDate");
       const storedEndDate = await AsyncStorage.getItem("endDate");
       const storedTripName = await AsyncStorage.getItem("tripName");
+      const storedPhotoRef = await AsyncStorage.getItem("photoRef");
       if (storedStartDate) {
         setStartDate(moment(storedStartDate));
       }
@@ -92,22 +94,30 @@ const BuildTrip: React.FC = () => {
           tripName: storedTripName,
         });
       }
+      if (storedPhotoRef) {
+        setPhotoRef(storedPhotoRef);
+      }
     };
     loadDatesAndTripName();
   }, []);
 
-  const handlePlaceSelect = (
+  const handlePlaceSelect = async (
     data: any,
     details: ExtendedGooglePlaceDetail | null
   ) => {
+    const photoReference = details?.photos?.[0]?.photo_reference || null;
     setTripData({
       locationInfo: {
         name: data.description,
         coordinates: details?.geometry.location,
-        photoRef: details?.photos?.[0]?.photo_reference,
+        photoRef: photoReference,
         url: details?.url,
       },
     });
+    if (photoReference) {
+      await AsyncStorage.setItem("photoRef", photoReference);
+      setPhotoRef(photoReference);
+    }
     console.log(tripData.locationInfo);
   };
 
@@ -122,7 +132,7 @@ const BuildTrip: React.FC = () => {
 
   const handleBudgetChoice = (option: string) => {
     if (option === "Moderate") {
-      setShowSelectDates(true); // Show SelectDates component when option "Moderate" is pressed
+      setShowSelectDates(true);
     } else {
       setTripData({
         ...tripData,
@@ -143,13 +153,11 @@ const BuildTrip: React.FC = () => {
   };
 
   const OnDateSelectionContinue = () => {
-    // Check if both startDate and endDate are selected
     if (!startDate || !endDate) {
       alert("Please select Start and End Date");
       return;
     }
 
-    // Ensure that endDate is after startDate before calculating
     if (endDate.isBefore(startDate)) {
       alert("End date cannot be before start date");
       return;
@@ -164,7 +172,6 @@ const BuildTrip: React.FC = () => {
       totalNoOfDays: totalNoOfDays + 1,
     });
 
-    // Close the CalendarPicker
     setShowSelectDates(false);
   };
 
@@ -196,9 +203,9 @@ const BuildTrip: React.FC = () => {
     <View style={{ flex: 1, backgroundColor: currentTheme.background }}>
       <ImageBackground
         source={{
-          uri: tripData.locationInfo?.photoRef
-            ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripData.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
-            : require("../../../assets/placeholder.jpeg"), // Use placeholder.jpg instead of undefined
+          uri: photoRef
+            ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+            : require("../../../assets/placeholder.jpeg"),
         }}
         style={{
           width: "100%",
@@ -245,9 +252,9 @@ const BuildTrip: React.FC = () => {
           textInputContainer: {
             alignSelf: "center",
             width: "90%",
-            position: "absolute", // Changed to absolute positioning
-            top: -60, // Adjusted to position it above the text inputs
-            zIndex: 1, // Ensure it appears above other components
+            position: "absolute",
+            top: -60,
+            zIndex: 1,
           },
           textInput: {
             height: 50,
@@ -259,13 +266,13 @@ const BuildTrip: React.FC = () => {
             color: "#1faadb",
           },
           listView: {
-            backgroundColor: currentTheme.background, // Ensure dropdown matches theme
+            backgroundColor: currentTheme.background,
             zIndex: 99,
           },
         }}
       />
 
-      {showSelectDates ? ( // Render SelectDates component if showSelectDates is true
+      {showSelectDates ? (
         <View style={{ padding: 30, marginBottom: 170 }}>
           <View
             style={{
@@ -379,12 +386,12 @@ const BuildTrip: React.FC = () => {
                       ? currentTheme.alternate
                       : currentTheme.accentBackground,
                   borderBottomWidth: focusedInput === 4 ? 2 : 1,
-                  paddingLeft: 40, // Adjusted padding to avoid overlap with the icon
+                  paddingLeft: 40,
                   width: "100%",
                   color: currentTheme.textSecondary,
                 }}
-                editable={isPlaceSelected} // Disable input if place is not selected
-                value={tripName} // Ensure the trip name persists
+                editable={isPlaceSelected}
+                value={tripName}
               />
             </View>
             <View style={{ width: "100%", marginBottom: 20 }}>
@@ -417,9 +424,9 @@ const BuildTrip: React.FC = () => {
                         "MM/DD/YYYY"
                       )}`
                     : ""
-                } // Set the input value for startDate-endDate
-                onPress={() => handleBudgetChoice("Moderate")} // Handle press for option "Moderate"
-                editable={isPlaceSelected} // Disable input if place is not selected
+                }
+                onPress={() => handleBudgetChoice("Moderate")}
+                editable={isPlaceSelected}
               />
             </View>
             <View style={{ width: "100%", marginBottom: 20 }}>
@@ -427,7 +434,7 @@ const BuildTrip: React.FC = () => {
                 name="wallet-outline"
                 size={20}
                 color={currentTheme.textSecondary}
-                style={{ position: "absolute", left: 10, top: 10, zIndex: 99 }}
+                style={{ position: "absolute", left: 10, top: 10 }}
               />
               <Dropdown
                 data={items}
@@ -451,7 +458,7 @@ const BuildTrip: React.FC = () => {
                 }}
                 value={
                   items.find((item) => item.value === tripData.budget) || null
-                } // Find the item object
+                }
                 onChange={(item) => {
                   setTripData({
                     ...tripData,
@@ -467,7 +474,7 @@ const BuildTrip: React.FC = () => {
                       ? currentTheme.alternate
                       : currentTheme.accentBackground,
                   borderBottomWidth: focusedInput === 3 ? 2 : 1,
-                  borderWidth: 0, // Remove other borders
+                  borderWidth: 0,
                 }}
                 selectedTextStyle={{
                   color: currentTheme.textSecondary,
@@ -482,7 +489,7 @@ const BuildTrip: React.FC = () => {
                 }}
                 onFocus={() => setFocusedInput(3)}
                 onBlur={() => setFocusedInput(null)}
-                disable={!isPlaceSelected} // Use 'disable' instead of 'disabled'
+                disable={!isPlaceSelected}
               />
             </View>
 
@@ -526,7 +533,7 @@ const BuildTrip: React.FC = () => {
                     flex: 1,
                     marginHorizontal: 5,
                   }}
-                  disabled={!isPlaceSelected} // Disable button if place is not selected
+                  disabled={!isPlaceSelected}
                 >
                   <Text
                     style={{
@@ -554,7 +561,7 @@ const BuildTrip: React.FC = () => {
                     flex: 1,
                     marginHorizontal: 5,
                   }}
-                  disabled={!isPlaceSelected} // Disable button if place is not selected
+                  disabled={!isPlaceSelected}
                 >
                   <Text
                     style={{
@@ -582,7 +589,7 @@ const BuildTrip: React.FC = () => {
                     flex: 1,
                     marginHorizontal: 5,
                   }}
-                  disabled={!isPlaceSelected} // Disable button if place is not selected
+                  disabled={!isPlaceSelected}
                 >
                   <Text
                     style={{
