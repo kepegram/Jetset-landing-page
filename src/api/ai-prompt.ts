@@ -1,25 +1,27 @@
 export const AI_PROMPT = `
-  Generate Travel Plan to {location}, for {totalDays} Days and {totalNight} Nights.
-  It will be a {whoIsGoing} trip with a {budget} budget.
-  
-  Give me flight details and flight prices with a real airline url to the airlines website.
-  
-  Also give me a Hotel options list with:
+  Generate a structured JSON Travel Plan for a trip to {location}, lasting {totalDays} days and {totalNight} nights.
+  The trip will be for {whoIsGoing} with a {budget} budget.
+
+  Provide flight details including:
+  - Airline Name
+  - Flight Price
+  - Airline URL
+
+  Provide a list of hotel options, each with:
   - HotelName
-  - Hotel address 
+  - HotelAddress
   - Price
-  - hotel image url
-  - geo coordinates
-  - rating
-  - descriptions
-  
-  Also suggest an itinerary with:
-  - placeName
-  - Place Details  
-  - Place Image Url
-  - Geo Coordinates
-  - Ticket Price
-  
-  For {totalDays} days and {totalNight} nights.
-  Give me with a plan for each day with best time to visit all in JSON format.
+  - HotelImageUrl
+  - GeoCoordinates
+  - Rating
+  - Description
+
+  Suggest an itinerary with details for each place, including:
+  - PlaceName
+  - PlaceDetails
+  - PlaceImageUrl
+  - GeoCoordinates
+  - TicketPrice
+
+  Ensure the JSON format is consistent and includes a daily plan with the best times to visit each location.
 `;
