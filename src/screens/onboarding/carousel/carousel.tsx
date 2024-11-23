@@ -5,7 +5,6 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
 import { useTheme } from "../../../context/themeContext";
-import * as Haptics from "expo-haptics";
 
 type CarouselScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -87,7 +86,6 @@ const Carousel: React.FC = () => {
             ]}
             onPress={() => {
               navigation.navigate("SignUp");
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }}
           >
             <Text

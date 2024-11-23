@@ -17,6 +17,8 @@
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		BE21E2491054493CAF79BF0C /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEC82DB9A8D41F0ACE96F07 /* noop-file.swift */; };
+		A7938910EF4E4C20AE59C3E7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3A1D39CC79944D5F89554318 /* GoogleService-Info.plist */; };
+		FCCDC2958D2445499A9CFCB7 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E152B5E70E40A399BAD6FA /* noop-file.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +39,9 @@
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-jetset/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		3A1D39CC79944D5F89554318 /* GoogleService-Info.plist */ = {isa = PBXFileReference; name = "GoogleService-Info.plist"; path = "Jetset/GoogleService-Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
+		F7E152B5E70E40A399BAD6FA /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "Jetset/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		4473473356614AB59D527CA1 /* SplashScreen.storyboard */ = {isa = PBXFileReference; name = "SplashScreen.storyboard"; path = "Jetset/SplashScreen.storyboard"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +99,9 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				D65327D7A22EEC0BE12398D9 /* Pods */,
 				D7E4C46ADA2E9064B798F356 /* ExpoModulesProviders */,
+				3A1D39CC79944D5F89554318 /* GoogleService-Info.plist */,
+				F7E152B5E70E40A399BAD6FA /* noop-file.swift */,
+				4473473356614AB59D527CA1 /* SplashScreen.storyboard */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -184,7 +192,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "jetset" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "Jetset" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -212,6 +220,8 @@
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				524AAD51AA9742DB85ED5C47 /* GoogleService-Info.plist in Resources */,
 				8477818C8C3AEC7F32E7CC37 /* PrivacyInfo.xcprivacy in Resources */,
+				A7938910EF4E4C20AE59C3E7 /* GoogleService-Info.plist in Resources */,
+				5F8CB850F6C74ED898367B7C /* SplashScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,6 +394,7 @@
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
 				BE21E2491054493CAF79BF0C /* noop-file.swift in Sources */,
+				FCCDC2958D2445499A9CFCB7 /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,7 +428,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.kpegra1.jetset;
-				PRODUCT_NAME = Jetset;
+				PRODUCT_NAME = "Jetset";
 				SWIFT_OBJC_BRIDGING_HEADER = "jetset/jetset-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -448,7 +459,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.kpegra1.jetset;
-				PRODUCT_NAME = Jetset;
+				PRODUCT_NAME = "Jetset";
 				SWIFT_OBJC_BRIDGING_HEADER = "jetset/jetset-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -615,7 +626,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "jetset" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "Jetset" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

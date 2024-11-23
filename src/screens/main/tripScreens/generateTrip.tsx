@@ -136,20 +136,8 @@ const GenerateTrip: React.FC = () => {
           color: currentTheme.textPrimary,
         }}
       >
-        Please Wait...
+        Please wait, we are building your dream trip
       </Text>
-      <Text
-        style={{
-          fontFamily: "outfit-medium",
-          fontSize: 20,
-          textAlign: "center",
-          marginTop: 40,
-          color: currentTheme.textSecondary,
-        }}
-      >
-        We are working on generating your dream trip
-      </Text>
-
       <Image
         source={require("../../../assets/plane.gif")}
         style={{
@@ -159,18 +147,6 @@ const GenerateTrip: React.FC = () => {
           marginTop: 40,
         }}
       />
-
-      <Text
-        style={{
-          fontFamily: "outfit",
-          color: currentTheme.textSecondary,
-          fontSize: 20,
-          textAlign: "center",
-          marginTop: 30,
-        }}
-      >
-        Please do not go back
-      </Text>
     </View>
   );
 };

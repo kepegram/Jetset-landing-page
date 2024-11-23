@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -16,7 +17,6 @@ import { RootStackParamList } from "../../../../App";
 import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import * as Haptics from "expo-haptics";
 import { useTheme } from "../../../context/themeContext";
 import { AuthRequestPromptOptions, AuthSessionResult } from "expo-auth-session";
 
@@ -150,10 +150,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               styles.button,
               { backgroundColor: currentTheme.buttonBackground },
             ]}
-            onPress={() => {
-              handleLogin();
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-            }}
+            onPress={() => handleLogin()}
           >
             <Text
               style={[styles.buttonText, { color: currentTheme.buttonText }]}
@@ -166,6 +163,22 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               {errorMessage}
             </Text>
           )}
+          <View style={styles.createAccountContainer}>
+            <Text
+              style={[
+                styles.createAccountText,
+                { color: currentTheme.textPrimary },
+              ]}
+            >
+              New to Jetset?{" "}
+              <Text
+                style={{ color: currentTheme.alternate, fontWeight: "bold" }}
+                onPress={() => navigation.navigate("SignUp")}
+              >
+                Sign up here
+              </Text>
+            </Text>
+          </View>
           <View style={styles.dividerContainer}>
             <View
               style={[
@@ -179,7 +192,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                 { color: currentTheme.textSecondary },
               ]}
             >
-              or sign in with
+              OR
             </Text>
             <View
               style={[
@@ -190,41 +203,45 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           </View>
           <View style={styles.socialIconsContainer}>
             <Pressable
-              style={styles.iconButton}
-              onPress={() => {
-                promptAsync();
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-              }}
+              style={[
+                styles.iconButton,
+                { backgroundColor: currentTheme.accentBackground },
+              ]}
+              onPress={() => promptAsync()}
             >
-              <Ionicons name="logo-google" size={22} color="grey" />
+              <Image
+                source={require("../../../assets/google.png")}
+                style={{ width: 22, height: 22 }}
+              />
+              <Text
+                style={[
+                  styles.iconButtonText,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                Continue with Google
+              </Text>
             </Pressable>
+            <View style={{ height: 10 }} />
             <Pressable
-              style={styles.iconButton}
-              onPress={() => {
-                console.log("Apple Sign-In");
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-              }}
+              style={[
+                styles.iconButton,
+                { backgroundColor: currentTheme.accentBackground },
+              ]}
+              onPress={() => console.log("Apple Sign-In")}
             >
-              <Ionicons name="logo-apple" size={22} color="grey" />
+              <Ionicons name="logo-apple" size={23} color="black" />
+              <Text
+                style={[
+                  styles.iconButtonText,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                Continue with Apple
+              </Text>
             </Pressable>
           </View>
         </View>
-
-        <Pressable
-          onPress={() => {
-            navigation.navigate("SignUp");
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-          }}
-        >
-          <Text
-            style={[
-              styles.createAccountText,
-              { color: currentTheme.alternate },
-            ]}
-          >
-            Create an account
-          </Text>
-        </Pressable>
       </ScrollView>
 
       {loading && (
@@ -299,10 +316,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
+  createAccountContainer: {
+    marginTop: 5,
+    alignItems: "center",
+  },
+  createAccountText: {
+    fontSize: 16,
+    textAlign: "center",
+  },
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 15,
+    marginTop: 25,
   },
   divider: {
     flex: 1,
@@ -313,25 +338,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   socialIconsContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
+    alignItems: "center",
     justifyContent: "center",
-    marginVertical: 20,
+    marginTop: 30,
   },
   iconButton: {
     marginHorizontal: 20,
     padding: 15,
     borderRadius: 10,
-    borderWidth: 1,
-    width: 100,
-    borderColor: "#888",
+    width: "100%",
     justifyContent: "center",
     alignItems: "center",
+    flexDirection: "row",
   },
-  createAccountText: {
+  iconButtonText: {
+    marginLeft: 10,
     fontSize: 16,
-    textAlign: "center",
     fontWeight: "bold",
-    marginTop: 15,
+    color: "grey",
   },
   loadingOverlay: {
     position: "absolute",

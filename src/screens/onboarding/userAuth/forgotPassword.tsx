@@ -11,7 +11,6 @@ import {
 import React, { useState } from "react";
 import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { sendPasswordResetEmail } from "firebase/auth";
-import * as Haptics from "expo-haptics";
 import { useTheme } from "../../../context/themeContext";
 
 const ForgotPassword: React.FC = () => {
@@ -81,7 +80,6 @@ const ForgotPassword: React.FC = () => {
             ]}
             onPress={() => {
               handlePasswordReset();
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }}
           >
             <Text

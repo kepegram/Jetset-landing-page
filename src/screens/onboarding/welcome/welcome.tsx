@@ -9,7 +9,6 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
-import * as Haptics from "expo-haptics";
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -36,7 +35,6 @@ const Welcome: React.FC = () => {
             style={styles.button}
             onPress={() => {
               navigation.navigate("Carousel");
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }}
           >
             <Text style={styles.buttonText}>Sign Up</Text>
@@ -45,7 +43,6 @@ const Welcome: React.FC = () => {
           <Pressable
             onPress={() => {
               navigation.navigate("Login");
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }}
           >
             <Text style={styles.altButtonText}>Login</Text>

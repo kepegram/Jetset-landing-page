@@ -24,10 +24,10 @@ import Settings from "../screens/main/userScreens/settings";
 import ChangePassword from "../screens/main/userScreens/changePassword";
 import AppTheme from "../screens/main/userScreens/appTheme";
 import DeleteAccount from "../screens/main/userScreens/deleteAccount";
-import BuildTrip from "../screens/main/buildTripScreens/buildTrip";
-import ReviewTrip from "../screens/main/buildTripScreens/reviewTrip";
-import GenerateTrip from "../screens/main/buildTripScreens/generateTrip";
-import TripDetails from "../screens/main/tripDetailScreen/tripDetails";
+import BuildTrip from "../screens/main/tripScreens/buildTrip";
+import ReviewTrip from "../screens/main/tripScreens/reviewTrip";
+import GenerateTrip from "../screens/main/tripScreens/generateTrip";
+import TripDetails from "../screens/main/tripScreens/tripDetails";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type RootStackParamList = {

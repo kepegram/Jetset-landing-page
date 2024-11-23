@@ -51,32 +51,32 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
       return dateA.diff(dateB);
     });
 
-  const LatestTrip = sortedTrips[0]?.parsedTripData;
-  const LatestPlan = sortedTrips[0]?.parsedTripPlan;
+  const UpcomingTrip = sortedTrips[0]?.parsedTripData;
+  const UpcomingPlan = sortedTrips[0]?.parsedTripPlan;
 
   if (
-    LatestTrip?.startDate &&
-    moment(LatestTrip.startDate).isSame(today, "day")
+    UpcomingTrip?.startDate &&
+    moment(UpcomingTrip.startDate).isSame(today, "day")
   ) {
     return null;
   }
 
   return (
     <View style={{ marginVertical: 20, width: 250 }}>
-      {LatestTrip?.locationInfo?.photoRef ? (
+      {UpcomingTrip?.locationInfo?.photoRef ? (
         <Pressable
           onPress={() =>
             navigation.navigate("TripDetails", {
               trip: JSON.stringify({
-                ...LatestTrip,
-                travelPlan: LatestPlan?.travelPlan || {},
+                ...UpcomingTrip,
+                travelPlan: UpcomingPlan?.travelPlan || {},
               }),
             })
           }
         >
           <Image
             source={{
-              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${LatestTrip.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
+              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${UpcomingTrip.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
             }}
             style={{
               width: "100%",
@@ -103,7 +103,7 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
             color: currentTheme.textPrimary,
           }}
         >
-          {LatestTrip?.tripName || "No Location Available"}
+          {UpcomingTrip?.tripName || "No Location Available"}
         </Text>
         <Text
           style={{
@@ -113,7 +113,7 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
             marginTop: 5,
           }}
         >
-          {LatestTrip?.locationInfo?.name || "No Location Name"}
+          {UpcomingTrip?.locationInfo?.name || "No Location Name"}
         </Text>
         <View
           style={{
@@ -129,8 +129,8 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
               color: currentTheme.textSecondary,
             }}
           >
-            {LatestTrip?.startDate
-              ? moment(LatestTrip.startDate).format("MMM DD yyyy")
+            {UpcomingTrip?.startDate
+              ? moment(UpcomingTrip.startDate).format("MMM DD yyyy")
               : "No Start Date"}{" "}
             -{" "}
           </Text>
@@ -141,8 +141,8 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
               color: currentTheme.textSecondary,
             }}
           >
-            {LatestTrip?.startDate
-              ? moment(LatestTrip.endDate).format("MMM DD yyyy")
+            {UpcomingTrip?.startDate
+              ? moment(UpcomingTrip.endDate).format("MMM DD yyyy")
               : "No Start Date"}
           </Text>
         </View>
