@@ -1,15 +1,12 @@
-import { View, Text, Image, Pressable } from "react-native";
+import { View, Text, Image } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
 import { GetPhotoRef } from "../../api/googlePlaceApi";
 import { useTheme } from "../../context/themeContext";
 
 // Define an interface for the place prop
 interface Place {
   placeName: string;
-  placeDetails: string;
-  ticketPricing: string;
-  timeToTravel: string;
+  details: string;
 }
 
 interface PlaceCardProps {
@@ -67,6 +64,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
         >
           {place?.placeName}
         </Text>
+        <View style={{ marginTop: 5 }} />
         <Text
           style={{
             fontFamily: "outfit",
@@ -74,47 +72,8 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
             color: currentTheme.textSecondary,
           }}
         >
-          {place.placeDetails}
+          {place.details}
         </Text>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <View>
-            <Text
-              style={{
-                fontFamily: "outfit",
-                fontSize: 17,
-                marginTop: 5,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              🎟️ Ticket Price:
-              <Text
-                style={{
-                  fontFamily: "outfit-bold",
-                  color: currentTheme.textSecondary,
-                }}
-              >
-                {" "}
-                {place?.ticketPricing}
-              </Text>
-            </Text>
-          </View>
-          <Pressable
-            style={{
-              backgroundColor: currentTheme.alternate,
-              padding: 8,
-              borderRadius: 7,
-            }}
-          >
-            <Ionicons name="navigate" size={20} color="white" />
-          </Pressable>
-        </View>
       </View>
     </View>
   );

@@ -3,7 +3,7 @@ import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query } from "firebase/firestore";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -15,12 +15,11 @@ import {
   FlatList,
   ScrollView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Fontisto } from "@expo/vector-icons";
 import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
 import CurrentTripsCard from "../../../components/myTrips/currentTripCard";
 import UpcomingTripsCard from "../../../components/myTrips/upcomingTripsCard";
 import PastTripListCard from "../../../components/myTrips/pastTripListCard";
-import moment from "moment";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -86,19 +85,6 @@ const Home: React.FC = () => {
     }
   };
 
-  const today = moment().startOf("day");
-
-  const currentTrip = userTrips.find((trip) => {
-    const startDate = moment(trip.tripData.startDate).startOf("day");
-    const endDate = moment(trip.tripData.endDate).endOf("day");
-    return startDate.isSame(today) && today.isBefore(endDate);
-  });
-
-  const pastTrips = userTrips.filter((trip) => {
-    const endDate = moment(trip.tripData.endDate).endOf("day");
-    return endDate.isBefore(today);
-  });
-
   return (
     <ScrollView
       contentContainerStyle={{
@@ -127,15 +113,14 @@ const Home: React.FC = () => {
           {userName}'s Trips
         </Text>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Pressable onPress={() => console.log("TODO")}>
-            <Ionicons
-              name="search-circle-sharp"
-              size={55}
-              color={currentTheme.icon}
-            />
+          <Pressable
+            onPress={() => console.log("TODO")}
+            style={{ marginRight: 10 }}
+          >
+            <Fontisto name="search" size={30} color={currentTheme.icon} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("BuildTrip")}>
-            <Ionicons name="add-circle" size={50} color={currentTheme.icon} />
+            <Fontisto name="plus-a" size={30} color={currentTheme.icon} />
           </Pressable>
         </View>
       </View>
@@ -145,24 +130,20 @@ const Home: React.FC = () => {
         <StartNewTripCard navigation={navigation} />
       ) : (
         <View>
-          {currentTrip && (
-            <>
-              <Text
-                style={{
-                  fontFamily: "outfit-bold",
-                  fontSize: 24,
-                  color: currentTheme.textPrimary,
-                  marginTop: 20,
-                  textAlign: "left",
-                }}
-              >
-                Current Trip
-              </Text>
-              <View style={{ alignItems: "center" }}>
-                <CurrentTripsCard userTrips={[currentTrip]} />
-              </View>
-            </>
-          )}
+          <Text
+            style={{
+              fontFamily: "outfit-bold",
+              fontSize: 24,
+              color: currentTheme.textPrimary,
+              marginTop: 20,
+              textAlign: "left",
+            }}
+          >
+            Current Trip
+          </Text>
+          <View style={{ alignItems: "center" }}>
+            <CurrentTripsCard userTrips={userTrips} />
+          </View>
 
           <Text
             style={{
@@ -186,36 +167,32 @@ const Home: React.FC = () => {
             showsHorizontalScrollIndicator={false}
           />
 
-          {pastTrips.length > 0 && (
-            <>
-              <Text
-                style={{
-                  fontFamily: "outfit-bold",
-                  fontSize: 24,
-                  color: currentTheme.textPrimary,
-                  marginTop: 20,
+          <Text
+            style={{
+              fontFamily: "outfit-bold",
+              fontSize: 24,
+              color: currentTheme.textPrimary,
+              marginTop: 20,
+            }}
+          >
+            Past Trips
+          </Text>
+          {userTrips.map((trip, index) => {
+            if (!trip || !trip.tripData || !trip.tripPlan) {
+              console.warn(`Skipping invalid trip at index ${index}:`, trip);
+              return null;
+            }
+            return (
+              <PastTripListCard
+                trip={{
+                  tripData: trip.tripData,
+                  tripPlan: trip.tripPlan,
+                  id: trip.id,
                 }}
-              >
-                Past Trips
-              </Text>
-              {pastTrips.map((trip, index) => {
-                if (!trip || !trip.tripData || !trip.tripPlan) {
-                  console.warn(`Skipping invalid trip at index ${index}:`, trip);
-                  return null;
-                }
-                return (
-                  <PastTripListCard
-                    trip={{
-                      tripData: trip.tripData,
-                      tripPlan: trip.tripPlan,
-                      id: trip.id,
-                    }}
-                    key={index}
-                  />
-                );
-              })}
-            </>
-          )}
+                key={index}
+              />
+            );
+          })}
         </View>
       )}
     </ScrollView>

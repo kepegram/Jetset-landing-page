@@ -30,6 +30,9 @@ const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
       style={{
         marginRight: 20,
         width: 180,
+        backgroundColor: currentTheme.accentBackground,
+        borderRadius: 15,
+        overflow: "hidden",
       }}
     >
       <Image
@@ -43,7 +46,6 @@ const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
         style={{
           width: 180,
           height: 120,
-          borderRadius: 15,
         }}
       />
       <View

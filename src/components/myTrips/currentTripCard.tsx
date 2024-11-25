@@ -44,7 +44,7 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
     const tripData = parseData(trip.tripData);
     const startDate = moment(tripData.startDate).startOf("day");
     const endDate = moment(tripData.endDate).endOf("day");
-    return startDate.isSame(today) && today.isBefore(endDate);
+    return startDate.isSameOrBefore(today) && endDate.isSameOrAfter(today);
   });
 
   if (!currentTrip) return null;

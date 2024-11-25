@@ -51,15 +51,19 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
       return dateA.diff(dateB);
     });
 
-  const UpcomingTrip = sortedTrips[0]?.parsedTripData;
-  const UpcomingPlan = sortedTrips[0]?.parsedTripPlan;
+  const UpcomingTrip = sortedTrips.find((trip) => {
+    const startDate = moment(trip.parsedTripData.startDate).startOf("day");
+    const endDate = moment(trip.parsedTripData.endDate).endOf("day");
+    return !startDate.isSame(today, "day") && !endDate.isSame(today, "day");
+  })?.parsedTripData;
 
-  if (
-    UpcomingTrip?.startDate &&
-    moment(UpcomingTrip.startDate).isSame(today, "day")
-  ) {
-    return null;
-  }
+  const UpcomingPlan = sortedTrips.find((trip) => {
+    const startDate = moment(trip.parsedTripData.startDate).startOf("day");
+    const endDate = moment(trip.parsedTripData.endDate).endOf("day");
+    return !startDate.isSame(today, "day") && !endDate.isSame(today, "day");
+  })?.parsedTripPlan;
+
+  if (!UpcomingTrip) return null;
 
   return (
     <View style={{ marginVertical: 20, width: 250 }}>
@@ -141,9 +145,9 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
               color: currentTheme.textSecondary,
             }}
           >
-            {UpcomingTrip?.startDate
+            {UpcomingTrip?.endDate
               ? moment(UpcomingTrip.endDate).format("MMM DD yyyy")
-              : "No Start Date"}
+              : "No End Date"}
           </Text>
         </View>
       </View>

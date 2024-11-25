@@ -1,19 +1,21 @@
 import { View, Text } from "react-native";
+import { useTheme } from "../../context/themeContext";
 import React from "react";
 import PlaceCard from "./placeCard";
-import { useTheme } from "../../context/themeContext";
 
 // Define an interface for the details prop
 interface PlannedTripProps {
   details: {
-    [day: string]: {
-      plan: {
+    itinerary: {
+      day: string;
+      places: {
         placeName: string;
-        placeDetails: string;
-        ticketPricing?: string; // Made ticketPricing optional
+        details: string;
         timeToTravel: string;
       }[];
-    };
+    }[];
+    budget: string;
+    destination: string;
   } | null;
 }
 
@@ -53,7 +55,7 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
         🏕️ Plan Details
       </Text>
 
-      {Object.entries(details).map(([day, { plan }]) => (
+      {details.itinerary.map(({ day, places }) => (
         <View key={day}>
           <Text
             style={{
@@ -64,25 +66,32 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
               color: currentTheme.textPrimary,
             }}
           >
-            Day {parseInt(day) + 1}
+            {day}
           </Text>
-          {Array.isArray(plan) && plan.length > 0 ? (
-            plan.map((place, index) => (
+          {Array.isArray(places) && places.length > 0 ? (
+            places.map((place, index) => (
               <PlaceCard
                 key={index}
                 place={{
                   ...place,
-                  ticketPricing: place.ticketPricing || "N/A", // Check for ticketPricing
+                  details: place.details,
                 }}
               />
             ))
           ) : (
             <Text style={{ color: "red" }}>
               No places planned for this day.
-            </Text> // Handle case where plan is empty or undefined
+            </Text>
           )}
         </View>
       ))}
+
+      <Text style={{ color: currentTheme.textPrimary }}>
+        Budget: {details.budget}
+      </Text>
+      <Text style={{ color: currentTheme.textPrimary }}>
+        Destination: {details.destination}
+      </Text>
     </View>
   );
 };
