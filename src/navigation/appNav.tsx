@@ -14,7 +14,11 @@ import {
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import { ProfileProvider, useProfile } from "../context/profileContext";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { CreateTripContext } from "../context/createTripContext";
 import Home from "../screens/main/homeScreen/home";
@@ -29,10 +33,12 @@ import ReviewTrip from "../screens/main/tripScreens/reviewTrip";
 import GenerateTrip from "../screens/main/tripScreens/generateTrip";
 import TripDetails from "../screens/main/tripScreens/tripDetails";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import MyTrips from "../screens/main/tripScreens/myTrips";
 
 export type RootStackParamList = {
   App: undefined;
-  HomeMain: undefined;
+  Home: undefined;
+  MyTrips: undefined;
   BuildTrip: undefined;
   ReviewTrip: undefined;
   GenerateTrip: undefined;
@@ -47,7 +53,7 @@ export type RootStackParamList = {
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
-const HomeStack: React.FC = () => {
+const MyTripsStack: React.FC = () => {
   const { currentTheme } = useTheme();
 
   const tripBuilderScreenOptions = ({
@@ -108,8 +114,8 @@ const HomeStack: React.FC = () => {
   return (
     <RootStack.Navigator>
       <RootStack.Screen
-        name="HomeMain"
-        component={Home}
+        name="MyTrips"
+        component={MyTrips}
         options={{ headerShown: false }}
       />
       <RootStack.Screen
@@ -221,16 +227,6 @@ const ProfileStack: React.FC = () => {
   }): NativeStackNavigationOptions => ({
     title: "Your Profile",
     ...screenOptions({ navigation }),
-    headerRight: () => (
-      <Pressable onPress={() => navigation.navigate("Settings")}>
-        <Ionicons
-          name="settings-sharp"
-          size={28}
-          color={currentTheme.textPrimary}
-          style={{ marginLeft: 10 }}
-        />
-      </Pressable>
-    ),
     headerLeft: () => null,
     headerBackVisible: false,
   });
@@ -240,7 +236,11 @@ const ProfileStack: React.FC = () => {
       <RootStack.Screen
         name="Profile"
         component={Profile}
-        options={profileScreenOptions}
+        options={({ navigation }) => ({
+          ...profileScreenOptions({ navigation }),
+          title: "",
+          headerShown: false,
+        })}
       />
       <RootStack.Screen
         name="Settings"
@@ -321,8 +321,8 @@ const TabNavigator: React.FC = () => {
       }}
     >
       <Tab.Screen
-        name="HomeTab"
-        component={HomeStack}
+        name="Home"
+        component={Home}
         options={({ route }) => {
           const tabBarStyle = {
             backgroundColor: currentTheme.background,
@@ -334,6 +334,27 @@ const TabNavigator: React.FC = () => {
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "home" : "home-outline"}
+                color={color}
+                size={30}
+              />
+            ),
+          } as BottomTabNavigationOptions;
+        }}
+      />
+      <Tab.Screen
+        name="MyTrips"
+        component={MyTripsStack}
+        options={({ route }) => {
+          const tabBarStyle = {
+            backgroundColor: currentTheme.background,
+            ...(getTabBarStyle(route) || {}),
+          };
+          return {
+            tabBarStyle,
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <MaterialCommunityIcons
+                name={focused ? "bag-suitcase" : "bag-suitcase-outline"}
                 color={color}
                 size={30}
               />
@@ -355,8 +376,8 @@ const TabNavigator: React.FC = () => {
               <Image
                 source={{ uri: profilePicture }}
                 style={{
-                  width: 35,
-                  height: 35,
+                  width: 30,
+                  height: 30,
                   borderRadius: 25,
                   borderColor: focused
                     ? currentTheme.alternate

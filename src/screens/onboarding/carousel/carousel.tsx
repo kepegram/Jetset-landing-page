@@ -49,17 +49,6 @@ const Carousel: React.FC = () => {
       <View
         style={[styles.slide, { backgroundColor: currentTheme.background }]}
       >
-        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
-          Capture Memories
-        </Text>
-        <Text style={[styles.paragraph, { color: currentTheme.textSecondary }]}>
-          Upload and share your photos
-        </Text>
-      </View>
-
-      <View
-        style={[styles.slide, { backgroundColor: currentTheme.background }]}
-      >
         <Text
           style={[styles.specialTitle, { color: currentTheme.textPrimary }]}
         >

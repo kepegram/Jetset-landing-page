@@ -77,7 +77,7 @@ const GenerateTrip: React.FC = () => {
       await AsyncStorage.clear();
       console.log("AsyncStorage cleared successfully.");
 
-      navigation.navigate("HomeMain");
+      navigation.navigate("MyTrips");
     } catch (error: any) {
       console.error("AI generation failed:", error.message);
       if (retryCount < 3 && isMounted.current) {
@@ -95,7 +95,7 @@ const GenerateTrip: React.FC = () => {
           [
             {
               text: "OK",
-              onPress: () => navigation.navigate("HomeMain"),
+              onPress: () => navigation.navigate("Home"),
             },
           ]
         );

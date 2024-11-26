@@ -16,6 +16,7 @@ import { RootStackParamList } from "../../../navigation/appNav";
 import { useProfile } from "../../../context/profileContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { useTheme } from "../../../context/themeContext";
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the settings icon
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -55,18 +56,41 @@ const Profile: React.FC = () => {
     <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <View style={styles.profileContainer}>
-        <Pressable onPress={() => setModalVisible(true)}>
-          <Image
-            source={{ uri: profilePicture }}
-            style={styles.profilePicture}
+      <View style={styles.header}>
+        <Image
+          source={require("../../../assets/placeholder.jpeg")}
+          style={styles.headerImage}
+        />
+        <View style={styles.overlay} />
+        <Pressable
+          style={styles.settingsIcon}
+          onPress={() => navigation.navigate("Settings")}
+        >
+          <Ionicons
+            name="settings-sharp"
+            size={28}
+            color={currentTheme.textPrimary}
           />
         </Pressable>
+        <View style={styles.profileContainer}>
+          <Pressable onPress={() => setModalVisible(true)}>
+            <Image
+              source={{ uri: profilePicture }}
+              style={styles.profilePicture}
+            />
+          </Pressable>
 
-        <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
-          {displayName || userName}
-        </Text>
+          <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
+            {displayName || userName}
+          </Text>
+        </View>
       </View>
+
+      <View style={styles.divider} />
+
+      <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+        My Trips
+      </Text>
 
       <Modal
         animationType="fade"
@@ -102,39 +126,62 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  profileContainer: {
+  header: {
+    width: "100%",
+    height: 200,
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 40,
+    position: "relative", // Added to position overlay and settings icon
+  },
+  headerImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.3)", // Slight overlay
+  },
+  settingsIcon: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+  },
+  profileContainer: {
+    position: "absolute",
+    flexDirection: "row",
+    alignItems: "center",
+    top: 160,
+    left: 0,
+    paddingHorizontal: 20,
   },
   profilePicture: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginRight: 20,
+    borderWidth: 3,
+    borderColor: "#fff",
   },
   userName: {
     fontSize: 26,
     fontWeight: "bold",
-    marginTop: 10,
+    marginTop: 40,
   },
-  iconsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
+  divider: {
+    height: 1,
+    backgroundColor: "#ccc",
+    width: "100%",
+    position: "absolute",
+    top: "40%",
   },
-  iconItem: {
-    alignItems: "center",
-    marginHorizontal: 10,
-  },
-  iconText: {
-    fontSize: 16,
+  heading: {
+    fontSize: 24,
     fontWeight: "bold",
+    marginTop: 170,
     textAlign: "center",
-  },
-  separator: {
-    height: 20,
-    width: 1,
-    marginHorizontal: 10,
+    alignSelf: "flex-start",
+    paddingLeft: 20,
   },
   modalOverlay: {
     flex: 1,
