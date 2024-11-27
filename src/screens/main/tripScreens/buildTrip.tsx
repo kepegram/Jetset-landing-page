@@ -42,7 +42,6 @@ const BuildTrip: React.FC = () => {
   const [focusedInput, setFocusedInput] = useState<number | null>(null);
   const [startDate, setStartDate] = useState<Moment | undefined>();
   const [endDate, setEndDate] = useState<Moment | undefined>();
-  const [tripName, setTripName] = useState<string>("");
   const [showSelectDates, setShowSelectDates] = useState(false);
   const [photoRef, setPhotoRef] = useState<string | null>(null);
   const [items] = useState([
@@ -76,10 +75,9 @@ const BuildTrip: React.FC = () => {
   }, [navigation]);
 
   useEffect(() => {
-    const loadDatesAndTripName = async () => {
+    const loadDatesAndPhotoRef = async () => {
       const storedStartDate = await AsyncStorage.getItem("startDate");
       const storedEndDate = await AsyncStorage.getItem("endDate");
-      const storedTripName = await AsyncStorage.getItem("tripName");
       const storedPhotoRef = await AsyncStorage.getItem("photoRef");
       if (storedStartDate) {
         setStartDate(moment(storedStartDate));
@@ -87,18 +85,11 @@ const BuildTrip: React.FC = () => {
       if (storedEndDate) {
         setEndDate(moment(storedEndDate));
       }
-      if (storedTripName) {
-        setTripName(storedTripName);
-        setTripData({
-          ...tripData,
-          tripName: storedTripName,
-        });
-      }
       if (storedPhotoRef) {
         setPhotoRef(storedPhotoRef);
       }
     };
-    loadDatesAndTripName();
+    loadDatesAndPhotoRef();
   }, []);
 
   const handlePlaceSelect = async (
@@ -119,15 +110,6 @@ const BuildTrip: React.FC = () => {
       setPhotoRef(photoReference);
     }
     console.log(tripData.locationInfo);
-  };
-
-  const handleTripNameChange = async (text: string) => {
-    setTripName(text);
-    setTripData({
-      ...tripData,
-      tripName: tripName,
-    });
-    await AsyncStorage.setItem("tripName", text);
   };
 
   const handleBudgetChoice = (option: string) => {
@@ -191,7 +173,6 @@ const BuildTrip: React.FC = () => {
 
   const isFormValid =
     tripData.locationInfo &&
-    tripName &&
     tripData.budget !== null &&
     startDate &&
     endDate &&
@@ -366,34 +347,6 @@ const BuildTrip: React.FC = () => {
                 ]}
               />
             )}
-            <View style={{ width: "100%", marginBottom: 20 }}>
-              <Ionicons
-                name="map-outline"
-                size={20}
-                color={currentTheme.textSecondary}
-                style={{ position: "absolute", left: 10, top: 10 }}
-              />
-              <TextInput
-                placeholder="Trip Name"
-                placeholderTextColor={currentTheme.textSecondary}
-                onChangeText={handleTripNameChange}
-                onFocus={() => setFocusedInput(4)}
-                onBlur={() => setFocusedInput(null)}
-                style={{
-                  height: 50,
-                  borderBottomColor:
-                    focusedInput === 4
-                      ? currentTheme.alternate
-                      : currentTheme.accentBackground,
-                  borderBottomWidth: focusedInput === 4 ? 2 : 1,
-                  paddingLeft: 40,
-                  width: "100%",
-                  color: currentTheme.textSecondary,
-                }}
-                editable={isPlaceSelected}
-                value={tripName}
-              />
-            </View>
             <View style={{ width: "100%", marginBottom: 20 }}>
               <Ionicons
                 name="calendar-outline"
@@ -611,8 +564,6 @@ const BuildTrip: React.FC = () => {
                 console.log(
                   "LOCATION",
                   tripData.locationInfo,
-                  "TRIP NAME",
-                  tripData.tripName,
                   "START DATE",
                   tripData.startDate,
                   "END DATE",

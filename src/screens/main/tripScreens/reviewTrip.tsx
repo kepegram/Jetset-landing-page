@@ -49,42 +49,6 @@ const ReviewTrip: React.FC = () => {
           Before generating your trip, please review your selections
         </Text>
 
-        {/* Trip Name Info */}
-        <View
-          style={{
-            marginTop: 25,
-            display: "flex",
-            flexDirection: "row",
-            gap: 20,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 30,
-            }}
-          >
-            🏷️
-          </Text>
-          <View>
-            <Text
-              style={{
-                fontSize: 17,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              Trip Name
-            </Text>
-            <Text
-              style={{
-                fontSize: 20,
-                color: currentTheme.textPrimary,
-              }}
-            >
-              {tripData?.tripName}
-            </Text>
-          </View>
-        </View>
-
         {/* Destination Info  */}
         <View
           style={{

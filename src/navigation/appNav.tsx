@@ -356,7 +356,7 @@ const TabNavigator: React.FC = () => {
               <MaterialCommunityIcons
                 name={focused ? "bag-suitcase" : "bag-suitcase-outline"}
                 color={color}
-                size={30}
+                size={33}
               />
             ),
           } as BottomTabNavigationOptions;

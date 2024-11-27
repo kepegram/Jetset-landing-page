@@ -21,6 +21,7 @@ import CurrentTripsCard from "../../../components/myTrips/currentTripCard";
 import UpcomingTripsCard from "../../../components/myTrips/upcomingTripsCard";
 import PastTripListCard from "../../../components/myTrips/pastTripListCard";
 import { useProfile } from "../../../context/profileContext";
+import moment from "moment";
 
 type MyTripsScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -87,6 +88,17 @@ const MyTrips: React.FC = () => {
     }
   };
 
+  const sortedUpcomingTrips = userTrips
+    .filter((trip) => {
+      const startDate = moment(trip.tripData.startDate).startOf("day");
+      return startDate.isAfter(moment().startOf("day"));
+    })
+    .sort((a, b) => {
+      const dateA = moment(a.tripData.startDate);
+      const dateB = moment(b.tripData.startDate);
+      return dateA.diff(dateB);
+    });
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -147,18 +159,20 @@ const MyTrips: React.FC = () => {
             <CurrentTripsCard userTrips={userTrips} />
           </View>
 
-          <Text
-            style={{
-              fontFamily: "outfit-bold",
-              fontSize: 24,
-              color: currentTheme.textPrimary,
-              marginTop: 20,
-            }}
-          >
-            Upcoming Trips
-          </Text>
+          {sortedUpcomingTrips.length > 0 && (
+            <Text
+              style={{
+                fontFamily: "outfit-bold",
+                fontSize: 24,
+                color: currentTheme.textPrimary,
+                marginTop: 20,
+              }}
+            >
+              Upcoming Trips
+            </Text>
+          )}
           <FlatList
-            data={userTrips}
+            data={sortedUpcomingTrips}
             horizontal
             renderItem={({ item }) => (
               <View style={{ marginRight: 10 }}>
@@ -169,16 +183,20 @@ const MyTrips: React.FC = () => {
             showsHorizontalScrollIndicator={false}
           />
 
-          <Text
-            style={{
-              fontFamily: "outfit-bold",
-              fontSize: 24,
-              color: currentTheme.textPrimary,
-              marginTop: 20,
-            }}
-          >
-            Past Trips
-          </Text>
+          {userTrips.some((trip) =>
+            moment(trip.tripData.endDate).isBefore(moment(), "day")
+          ) && (
+            <Text
+              style={{
+                fontFamily: "outfit-bold",
+                fontSize: 24,
+                color: currentTheme.textPrimary,
+                marginTop: 20,
+              }}
+            >
+              Past Trips
+            </Text>
+          )}
           {userTrips.map((trip, index) => {
             if (!trip || !trip.tripData || !trip.tripPlan) {
               console.warn(`Skipping invalid trip at index ${index}:`, trip);

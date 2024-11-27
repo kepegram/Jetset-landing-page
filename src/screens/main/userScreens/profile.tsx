@@ -142,6 +142,11 @@ const Profile: React.FC = () => {
         <ActivityIndicator size="large" color={currentTheme.alternate} />
       ) : (
         <View style={{ padding: 20 }}>
+          <View style={styles.ongoingBadgeContainer}>
+            <Text style={[styles.ongoingBadge, { backgroundColor: currentTheme.alternate }]}>
+              Ongoing
+            </Text>
+          </View>
           <CurrentTripCard userTrips={userTrips} />
         </View>
       )}
@@ -250,6 +255,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     alignSelf: "flex-start",
     paddingLeft: 20,
+  },
+  ongoingBadgeContainer: {
+    position: "absolute",
+    top: 50,
+    left: 30,
+    zIndex: 1,
+  },
+  ongoingBadge: {
+    padding: 5,
+    borderRadius: 5,
+    color: "white",
+    fontWeight: "bold",
   },
   modalOverlay: {
     flex: 1,

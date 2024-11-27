@@ -18,7 +18,28 @@ export const AI_PROMPT = `
           "hotelName": "",
           "hotelAddress": "",
           "price": "",
-          "hotelImageUrl": "",
+          "geoCoordinates": {
+            "latitude": "",
+            "longitude": ""
+          },
+          "rating": "",
+          "description": ""
+        },
+        {
+          "hotelName": "",
+          "hotelAddress": "",
+          "price": "",
+          "geoCoordinates": {
+            "latitude": "",
+            "longitude": ""
+          },
+          "rating": "",
+          "description": ""
+        },
+        {
+          "hotelName": "",
+          "hotelAddress": "",
+          "price": "",
           "geoCoordinates": {
             "latitude": "",
             "longitude": ""
@@ -38,7 +59,7 @@ export const AI_PROMPT = `
                 "latitude": "",
                 "longitude": ""
               },
-              "ticketPrice": "$",
+              "ticketPrice": "",
             }
           ]
         }
@@ -46,5 +67,5 @@ export const AI_PROMPT = `
     }
   }
 
-  Ensure the JSON format is consistent and includes a daily plan with the best times to visit each location.
+  Ensure the JSON format is consistent and includes a daily plan with the best times to visit each location. Provide multiple hotel options in the "hotels" array.
 `;

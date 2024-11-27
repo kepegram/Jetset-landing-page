@@ -83,7 +83,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
             marginTop: 5,
           }}
         >
-          🎟️: {place.ticketPrice}
+          🎟️: ${place.ticketPrice}
         </Text>
       </View>
     </View>

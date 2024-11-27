@@ -102,19 +102,9 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
       <View style={{ marginTop: 10 }}>
         <Text
           style={{
-            fontFamily: "outfit-medium",
+            fontFamily: "outfit",
             fontSize: 24,
             color: currentTheme.textPrimary,
-          }}
-        >
-          {UpcomingTrip?.tripName || "No Location Available"}
-        </Text>
-        <Text
-          style={{
-            fontFamily: "outfit",
-            fontSize: 20,
-            color: currentTheme.textSecondary,
-            marginTop: 5,
           }}
         >
           {UpcomingTrip?.locationInfo?.name || "No Location Name"}
