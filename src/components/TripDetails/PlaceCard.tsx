@@ -6,7 +6,8 @@ import { useTheme } from "../../context/themeContext";
 // Define an interface for the place prop
 interface Place {
   placeName: string;
-  details: string;
+  placeDetails: string;
+  ticketPrice: string;
 }
 
 interface PlaceCardProps {
@@ -72,7 +73,17 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
             color: currentTheme.textSecondary,
           }}
         >
-          {place.details}
+          {place.placeDetails}
+        </Text>
+        <Text
+          style={{
+            fontFamily: "outfit",
+            fontSize: 14,
+            color: currentTheme.textSecondary,
+            marginTop: 5,
+          }}
+        >
+          🎟️: {place.ticketPrice}
         </Text>
       </View>
     </View>

@@ -4,9 +4,9 @@ import { useTheme } from "../../context/themeContext";
 
 // Define an interface for flightData
 interface FlightData {
-  price: number;
-  airline: string;
-  bookingUrl: string; // Add bookingUrl property
+  airlineName: string;
+  airlineUrl: string;
+  flightPrice: number;
 }
 
 interface FlightInfoProps {
@@ -18,9 +18,9 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
 
   // Handle "Book Here" button click
   const handleBookClick = () => {
-    if (flightData.bookingUrl) {
-      Linking.openURL(flightData.bookingUrl);
-      console.log(flightData.bookingUrl);
+    if (flightData.airlineUrl) {
+      Linking.openURL(flightData.airlineUrl);
+      console.log(flightData.airlineUrl);
     } else {
       alert("Invalid url");
     }
@@ -80,7 +80,7 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
           color: currentTheme.textSecondary,
         }}
       >
-        Airline: {flightData.airline}
+        Airline: {flightData.airlineName}
       </Text>
       <Text
         style={{
@@ -89,7 +89,7 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
           color: currentTheme.textSecondary,
         }}
       >
-        Price: ${flightData.price} (approx.)
+        Price: {flightData.flightPrice} (approx.)
       </Text>
     </View>
   );

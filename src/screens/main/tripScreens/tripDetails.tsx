@@ -40,7 +40,8 @@ const TripDetails: React.FC = () => {
 
     // Parse trip details from JSON
     try {
-      setTripDetails(JSON.parse(trip));
+      const parsedTrip = JSON.parse(trip);
+      setTripDetails(parsedTrip);
     } catch (error) {
       console.error("Error parsing trip details:", error);
     }
@@ -57,10 +58,10 @@ const TripDetails: React.FC = () => {
             const tripDocRef = doc(
               FIREBASE_DB,
               `users/${user.uid}/userTrips/${tripId}`
-            ); // Update path
+            );
             await deleteDoc(tripDocRef);
             console.log(`Trip with ID ${tripId} deleted successfully.`);
-            navigation.navigate("HomeMain"); // Navigate to Home after deletion
+            navigation.navigate("MyTrips");
           },
         },
       ]);
@@ -129,7 +130,7 @@ const TripDetails: React.FC = () => {
             name="trash-bin-outline"
             size={24}
             color={currentTheme.textSecondary}
-            onPress={() => deleteTrip(tripDetails.id)} // Call deleteTrip on icon press
+            onPress={() => deleteTrip(tripDetails.id)}
             style={{ marginLeft: 10 }}
           />
         </View>
@@ -164,9 +165,7 @@ const TripDetails: React.FC = () => {
           Traveling as: {tripDetails?.whoIsGoing || "Unknown"}
         </Text>
 
-        {tripDetails?.travelPlan?.flights?.map((flight, index) => (
-          <FlightInfo key={index} flightData={flight} />
-        ))}
+        <FlightInfo flightData={tripDetails?.travelPlan?.flights} />
 
         {/* Hotels List */}
         <HotelList hotelList={tripDetails?.travelPlan?.hotels || []} />

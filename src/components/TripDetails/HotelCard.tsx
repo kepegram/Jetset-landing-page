@@ -1,7 +1,9 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { GetPhotoRef } from "../../api/googlePlaceApi";
 import { useTheme } from "../../context/themeContext";
+import MapView, { Marker } from "react-native-maps";
+import Modal from "react-native-modal";
 
 // Define the interface for the 'item' prop
 interface HotelCardProps {
@@ -9,12 +11,17 @@ interface HotelCardProps {
     hotelName: string;
     rating: number;
     price: number;
+    geoCoordinates: {
+      latitude: number;
+      longitude: number;
+    };
   };
 }
 
 const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
   const { currentTheme } = useTheme();
   const [photoRef, setPhotoRef] = useState<string | undefined>();
+  const [isModalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     GetGooglePhotoRef();
@@ -25,71 +32,101 @@ const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
     setPhotoRef(result);
   };
 
-  return (
-    <View
-      style={{
-        marginRight: 20,
-        width: 180,
-        backgroundColor: currentTheme.accentBackground,
-        borderRadius: 15,
-        overflow: "hidden",
-      }}
-    >
-      <Image
-        source={{
-          uri:
-            "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" +
-            photoRef +
-            "&key=" +
-            process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
-        }}
-        style={{
-          width: 180,
-          height: 120,
-        }}
-      />
-      <View
-        style={{
-          padding: 5,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "outfit-medium",
-            fontSize: 17,
-            color: currentTheme.textPrimary,
-          }}
-          numberOfLines={1}
-        >
-          {item.hotelName}
-        </Text>
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
 
+  return (
+    <>
+      <Pressable onPress={toggleModal}>
         <View
           style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
+            marginRight: 20,
+            width: 180,
+            backgroundColor: currentTheme.accentBackground,
+            borderRadius: 15,
+            overflow: "hidden",
           }}
         >
-          <Text
+          <Image
+            source={{
+              uri:
+                "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" +
+                photoRef +
+                "&key=" +
+                process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
+            }}
             style={{
-              fontFamily: "outfit",
-              color: currentTheme.textSecondary,
+              width: 180,
+              height: 120,
+            }}
+          />
+          <View
+            style={{
+              padding: 5,
             }}
           >
-            Rating: {item.rating} ⭐
-          </Text>
-          <Text
-            style={{
-              fontFamily: "outfit",
-              color: currentTheme.textSecondary,
-            }}
-          >
-            Price: ${item.price}/night
-          </Text>
+            <Text
+              style={{
+                fontFamily: "outfit-medium",
+                fontSize: 17,
+                color: currentTheme.textPrimary,
+              }}
+              numberOfLines={1}
+            >
+              {item.hotelName}
+            </Text>
+
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "outfit",
+                  color: currentTheme.textSecondary,
+                }}
+              >
+                Rating: {item.rating} ⭐
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "outfit",
+                  color: currentTheme.textSecondary,
+                }}
+              >
+                Price: {item.price}
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
-    </View>
+      </Pressable>
+
+      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+        <View style={{ flex: 1 }}>
+          <MapView
+            style={{ flex: 1 }}
+            initialRegion={{
+              latitude: item.geoCoordinates.latitude,
+              longitude: item.geoCoordinates.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          >
+            <Marker
+              coordinate={{
+                latitude: item.geoCoordinates.latitude,
+                longitude: item.geoCoordinates.longitude,
+              }}
+              title={item.hotelName}
+            />
+          </MapView>
+        </View>
+      </Modal>
+    </>
   );
 };
 

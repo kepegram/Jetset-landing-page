@@ -1,7 +1,8 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable, Modal } from "react-native";
 import { useTheme } from "../../context/themeContext";
-import React from "react";
+import React, { useState } from "react";
 import PlaceCard from "./placeCard";
+import MapView, { Marker } from "react-native-maps";
 
 // Define an interface for the details prop
 interface PlannedTripProps {
@@ -10,8 +11,13 @@ interface PlannedTripProps {
       day: string;
       places: {
         placeName: string;
-        details: string;
+        placeDetails: string;
+        ticketPrice: string;
         timeToTravel: string;
+        geoCoordinates: {
+          latitude: number;
+          longitude: number;
+        };
       }[];
     }[];
     budget: string;
@@ -21,6 +27,7 @@ interface PlannedTripProps {
 
 const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
   const { currentTheme } = useTheme();
+  const [isMapVisible, setMapVisible] = useState(false);
 
   if (!details || typeof details !== "object") {
     return (
@@ -38,6 +45,20 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
     );
   }
 
+  const toggleMapModal = () => {
+    setMapVisible(!isMapVisible);
+  };
+
+  // Calculate the initial region for the map
+  const initialRegion = details.itinerary.length > 0 && details.itinerary[0].places.length > 0
+    ? {
+        latitude: details.itinerary[0].places[0].geoCoordinates.latitude,
+        longitude: details.itinerary[0].places[0].geoCoordinates.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      }
+    : null;
+
   return (
     <View
       style={{
@@ -52,7 +73,7 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
           color: currentTheme.textPrimary,
         }}
       >
-        🏕️ Plan Details
+        🏕️ Suggested Itinerary
       </Text>
 
       {details.itinerary.map(({ day, places }) => (
@@ -74,7 +95,8 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
                 key={index}
                 place={{
                   ...place,
-                  details: place.details,
+                  placeDetails: place.placeDetails,
+                  ticketPrice: place.ticketPrice,
                 }}
               />
             ))
@@ -92,6 +114,63 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
       <Text style={{ color: currentTheme.textPrimary }}>
         Destination: {details.destination}
       </Text>
+
+      <Pressable
+        onPress={toggleMapModal}
+        style={{
+          backgroundColor: currentTheme.alternate,
+          padding: 10,
+          borderRadius: 5,
+          marginTop: 20,
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={{
+            color: currentTheme.buttonText,
+            fontFamily: "outfit",
+          }}
+        >
+          Show Map
+        </Text>
+      </Pressable>
+
+      <Modal visible={isMapVisible} onRequestClose={toggleMapModal}>
+        <MapView style={{ flex: 1 }} initialRegion={initialRegion}>
+          {details.itinerary.map(({ places }) =>
+            places.map((place, index) => (
+              <Marker
+                key={index}
+                coordinate={{
+                  latitude: place.geoCoordinates.latitude,
+                  longitude: place.geoCoordinates.longitude,
+                }}
+                title={place.placeName}
+              />
+            ))
+          )}
+        </MapView>
+        <Pressable
+          onPress={toggleMapModal}
+          style={{
+            position: "absolute",
+            top: 40,
+            right: 20,
+            backgroundColor: currentTheme.alternate,
+            padding: 10,
+            borderRadius: 5,
+          }}
+        >
+          <Text
+            style={{
+              color: currentTheme.buttonText,
+              fontFamily: "outfit",
+            }}
+          >
+            Close Map
+          </Text>
+        </Pressable>
+      </Modal>
     </View>
   );
 };

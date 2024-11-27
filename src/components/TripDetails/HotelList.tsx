@@ -9,6 +9,10 @@ interface HotelListProps {
     hotelName: string;
     rating: number;
     price: number;
+    geoCoordinates: {
+      latitude: number;
+      longitude: number;
+    };
   }>;
 }
 

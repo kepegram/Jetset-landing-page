@@ -23,7 +23,7 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
 
-  if (!userTrips || userTrips.length === 0) return null;
+  if (!userTrips || userTrips.length === 0) return <Text>None</Text>;
 
   const parseData = (data: string) => {
     if (typeof data === "string") {

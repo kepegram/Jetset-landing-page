@@ -131,7 +131,7 @@ const GenerateTrip: React.FC = () => {
       <Text
         style={{
           fontFamily: "outfit-bold",
-          fontSize: 35,
+          fontSize: 20,
           textAlign: "center",
           color: currentTheme.textPrimary,
         }}
