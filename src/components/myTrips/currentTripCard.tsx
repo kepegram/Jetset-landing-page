@@ -1,5 +1,5 @@
 import { View, Text, Image, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import moment from "moment";
 import { useTheme } from "../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -15,59 +15,75 @@ interface CurrentTripCardProps {
   userTrips: Array<{
     tripData: string;
     tripPlan: string;
-    id: string; // Added trip ID to the interface
+    id: string;
   }>;
 }
 
 const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
+  const [currentTrip, setCurrentTrip] = useState<any>(null);
 
-  if (!userTrips || userTrips.length === 0) return null;
+  useEffect(() => {
+    const today = moment().startOf("day");
 
-  // Safely parse tripData and tripPlan
+    const findCurrentTrip = userTrips.find((trip) => {
+      const tripData = parseData(trip.tripData);
+      const startDate = moment(tripData.startDate).startOf("day");
+      const endDate = moment(tripData.endDate).endOf("day");
+      return startDate.isSameOrBefore(today) && endDate.isSameOrAfter(today);
+    });
+
+    setCurrentTrip(findCurrentTrip);
+  }, [userTrips]);
+
   const parseData = (data: string) => {
     if (typeof data === "string") {
       try {
         return JSON.parse(data);
       } catch (error) {
         console.error("Failed to parse data:", error);
-        return {}; // Return fallback object
+        return {};
       }
     }
-    return data; // Already an object
+    return data;
   };
 
-  const today = moment().startOf("day");
+  if (!currentTrip) {
+    return (
+      <View style={{ marginVertical: 20, width: "100%", alignItems: "center" }}>
+        <Text
+          style={{
+            fontFamily: "outfit-medium",
+            fontSize: 18,
+            color: currentTheme.textSecondary,
+          }}
+        >
+          None. Book something for today!
+        </Text>
+      </View>
+    );
+  }
 
-  const currentTrip = userTrips.find((trip) => {
-    const tripData = parseData(trip.tripData);
-    const startDate = moment(tripData.startDate).startOf("day");
-    const endDate = moment(tripData.endDate).endOf("day");
-    return startDate.isSameOrBefore(today) && endDate.isSameOrAfter(today);
-  });
-
-  if (!currentTrip) return null;
-
-  const CurrentTrip = parseData(currentTrip.tripData);
-  const CurrentPlan = parseData(currentTrip.tripPlan);
+  const parsedCurrentTrip = parseData(currentTrip.tripData);
+  const parsedCurrentPlan = parseData(currentTrip.tripPlan);
 
   return (
     <View style={{ marginVertical: 20, width: "100%" }}>
-      {CurrentTrip?.locationInfo?.photoRef ? (
+      {parsedCurrentTrip?.locationInfo?.photoRef ? (
         <Pressable
           onPress={() =>
             navigation.navigate("TripDetails", {
               trip: JSON.stringify({
-                ...CurrentTrip,
-                travelPlan: CurrentPlan?.travelPlan || {},
+                ...parsedCurrentTrip,
+                travelPlan: parsedCurrentPlan?.travelPlan || {},
               }),
             })
           }
         >
           <Image
             source={{
-              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${CurrentTrip.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
+              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${parsedCurrentTrip.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
             }}
             style={{
               width: "100%",
@@ -94,7 +110,7 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
             color: currentTheme.textPrimary,
           }}
         >
-          {CurrentTrip?.tripName || "No Location Available"}
+          {parsedCurrentTrip?.tripName || "No Location Available"}
         </Text>
         <Text
           style={{
@@ -104,7 +120,7 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
             marginTop: 5,
           }}
         >
-          {CurrentTrip?.locationInfo?.name || "No Location Name"}
+          {parsedCurrentTrip?.locationInfo?.name || "No Location Name"}
         </Text>
         <View
           style={{
@@ -120,8 +136,8 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
               color: currentTheme.textSecondary,
             }}
           >
-            {CurrentTrip?.startDate
-              ? moment(CurrentTrip.startDate).format("MMM DD yyyy")
+            {parsedCurrentTrip?.startDate
+              ? moment(parsedCurrentTrip.startDate).format("MMM DD yyyy")
               : "No Start Date"}{" "}
             -{" "}
           </Text>
@@ -132,8 +148,8 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
               color: currentTheme.textSecondary,
             }}
           >
-            {CurrentTrip?.startDate
-              ? moment(CurrentTrip.endDate).format("MMM DD yyyy")
+            {parsedCurrentTrip?.startDate
+              ? moment(parsedCurrentTrip.endDate).format("MMM DD yyyy")
               : "No Start Date"}
           </Text>
         </View>

@@ -54,13 +54,13 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
   const UpcomingTrip = sortedTrips.find((trip) => {
     const startDate = moment(trip.parsedTripData.startDate).startOf("day");
     const endDate = moment(trip.parsedTripData.endDate).endOf("day");
-    return !startDate.isSame(today, "day") && !endDate.isSame(today, "day");
+    return startDate.isAfter(today) && endDate.isAfter(today);
   })?.parsedTripData;
 
   const UpcomingPlan = sortedTrips.find((trip) => {
     const startDate = moment(trip.parsedTripData.startDate).startOf("day");
     const endDate = moment(trip.parsedTripData.endDate).endOf("day");
-    return !startDate.isSame(today, "day") && !endDate.isSame(today, "day");
+    return startDate.isAfter(today) && endDate.isAfter(today);
   })?.parsedTripPlan;
 
   if (!UpcomingTrip) return null;

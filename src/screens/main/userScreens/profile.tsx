@@ -6,6 +6,7 @@ import {
   Image,
   Modal,
   Button,
+  ActivityIndicator,
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
@@ -15,8 +16,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useProfile } from "../../../context/profileContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
+import { collection, getDocs, query } from "firebase/firestore";
 import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the settings icon
+import CurrentTripCard from "../../../components/myTrips/currentTripCard"; // Import CurrentTripCard
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -26,9 +29,13 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 const Profile: React.FC = () => {
   const { profilePicture, displayName } = useProfile();
   const { currentTheme } = useTheme();
+  const [loading, setLoading] = useState<boolean>(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [userTrips, setUserTrips] = useState<any[]>([]); // State to hold user trips
+  const [location, setLocation] = useState<string>("Location"); // State to hold user location
 
+  const user = getAuth().currentUser;
   const navigation = useNavigation<ProfileScreenNavigationProp>();
 
   useFocusEffect(
@@ -41,6 +48,7 @@ const Profile: React.FC = () => {
             if (userDoc.exists()) {
               const data = userDoc.data();
               setUserName(data?.name || "");
+              setUserTrips(data?.trips || []); // Assuming trips are stored in user data
             }
           } catch (error) {
             console.error("Error fetching user data:", error);
@@ -51,6 +59,39 @@ const Profile: React.FC = () => {
       fetchUserData();
     }, [])
   );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (user) GetMyTrips();
+    }, [user])
+  );
+
+  const GetMyTrips = async () => {
+    try {
+      setLoading(true);
+      setUserTrips([]);
+
+      const tripsQuery = query(
+        collection(FIREBASE_DB, `users/${user.uid}/userTrips`)
+      );
+
+      const querySnapshot = await getDocs(tripsQuery);
+      const trips = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setUserTrips(trips);
+    } catch (error) {
+      console.error("Error fetching user trips:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLocationPress = () => {
+    console.log("TODO");
+  };
 
   return (
     <View
@@ -66,11 +107,7 @@ const Profile: React.FC = () => {
           style={styles.settingsIcon}
           onPress={() => navigation.navigate("Settings")}
         >
-          <Ionicons
-            name="settings-sharp"
-            size={28}
-            color={currentTheme.textPrimary}
-          />
+          <Ionicons name="settings-sharp" size={28} color="white" />
         </Pressable>
         <View style={styles.profileContainer}>
           <Pressable onPress={() => setModalVisible(true)}>
@@ -84,6 +121,15 @@ const Profile: React.FC = () => {
             {displayName || userName}
           </Text>
         </View>
+        <Pressable
+          style={styles.locationContainer}
+          onPress={handleLocationPress}
+        >
+          <Ionicons name="location-sharp" size={24} color="white" />
+          <Text style={[styles.locationText, { color: "white" }]}>
+            {location}
+          </Text>
+        </Pressable>
       </View>
 
       <View style={styles.divider} />
@@ -91,6 +137,14 @@ const Profile: React.FC = () => {
       <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
         My Trips
       </Text>
+
+      {loading ? (
+        <ActivityIndicator size="large" color={currentTheme.alternate} />
+      ) : (
+        <View style={{ padding: 20 }}>
+          <CurrentTripCard userTrips={userTrips} />
+        </View>
+      )}
 
       <Modal
         animationType="fade"
@@ -167,6 +221,20 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "bold",
     marginTop: 40,
+  },
+  locationContainer: {
+    position: "absolute",
+    top: 150,
+    left: 120,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(128, 128, 128, 0.5)", // Transparent grey background
+    padding: 5,
+    borderRadius: 5,
+  },
+  locationText: {
+    fontSize: 18,
+    marginLeft: 5,
   },
   divider: {
     height: 1,
