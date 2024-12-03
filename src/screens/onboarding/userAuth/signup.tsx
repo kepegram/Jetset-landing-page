@@ -4,7 +4,6 @@ import {
   Text,
   View,
   TextInput,
-  Alert,
   ActivityIndicator,
   Pressable,
   KeyboardAvoidingView,
@@ -85,6 +84,10 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
       });
 
       await AsyncStorage.setItem("userName", name);
+
+      await AsyncStorage.setItem("preferencesSet", "false");
+
+      navigation.navigate("Preferences", { navigateToAppNav: () => true });
     } catch (err: any) {
       console.error("Error signing up:", err);
       const user = auth.currentUser;

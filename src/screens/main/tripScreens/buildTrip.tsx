@@ -10,7 +10,6 @@ import { useTheme } from "../../../context/themeContext";
 import React, { useState, useContext, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Dropdown } from "react-native-element-dropdown";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -44,26 +43,6 @@ const BuildTrip: React.FC = () => {
   const [endDate, setEndDate] = useState<Moment | undefined>();
   const [showSelectDates, setShowSelectDates] = useState(false);
   const [photoRef, setPhotoRef] = useState<string | null>(null);
-  const [items] = useState([
-    {
-      label: "Cheap",
-      desc: "Stay conscious of costs",
-      icon: "💵",
-      value: "Cheap",
-    },
-    {
-      label: "Moderate",
-      desc: "Keep cost on the average side",
-      icon: "💰",
-      value: "Moderate",
-    },
-    {
-      label: "Lavish",
-      desc: "Dont worry about cost",
-      icon: "💸",
-      value: "Lavish",
-    },
-  ]);
   const navigation = useNavigation<BuildTripNavigationProp>();
 
   useEffect(() => {
@@ -110,17 +89,6 @@ const BuildTrip: React.FC = () => {
       setPhotoRef(photoReference);
     }
     console.log(tripData.locationInfo);
-  };
-
-  const handleBudgetChoice = (option: string) => {
-    if (option === "Moderate") {
-      setShowSelectDates(true);
-    } else {
-      setTripData({
-        ...tripData,
-        budget: option,
-      });
-    }
   };
 
   const onDateChange = (date: Date, type: string) => {
@@ -173,7 +141,6 @@ const BuildTrip: React.FC = () => {
 
   const isFormValid =
     tripData.locationInfo &&
-    tripData.budget !== null &&
     startDate &&
     endDate &&
     tripData.whoIsGoing !== null;
@@ -357,7 +324,7 @@ const BuildTrip: React.FC = () => {
               <TextInput
                 placeholder="When?"
                 placeholderTextColor={currentTheme.textSecondary}
-                onFocus={() => setFocusedInput(2)}
+                onFocus={() => setShowSelectDates(true)}
                 onBlur={() => setFocusedInput(null)}
                 style={{
                   height: 50,
@@ -378,71 +345,7 @@ const BuildTrip: React.FC = () => {
                       )}`
                     : ""
                 }
-                onPress={() => handleBudgetChoice("Moderate")}
                 editable={isPlaceSelected}
-              />
-            </View>
-            <View style={{ width: "100%", marginBottom: 20 }}>
-              <Ionicons
-                name="wallet-outline"
-                size={20}
-                color={currentTheme.textSecondary}
-                style={{ position: "absolute", left: 10, top: 10 }}
-              />
-              <Dropdown
-                data={items}
-                labelField="label"
-                valueField="value"
-                placeholder="Budget?"
-                style={{
-                  borderBottomColor:
-                    focusedInput === 3
-                      ? currentTheme.alternate
-                      : currentTheme.accentBackground,
-                  borderBottomWidth: focusedInput === 3 ? 2 : 1,
-                  paddingBottom: 10,
-                }}
-                placeholderStyle={{
-                  color: currentTheme.textSecondary,
-                  fontSize: 13,
-                  paddingLeft: 40,
-                  paddingTop: 12,
-                  paddingBottom: 10,
-                }}
-                value={
-                  items.find((item) => item.value === tripData.budget) || null
-                }
-                onChange={(item) => {
-                  setTripData({
-                    ...tripData,
-                    budget: item.value,
-                  });
-                  setFocusedInput(null);
-                }}
-                containerStyle={{
-                  width: "100%",
-                  backgroundColor: currentTheme.background,
-                  borderBottomColor:
-                    focusedInput === 3
-                      ? currentTheme.alternate
-                      : currentTheme.accentBackground,
-                  borderBottomWidth: focusedInput === 3 ? 2 : 1,
-                  borderWidth: 0,
-                }}
-                selectedTextStyle={{
-                  color: currentTheme.textSecondary,
-                  fontSize: 13,
-                  paddingLeft: 40,
-                  paddingTop: 12,
-                  paddingBottom: 10,
-                }}
-                itemTextStyle={{
-                  color: currentTheme.textSecondary,
-                  paddingTop: 12,
-                }}
-                onFocus={() => setFocusedInput(3)}
-                onBlur={() => setFocusedInput(null)}
-                disable={!isPlaceSelected}
               />
             </View>
 
@@ -568,10 +471,12 @@ const BuildTrip: React.FC = () => {
                   tripData.startDate,
                   "END DATE",
                   tripData.endDate,
+                  "WHO IS GOING",
+                  tripData.whoIsGoing,
                   "BUDGET",
                   tripData.budget,
-                  "WHO IS GOING",
-                  tripData.whoIsGoing
+                  "TRAVELER TYPE",
+                  tripData.travelerType,
                 );
               }}
               style={{

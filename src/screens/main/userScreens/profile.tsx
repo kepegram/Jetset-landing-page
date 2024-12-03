@@ -18,8 +18,8 @@ import { useProfile } from "../../../context/profileContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { collection, getDocs, query } from "firebase/firestore";
 import { useTheme } from "../../../context/themeContext";
-import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the settings icon
-import CurrentTripCard from "../../../components/myTrips/currentTripCard"; // Import CurrentTripCard
+import { Ionicons } from "@expo/vector-icons";
+import CurrentTripCard from "../../../components/myTrips/currentTripCard";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -32,8 +32,8 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [userTrips, setUserTrips] = useState<any[]>([]); // State to hold user trips
-  const [location, setLocation] = useState<string>("Location"); // State to hold user location
+  const [userTrips, setUserTrips] = useState<any[]>([]);
+  const [location, setLocation] = useState<string>("Location");
 
   const user = getAuth().currentUser;
   const navigation = useNavigation<ProfileScreenNavigationProp>();
@@ -48,7 +48,7 @@ const Profile: React.FC = () => {
             if (userDoc.exists()) {
               const data = userDoc.data();
               setUserName(data?.name || "");
-              setUserTrips(data?.trips || []); // Assuming trips are stored in user data
+              setUserTrips(data?.trips || []);
             }
           } catch (error) {
             console.error("Error fetching user data:", error);
@@ -111,10 +111,17 @@ const Profile: React.FC = () => {
         </Pressable>
         <View style={styles.profileContainer}>
           <Pressable onPress={() => setModalVisible(true)}>
-            <Image
-              source={{ uri: profilePicture }}
-              style={styles.profilePicture}
-            />
+            <View
+              style={[
+                styles.profilePictureBackground,
+                { backgroundColor: currentTheme.background },
+              ]}
+            >
+              <Image
+                source={{ uri: profilePicture }}
+                style={styles.profilePicture}
+              />
+            </View>
           </Pressable>
 
           <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
@@ -142,11 +149,16 @@ const Profile: React.FC = () => {
         <ActivityIndicator size="large" color={currentTheme.alternate} />
       ) : (
         <View style={{ padding: 20 }}>
-          <View style={styles.ongoingBadgeContainer}>
-            <Text style={[styles.ongoingBadge, { backgroundColor: currentTheme.alternate }]}>
+          {/* <View style={styles.ongoingBadgeContainer}>
+            <Text
+              style={[
+                styles.ongoingBadge,
+                { backgroundColor: currentTheme.alternate },
+              ]}
+            >
               Ongoing
             </Text>
-          </View>
+          </View> */}
           <CurrentTripCard userTrips={userTrips} />
         </View>
       )}
@@ -190,7 +202,7 @@ const styles = StyleSheet.create({
     height: 200,
     justifyContent: "center",
     alignItems: "center",
-    position: "relative", // Added to position overlay and settings icon
+    position: "relative",
   },
   headerImage: {
     width: "100%",
@@ -199,7 +211,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.3)", // Slight overlay
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
   settingsIcon: {
     position: "absolute",
@@ -214,13 +226,16 @@ const styles = StyleSheet.create({
     left: 0,
     paddingHorizontal: 20,
   },
+  profilePictureBackground: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginRight: 10,
+  },
   profilePicture: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginRight: 20,
-    borderWidth: 3,
-    borderColor: "#fff",
   },
   userName: {
     fontSize: 26,
@@ -233,7 +248,7 @@ const styles = StyleSheet.create({
     left: 120,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(128, 128, 128, 0.5)", // Transparent grey background
+    backgroundColor: "rgba(128, 128, 128, 0.5)",
     padding: 5,
     borderRadius: 5,
   },
@@ -246,12 +261,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
     width: "100%",
     position: "absolute",
-    top: "40%",
+    top: "35%",
   },
   heading: {
     fontSize: 24,
     fontWeight: "bold",
-    marginTop: 170,
+    marginTop: 120,
     textAlign: "center",
     alignSelf: "flex-start",
     paddingLeft: 20,

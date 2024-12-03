@@ -1,12 +1,11 @@
 import { View, Text, Pressable } from "react-native";
-import React from "react";
-import { useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { CreateTripContext } from "../../../context/createTripContext";
-import moment from "moment";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
+import moment from "moment";
 
 type ReviewTripScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -17,6 +16,11 @@ const ReviewTrip: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<ReviewTripScreenNavigationProp>();
   const { tripData } = useContext(CreateTripContext);
+  const [localTripData, setLocalTripData] = useState(tripData);
+
+  useEffect(() => {
+    setLocalTripData(tripData);
+  }, [tripData]);
 
   return (
     <View
@@ -80,7 +84,7 @@ const ReviewTrip: React.FC = () => {
                 color: currentTheme.textPrimary,
               }}
             >
-              {tripData?.locationInfo?.name}
+              {localTripData?.locationInfo?.name}
             </Text>
           </View>
         </View>
@@ -116,11 +120,11 @@ const ReviewTrip: React.FC = () => {
                 color: currentTheme.textPrimary,
               }}
             >
-              {moment(tripData?.startDate).format("MMM DD") +
+              {moment(localTripData?.startDate).format("MMM DD") +
                 " - " +
-                moment(tripData.endDate).format("MMM DD") +
+                moment(localTripData.endDate).format("MMM DD") +
                 " "}
-              ({tripData?.totalNoOfDays} days)
+              ({localTripData?.totalNoOfDays} days)
             </Text>
           </View>
         </View>
@@ -156,7 +160,7 @@ const ReviewTrip: React.FC = () => {
                 color: currentTheme.textPrimary,
               }}
             >
-              {tripData?.whoIsGoing}
+              {localTripData?.whoIsGoing}
             </Text>
           </View>
         </View>
@@ -192,7 +196,115 @@ const ReviewTrip: React.FC = () => {
                 color: currentTheme.textPrimary,
               }}
             >
-              {tripData?.budget}
+              {localTripData?.budget}
+            </Text>
+          </View>
+        </View>
+
+        {/* Traveler Type Info  */}
+        <View
+          style={{
+            marginTop: 25,
+            display: "flex",
+            flexDirection: "row",
+            gap: 20,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 30,
+            }}
+          >
+            🧳
+          </Text>
+          <View>
+            <Text
+              style={{
+                fontSize: 17,
+                color: currentTheme.textSecondary,
+              }}
+            >
+              Traveler Type
+            </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                color: currentTheme.textPrimary,
+              }}
+            >
+              {localTripData?.travelerType}
+            </Text>
+          </View>
+        </View>
+
+        {/* Accommodation Type Info  */}
+        <View
+          style={{
+            marginTop: 25,
+            display: "flex",
+            flexDirection: "row",
+            gap: 20,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 30,
+            }}
+          >
+            🏨
+          </Text>
+          <View>
+            <Text
+              style={{
+                fontSize: 17,
+                color: currentTheme.textSecondary,
+              }}
+            >
+              Accommodation Type
+            </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                color: currentTheme.textPrimary,
+              }}
+            >
+              {localTripData?.accommodationType}
+            </Text>
+          </View>
+        </View>
+
+        {/* Activity Level Info  */}
+        <View
+          style={{
+            marginTop: 25,
+            display: "flex",
+            flexDirection: "row",
+            gap: 20,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 30,
+            }}
+          >
+            🏃‍♂️
+          </Text>
+          <View>
+            <Text
+              style={{
+                fontSize: 17,
+                color: currentTheme.textSecondary,
+              }}
+            >
+              Activity Level
+            </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                color: currentTheme.textPrimary,
+              }}
+            >
+              {localTripData?.activityLevel}
             </Text>
           </View>
         </View>

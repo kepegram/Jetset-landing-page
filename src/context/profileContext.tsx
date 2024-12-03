@@ -11,7 +11,7 @@ interface ProfileContextType {
   setDisplayName: (name: string) => void;
 }
 
-const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
+export const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   children,

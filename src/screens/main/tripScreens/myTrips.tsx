@@ -119,7 +119,7 @@ const MyTrips: React.FC = () => {
       >
         <Text
           style={{
-            fontFamily: "outfit-bold",
+            fontWeight: "bold",
             fontSize: 35,
             color: currentTheme.textPrimary,
           }}
@@ -139,14 +139,16 @@ const MyTrips: React.FC = () => {
         </View>
       </View>
       {loading ? (
-        <ActivityIndicator size="large" color={currentTheme.alternate} />
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color={currentTheme.alternate} />
+        </View>
       ) : userTrips.length === 0 ? (
         <StartNewTripCard navigation={navigation} />
       ) : (
         <View>
           <Text
             style={{
-              fontFamily: "outfit-bold",
+              fontWeight: "bold",
               fontSize: 24,
               color: currentTheme.textPrimary,
               marginTop: 20,
@@ -162,7 +164,7 @@ const MyTrips: React.FC = () => {
           {sortedUpcomingTrips.length > 0 && (
             <Text
               style={{
-                fontFamily: "outfit-bold",
+                fontWeight: "bold",
                 fontSize: 24,
                 color: currentTheme.textPrimary,
                 marginTop: 20,
@@ -188,7 +190,7 @@ const MyTrips: React.FC = () => {
           ) && (
             <Text
               style={{
-                fontFamily: "outfit-bold",
+                fontWeight: "bold",
                 fontSize: 24,
                 color: currentTheme.textPrimary,
                 marginTop: 20,

@@ -23,6 +23,8 @@ import SignUp from "./src/screens/onboarding/userAuth/signup";
 import ForgotPassword from "./src/screens/onboarding/userAuth/forgotPassword";
 import AppNav from "./src/navigation/appNav";
 import Carousel from "./src/screens/onboarding/carousel/carousel";
+import Preferences from "./src/screens/onboarding/welcome/preferences";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -31,6 +33,7 @@ export type RootStackParamList = {
   SignUp: undefined;
   ForgotPassword: undefined;
   AppNav: undefined;
+  Preferences: { navigateToAppNav: () => void };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -43,6 +46,7 @@ WebBrowser.maybeCompleteAuthSession();
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [appIsReady, setAppIsReady] = useState(false);
+  const [showPreferences, setShowPreferences] = useState(false);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId:
@@ -99,6 +103,15 @@ const App: React.FC = () => {
     prepare();
   }, []);
 
+  useEffect(() => {
+    const checkPreferences = async () => {
+      const preferencesSet = await AsyncStorage.getItem("preferencesSet");
+      setShowPreferences(preferencesSet === "false");
+    };
+
+    checkPreferences();
+  }, [user]);
+
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
       await SplashScreen.hideAsync();
@@ -135,11 +148,20 @@ const App: React.FC = () => {
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         <Stack.Navigator initialRouteName="Welcome">
           {user ? (
-            <Stack.Screen
-              name="AppNav"
-              component={AppNav}
-              options={{ headerShown: false }}
-            />
+            showPreferences ? (
+              <Stack.Screen
+                name="Preferences"
+                component={Preferences}
+                options={{ headerShown: false }}
+                initialParams={{ navigateToAppNav: () => setShowPreferences(false) }}
+              />
+            ) : (
+              <Stack.Screen
+                name="AppNav"
+                component={AppNav}
+                options={{ headerShown: false }}
+              />
+            )
           ) : (
             <>
               <Stack.Screen

@@ -36,6 +36,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyTrips from "../screens/main/tripScreens/myTrips";
 
 export type RootStackParamList = {
+  Preferences: { navigateToAppNav: boolean };
   App: undefined;
   Home: undefined;
   MyTrips: undefined;

@@ -32,7 +32,7 @@ const StartNewTripCard: React.FC<StartNewTripCardProps> = ({ navigation }) => {
         <Text
           style={{
             fontSize: 25,
-            fontFamily: "outfit-medium",
+            fontWeight: "bold",
             color: currentTheme.textPrimary,
           }}
         >
@@ -42,7 +42,6 @@ const StartNewTripCard: React.FC<StartNewTripCardProps> = ({ navigation }) => {
         <Text
           style={{
             fontSize: 20,
-            fontFamily: "outfit",
             textAlign: "center",
             color: "gray",
           }}
@@ -62,7 +61,6 @@ const StartNewTripCard: React.FC<StartNewTripCardProps> = ({ navigation }) => {
           <Text
             style={{
               color: currentTheme.buttonText,
-              fontFamily: "outfit-medium",
               fontSize: 20,
             }}
           >
