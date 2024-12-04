@@ -2,7 +2,7 @@ import React, { useContext, useState, useCallback, useRef } from "react";
 import { View, Text, Image, Alert } from "react-native";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { AI_PROMPT } from "../../../api/ai-prompt";
-import { chatSession } from "../../../../aiModal";
+import { chatSession } from "../../../../AI-Model";
 import { doc, setDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
 import { useTheme } from "../../../context/themeContext";
@@ -77,7 +77,7 @@ const GenerateTrip: React.FC = () => {
       await AsyncStorage.clear();
       console.log("AsyncStorage cleared successfully.");
 
-      navigation.navigate("MyTrips");
+      navigation.navigate("MyTripsMain");
     } catch (error: any) {
       console.error("AI generation failed:", error.message);
       if (retryCount < 3 && isMounted.current) {

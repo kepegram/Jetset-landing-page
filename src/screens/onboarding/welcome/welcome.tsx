@@ -54,7 +54,6 @@ const Welcome: React.FC = () => {
 };
 
 export default Welcome;
-
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
@@ -107,3 +106,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+

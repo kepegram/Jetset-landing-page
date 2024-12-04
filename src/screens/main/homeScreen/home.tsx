@@ -1,10 +1,14 @@
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, Pressable } from "react-native";
 import React, { useState, useContext, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { Dropdown } from "react-native-element-dropdown";
+import { getAuth } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { FIREBASE_DB } from "../../../../firebase.config";
+import { Ionicons } from "@expo/vector-icons";
 
 // Define the type for tripData
 interface TripData {
@@ -46,10 +50,8 @@ const Home: React.FC = () => {
       setPreferences(parsedPreferences);
       setTripData((prevTripData: TripData) => {
         const updatedTripData = { ...prevTripData, ...parsedPreferences };
-        console.log("Trip data after fetching preferences:", updatedTripData);
         return updatedTripData;
       });
-      console.log("Fetched and set preferences:", parsedPreferences);
     } catch (error) {
       console.error("Error fetching preferences:", error);
     }
@@ -63,14 +65,23 @@ const Home: React.FC = () => {
 
   const savePreferences = async () => {
     try {
-      await AsyncStorage.setItem("preferences", JSON.stringify(preferences));
-      setTripData((prevTripData: TripData) => {
-        const updatedTripData = { ...prevTripData, ...preferences };
-        console.log("Trip data after saving preferences:", updatedTripData);
-        return updatedTripData;
-      });
-      console.log("Saved preferences:", preferences);
-      setIsEditing(false);
+      const user = getAuth().currentUser;
+      if (user) {
+        // Update Firestore with new preferences
+        await setDoc(
+          doc(FIREBASE_DB, `users/${user.uid}/userPreferences`),
+          preferences
+        );
+
+        await AsyncStorage.setItem("preferences", JSON.stringify(preferences));
+        setTripData((prevTripData: TripData) => {
+          const updatedTripData = { ...prevTripData, ...preferences };
+          console.log("Trip data after saving preferences:", updatedTripData);
+          return updatedTripData;
+        });
+        console.log("Saved preferences:", preferences);
+        setIsEditing(false);
+      }
     } catch (error) {
       console.error("Error saving preferences:", error);
     }
@@ -85,12 +96,15 @@ const Home: React.FC = () => {
   const travelerTypes = [
     { label: "Adventurous", value: "Adventurous" },
     { label: "Foodie", value: "Foodie" },
+    { label: "Cultural", value: "Cultural" },
+    { label: "Relaxation", value: "Relaxation" },
   ];
 
   const accommodationTypes = [
     { label: "Hotel", value: "Hotel" },
-    { label: "Apartment", value: "Apartment" },
     { label: "Hostel", value: "Hostel" },
+    { label: "Airbnb", value: "Airbnb" },
+    { label: "Camping", value: "Camping" },
   ];
 
   const activityLevels = [
@@ -100,10 +114,17 @@ const Home: React.FC = () => {
   ];
 
   const preferredClimates = [
-    { label: "Tropical", value: "Tropical" },
-    { label: "Temperate", value: "Temperate" },
-    { label: "Polar", value: "Polar" },
+    { label: "Warm", value: "Warm" },
+    { label: "Mild", value: "Mild" },
+    { label: "Cold", value: "Cold" },
   ];
+
+  const allPreferencesSelected =
+    preferences.budget &&
+    preferences.travelerType &&
+    preferences.accommodationType &&
+    preferences.activityLevel &&
+    preferences.preferredClimate;
 
   return (
     <View
@@ -115,21 +136,47 @@ const Home: React.FC = () => {
         padding: 20,
       }}
     >
-      <View style={{ position: "absolute", top: "7%", left: "4%" }}>
-        <Text style={{ fontSize: 45, fontWeight: "bold" }}>Jetset</Text>
-      </View>
       {!isEditing ? (
-        <View>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              position: "absolute",
+              top: "5%",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 45,
+                fontWeight: "bold",
+                color: currentTheme.textPrimary,
+              }}
+            >
+              Jetset
+            </Text>
+            <Pressable onPress={() => setIsEditing(true)}>
+              <Ionicons
+                name="pencil"
+                size={30}
+                color={currentTheme.textPrimary}
+              />
+            </Pressable>
+          </View>
           <Text style={{ color: currentTheme.textPrimary, marginBottom: 10 }}>
             Preferences: {JSON.stringify(preferences)}
           </Text>
-          <Button title="Edit Preferences" onPress={() => setIsEditing(true)} />
         </View>
       ) : (
         <View style={{ width: "100%" }}>
-          <View style={{ alignSelf: "flex-start" }}>
-            <Button title="Cancel" onPress={() => setIsEditing(false)} />
-          </View>
           <Text
             style={{
               color: currentTheme.textPrimary,
@@ -273,7 +320,12 @@ const Home: React.FC = () => {
             placeholderStyle={{ color: currentTheme.textPrimary }}
             selectedTextStyle={{ color: currentTheme.textPrimary }}
           />
-          <Button title="Save Preferences" onPress={savePreferences} />
+          <Button
+            title="Save Preferences"
+            onPress={savePreferences}
+            disabled={!allPreferencesSelected}
+          />
+          <Button title="Cancel" onPress={() => setIsEditing(false)} />
         </View>
       )}
     </View>

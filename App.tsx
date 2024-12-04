@@ -23,8 +23,8 @@ import SignUp from "./src/screens/onboarding/userAuth/signup";
 import ForgotPassword from "./src/screens/onboarding/userAuth/forgotPassword";
 import AppNav from "./src/navigation/appNav";
 import Carousel from "./src/screens/onboarding/carousel/carousel";
-import Preferences from "./src/screens/onboarding/welcome/preferences";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Preferences from "./src/screens/onboarding/welcome/preferences";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -32,8 +32,8 @@ export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
+  Preferences: { fromSignUp: boolean };
   AppNav: undefined;
-  Preferences: { navigateToAppNav: () => void };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -46,7 +46,6 @@ WebBrowser.maybeCompleteAuthSession();
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [appIsReady, setAppIsReady] = useState(false);
-  const [showPreferences, setShowPreferences] = useState(false);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId:
@@ -59,7 +58,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (response?.type === "success") {
-      const { id_token } = response.params as { id_token: string }; // Get the id_token from response.params
+      const { id_token } = response.params as { id_token: string };
       if (id_token) {
         const credential = GoogleAuthProvider.credential(id_token);
         signInWithCredential(FIREBASE_AUTH, credential)
@@ -104,12 +103,18 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const checkPreferences = async () => {
+    const checkPreferencesSet = async () => {
       const preferencesSet = await AsyncStorage.getItem("preferencesSet");
-      setShowPreferences(preferencesSet === "false");
+      if (preferencesSet === "true") {
+        setUser(user); // Navigate to the main app if preferences are set
+      } else {
+        console.log("Preferences not set");
+      }
     };
 
-    checkPreferences();
+    if (user) {
+      checkPreferencesSet();
+    }
   }, [user]);
 
   const onLayoutRootView = useCallback(async () => {
@@ -147,21 +152,17 @@ const App: React.FC = () => {
       <NavigationContainer onReady={onLayoutRootView}>
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         <Stack.Navigator initialRouteName="Welcome">
+          <Stack.Screen
+            name="Preferences"
+            component={Preferences}
+            options={{ headerShown: false }}
+          />
           {user ? (
-            showPreferences ? (
-              <Stack.Screen
-                name="Preferences"
-                component={Preferences}
-                options={{ headerShown: false }}
-                initialParams={{ navigateToAppNav: () => setShowPreferences(false) }}
-              />
-            ) : (
-              <Stack.Screen
-                name="AppNav"
-                component={AppNav}
-                options={{ headerShown: false }}
-              />
-            )
+            <Stack.Screen
+              name="AppNav"
+              component={AppNav}
+              options={{ headerShown: false }}
+            />
           ) : (
             <>
               <Stack.Screen

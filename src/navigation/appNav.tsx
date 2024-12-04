@@ -34,12 +34,19 @@ import GenerateTrip from "../screens/main/tripScreens/generateTrip";
 import TripDetails from "../screens/main/tripScreens/tripDetails";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyTrips from "../screens/main/tripScreens/myTrips";
+import Preferences from "../screens/onboarding/welcome/preferences";
 
 export type RootStackParamList = {
-  Preferences: { navigateToAppNav: boolean };
+  Welcome: undefined;
+  Carousel: undefined;
+  Login: undefined;
+  SignUp: undefined;
+  ForgotPassword: undefined;
+  AppNav: undefined;
+  Preferences: { fromSignUp: boolean };
   App: undefined;
   Home: undefined;
-  MyTrips: undefined;
+  MyTripsMain: undefined;
   BuildTrip: undefined;
   ReviewTrip: undefined;
   GenerateTrip: undefined;
@@ -115,7 +122,7 @@ const MyTripsStack: React.FC = () => {
   return (
     <RootStack.Navigator>
       <RootStack.Screen
-        name="MyTrips"
+        name="MyTripsMain"
         component={MyTrips}
         options={{ headerShown: false }}
       />
@@ -401,7 +408,12 @@ const AppNav: React.FC = () => {
     <ProfileProvider>
       <CreateTripContext.Provider value={{ tripData, setTripData }}>
         <StatusBar style={theme === "dark" ? "light" : "dark"} />
-        <RootStack.Navigator>
+        <RootStack.Navigator initialRouteName="App">
+          <RootStack.Screen
+            name="Preferences"
+            component={Preferences}
+            options={{ headerShown: false }}
+          />
           <RootStack.Screen
             name="App"
             component={TabNavigator}

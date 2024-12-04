@@ -87,7 +87,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
       await AsyncStorage.setItem("preferencesSet", "false");
 
-      navigation.navigate("Preferences", { navigateToAppNav: () => true });
+      navigation.navigate("Preferences", { fromSignUp: true });
     } catch (err: any) {
       console.error("Error signing up:", err);
       const user = auth.currentUser;
@@ -472,7 +472,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 16,
     fontWeight: "bold",
-    color: "grey",
   },
   createAccountText: {
     fontSize: 16,

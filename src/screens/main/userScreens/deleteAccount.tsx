@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
-import { deleteDoc, doc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc, collection, getDocs } from "firebase/firestore";
 import {
   reauthenticateWithCredential,
   EmailAuthProvider,
@@ -52,22 +52,18 @@ const DeleteAccount: React.FC = () => {
     }
 
     try {
-      // Step 1: Re-authenticate the user
       let credential;
 
-      // Check if the user is signed in with Google
       if (
         user.providerData.some(
           (provider) => provider.providerId === "google.com"
         )
       ) {
-        // Reauthenticate with Google credentials
         const googleCredential = GoogleAuthProvider.credential(
-          user.refreshToken // Pass the user's refresh token instead of the ID token
+          user.refreshToken
         );
         credential = googleCredential;
       } else {
-        // Use email/password credentials for reauthentication
         if (!password) {
           Alert.alert("Error", "Please enter your password.");
           return;
@@ -76,10 +72,8 @@ const DeleteAccount: React.FC = () => {
         credential = EmailAuthProvider.credential(email!, password);
       }
 
-      // Reauthenticate the user
       await reauthenticateWithCredential(user, credential);
 
-      // Step 2: Ask for confirmation
       Alert.alert(
         "Confirm Deletion",
         "Are you sure you want to delete your account? This action cannot be undone.",
@@ -91,11 +85,23 @@ const DeleteAccount: React.FC = () => {
               try {
                 const userId = user?.uid;
 
-                // Delete only the specific user's document from the 'users' collection
-                const userDocRef = doc(FIREBASE_DB, "users", userId!);
-                await deleteDoc(userDocRef); // This removes just the user's document
+                // Function to delete all subcollections
+                const deleteSubcollections = async (docRef: any) => {
+                  const subcollectionNames = ["subcollection1", "subcollection2"];
+                  for (const name of subcollectionNames) {
+                    const subcollectionRef = collection(docRef, name);
+                    const subcollectionDocs = await getDocs(subcollectionRef);
+                    for (const doc of subcollectionDocs.docs) {
+                      await deleteSubcollections(doc.ref);
+                      await deleteDoc(doc.ref);
+                    }
+                  }
+                };
 
-                // Optionally, save the account deletion reason to another collection for reference
+                const userDocRef = doc(FIREBASE_DB, "users", userId!);
+                await deleteSubcollections(userDocRef);
+                await deleteDoc(userDocRef);
+
                 const deletionDocRef = doc(
                   FIREBASE_DB,
                   "accountDeletions",
@@ -106,11 +112,10 @@ const DeleteAccount: React.FC = () => {
                   deletedAt: new Date().toISOString(),
                 });
 
-                // Step 3: Delete the user's account from Firebase Auth
                 await user.delete();
                 Alert.alert(
                   "Account Deleted",
-                  "Your account has been deleted."
+                  "Your account and all associated data have been deleted."
                 );
               } catch (error) {
                 console.error("Error deleting account:", error);
@@ -132,7 +137,6 @@ const DeleteAccount: React.FC = () => {
     }
   };
 
-  // Check if the user is signed in with Google
   const isGoogleSignIn = FIREBASE_AUTH.currentUser?.providerData.some(
     (provider) => provider.providerId === "google.com"
   );
@@ -181,7 +185,6 @@ const DeleteAccount: React.FC = () => {
           </Pressable>
         ))}
 
-        {/* TextInput for 'Other' reason */}
         {selectedReason === "Other" && (
           <TextInput
             style={[
@@ -198,7 +201,6 @@ const DeleteAccount: React.FC = () => {
           />
         )}
 
-        {/* Render password input only if user is NOT signed in with Google */}
         {!isGoogleSignIn && (
           <TextInput
             style={[

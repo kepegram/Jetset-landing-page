@@ -1,18 +1,17 @@
 import { View, Text, Button } from "react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useTheme } from "../../../context/themeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   useNavigation,
-  useRoute,
-  RouteProp,
   useFocusEffect,
+  RouteProp,
 } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { getAuth } from "firebase/auth";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, setDoc } from "firebase/firestore";
 import { Dropdown } from "react-native-element-dropdown";
 
 type PreferencesScreenNavigationProp = NativeStackNavigationProp<
@@ -22,12 +21,20 @@ type PreferencesScreenNavigationProp = NativeStackNavigationProp<
 
 type PreferencesScreenRouteProp = RouteProp<RootStackParamList, "Preferences">;
 
-const Preferences: React.FC = () => {
+interface PreferencesProps {
+  route: PreferencesScreenRouteProp;
+}
+
+const Preferences: React.FC<PreferencesProps> = ({ route }) => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<PreferencesScreenNavigationProp>();
-  const route = useRoute<PreferencesScreenRouteProp>();
-  const { navigateToAppNav } = route.params;
   const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    if (route.params && !route.params.fromSignUp) {
+      navigation.navigate("AppNav");
+    }
+  }, [route.params, navigation]);
 
   const [preferences, setPreferences] = useState({
     budget: "",
@@ -59,20 +66,33 @@ const Preferences: React.FC = () => {
   );
 
   const completePreferences = async () => {
-    await AsyncStorage.setItem("preferencesSet", "true");
-    await AsyncStorage.setItem("budget", preferences.budget);
-    await AsyncStorage.setItem("travelerType", preferences.travelerType);
-    await AsyncStorage.setItem(
-      "accommodationType",
-      preferences.accommodationType
-    );
-    await AsyncStorage.setItem("activityLevel", preferences.activityLevel);
-    await AsyncStorage.setItem(
-      "preferredClimate",
-      preferences.preferredClimate
-    );
-    navigateToAppNav();
-    navigation.navigate("AppNav");
+    const user = getAuth().currentUser;
+    if (user) {
+      try {
+        await AsyncStorage.setItem("preferencesSet", "true");
+        await AsyncStorage.setItem("budget", preferences.budget);
+        await AsyncStorage.setItem("travelerType", preferences.travelerType);
+        await AsyncStorage.setItem(
+          "accommodationType",
+          preferences.accommodationType
+        );
+        await AsyncStorage.setItem("activityLevel", preferences.activityLevel);
+        await AsyncStorage.setItem(
+          "preferredClimate",
+          preferences.preferredClimate
+        );
+
+        // Add preferences to Firestore under user.id/userPreferences
+        await setDoc(
+          doc(FIREBASE_DB, `users/${user.uid}/userPreferences`, user.uid),
+          preferences
+        );
+
+        navigation.navigate("AppNav");
+      } catch (error) {
+        console.error("Error saving preferences:", error);
+      }
+    }
   };
 
   const budgetOptions = [
@@ -103,8 +123,8 @@ const Preferences: React.FC = () => {
 
   const preferredClimates = [
     { label: "Warm", value: "Warm" },
-    { label: "Cold", value: "Cold" },
     { label: "Mild", value: "Mild" },
+    { label: "Cold", value: "Cold" },
   ];
 
   const allPreferencesSelected =
@@ -168,7 +188,7 @@ const Preferences: React.FC = () => {
             setPreferences((prev) => ({ ...prev, budget: item.value }))
           }
           style={{
-            width: "80%",
+            width: "100%",
             borderColor: currentTheme.textPrimary,
             borderWidth: 1,
             padding: 10,
@@ -197,7 +217,7 @@ const Preferences: React.FC = () => {
             setPreferences((prev) => ({ ...prev, travelerType: item.value }))
           }
           style={{
-            width: "80%",
+            width: "100%",
             borderColor: currentTheme.textPrimary,
             borderWidth: 1,
             padding: 10,
@@ -229,7 +249,7 @@ const Preferences: React.FC = () => {
             }))
           }
           style={{
-            width: "80%",
+            width: "100%",
             borderColor: currentTheme.textPrimary,
             borderWidth: 1,
             padding: 10,
@@ -258,7 +278,7 @@ const Preferences: React.FC = () => {
             setPreferences((prev) => ({ ...prev, activityLevel: item.value }))
           }
           style={{
-            width: "80%",
+            width: "100%",
             borderColor: currentTheme.textPrimary,
             borderWidth: 1,
             padding: 10,
@@ -290,7 +310,7 @@ const Preferences: React.FC = () => {
             }))
           }
           style={{
-            width: "80%",
+            width: "100%",
             borderColor: currentTheme.textPrimary,
             borderWidth: 1,
             padding: 10,
@@ -304,6 +324,7 @@ const Preferences: React.FC = () => {
           title="Save Preferences"
           onPress={completePreferences}
           disabled={!allPreferencesSelected}
+          color={allPreferencesSelected ? null : currentTheme.textSecondary}
         />
       </View>
     </View>

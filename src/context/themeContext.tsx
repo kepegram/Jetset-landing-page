@@ -24,8 +24,8 @@ type ThemeProviderProps = {
 };
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: "light",
-  currentTheme: lightTheme,
+  theme: Appearance.getColorScheme() as Theme, // Default to system UI theme
+  currentTheme: Appearance.getColorScheme() === "dark" ? darkTheme : lightTheme,
   toggleTheme: () => {},
 });
 
