@@ -152,11 +152,6 @@ const App: React.FC = () => {
       <NavigationContainer onReady={onLayoutRootView}>
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         <Stack.Navigator initialRouteName="Welcome">
-          <Stack.Screen
-            name="Preferences"
-            component={Preferences}
-            options={{ headerShown: false }}
-          />
           {user ? (
             <Stack.Screen
               name="AppNav"
@@ -185,6 +180,11 @@ const App: React.FC = () => {
                 name="ForgotPassword"
                 component={ForgotPassword}
                 options={screenOptions}
+              />
+              <Stack.Screen
+                name="Preferences"
+                component={Preferences}
+                options={{ headerShown: false }}
               />
             </>
           )}

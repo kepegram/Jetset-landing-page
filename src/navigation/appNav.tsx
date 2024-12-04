@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Alert, Image, Pressable, Text } from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
@@ -404,16 +404,33 @@ const TabNavigator: React.FC = () => {
 const AppNav: React.FC = () => {
   const { theme } = useTheme();
   const [tripData, setTripData] = useState<any>([]);
+  const [preferencesSet, setPreferencesSet] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkPreferencesSet = async () => {
+      const preferences = await AsyncStorage.getItem("preferencesSet");
+      setPreferencesSet(preferences === "true");
+    };
+
+    checkPreferencesSet();
+  }, []);
+
+  if (preferencesSet === null) {
+    return null;
+  }
+
   return (
     <ProfileProvider>
       <CreateTripContext.Provider value={{ tripData, setTripData }}>
         <StatusBar style={theme === "dark" ? "light" : "dark"} />
-        <RootStack.Navigator initialRouteName="App">
-          <RootStack.Screen
-            name="Preferences"
-            component={Preferences}
-            options={{ headerShown: false }}
-          />
+        <RootStack.Navigator initialRouteName={preferencesSet ? "App" : "Preferences"}>
+          {!preferencesSet && (
+            <RootStack.Screen
+              name="Preferences"
+              component={Preferences}
+              options={{ headerShown: false }}
+            />
+          )}
           <RootStack.Screen
             name="App"
             component={TabNavigator}

@@ -1,14 +1,13 @@
 import { View, Text, Button } from "react-native";
 import React, { useCallback, useState, useEffect } from "react";
 import { useTheme } from "../../../context/themeContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   useNavigation,
   useFocusEffect,
   RouteProp,
 } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../../App";
+import { RootStackParamList } from "../../../navigation/appNav";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { getAuth } from "firebase/auth";
 import { getDoc, doc, setDoc } from "firebase/firestore";
@@ -69,26 +68,13 @@ const Preferences: React.FC<PreferencesProps> = ({ route }) => {
     const user = getAuth().currentUser;
     if (user) {
       try {
-        await AsyncStorage.setItem("preferencesSet", "true");
-        await AsyncStorage.setItem("budget", preferences.budget);
-        await AsyncStorage.setItem("travelerType", preferences.travelerType);
-        await AsyncStorage.setItem(
-          "accommodationType",
-          preferences.accommodationType
-        );
-        await AsyncStorage.setItem("activityLevel", preferences.activityLevel);
-        await AsyncStorage.setItem(
-          "preferredClimate",
-          preferences.preferredClimate
-        );
-
         // Add preferences to Firestore under user.id/userPreferences
         await setDoc(
           doc(FIREBASE_DB, `users/${user.uid}/userPreferences`, user.uid),
           preferences
         );
-
-        navigation.navigate("AppNav");
+        console.log("Preferences saved", preferences);
+        navigation.navigate("App");
       } catch (error) {
         console.error("Error saving preferences:", error);
       }

@@ -84,10 +84,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
       });
 
       await AsyncStorage.setItem("userName", name);
-
       await AsyncStorage.setItem("preferencesSet", "false");
-
-      navigation.navigate("Preferences", { fromSignUp: true });
     } catch (err: any) {
       console.error("Error signing up:", err);
       const user = auth.currentUser;

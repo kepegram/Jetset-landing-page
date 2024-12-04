@@ -2,11 +2,10 @@ import { View, Text, Button, Pressable } from "react-native";
 import React, { useState, useContext, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { Dropdown } from "react-native-element-dropdown";
 import { getAuth } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -33,25 +32,26 @@ const Home: React.FC = () => {
 
   const fetchPreferences = async () => {
     try {
-      const budget = await AsyncStorage.getItem("budget");
-      const travelerType = await AsyncStorage.getItem("travelerType");
-      const accommodationType = await AsyncStorage.getItem("accommodationType");
-      const activityLevel = await AsyncStorage.getItem("activityLevel");
-      const preferredClimate = await AsyncStorage.getItem("preferredClimate");
+      const user = getAuth().currentUser;
+      if (user) {
+        const docRef = doc(
+          FIREBASE_DB,
+          `users/${user.uid}/userPreferences`,
+          user.uid
+        );
+        const docSnap = await getDoc(docRef);
 
-      const parsedPreferences: TripData = {
-        budget: budget || null,
-        travelerType: travelerType || null,
-        accommodationType: accommodationType || null,
-        activityLevel: activityLevel || null,
-        preferredClimate: preferredClimate || null,
-      };
-
-      setPreferences(parsedPreferences);
-      setTripData((prevTripData: TripData) => {
-        const updatedTripData = { ...prevTripData, ...parsedPreferences };
-        return updatedTripData;
-      });
+        if (docSnap.exists()) {
+          const data = docSnap.data() as TripData;
+          setPreferences(data);
+          setTripData((prevTripData: TripData) => {
+            const updatedTripData = { ...prevTripData, ...data };
+            return updatedTripData;
+          });
+        } else {
+          console.log("No such document!");
+        }
+      }
     } catch (error) {
       console.error("Error fetching preferences:", error);
     }
@@ -73,7 +73,6 @@ const Home: React.FC = () => {
           preferences
         );
 
-        await AsyncStorage.setItem("preferences", JSON.stringify(preferences));
         setTripData((prevTripData: TripData) => {
           const updatedTripData = { ...prevTripData, ...preferences };
           console.log("Trip data after saving preferences:", updatedTripData);
