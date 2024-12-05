@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../context/themeContext";
 import { RootStackParamList } from "../../navigation/appNav";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { MainButton } from "../ui/button";
 
 type StartNewTripCardProps = {
   navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -49,24 +50,12 @@ const StartNewTripCard: React.FC<StartNewTripCardProps> = ({ navigation }) => {
           Looks like its time to plan a new travel experinece! Get Started below
         </Text>
 
-        <Pressable
+        <MainButton
+          buttonText="Start a new trip"
           onPress={() => navigation.navigate("BuildTrip")}
-          style={{
-            padding: 15,
-            backgroundColor: currentTheme.alternate,
-            borderRadius: 15,
-            paddingHorizontal: 30,
-          }}
-        >
-          <Text
-            style={{
-              color: currentTheme.buttonText,
-              fontSize: 20,
-            }}
-          >
-            Start a new trip
-          </Text>
-        </Pressable>
+          width={200}
+          backgroundColor={currentTheme.alternate}
+        />
       </View>
     </View>
   );

@@ -1,14 +1,9 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  ImageBackground,
-} from "react-native";
+import { StyleSheet, Text, View, ImageBackground } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
+import { MainButton } from "../../../components/ui/button";
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -31,22 +26,22 @@ const Welcome: React.FC = () => {
 
         {/* Buttons */}
         <View style={styles.buttonContainer}>
-          <Pressable
-            style={styles.button}
+          <MainButton
             onPress={() => {
               navigation.navigate("Carousel");
             }}
-          >
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </Pressable>
+            buttonText="Sign Up"
+            textColor="black"
+            style={styles.button}
+          />
 
-          <Pressable
+          <MainButton
             onPress={() => {
               navigation.navigate("Login");
             }}
-          >
-            <Text style={styles.altButtonText}>Login</Text>
-          </Pressable>
+            buttonText="Login"
+            style={styles.altButton}
+          />
         </View>
       </View>
     </ImageBackground>
@@ -85,15 +80,17 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: "100%",
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: 10,
   },
   button: {
     backgroundColor: "white",
     width: "80%",
-    padding: 15,
-    borderRadius: 30,
     alignItems: "center",
-    marginBottom: 10,
+  },
+  altButton: {
+    backgroundColor: "transparent",
+    width: "80%",
+    alignItems: "center",
   },
   buttonText: {
     color: "#000",
@@ -106,4 +103,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-

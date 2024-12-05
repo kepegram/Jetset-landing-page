@@ -6,6 +6,7 @@ import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
 import moment from "moment";
+import { MainButton } from "../../../components/ui/button";
 
 type ReviewTripScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -310,25 +311,16 @@ const ReviewTrip: React.FC = () => {
         </View>
       </View>
 
-      <Pressable
+      <MainButton
         onPress={() => navigation.navigate("GenerateTrip")}
+        buttonText="Build My Trip"
         style={{
-          padding: 15,
-          backgroundColor: currentTheme.alternate,
-          borderRadius: 5,
+          alignSelf: "center",
           marginTop: 50,
         }}
-      >
-        <Text
-          style={{
-            textAlign: "center",
-            color: currentTheme.buttonText,
-            fontSize: 20,
-          }}
-        >
-          Build My Trip
-        </Text>
-      </Pressable>
+        backgroundColor={currentTheme.alternate}
+        width="80%"
+      />
     </View>
   );
 };

@@ -19,6 +19,7 @@ import { FIREBASE_AUTH } from "../../../../firebase.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useTheme } from "../../../context/themeContext";
 import { AuthRequestPromptOptions, AuthSessionResult } from "expo-auth-session";
+import { MainButton } from "../../../components/ui/button";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -145,19 +146,14 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               />
             </Pressable>
           </View>
-          <Pressable
-            style={[
-              styles.button,
-              { backgroundColor: currentTheme.buttonBackground },
-            ]}
-            onPress={() => handleLogin()}
-          >
-            <Text
-              style={[styles.buttonText, { color: currentTheme.buttonText }]}
-            >
-              Login
-            </Text>
-          </Pressable>
+          <MainButton
+            buttonText="Login"
+            onPress={handleLogin}
+            backgroundColor={currentTheme.buttonBackground}
+            textColor={currentTheme.buttonText}
+            disabled={loading}
+            style={styles.button}
+          />
           {errorMessage && (
             <Text style={[styles.errorText, { color: "red" }]}>
               {errorMessage}
@@ -202,12 +198,11 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
             />
           </View>
           <View style={styles.socialIconsContainer}>
-            <Pressable
-              style={[
-                styles.iconButton,
-                { backgroundColor: currentTheme.accentBackground },
-              ]}
+            <MainButton
               onPress={() => promptAsync()}
+              backgroundColor={currentTheme.accentBackground}
+              textColor={currentTheme.textPrimary}
+              style={styles.iconButton}
             >
               <Image
                 source={require("../../../assets/google.png")}
@@ -221,16 +216,15 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               >
                 Continue with Google
               </Text>
-            </Pressable>
+            </MainButton>
             <View style={{ height: 10 }} />
-            <Pressable
-              style={[
-                styles.iconButton,
-                { backgroundColor: currentTheme.accentBackground },
-              ]}
+            <MainButton
               onPress={() => console.log("Apple Sign-In")}
+              backgroundColor={currentTheme.accentBackground}
+              textColor={currentTheme.textPrimary}
+              style={styles.iconButton}
             >
-              <Ionicons name="logo-apple" size={23} color="black" />
+              <Ionicons name="logo-apple" size={25} color="grey" />
               <Text
                 style={[
                   styles.iconButtonText,
@@ -239,7 +233,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               >
                 Continue with Apple
               </Text>
-            </Pressable>
+            </MainButton>
           </View>
         </View>
       </ScrollView>
@@ -308,10 +302,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
   },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   errorText: {
     textAlign: "center",
     marginBottom: 10,
@@ -346,7 +336,6 @@ const styles = StyleSheet.create({
   iconButton: {
     marginHorizontal: 20,
     padding: 15,
-    borderRadius: 10,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",

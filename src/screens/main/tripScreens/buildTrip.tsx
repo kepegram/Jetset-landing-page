@@ -20,6 +20,8 @@ import {
   GooglePlaceDetail,
   GooglePlacesAutocomplete,
 } from "react-native-google-places-autocomplete";
+import { MainButton } from "../../../components/ui/button";
+import Slider from "@react-native-community/slider";
 
 type BuildTripNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -43,6 +45,7 @@ const BuildTrip: React.FC = () => {
   const [endDate, setEndDate] = useState<Moment | undefined>();
   const [showSelectDates, setShowSelectDates] = useState(false);
   const [photoRef, setPhotoRef] = useState<string | null>(null);
+  const [whoIsGoing, setWhoIsGoing] = useState<number>(1);
   const navigation = useNavigation<BuildTripNavigationProp>();
 
   useEffect(() => {
@@ -125,18 +128,18 @@ const BuildTrip: React.FC = () => {
     setShowSelectDates(false);
   };
 
-  const handleWhoIsGoingPress = (option: string) => {
+  const handleWhoIsGoingChange = (value: number) => {
+    setWhoIsGoing(value);
+    let whoIsGoingText = "Group";
+    if (value === 1) {
+      whoIsGoingText = "Solo";
+    } else if (value === 2) {
+      whoIsGoingText = "Couple";
+    }
     setTripData({
       ...tripData,
-      whoIsGoing: option,
+      whoIsGoing: whoIsGoingText,
     });
-    console.log(
-      option === "Solo"
-        ? "Solo selected"
-        : option === "Couple"
-        ? "Couple selected"
-        : "Group selected"
-    );
   };
 
   const isFormValid =
@@ -274,25 +277,13 @@ const BuildTrip: React.FC = () => {
               color: currentTheme.textPrimary,
             }}
           />
-          <Pressable
+          <MainButton
+            style={{ marginTop: 20 }}
+            buttonText="Continue"
             onPress={OnDateSelectionContinue}
-            style={{
-              padding: 15,
-              backgroundColor: currentTheme.alternate,
-              borderRadius: 15,
-              marginTop: 35,
-            }}
-          >
-            <Text
-              style={{
-                textAlign: "center",
-                color: currentTheme.buttonText,
-                fontSize: 20,
-              }}
-            >
-              Continue
-            </Text>
-          </Pressable>
+            width="100%"
+            backgroundColor={currentTheme.alternate}
+          />
         </View>
       ) : (
         <View
@@ -367,101 +358,42 @@ const BuildTrip: React.FC = () => {
               >
                 Who's going?
               </Text>
-              <View
+              <Slider
+                style={{ width: "100%", height: 40 }}
+                minimumValue={1}
+                maximumValue={10}
+                step={1}
+                value={whoIsGoing}
+                onValueChange={handleWhoIsGoingChange}
+                minimumTrackTintColor={currentTheme.alternate}
+                maximumTrackTintColor={currentTheme.accentBackground}
+                thumbTintColor={currentTheme.alternate}
+              />
+              <Text
                 style={{
-                  flexDirection: "row",
-                  alignSelf: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
+                  color: currentTheme.textSecondary,
+                  textAlign: "center",
+                  marginTop: 10,
                 }}
               >
-                <Pressable
-                  onPress={() => handleWhoIsGoingPress("Solo")}
-                  style={{
-                    borderColor: currentTheme.alternate,
-                    borderWidth: 1,
-                    paddingVertical: 8,
-                    borderRadius: 5,
-                    backgroundColor:
-                      tripData.whoIsGoing === "Solo"
-                        ? currentTheme.alternate
-                        : currentTheme.background,
-                    flex: 1,
-                    marginHorizontal: 5,
-                  }}
-                  disabled={!isPlaceSelected}
-                >
-                  <Text
-                    style={{
-                      color:
-                        tripData.whoIsGoing === "Solo"
-                          ? "white"
-                          : currentTheme.textPrimary,
-                      textAlign: "center",
-                    }}
-                  >
-                    Solo
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => handleWhoIsGoingPress("Couple")}
-                  style={{
-                    borderColor: currentTheme.alternate,
-                    borderWidth: 1,
-                    paddingVertical: 8,
-                    borderRadius: 5,
-                    backgroundColor:
-                      tripData.whoIsGoing === "Couple"
-                        ? currentTheme.alternate
-                        : currentTheme.background,
-                    flex: 1,
-                    marginHorizontal: 5,
-                  }}
-                  disabled={!isPlaceSelected}
-                >
-                  <Text
-                    style={{
-                      color:
-                        tripData.whoIsGoing === "Couple"
-                          ? "white"
-                          : currentTheme.textPrimary,
-                      textAlign: "center",
-                    }}
-                  >
-                    Couple
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => handleWhoIsGoingPress("Group")}
-                  style={{
-                    borderColor: currentTheme.alternate,
-                    borderWidth: 1,
-                    paddingVertical: 8,
-                    borderRadius: 5,
-                    backgroundColor:
-                      tripData.whoIsGoing === "Group"
-                        ? currentTheme.alternate
-                        : currentTheme.background,
-                    flex: 1,
-                    marginHorizontal: 5,
-                  }}
-                  disabled={!isPlaceSelected}
-                >
-                  <Text
-                    style={{
-                      color:
-                        tripData.whoIsGoing === "Group"
-                          ? "white"
-                          : currentTheme.textPrimary,
-                      textAlign: "center",
-                    }}
-                  >
-                    Group (3+)
-                  </Text>
-                </Pressable>
-              </View>
+                {whoIsGoing === 1
+                  ? "Solo"
+                  : whoIsGoing === 2
+                  ? "Couple"
+                  : "Group"}
+              </Text>
+              <Text
+                style={{
+                  color: currentTheme.textSecondary,
+                  textAlign: "center",
+                  marginTop: 10,
+                }}
+              >
+                {`Number of people: ${whoIsGoing}`}
+              </Text>
             </View>
-            <Pressable
+            <MainButton
+              buttonText="Start My Trip"
               onPress={() => {
                 navigation.navigate("ReviewTrip");
                 console.log(
@@ -475,18 +407,16 @@ const BuildTrip: React.FC = () => {
                   tripData.whoIsGoing,
                   "BUDGET",
                   tripData.budget,
-                  "TRAVELER TYPE",
-                  tripData.travelerType,
+                  "TRAVELER TYPE"
                 );
               }}
-              style={{
-                backgroundColor: isFormValid
+              width="80%"
+              backgroundColor={
+                isFormValid
                   ? currentTheme.alternate
-                  : currentTheme.accentBackground,
-                padding: 15,
-                borderRadius: 5,
-                width: "80%",
-                alignItems: "center",
+                  : currentTheme.accentBackground
+              }
+              style={{
                 marginTop: 20,
                 alignSelf: "center",
               }}
@@ -500,7 +430,7 @@ const BuildTrip: React.FC = () => {
               >
                 Start My Trip
               </Text>
-            </Pressable>
+            </MainButton>
           </View>
         </View>
       )}

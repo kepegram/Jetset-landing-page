@@ -35,6 +35,8 @@ import TripDetails from "../screens/main/tripScreens/tripDetails";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyTrips from "../screens/main/tripScreens/myTrips";
 import Preferences from "../screens/onboarding/welcome/preferences";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebase.config";
+import { doc, getDoc } from "firebase/firestore";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -408,8 +410,25 @@ const AppNav: React.FC = () => {
 
   useEffect(() => {
     const checkPreferencesSet = async () => {
-      const preferences = await AsyncStorage.getItem("preferencesSet");
-      setPreferencesSet(preferences === "true");
+      const user = FIREBASE_AUTH.currentUser;
+      if (user) {
+        const docRef = doc(
+          FIREBASE_DB,
+          `users/${user.uid}/userPreferences`,
+          user.uid
+        );
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setPreferencesSet(true);
+          console.log("(APPNAV CHECK) Preferences: ", docSnap.data());
+        } else {
+          setPreferencesSet(false);
+          console.log("(APPNAV CHECK) Preferences are not set");
+        }
+      } else {
+        setPreferencesSet(false);
+        console.log("(APPNAV CHECK) No user is signed in");
+      }
     };
 
     checkPreferencesSet();
@@ -423,7 +442,9 @@ const AppNav: React.FC = () => {
     <ProfileProvider>
       <CreateTripContext.Provider value={{ tripData, setTripData }}>
         <StatusBar style={theme === "dark" ? "light" : "dark"} />
-        <RootStack.Navigator initialRouteName={preferencesSet ? "App" : "Preferences"}>
+        <RootStack.Navigator
+          initialRouteName={preferencesSet ? "App" : "Preferences"}
+        >
           {!preferencesSet && (
             <RootStack.Screen
               name="Preferences"

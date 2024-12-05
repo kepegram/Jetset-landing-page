@@ -4,25 +4,42 @@ import {
   Pressable,
   StyleSheet,
   GestureResponderEvent,
+  ViewStyle,
+  DimensionValue,
+  StyleProp,
 } from "react-native";
 import { useTheme } from "../../context/themeContext";
 
 type ButtonProps = {
-  buttonText: string;
+  buttonText?: string;
   onPress: (event: GestureResponderEvent) => void;
+  width?: number | string;
+  backgroundColor?: string;
+  style?: StyleProp<ViewStyle>;
+  children?: React.ReactNode;
+  disabled?: boolean;
+  textColor?: string;
 };
 
-const Button: React.FC<ButtonProps> = ({ buttonText, onPress }) => {
+const CustomButton: React.FC<ButtonProps> = ({ buttonText, onPress, children, disabled }) => {
   const { currentTheme } = useTheme();
 
   return (
     <Pressable
-      style={[styles.button, { borderColor: currentTheme.primary }]}
+      style={[
+        styles.button,
+        { borderColor: currentTheme.primary, opacity: disabled ? 0.5 : 1 },
+      ]}
       onPress={onPress}
+      disabled={disabled}
     >
-      <Text style={[styles.buttonText, { color: currentTheme.textPrimary }]}>
-        {buttonText}
-      </Text>
+      {children ? (
+        children
+      ) : (
+        <Text style={[styles.buttonText, { color: currentTheme.buttonText }]}>
+          {buttonText}
+        </Text>
+      )}
     </Pressable>
   );
 };
@@ -45,6 +62,43 @@ const AltButton: React.FC<ButtonProps> = ({ buttonText, onPress }) => {
   );
 };
 
+const MainButton: React.FC<ButtonProps> = ({
+  buttonText,
+  onPress,
+  width,
+  backgroundColor,
+  style,
+  children,
+  disabled,
+  textColor,
+}) => {
+  const { currentTheme } = useTheme();
+
+  return (
+    <Pressable
+      style={[
+        styles.mainButton,
+        {
+          backgroundColor: backgroundColor || currentTheme.alternate,
+          width: (width as DimensionValue) || 120,
+          opacity: disabled ? 0.5 : 1,
+        },
+        style,
+      ]}
+      onPress={onPress}
+      disabled={disabled}
+    >
+      {children ? (
+        children
+      ) : (
+        <Text style={[styles.mainButtonText, { color: textColor || currentTheme.buttonText }]}>
+          {buttonText}
+        </Text>
+      )}
+    </Pressable>
+  );
+};
+
 const styles = StyleSheet.create({
   button: {
     paddingVertical: 5,
@@ -54,6 +108,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
   },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   altButton: {
     paddingVertical: 5,
     paddingHorizontal: 20,
@@ -61,14 +119,19 @@ const styles = StyleSheet.create({
     width: 120,
     alignItems: "center",
   },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   altButtonText: {
     fontSize: 16,
     fontWeight: "bold",
   },
+  mainButton: {
+    padding: 15,
+    borderRadius: 25,
+    alignItems: "center",
+  },
+  mainButtonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
 });
 
-export { Button, AltButton };
+export { CustomButton, AltButton, MainButton };

@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { FIREBASE_AUTH } from "./firebase.config";
+import { FIREBASE_AUTH, FIREBASE_DB } from "./firebase.config";
 import { useColorScheme } from "react-native";
 import { ThemeProvider } from "./src/context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,8 +23,8 @@ import SignUp from "./src/screens/onboarding/userAuth/signup";
 import ForgotPassword from "./src/screens/onboarding/userAuth/forgotPassword";
 import AppNav from "./src/navigation/appNav";
 import Carousel from "./src/screens/onboarding/carousel/carousel";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Preferences from "./src/screens/onboarding/welcome/preferences";
+import { doc, getDoc } from "firebase/firestore";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -104,11 +104,20 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const checkPreferencesSet = async () => {
-      const preferencesSet = await AsyncStorage.getItem("preferencesSet");
-      if (preferencesSet === "true") {
-        setUser(user); // Navigate to the main app if preferences are set
-      } else {
-        console.log("Preferences not set");
+      const user = FIREBASE_AUTH.currentUser;
+      if (user) {
+        const docRef = doc(
+          FIREBASE_DB,
+          `users/${user.uid}/userPreferences`,
+          user.uid
+        );
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          console.log("(APP CHECK) Preferences: ", docSnap.data());
+          setUser(user);
+        } else {
+          console.log("(APP CHECK) Preferences are not set");
+        }
       }
     };
 

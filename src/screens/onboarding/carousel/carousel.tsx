@@ -12,6 +12,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
 import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from '@expo/vector-icons';
+import { MainButton } from "../../../components/ui/button";
 
 type CarouselScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -107,24 +108,15 @@ const Carousel: React.FC = () => {
               the world
             </Text>
             <View style={styles.buttonContainer}>
-              <Pressable
-                style={[
-                  styles.authButton,
-                  { backgroundColor: currentTheme.buttonBackground },
-                ]}
+              <MainButton
                 onPress={() => {
                   navigation.navigate("SignUp");
                 }}
-              >
-                <Text
-                  style={[
-                    styles.buttonText,
-                    { color: currentTheme.buttonText },
-                  ]}
-                >
-                  Get Started
-                </Text>
-              </Pressable>
+                buttonText="Get Started"
+                style={styles.authButton}
+                textColor={currentTheme.buttonText}
+                backgroundColor={currentTheme.buttonBackground}
+              />
             </View>
           </View>
         </View>
@@ -238,7 +230,6 @@ const styles = StyleSheet.create({
   authButton: {
     width: "70%",
     padding: 15,
-    borderRadius: 25,
     alignItems: "center",
   },
   buttonText: {

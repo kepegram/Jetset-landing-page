@@ -29,6 +29,7 @@ const Home: React.FC = () => {
     preferredClimate: null,
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [userName, setUserName] = useState("");
 
   const fetchPreferences = async () => {
     try {
@@ -51,6 +52,12 @@ const Home: React.FC = () => {
         } else {
           console.log("No such document!");
         }
+
+        const userDoc = await getDoc(doc(FIREBASE_DB, "users", user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setUserName(userData?.name || "");
+        }
       }
     } catch (error) {
       console.error("Error fetching preferences:", error);
@@ -67,7 +74,6 @@ const Home: React.FC = () => {
     try {
       const user = getAuth().currentUser;
       if (user) {
-        // Update Firestore with new preferences
         await setDoc(
           doc(FIREBASE_DB, `users/${user.uid}/userPreferences`),
           preferences
@@ -83,6 +89,17 @@ const Home: React.FC = () => {
       }
     } catch (error) {
       console.error("Error saving preferences:", error);
+    }
+  };
+
+  const getGreeting = () => {
+    const currentHour = new Date().getHours();
+    if (currentHour < 12) {
+      return `Morning, ${userName} 🌅`;
+    } else if (currentHour < 18) {
+      return `Afternoon, ${userName} ☀️`;
+    } else {
+      return `Evening, ${userName} 🌙`;
     }
   };
 
@@ -155,12 +172,12 @@ const Home: React.FC = () => {
           >
             <Text
               style={{
-                fontSize: 45,
+                fontSize: 30,
                 fontWeight: "bold",
                 color: currentTheme.textPrimary,
               }}
             >
-              Jetset
+              {getGreeting()}
             </Text>
             <Pressable onPress={() => setIsEditing(true)}>
               <Ionicons

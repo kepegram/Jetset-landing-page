@@ -26,6 +26,7 @@ import { RootStackParamList } from "../../../../App";
 import { useTheme } from "../../../context/themeContext";
 import { AuthRequestPromptOptions, AuthSessionResult } from "expo-auth-session";
 import * as AppleAuthentication from "expo-apple-authentication";
+import { MainButton } from "../../../components/ui/button";
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -280,19 +281,14 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             </Pressable>
           </View>
 
-          <Pressable
-            style={[
-              styles.button,
-              { backgroundColor: currentTheme.buttonBackground },
-            ]}
-            onPress={() => handleSignUp()}
-          >
-            <Text
-              style={[styles.buttonText, { color: currentTheme.buttonText }]}
-            >
-              Sign Up
-            </Text>
-          </Pressable>
+          <MainButton
+            buttonText="Sign Up"
+            onPress={handleSignUp}
+            backgroundColor={currentTheme.buttonBackground}
+            textColor={currentTheme.buttonText}
+            disabled={loading}
+            style={styles.button}
+          />
           {errorMessage && (
             <Text style={[styles.errorText, { color: "red" }]}>
               {errorMessage}
@@ -335,12 +331,11 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
         </View>
 
         <View style={styles.socialIconsContainer}>
-          <Pressable
-            style={[
-              styles.iconButton,
-              { backgroundColor: currentTheme.accentBackground },
-            ]}
+          <MainButton
             onPress={() => promptAsync()}
+            backgroundColor={currentTheme.accentBackground}
+            textColor={currentTheme.textPrimary}
+            style={styles.iconButton}
           >
             <Image
               source={require("../../../assets/google.png")}
@@ -354,14 +349,13 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             >
               Continue with Google
             </Text>
-          </Pressable>
+          </MainButton>
           <View style={{ height: 10 }} />
-          <Pressable
-            style={[
-              styles.iconButton,
-              { backgroundColor: currentTheme.accentBackground },
-            ]}
+          <MainButton
             onPress={() => console.log("Apple Sign-In")}
+            backgroundColor={currentTheme.accentBackground}
+            textColor={currentTheme.textPrimary}
+            style={styles.iconButton}
           >
             <Ionicons name="logo-apple" size={23} color="black" />
             <Text
@@ -372,7 +366,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             >
               Continue with Apple
             </Text>
-          </Pressable>
+          </MainButton>
         </View>
         {loading && (
           <View style={styles.loadingOverlay}>
@@ -424,14 +418,9 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     padding: 15,
-    borderRadius: 10,
     alignItems: "center",
     marginBottom: 20,
     marginTop: 15,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
   },
   errorText: {
     textAlign: "center",
@@ -459,7 +448,6 @@ const styles = StyleSheet.create({
   iconButton: {
     marginHorizontal: 20,
     padding: 15,
-    borderRadius: 10,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",

@@ -68,7 +68,6 @@ const Preferences: React.FC<PreferencesProps> = ({ route }) => {
     const user = getAuth().currentUser;
     if (user) {
       try {
-        // Add preferences to Firestore under user.id/userPreferences
         await setDoc(
           doc(FIREBASE_DB, `users/${user.uid}/userPreferences`, user.uid),
           preferences
@@ -175,8 +174,10 @@ const Preferences: React.FC<PreferencesProps> = ({ route }) => {
           }
           style={{
             width: "100%",
+            height: 50,
             borderColor: currentTheme.textPrimary,
             borderWidth: 1,
+            borderRadius: 10,
             padding: 10,
             marginBottom: 20,
             alignSelf: "flex-start",
@@ -204,8 +205,10 @@ const Preferences: React.FC<PreferencesProps> = ({ route }) => {
           }
           style={{
             width: "100%",
+            height: 50,
             borderColor: currentTheme.textPrimary,
             borderWidth: 1,
+            borderRadius: 10,
             padding: 10,
             marginBottom: 20,
             alignSelf: "flex-start",
@@ -236,8 +239,10 @@ const Preferences: React.FC<PreferencesProps> = ({ route }) => {
           }
           style={{
             width: "100%",
+            height: 50,
             borderColor: currentTheme.textPrimary,
             borderWidth: 1,
+            borderRadius: 10,
             padding: 10,
             marginBottom: 20,
             alignSelf: "flex-start",
@@ -265,8 +270,10 @@ const Preferences: React.FC<PreferencesProps> = ({ route }) => {
           }
           style={{
             width: "100%",
+            height: 50,
             borderColor: currentTheme.textPrimary,
             borderWidth: 1,
+            borderRadius: 10,
             padding: 10,
             marginBottom: 20,
             alignSelf: "flex-start",
@@ -297,8 +304,10 @@ const Preferences: React.FC<PreferencesProps> = ({ route }) => {
           }
           style={{
             width: "100%",
+            height: 50,
             borderColor: currentTheme.textPrimary,
             borderWidth: 1,
+            borderRadius: 10,
             padding: 10,
             marginBottom: 20,
             alignSelf: "flex-start",

@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     height: 25,
     borderRadius: 12.5,
     borderWidth: 2,
-    borderColor: "black",
+    borderColor: "grey",
     backgroundColor: "transparent",
   },
   activeButton: {
