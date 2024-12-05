@@ -4,7 +4,6 @@ import {
   Text,
   View,
   TextInput,
-  ActivityIndicator,
   Pressable,
   KeyboardAvoidingView,
   Platform,
@@ -296,7 +295,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           )}
         </View>
 
-        <Pressable onPress={() => navigation.navigate("Login")}>
+        <Pressable onPress={() => navigation.navigate("Login")} disabled={loading}>
           <Text
             style={[
               styles.createAccountText,
@@ -336,6 +335,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             backgroundColor={currentTheme.accentBackground}
             textColor={currentTheme.textPrimary}
             style={styles.iconButton}
+            disabled={loading}
           >
             <Image
               source={require("../../../assets/google.png")}
@@ -356,6 +356,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             backgroundColor={currentTheme.accentBackground}
             textColor={currentTheme.textPrimary}
             style={styles.iconButton}
+            disabled={loading}
           >
             <Ionicons name="logo-apple" size={23} color="black" />
             <Text
@@ -368,11 +369,6 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             </Text>
           </MainButton>
         </View>
-        {loading && (
-          <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color={currentTheme.alternate} />
-          </View>
-        )}
       </View>
     </KeyboardAvoidingView>
   );
@@ -466,16 +462,5 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 16,
     fontWeight: "bold",
-  },
-  loadingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.4)",
-    zIndex: 20,
   },
 });

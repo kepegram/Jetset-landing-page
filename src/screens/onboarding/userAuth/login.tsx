@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -107,6 +106,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           <Pressable
             onPress={() => navigation.navigate("ForgotPassword")}
             style={styles.forgotPasswordContainer}
+            disabled={loading}
           >
             <Text style={{ color: currentTheme.primary }}>
               Forgot Password?
@@ -138,6 +138,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
             <Pressable
               onPress={() => setPasswordVisible(!passwordVisible)}
               style={styles.eyeIcon}
+              disabled={loading}
             >
               <Ionicons
                 name={passwordVisible ? "eye-off" : "eye"}
@@ -203,6 +204,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               backgroundColor={currentTheme.accentBackground}
               textColor={currentTheme.textPrimary}
               style={styles.iconButton}
+              disabled={loading}
             >
               <Image
                 source={require("../../../assets/google.png")}
@@ -223,6 +225,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               backgroundColor={currentTheme.accentBackground}
               textColor={currentTheme.textPrimary}
               style={styles.iconButton}
+              disabled={loading}
             >
               <Ionicons name="logo-apple" size={25} color="grey" />
               <Text
@@ -237,12 +240,6 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           </View>
         </View>
       </ScrollView>
-
-      {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={currentTheme.alternate} />
-        </View>
-      )}
     </KeyboardAvoidingView>
   );
 };
@@ -346,16 +343,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "grey",
-  },
-  loadingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.4)",
-    zIndex: 20,
   },
 });

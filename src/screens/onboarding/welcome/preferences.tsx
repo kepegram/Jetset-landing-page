@@ -82,7 +82,7 @@ const Preferences: React.FC<PreferencesProps> = ({ route }) => {
 
   const budgetOptions = [
     { label: "Cheap", value: "Cheap" },
-    { label: "Moderate", value: "Moderate" },
+    { label: "Modest", value: "Modest" },
     { label: "Lavish", value: "Lavish" },
   ];
 
@@ -102,7 +102,7 @@ const Preferences: React.FC<PreferencesProps> = ({ route }) => {
 
   const activityLevels = [
     { label: "Low", value: "Low" },
-    { label: "Moderate", value: "Moderate" },
+    { label: "Medium", value: "Medium" },
     { label: "High", value: "High" },
   ];
 

@@ -1,4 +1,4 @@
-import { View, Text, Button, Pressable } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import React, { useState, useContext, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
@@ -8,6 +8,7 @@ import { getAuth } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
+import { MainButton } from "../../../components/ui/button";
 
 // Define the type for tripData
 interface TripData {
@@ -75,7 +76,7 @@ const Home: React.FC = () => {
       const user = getAuth().currentUser;
       if (user) {
         await setDoc(
-          doc(FIREBASE_DB, `users/${user.uid}/userPreferences`),
+          doc(FIREBASE_DB, `users/${user.uid}/userPreferences`, user.uid),
           preferences
         );
 
@@ -105,7 +106,7 @@ const Home: React.FC = () => {
 
   const budgetOptions = [
     { label: "Cheap", value: "Cheap" },
-    { label: "Moderate", value: "Moderate" },
+    { label: "Modest", value: "Modest" },
     { label: "Lavish", value: "Lavish" },
   ];
 
@@ -187,12 +188,156 @@ const Home: React.FC = () => {
               />
             </Pressable>
           </View>
-          <Text style={{ color: currentTheme.textPrimary, marginBottom: 10 }}>
-            Preferences: {JSON.stringify(preferences)}
-          </Text>
+          <Pressable
+            onPress={() => {
+              // Handle location press
+              console.log("Location pressed");
+            }}
+            style={{
+              position: "absolute",
+              top: "10%",
+              flexDirection: "row",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <Ionicons
+              name="location-outline"
+              size={20}
+              color={currentTheme.textPrimary}
+            />
+            <Text
+              style={{
+                fontSize: 16,
+                color: currentTheme.textPrimary,
+                marginLeft: 10,
+              }}
+            >
+              Your Location
+            </Text>
+          </Pressable>
+
+          {/* Preferences */}
+          <View style={{ marginTop: 50 }}>
+            <Text
+              style={{
+                fontSize: 30,
+                color: currentTheme.textPrimary,
+                marginBottom: 40,
+              }}
+            >
+              You have a{" "}
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: currentTheme.alternate,
+                  fontSize: 38,
+                }}
+              >
+                {preferences.budget
+                  ? preferences.budget.toLowerCase()
+                  : "unknown"}
+              </Text>{" "}
+              budget
+            </Text>
+            <Text
+              style={{
+                fontSize: 30,
+                color: currentTheme.textPrimary,
+                marginBottom: 40,
+                textAlign: "right",
+              }}
+            >
+              and you are a{" "}
+              <Text
+                style={{
+                  fontSize: 38,
+                  fontWeight: "bold",
+                  color: currentTheme.alternate,
+                }}
+              >
+                {preferences.travelerType
+                  ? preferences.travelerType.toLowerCase()
+                  : "unknown"}
+              </Text>
+              .
+            </Text>
+            <Text
+              style={{
+                fontSize: 30,
+                color: currentTheme.textPrimary,
+                marginBottom: 40,
+              }}
+            >
+              You love to stay in a{" "}
+              <Text
+                style={{
+                  fontSize: 38,
+                  fontWeight: "bold",
+                  color: currentTheme.alternate,
+                }}
+              >
+                {preferences.accommodationType
+                  ? preferences.accommodationType.toLowerCase()
+                  : "unknown"}
+              </Text>
+              ,
+            </Text>
+            <Text
+              style={{
+                fontSize: 30,
+                color: currentTheme.textPrimary,
+                marginBottom: 40,
+                textAlign: "right",
+              }}
+            >
+              your activity level is{" "}
+              <Text
+                style={{
+                  fontSize: 38,
+                  fontWeight: "bold",
+                  color: currentTheme.alternate,
+                }}
+              >
+                {preferences.activityLevel
+                  ? preferences.activityLevel.toLowerCase()
+                  : "unknown"}
+              </Text>
+            </Text>
+            <Text
+              style={{
+                fontSize: 30,
+                color: currentTheme.textPrimary,
+                marginBottom: 40,
+              }}
+            >
+              and you enjoy a{" "}
+              <Text
+                style={{
+                  fontSize: 38,
+                  fontWeight: "bold",
+                  color: currentTheme.alternate,
+                }}
+              >
+                {preferences.preferredClimate
+                  ? preferences.preferredClimate.toLowerCase()
+                  : "unknown"}
+              </Text>{" "}
+              climate.
+            </Text>
+          </View>
         </View>
       ) : (
         <View style={{ width: "100%" }}>
+          <Pressable
+            onPress={() => setIsEditing(false)}
+            style={{
+              position: "absolute",
+              top: "-20%",
+            }}
+          >
+            <Ionicons name="close" size={35} color={currentTheme.textPrimary} />
+          </Pressable>
           <Text
             style={{
               color: currentTheme.textPrimary,
@@ -215,8 +360,14 @@ const Home: React.FC = () => {
               width: "100%",
               borderColor: currentTheme.textPrimary,
               borderWidth: 1,
+              borderRadius: 10,
               padding: 10,
               marginBottom: 20,
+            }}
+            containerStyle={{
+              backgroundColor: currentTheme.background,
+              borderRadius: 10,
+              padding: 10,
             }}
             placeholderStyle={{ color: currentTheme.textPrimary }}
             selectedTextStyle={{ color: currentTheme.textPrimary }}
@@ -243,8 +394,14 @@ const Home: React.FC = () => {
               width: "100%",
               borderColor: currentTheme.textPrimary,
               borderWidth: 1,
+              borderRadius: 10,
               padding: 10,
               marginBottom: 20,
+            }}
+            containerStyle={{
+              backgroundColor: currentTheme.background,
+              borderRadius: 10,
+              padding: 10,
             }}
             placeholderStyle={{ color: currentTheme.textPrimary }}
             selectedTextStyle={{ color: currentTheme.textPrimary }}
@@ -274,8 +431,14 @@ const Home: React.FC = () => {
               width: "100%",
               borderColor: currentTheme.textPrimary,
               borderWidth: 1,
+              borderRadius: 10,
               padding: 10,
               marginBottom: 20,
+            }}
+            containerStyle={{
+              backgroundColor: currentTheme.background,
+              borderRadius: 10,
+              padding: 10,
             }}
             placeholderStyle={{ color: currentTheme.textPrimary }}
             selectedTextStyle={{ color: currentTheme.textPrimary }}
@@ -305,8 +468,14 @@ const Home: React.FC = () => {
               width: "100%",
               borderColor: currentTheme.textPrimary,
               borderWidth: 1,
+              borderRadius: 10,
               padding: 10,
               marginBottom: 20,
+            }}
+            containerStyle={{
+              backgroundColor: currentTheme.background,
+              borderRadius: 10,
+              padding: 10,
             }}
             placeholderStyle={{ color: currentTheme.textPrimary }}
             selectedTextStyle={{ color: currentTheme.textPrimary }}
@@ -330,18 +499,24 @@ const Home: React.FC = () => {
               width: "100%",
               borderColor: currentTheme.textPrimary,
               borderWidth: 1,
+              borderRadius: 10,
               padding: 10,
               marginBottom: 20,
+            }}
+            containerStyle={{
+              backgroundColor: currentTheme.background,
+              borderRadius: 10,
+              padding: 10,
             }}
             placeholderStyle={{ color: currentTheme.textPrimary }}
             selectedTextStyle={{ color: currentTheme.textPrimary }}
           />
-          <Button
-            title="Save Preferences"
+          <MainButton
+            buttonText="Save Preferences"
             onPress={savePreferences}
             disabled={!allPreferencesSelected}
+            style={{ width: "80%", marginTop: 20, alignSelf: "center" }}
           />
-          <Button title="Cancel" onPress={() => setIsEditing(false)} />
         </View>
       )}
     </View>

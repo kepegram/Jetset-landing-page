@@ -18,6 +18,7 @@ import {
   Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
+  FontAwesome,
 } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { CreateTripContext } from "../context/createTripContext";
@@ -35,6 +36,7 @@ import TripDetails from "../screens/main/tripScreens/tripDetails";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyTrips from "../screens/main/tripScreens/myTrips";
 import Preferences from "../screens/onboarding/welcome/preferences";
+import Map from "../screens/main/mapScreen/map";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebase.config";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -59,6 +61,7 @@ export type RootStackParamList = {
   ChangePassword: undefined;
   AppTheme: undefined;
   DeleteAccount: undefined;
+  Map: undefined;
 };
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
@@ -367,6 +370,27 @@ const TabNavigator: React.FC = () => {
                 name={focused ? "bag-suitcase" : "bag-suitcase-outline"}
                 color={color}
                 size={33}
+              />
+            ),
+          } as BottomTabNavigationOptions;
+        }}
+      />
+      <Tab.Screen
+        name="Map"
+        component={Map}
+        options={({ route }) => {
+          const tabBarStyle = {
+            backgroundColor: currentTheme.background,
+            ...(getTabBarStyle(route) || {}),
+          };
+          return {
+            tabBarStyle,
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <FontAwesome
+                name={focused ? "map" : "map-o"}
+                color={color}
+                size={26}
               />
             ),
           } as BottomTabNavigationOptions;

@@ -224,13 +224,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     top: 160,
     left: 0,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   profilePictureBackground: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginRight: 10,
+    marginRight: 15,
   },
   profilePicture: {
     width: 100,
