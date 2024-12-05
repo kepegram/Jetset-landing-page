@@ -137,12 +137,9 @@ const MyTripsStack: React.FC = () => {
         options={{
           headerLeft: () => {
             const navigation = useNavigation();
-            const { setTripData } = useContext(CreateTripContext);
-
             return (
               <Pressable
                 onPress={async () => {
-                  setTripData({});
                   await AsyncStorage.clear();
                   navigation.goBack();
                 }}

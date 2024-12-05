@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import React, { useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
 import { CreateTripContext } from "../../../context/createTripContext";
@@ -9,6 +9,9 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "../../../components/ui/button";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../navigation/appNav";
 
 // Define the type for tripData
 interface TripData {
@@ -21,7 +24,7 @@ interface TripData {
 
 const Home: React.FC = () => {
   const { currentTheme } = useTheme();
-  const { setTripData } = useContext(CreateTripContext);
+  const { setTripData, tripData } = useContext(CreateTripContext);
   const [preferences, setPreferences] = useState<TripData>({
     budget: null,
     travelerType: null,
@@ -31,6 +34,7 @@ const Home: React.FC = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [userName, setUserName] = useState("");
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const fetchPreferences = async () => {
     try {
@@ -111,10 +115,10 @@ const Home: React.FC = () => {
   ];
 
   const travelerTypes = [
-    { label: "Adventurous", value: "Adventurous" },
+    { label: "Thrill-seeking", value: "Thrill-seeking" },
     { label: "Foodie", value: "Foodie" },
     { label: "Cultural", value: "Cultural" },
-    { label: "Relaxation", value: "Relaxation" },
+    { label: "Relaxed", value: "Relaxed" },
   ];
 
   const accommodationTypes = [
@@ -142,6 +146,10 @@ const Home: React.FC = () => {
     preferences.accommodationType &&
     preferences.activityLevel &&
     preferences.preferredClimate;
+
+  useEffect(() => {
+    console.log("Current trip data:", tripData);
+  }, [tripData]);
 
   return (
     <View
@@ -217,8 +225,18 @@ const Home: React.FC = () => {
             </Text>
           </Pressable>
 
+          <Text
+            style={{
+              fontSize: 20,
+              color: currentTheme.textPrimary,
+              alignSelf: "flex-start",
+            }}
+          >
+            About you:
+          </Text>
+
           {/* Preferences */}
-          <View style={{ marginTop: 50 }}>
+          <View style={{ marginTop: 20 }}>
             <Text
               style={{
                 fontSize: 30,
@@ -248,7 +266,7 @@ const Home: React.FC = () => {
                 textAlign: "right",
               }}
             >
-              and you are a{" "}
+              and you are{" "}
               <Text
                 style={{
                   fontSize: 38,
@@ -269,7 +287,7 @@ const Home: React.FC = () => {
                 marginBottom: 40,
               }}
             >
-              You love to stay in a{" "}
+              You stay in{" "}
               <Text
                 style={{
                   fontSize: 38,
@@ -278,7 +296,7 @@ const Home: React.FC = () => {
                 }}
               >
                 {preferences.accommodationType
-                  ? preferences.accommodationType.toLowerCase()
+                  ? preferences.accommodationType.toLowerCase() + "s"
                   : "unknown"}
               </Text>
               ,
@@ -326,6 +344,12 @@ const Home: React.FC = () => {
               climate.
             </Text>
           </View>
+          <MainButton
+            buttonText="Start Booking!"
+            width="100%"
+            onPress={() => navigation.navigate("BuildTrip")}
+            style={{ alignSelf: "center" }}
+          />
         </View>
       ) : (
         <View style={{ width: "100%" }}>

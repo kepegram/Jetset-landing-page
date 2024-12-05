@@ -61,7 +61,7 @@ const TripDetails: React.FC = () => {
             );
             await deleteDoc(tripDocRef);
             console.log(`Trip with ID ${tripId} deleted successfully.`);
-            navigation.navigate("MyTrips");
+            navigation.navigate("MyTripsMain");
           },
         },
       ]);
@@ -168,10 +168,10 @@ const TripDetails: React.FC = () => {
         <FlightInfo flightData={tripDetails?.travelPlan?.flights} />
 
         {/* Hotels List */}
-        <HotelList hotelList={tripDetails?.travelPlan?.hotels || []} />
+        <HotelList hotelList={tripDetails?.travelPlan?.hotels} />
 
         {/* Planned Trip */}
-        <PlannedTrip details={tripDetails?.travelPlan || {}} />
+        <PlannedTrip details={tripDetails?.travelPlan} />
       </View>
     </ScrollView>
   );

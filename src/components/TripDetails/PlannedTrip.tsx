@@ -1,8 +1,9 @@
-import { View, Text, Pressable, Modal } from "react-native";
+import { View, Text, Modal } from "react-native";
 import { useTheme } from "../../context/themeContext";
 import React, { useState } from "react";
 import PlaceCard from "./placeCard";
 import MapView, { Marker } from "react-native-maps";
+import { MainButton } from "../ui/button";
 
 // Define an interface for the details prop
 interface PlannedTripProps {
@@ -50,14 +51,15 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
   };
 
   // Calculate the initial region for the map
-  const initialRegion = details.itinerary.length > 0 && details.itinerary[0].places.length > 0
-    ? {
-        latitude: details.itinerary[0].places[0].geoCoordinates.latitude,
-        longitude: details.itinerary[0].places[0].geoCoordinates.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      }
-    : null;
+  const initialRegion =
+    details.itinerary.length > 0 && details.itinerary[0].places.length > 0
+      ? {
+          latitude: details.itinerary[0].places[0].geoCoordinates.latitude,
+          longitude: details.itinerary[0].places[0].geoCoordinates.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }
+      : null;
 
   return (
     <View
@@ -115,25 +117,12 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
         Destination: {details.destination}
       </Text>
 
-      <Pressable
+      <MainButton
+        buttonText="Show Itinerary on Map"
+        width="100%"
         onPress={toggleMapModal}
-        style={{
-          backgroundColor: currentTheme.alternate,
-          padding: 10,
-          borderRadius: 5,
-          marginTop: 20,
-          alignItems: "center",
-        }}
-      >
-        <Text
-          style={{
-            color: currentTheme.buttonText,
-            fontFamily: "outfit",
-          }}
-        >
-          Show Map
-        </Text>
-      </Pressable>
+        style={{ marginTop: 20 }}
+      />
 
       <Modal visible={isMapVisible} onRequestClose={toggleMapModal}>
         <MapView style={{ flex: 1 }} initialRegion={initialRegion}>
@@ -150,26 +139,19 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
             ))
           )}
         </MapView>
-        <Pressable
+        <MainButton
+          buttonText="Close Map"
+          width="auto"
           onPress={toggleMapModal}
           style={{
             position: "absolute",
-            top: 40,
+            top: 50,
             right: 20,
             backgroundColor: currentTheme.alternate,
             padding: 10,
             borderRadius: 5,
           }}
-        >
-          <Text
-            style={{
-              color: currentTheme.buttonText,
-              fontFamily: "outfit",
-            }}
-          >
-            Close Map
-          </Text>
-        </Pressable>
+        />
       </Modal>
     </View>
   );

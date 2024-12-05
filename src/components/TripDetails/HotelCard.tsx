@@ -1,9 +1,9 @@
-import { View, Text, Image, Pressable } from "react-native";
+import { View, Text, Image, Pressable, Modal } from "react-native";
 import React, { useEffect, useState } from "react";
 import { GetPhotoRef } from "../../api/googlePlaceApi";
 import { useTheme } from "../../context/themeContext";
 import MapView, { Marker } from "react-native-maps";
-import Modal from "react-native-modal";
+import { MainButton } from "../ui/button";
 
 // Define the interface for the 'item' prop
 interface HotelCardProps {
@@ -98,33 +98,44 @@ const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
                   color: currentTheme.textSecondary,
                 }}
               >
-                Price: {item.price}
+                Price: ${item.price}/night
               </Text>
             </View>
           </View>
         </View>
       </Pressable>
 
-      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
-        <View style={{ flex: 1 }}>
-          <MapView
-            style={{ flex: 1 }}
-            initialRegion={{
+      <Modal visible={isModalVisible} onRequestClose={toggleModal}>
+        <MapView
+          style={{ flex: 1 }}
+          initialRegion={{
+            latitude: item.geoCoordinates.latitude,
+            longitude: item.geoCoordinates.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        >
+          <Marker
+            coordinate={{
               latitude: item.geoCoordinates.latitude,
               longitude: item.geoCoordinates.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
             }}
-          >
-            <Marker
-              coordinate={{
-                latitude: item.geoCoordinates.latitude,
-                longitude: item.geoCoordinates.longitude,
-              }}
-              title={item.hotelName}
-            />
-          </MapView>
-        </View>
+            title={item.hotelName}
+          />
+        </MapView>
+        <MainButton
+          buttonText="Close Map"
+          width="auto"
+          onPress={toggleModal}
+          style={{
+            position: "absolute",
+            top: 50,
+            right: 20,
+            backgroundColor: currentTheme.alternate,
+            padding: 10,
+            borderRadius: 5,
+          }}
+        />
       </Modal>
     </>
   );

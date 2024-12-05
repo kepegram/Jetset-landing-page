@@ -65,6 +65,10 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
 
   if (!UpcomingTrip) return null;
 
+  const daysUntilTrip = UpcomingTrip?.startDate
+    ? moment(UpcomingTrip.startDate).diff(today, "days")
+    : null;
+
   return (
     <View style={{ marginVertical: 20, width: 250 }}>
       {UpcomingTrip?.locationInfo?.photoRef ? (
@@ -109,37 +113,18 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
         >
           {UpcomingTrip?.locationInfo?.name || "No Location Name"}
         </Text>
-        <View
-          style={{
-            flexDirection: "row",
-            marginTop: 5,
-            alignItems: "center",
-          }}
-        >
+        {daysUntilTrip !== null && (
           <Text
             style={{
               fontFamily: "outfit",
               fontSize: 17,
               color: currentTheme.textSecondary,
+              marginTop: 5,
             }}
           >
-            {UpcomingTrip?.startDate
-              ? moment(UpcomingTrip.startDate).format("MMM DD yyyy")
-              : "No Start Date"}{" "}
-            -{" "}
+            {daysUntilTrip} days until trip
           </Text>
-          <Text
-            style={{
-              fontFamily: "outfit",
-              fontSize: 17,
-              color: currentTheme.textSecondary,
-            }}
-          >
-            {UpcomingTrip?.endDate
-              ? moment(UpcomingTrip.endDate).format("MMM DD yyyy")
-              : "No End Date"}
-          </Text>
-        </View>
+        )}
       </View>
     </View>
   );

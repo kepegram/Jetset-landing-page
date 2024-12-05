@@ -25,7 +25,7 @@ import moment from "moment";
 
 type MyTripsScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "MyTrips"
+  "MyTripsMain"
 >;
 
 const MyTrips: React.FC = () => {
@@ -124,7 +124,7 @@ const MyTrips: React.FC = () => {
             color: currentTheme.textPrimary,
           }}
         >
-          {userName || displayName}'s Trips
+          {userName || displayName}'s Trips ✈️
         </Text>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Pressable
@@ -139,7 +139,9 @@ const MyTrips: React.FC = () => {
         </View>
       </View>
       {loading ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size="large" color={currentTheme.alternate} />
         </View>
       ) : userTrips.length === 0 ? (

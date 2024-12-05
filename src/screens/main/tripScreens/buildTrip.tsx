@@ -80,6 +80,7 @@ const BuildTrip: React.FC = () => {
   ) => {
     const photoReference = details?.photos?.[0]?.photo_reference || null;
     setTripData({
+      ...tripData,
       locationInfo: {
         name: data.description,
         coordinates: details?.geometry.location,
@@ -293,6 +294,8 @@ const BuildTrip: React.FC = () => {
             marginBottom: 170,
           }}
         >
+          {/* Location */}
+
           <View style={{ width: "100%" }}>
             {!isPlaceSelected && (
               <View
@@ -308,7 +311,7 @@ const BuildTrip: React.FC = () => {
             <View style={{ width: "100%", marginBottom: 20 }}>
               <Ionicons
                 name="calendar-outline"
-                size={20}
+                size={22}
                 color={currentTheme.textSecondary}
                 style={{ position: "absolute", left: 10, top: 10 }}
               />
@@ -328,6 +331,7 @@ const BuildTrip: React.FC = () => {
                   width: "100%",
                   position: "relative",
                   color: currentTheme.textSecondary,
+                  fontSize: 18,
                 }}
                 value={
                   startDate && endDate
@@ -340,10 +344,12 @@ const BuildTrip: React.FC = () => {
               />
             </View>
 
+            {/* Who's going? */}
+
             <View style={{ width: "100%", marginBottom: 20 }}>
               <Ionicons
                 name="people-outline"
-                size={20}
+                size={22}
                 color={currentTheme.textSecondary}
                 style={{ position: "absolute", left: 10, top: 10 }}
               />
@@ -354,6 +360,7 @@ const BuildTrip: React.FC = () => {
                   alignSelf: "flex-start",
                   paddingLeft: 40,
                   paddingTop: 10,
+                  fontSize: 18,
                 }}
               >
                 Who's going?
@@ -361,7 +368,7 @@ const BuildTrip: React.FC = () => {
               <Slider
                 style={{ width: "100%", height: 40 }}
                 minimumValue={1}
-                maximumValue={10}
+                maximumValue={6}
                 step={1}
                 value={whoIsGoing}
                 onValueChange={handleWhoIsGoingChange}
@@ -369,27 +376,39 @@ const BuildTrip: React.FC = () => {
                 maximumTrackTintColor={currentTheme.accentBackground}
                 thumbTintColor={currentTheme.alternate}
               />
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 0,
+                }}
+              >
+                {[...Array(6)].map((_, index) => (
+                  <Text
+                    key={index}
+                    style={{
+                      color: currentTheme.textSecondary,
+                      fontSize: 18,
+                      textAlign: "center",
+                      width: `${100 / 6}%`,
+                    }}
+                  >
+                    {index < 5 ? index + 1 : "6+"}
+                  </Text>
+                ))}
+              </View>
               <Text
                 style={{
                   color: currentTheme.textSecondary,
-                  textAlign: "center",
+                  alignSelf: "center",
                   marginTop: 10,
                 }}
               >
                 {whoIsGoing === 1
                   ? "Solo"
                   : whoIsGoing === 2
-                  ? "Couple"
-                  : "Group"}
-              </Text>
-              <Text
-                style={{
-                  color: currentTheme.textSecondary,
-                  textAlign: "center",
-                  marginTop: 10,
-                }}
-              >
-                {`Number of people: ${whoIsGoing}`}
+                  ? "A couple"
+                  : "A group"}
               </Text>
             </View>
             <MainButton

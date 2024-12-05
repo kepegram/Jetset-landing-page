@@ -87,10 +87,10 @@ const Preferences: React.FC<PreferencesProps> = ({ route }) => {
   ];
 
   const travelerTypes = [
-    { label: "Adventurous", value: "Adventurous" },
+    { label: "Thrill-seeking", value: "Thrill-seeking" },
     { label: "Foodie", value: "Foodie" },
     { label: "Cultural", value: "Cultural" },
-    { label: "Relaxation", value: "Relaxation" },
+    { label: "Relaxed", value: "Relaxed" },
   ];
 
   const accommodationTypes = [

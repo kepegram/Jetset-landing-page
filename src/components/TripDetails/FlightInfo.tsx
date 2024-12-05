@@ -30,12 +30,11 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
     <View
       style={{
         marginTop: 10,
-        padding: 10,
+        marginBottom: 10,
       }}
     >
       <View
         style={{
-          display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
@@ -56,8 +55,7 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
             backgroundColor: currentTheme.alternate,
             padding: 5,
             width: 100,
-            borderRadius: 7,
-            marginTop: 7,
+            borderRadius: 25,
           }}
         >
           <Text
@@ -76,7 +74,6 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
         style={{
           fontFamily: "outfit",
           fontSize: 17,
-          marginTop: 7,
           color: currentTheme.textSecondary,
         }}
       >
@@ -89,7 +86,7 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
           color: currentTheme.textSecondary,
         }}
       >
-        Price: {flightData.flightPrice} (approx.)
+        Price: ${flightData.flightPrice} (approx.)
       </Text>
     </View>
   );
