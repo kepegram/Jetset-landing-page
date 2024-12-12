@@ -477,7 +477,7 @@ const Home: React.FC = () => {
                 <Pressable onPress={clearStorageAndFetchNewTrips}>
                   <Ionicons
                     name="refresh"
-                    size={30}
+                    size={28}
                     color={currentTheme.textPrimary}
                   />
                 </Pressable>
@@ -502,6 +502,7 @@ const Home: React.FC = () => {
                         );
                         navigation.navigate("RecommendedTripDetails", {
                           trip: tripInfo,
+                          photoRef: trip.photoRef,
                         });
                       }}
                       style={{

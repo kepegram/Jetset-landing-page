@@ -8,7 +8,6 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
-import FlightInfo from "../../../components/tripDetails/flightInfo";
 import HotelList from "../../../components/tripDetails/hotelList";
 import PlannedTrip from "../../../components/tripDetails/plannedTrip";
 import { MainButton } from "../../../components/ui/button";
@@ -166,8 +165,6 @@ const TripDetails: React.FC = () => {
           >
             Traveling as: {tripDetails?.whoIsGoing || "Unknown"}
           </Text>
-
-          <FlightInfo flightData={tripDetails?.travelPlan?.flights} />
 
           {/* Hotels List */}
           <HotelList hotelList={tripDetails?.travelPlan?.hotels} />

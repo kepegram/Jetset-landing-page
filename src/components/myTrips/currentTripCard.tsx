@@ -77,7 +77,7 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
       {parsedCurrentTrip?.locationInfo?.photoRef ? (
         <Pressable
           onPress={() =>
-            navigation.navigate("TripDetails", {
+            navigation.navigate("CurrentTripDetails", {
               trip: JSON.stringify({
                 ...parsedCurrentTrip,
                 travelPlan: parsedCurrentPlan?.travelPlan || {},
@@ -131,7 +131,9 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
             }}
           >
             {daysRemaining >= 0
-              ? `${daysRemaining} day${daysRemaining !== 1 ? "s" : ""} remaining`
+              ? `${daysRemaining} day${
+                  daysRemaining !== 1 ? "s" : ""
+                } remaining`
               : "Trip has ended"}
           </Text>
         </View>

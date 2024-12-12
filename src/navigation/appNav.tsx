@@ -40,6 +40,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyTrips from "../screens/main/tripScreens/myTrips";
 import Preferences from "../screens/onboarding/welcome/preferences";
 import Map from "../screens/main/mapScreen/map";
+import CurrentTripDetails from "../screens/main/tripScreens/currentTripDetails";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -51,12 +52,13 @@ export type RootStackParamList = {
   Preferences: { fromSignUp: boolean };
   App: undefined;
   Home: undefined;
-  RecommendedTripDetails: { trip: string };
+  RecommendedTripDetails: { trip: string; photoRef: string };
   MyTripsMain: undefined;
   BuildTrip: undefined;
   ReviewTrip: undefined;
   GenerateTrip: undefined;
   TripDetails: { trip: string };
+  CurrentTripDetails: { trip: string };
   Profile: undefined;
   Edit: undefined;
   Settings: undefined;
@@ -79,7 +81,27 @@ const HomeStack: React.FC = () => {
       <RootStack.Screen
         name="RecommendedTripDetails"
         component={RecommendedTripDetails}
-        options={{ headerShown: false }}
+        options={{
+          headerLeft: () => {
+            const navigation = useNavigation();
+            return (
+              <Pressable
+                onPress={() => navigation.goBack()}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <MaterialIcons name="arrow-back" size={24} color="white" />
+              </Pressable>
+            );
+          },
+          headerShown: false,
+        }}
       />
     </RootStack.Navigator>
   );
@@ -216,6 +238,31 @@ const MyTripsStack: React.FC = () => {
           headerShown: false,
         }}
       />
+      <RootStack.Screen
+        name="CurrentTripDetails"
+        component={CurrentTripDetails}
+        options={{
+          headerLeft: () => {
+            const navigation = useNavigation();
+            return (
+              <Pressable
+                onPress={() => navigation.goBack()}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <MaterialIcons name="arrow-back" size={24} color="white" />
+              </Pressable>
+            );
+          },
+          headerShown: false,
+        }}
+      />
     </RootStack.Navigator>
   );
 };
@@ -320,18 +367,16 @@ const getTabBarStyle = (route: any): { display?: string } | undefined => {
   if (
     routeName === "SearchPlace" ||
     routeName === "BuildTrip" ||
-    routeName === "SelectTraveler" ||
-    routeName === "SelectDates" ||
-    routeName === "SetBudget" ||
     routeName === "ReviewTrip" ||
     routeName === "GenerateTrip" ||
+    routeName === "RecommendedTripDetails" ||
+    routeName === "TripDetails" ||
+    routeName === "CurrentTripDetails" ||
     routeName === "Edit" ||
     routeName === "Settings" ||
     routeName === "ChangePassword" ||
     routeName === "AppTheme" ||
-    routeName === "DeleteAccount" ||
-    routeName === "RecommendedTripDetails" ||
-    routeName === "TripDetails"
+    routeName === "DeleteAccount"
   ) {
     return { display: "none" };
   }

@@ -50,11 +50,12 @@ const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
         >
           <Image
             source={{
-              uri:
-                "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" +
-                photoRef +
-                "&key=" +
-                process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
+              uri: photoRef
+                ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" +
+                  photoRef +
+                  "&key=" +
+                  process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY
+                : require("../../assets/place-placeholder.jpg"),
             }}
             style={{
               width: 180,
