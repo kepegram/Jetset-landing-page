@@ -100,126 +100,144 @@ const MyTrips: React.FC = () => {
     });
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        padding: 25,
-        paddingTop: 55,
-        backgroundColor: currentTheme.background,
-        flexGrow: 1,
-      }}
-      showsVerticalScrollIndicator={false}
-    >
+    <View style={{ flex: 1, backgroundColor: currentTheme.background }}>
+      {/* Header */}
       <View
         style={{
-          display: "flex",
-          flexDirection: "row",
-          alignContent: "center",
-          justifyContent: "space-between",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1,
+          backgroundColor: currentTheme.background,
+          padding: 20,
         }}
       >
-        <Text
+        <View
           style={{
-            fontWeight: "bold",
-            fontSize: 35,
-            color: currentTheme.textPrimary,
+            display: "flex",
+            flexDirection: "row",
+            alignContent: "center",
+            justifyContent: "space-between",
+            marginTop: 40,
           }}
         >
-          {userName || displayName}'s Trips ✈️
-        </Text>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Pressable
-            onPress={() => console.log("TODO")}
-            style={{ marginRight: 10 }}
-          >
-            <Fontisto name="search" size={30} color={currentTheme.icon} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("BuildTrip")}>
-            <Fontisto name="plus-a" size={30} color={currentTheme.icon} />
-          </Pressable>
-        </View>
-      </View>
-      {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" color={currentTheme.alternate} />
-        </View>
-      ) : userTrips.length === 0 ? (
-        <StartNewTripCard navigation={navigation} />
-      ) : (
-        <View>
           <Text
             style={{
               fontWeight: "bold",
-              fontSize: 24,
+              fontSize: 35,
               color: currentTheme.textPrimary,
-              marginTop: 20,
-              textAlign: "left",
             }}
           >
-            Current Trip
+            {userName || displayName}'s Trips ✈️
           </Text>
-          <View style={{ alignItems: "center" }}>
-            <CurrentTripsCard userTrips={userTrips} />
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Pressable
+              onPress={() => console.log("TODO")}
+              style={{ marginRight: 10 }}
+            >
+              <Fontisto name="search" size={30} color={currentTheme.icon} />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("BuildTrip")}>
+              <Fontisto name="plus-a" size={30} color={currentTheme.icon} />
+            </Pressable>
           </View>
-
-          {sortedUpcomingTrips.length > 0 && (
-            <Text
-              style={{
-                fontWeight: "bold",
-                fontSize: 24,
-                color: currentTheme.textPrimary,
-                marginTop: 20,
-              }}
-            >
-              Upcoming Trips
-            </Text>
-          )}
-          <FlatList
-            data={sortedUpcomingTrips}
-            horizontal
-            renderItem={({ item }) => (
-              <View style={{ marginRight: 10 }}>
-                <UpcomingTripsCard userTrips={[item]} />
-              </View>
-            )}
-            keyExtractor={(item) => item.id}
-            showsHorizontalScrollIndicator={false}
-          />
-
-          {userTrips.some((trip) =>
-            moment(trip.tripData.endDate).isBefore(moment(), "day")
-          ) && (
-            <Text
-              style={{
-                fontWeight: "bold",
-                fontSize: 24,
-                color: currentTheme.textPrimary,
-                marginTop: 20,
-              }}
-            >
-              Past Trips
-            </Text>
-          )}
-          {userTrips.map((trip, index) => {
-            if (!trip || !trip.tripData || !trip.tripPlan) {
-              console.warn(`Skipping invalid trip at index ${index}:`, trip);
-              return null;
-            }
-            return (
-              <PastTripListCard
-                trip={{
-                  tripData: trip.tripData,
-                  tripPlan: trip.tripPlan,
-                  id: trip.id,
-                }}
-                key={index}
-              />
-            );
-          })}
         </View>
-      )}
-    </ScrollView>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={{
+          padding: 25,
+          paddingTop: 100, // Adjust padding to avoid overlap with the header
+          backgroundColor: currentTheme.background,
+          flexGrow: 1,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Content */}
+        {loading ? (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <ActivityIndicator size="large" color={currentTheme.alternate} />
+          </View>
+        ) : userTrips.length === 0 ? (
+          <StartNewTripCard navigation={navigation} />
+        ) : (
+          <View>
+            <Text
+              style={{
+                fontWeight: "bold",
+                fontSize: 24,
+                color: currentTheme.textPrimary,
+                marginTop: 20,
+                textAlign: "left",
+              }}
+            >
+              Current Trip
+            </Text>
+            <View style={{ alignItems: "center" }}>
+              <CurrentTripsCard userTrips={userTrips} />
+            </View>
+
+            {sortedUpcomingTrips.length > 0 && (
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 24,
+                  color: currentTheme.textPrimary,
+                  marginTop: 20,
+                }}
+              >
+                Upcoming Trips
+              </Text>
+            )}
+            <FlatList
+              data={sortedUpcomingTrips}
+              horizontal
+              renderItem={({ item }) => (
+                <View style={{ marginRight: 10 }}>
+                  <UpcomingTripsCard userTrips={[item]} />
+                </View>
+              )}
+              keyExtractor={(item) => item.id}
+              showsHorizontalScrollIndicator={false}
+            />
+
+            {userTrips.some((trip) =>
+              moment(trip.tripData.endDate).isBefore(moment(), "day")
+            ) && (
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 24,
+                  color: currentTheme.textPrimary,
+                  marginTop: 20,
+                }}
+              >
+                Past Trips
+              </Text>
+            )}
+            {userTrips.map((trip, index) => {
+              if (!trip || !trip.tripData || !trip.tripPlan) {
+                console.warn(`Skipping invalid trip at index ${index}:`, trip);
+                return null;
+              }
+              return (
+                <PastTripListCard
+                  trip={{
+                    tripData: trip.tripData,
+                    tripPlan: trip.tripPlan,
+                    id: trip.id,
+                  }}
+                  key={index}
+                />
+              );
+            })}
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 };
 

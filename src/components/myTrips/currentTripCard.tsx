@@ -68,6 +68,10 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
   const parsedCurrentTrip = parseData(currentTrip.tripData);
   const parsedCurrentPlan = parseData(currentTrip.tripPlan);
 
+  const today = moment().startOf("day");
+  const endDate = moment(parsedCurrentTrip.endDate).endOf("day");
+  const daysRemaining = endDate.diff(today, "days");
+
   return (
     <View style={{ marginVertical: 20, width: "100%" }}>
       {parsedCurrentTrip?.locationInfo?.photoRef ? (
@@ -126,21 +130,9 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
               color: currentTheme.textSecondary,
             }}
           >
-            {parsedCurrentTrip?.startDate
-              ? moment(parsedCurrentTrip.startDate).format("MMM DD yyyy")
-              : "No Start Date"}{" "}
-            -{" "}
-          </Text>
-          <Text
-            style={{
-              fontFamily: "outfit",
-              fontSize: 17,
-              color: currentTheme.textSecondary,
-            }}
-          >
-            {parsedCurrentTrip?.startDate
-              ? moment(parsedCurrentTrip.endDate).format("MMM DD yyyy")
-              : "No Start Date"}
+            {daysRemaining >= 0
+              ? `${daysRemaining} day${daysRemaining !== 1 ? "s" : ""} remaining`
+              : "Trip has ended"}
           </Text>
         </View>
       </View>

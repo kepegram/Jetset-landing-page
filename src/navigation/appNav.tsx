@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Alert, Image, Pressable, Text } from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
@@ -22,7 +22,10 @@ import {
 } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { CreateTripContext } from "../context/createTripContext";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebase.config";
+import { doc, getDoc } from "firebase/firestore";
 import Home from "../screens/main/homeScreen/home";
+import RecommendedTripDetails from "../screens/main/tripScreens/recommendedTripDetails";
 import Profile from "../screens/main/userScreens/profile";
 import Edit from "../screens/main/userScreens/edit";
 import Settings from "../screens/main/userScreens/settings";
@@ -37,8 +40,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyTrips from "../screens/main/tripScreens/myTrips";
 import Preferences from "../screens/onboarding/welcome/preferences";
 import Map from "../screens/main/mapScreen/map";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebase.config";
-import { doc, getDoc } from "firebase/firestore";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -50,6 +51,7 @@ export type RootStackParamList = {
   Preferences: { fromSignUp: boolean };
   App: undefined;
   Home: undefined;
+  RecommendedTripDetails: { trip: string };
   MyTripsMain: undefined;
   BuildTrip: undefined;
   ReviewTrip: undefined;
@@ -65,6 +67,23 @@ export type RootStackParamList = {
 };
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
+
+const HomeStack: React.FC = () => {
+  return (
+    <RootStack.Navigator>
+      <RootStack.Screen
+        name="Home"
+        component={Home}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="RecommendedTripDetails"
+        component={RecommendedTripDetails}
+        options={{ headerShown: false }}
+      />
+    </RootStack.Navigator>
+  );
+};
 
 const MyTripsStack: React.FC = () => {
   const { currentTheme } = useTheme();
@@ -310,7 +329,9 @@ const getTabBarStyle = (route: any): { display?: string } | undefined => {
     routeName === "Settings" ||
     routeName === "ChangePassword" ||
     routeName === "AppTheme" ||
-    routeName === "DeleteAccount"
+    routeName === "DeleteAccount" ||
+    routeName === "RecommendedTripDetails" ||
+    routeName === "TripDetails"
   ) {
     return { display: "none" };
   }
@@ -332,7 +353,7 @@ const TabNavigator: React.FC = () => {
     >
       <Tab.Screen
         name="Home"
-        component={Home}
+        component={HomeStack}
         options={({ route }) => {
           const tabBarStyle = {
             backgroundColor: currentTheme.background,
@@ -340,7 +361,6 @@ const TabNavigator: React.FC = () => {
           };
           return {
             tabBarStyle,
-            headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "home" : "home-outline"}

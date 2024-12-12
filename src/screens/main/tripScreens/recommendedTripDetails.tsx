@@ -1,4 +1,12 @@
-import { View, Text, Image, ScrollView, Alert, Linking } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  Alert,
+  Pressable,
+  Linking,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -22,15 +30,13 @@ interface RouteParams {
   trip: string;
 }
 
-const TripDetails: React.FC = () => {
+const RecommendedTripDetails: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
   const { trip } = route.params as RouteParams;
 
   const [tripDetails, setTripDetails] = useState<any>(null);
-
-  const user = FIREBASE_AUTH.currentUser;
 
   useEffect(() => {
     navigation.setOptions({
@@ -47,29 +53,6 @@ const TripDetails: React.FC = () => {
       console.error("Error parsing trip details:", error);
     }
   }, [trip, navigation]);
-
-  const deleteTrip = async (tripId: string) => {
-    try {
-      Alert.alert("Delete Trip", "Are you sure you want to delete this trip?", [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            const tripDocRef = doc(
-              FIREBASE_DB,
-              `users/${user.uid}/userTrips/${tripId}`
-            );
-            await deleteDoc(tripDocRef);
-            console.log(`Trip with ID ${tripId} deleted successfully.`);
-            navigation.navigate("MyTripsMain");
-          },
-        },
-      ]);
-    } catch (error) {
-      console.error("Failed to delete trip:", error);
-    }
-  };
 
   if (!tripDetails) {
     return (
@@ -99,8 +82,8 @@ const TripDetails: React.FC = () => {
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         <Image
           source={{
-            uri: tripDetails?.locationInfo?.photoRef
-              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripDetails.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+            uri: tripDetails?.photoRef
+              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripDetails.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
               : "https://via.placeholder.com/400",
           }}
           style={{
@@ -112,7 +95,6 @@ const TripDetails: React.FC = () => {
           style={{
             padding: 15,
             backgroundColor: currentTheme.background,
-            height: "100%",
             marginTop: -30,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
@@ -126,48 +108,58 @@ const TripDetails: React.FC = () => {
                 color: currentTheme.textPrimary,
               }}
             >
-              {tripDetails?.locationInfo?.name || "Unknown Location"}
-            </Text>
-            <Ionicons
-              name="trash-bin-outline"
-              size={24}
-              color={currentTheme.textSecondary}
-              onPress={() => deleteTrip(tripDetails.id)}
-              style={{ marginLeft: 10 }}
-            />
-          </View>
-          <View style={{ flexDirection: "row", gap: 5, marginTop: 5 }}>
-            <Text
-              style={{
-                fontFamily: "outfit",
-                fontSize: 18,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              {moment(tripDetails?.startDate).format("MMM DD yyyy")}
-            </Text>
-            <Text
-              style={{
-                fontFamily: "outfit",
-                fontSize: 18,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              {"- "}
-              {moment(tripDetails?.endDate).format("MMM DD yyyy")}
+              {tripDetails?.travelPlan?.destination || "Unknown Location"}
             </Text>
           </View>
-          <Text
+          <View
             style={{
-              fontFamily: "outfit",
-              fontSize: 17,
-              color: currentTheme.textSecondary,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 5,
+              marginTop: 5,
             }}
           >
-            Traveling as: {tripDetails?.whoIsGoing || "Unknown"}
-          </Text>
-
-          <FlightInfo flightData={tripDetails?.travelPlan?.flights} />
+            <Text
+              style={{
+                fontFamily: "outfit",
+                fontSize: 18,
+                color: currentTheme.textSecondary,
+              }}
+            >
+              {tripDetails?.travelPlan?.numberOfDays} days
+            </Text>
+            <Text
+              style={{
+                fontFamily: "outfit",
+                fontSize: 18,
+                marginRight: 5,
+                color: currentTheme.textSecondary,
+              }}
+            >
+              {tripDetails?.travelPlan?.numberOfNights} nights
+            </Text>
+          </View>
+          <View
+            style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}
+          >
+            <Text
+              style={{
+                fontFamily: "outfit",
+                fontSize: 17,
+                marginRight: 5,
+                color: currentTheme.textSecondary,
+              }}
+            >
+              Traveling as: {tripDetails?.whoIsGoing || "Unknown"}
+            </Text>
+            <Pressable onPress={() => Alert.alert("Edit Traveling As")}>
+              <Ionicons
+                name="pencil"
+                size={18}
+                color={currentTheme.textSecondary}
+              />
+            </Pressable>
+          </View>
 
           {/* Hotels List */}
           <HotelList hotelList={tripDetails?.travelPlan?.hotels} />
@@ -229,4 +221,4 @@ const TripDetails: React.FC = () => {
   );
 };
 
-export default TripDetails;
+export default RecommendedTripDetails;

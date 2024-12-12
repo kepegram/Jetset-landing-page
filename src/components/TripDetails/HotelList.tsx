@@ -32,7 +32,7 @@ const HotelList: React.FC<HotelListProps> = ({ hotelList }) => {
           color: currentTheme.textPrimary,
         }}
       >
-        🏨 Hotel Recommendations
+        🏨 Places to Stay
       </Text>
 
       <FlatList

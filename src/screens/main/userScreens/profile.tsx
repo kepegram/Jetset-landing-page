@@ -124,19 +124,21 @@ const Profile: React.FC = () => {
             </View>
           </Pressable>
 
-          <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
-            {displayName || userName}
-          </Text>
+          <View style={styles.userInfoContainer}>
+            <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
+              {displayName || userName}
+            </Text>
+            <Pressable
+              style={styles.locationContainer}
+              onPress={handleLocationPress}
+            >
+              <Ionicons name="location-sharp" size={24} color="white" />
+              <Text style={[styles.locationText, { color: "white" }]}>
+                {location}
+              </Text>
+            </Pressable>
+          </View>
         </View>
-        <Pressable
-          style={styles.locationContainer}
-          onPress={handleLocationPress}
-        >
-          <Ionicons name="location-sharp" size={24} color="white" />
-          <Text style={[styles.locationText, { color: "white" }]}>
-            {location}
-          </Text>
-        </Pressable>
       </View>
 
       <View style={styles.divider} />
@@ -237,20 +239,23 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
   },
+  userInfoContainer: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    marginTop: 5,
+  },
   userName: {
     fontSize: 26,
     fontWeight: "bold",
     marginTop: 40,
   },
   locationContainer: {
-    position: "absolute",
-    top: 150,
-    left: 120,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "rgba(128, 128, 128, 0.5)",
     padding: 5,
     borderRadius: 5,
+    marginTop: 5,
   },
   locationText: {
     fontSize: 18,
