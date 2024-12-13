@@ -14,7 +14,7 @@ import { useTheme } from "../../../context/themeContext";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { Dropdown } from "react-native-element-dropdown";
 import { getAuth } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, addDoc, getDocs, writeBatch } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "../../../components/ui/button";
@@ -29,8 +29,7 @@ import {
   activityLevels,
 } from "../../../constants/constants";
 import { RECOMMEND_TRIP_AI_PROMPT } from "../../../api/ai-prompt";
-import { chatSession } from "../../../../AI-Model"; // Assuming you have a chatSession setup similar to GenerateTrip
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { chatSession } from "../../../../AI-Model";
 
 // Define the type for tripData
 interface TripData {
@@ -139,6 +138,12 @@ const Home: React.FC = () => {
     try {
       setIsLoading(true);
       const trips = [];
+      const user = getAuth().currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      const userTripsCollection = collection(FIREBASE_DB, `users/${user.uid}/suggestedTrips`);
+
       for (let i = 0; i < 3; i++) {
         const FINAL_PROMPT = RECOMMEND_TRIP_AI_PROMPT.replace(
           "{budget}",
@@ -181,7 +186,7 @@ const Home: React.FC = () => {
         const photoRef =
           photoData.candidates[0]?.photos[0]?.photo_reference || null;
 
-        trips.push({
+        const trip = {
           id: `trip-${i}`,
           name: placeName,
           description:
@@ -189,11 +194,12 @@ const Home: React.FC = () => {
             "No description available",
           photoRef,
           fullResponse: responseText, // Store the full AI response
-        });
+        };
+
+        trips.push(trip);
+        await addDoc(userTripsCollection, trip);
       }
       setRecommendedTrips(trips);
-      await AsyncStorage.setItem("recommendedTrips", JSON.stringify(trips));
-      await AsyncStorage.setItem("tripsTimestamp", Date.now().toString());
     } catch (error) {
       console.error("Error generating recommended trips:", error);
     } finally {
@@ -203,18 +209,17 @@ const Home: React.FC = () => {
 
   const checkAndGenerateTrips = async () => {
     try {
-      const storedTrips = await AsyncStorage.getItem("recommendedTrips");
-      const storedTimestamp = await AsyncStorage.getItem("tripsTimestamp");
-      const currentTime = Date.now();
+      const user = getAuth().currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      const userTripsCollection = collection(FIREBASE_DB, `users/${user.uid}/suggestedTrips`);
+      const userTripsSnapshot = await getDocs(userTripsCollection);
 
-      if (storedTrips && storedTimestamp) {
-        const timeDifference = currentTime - parseInt(storedTimestamp, 10);
-        const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
-        if (timeDifference < oneDay) {
-          setRecommendedTrips(JSON.parse(storedTrips));
-          return;
-        }
+      if (!userTripsSnapshot.empty) {
+        const trips = userTripsSnapshot.docs.map(doc => doc.data() as RecommendedTrip);
+        setRecommendedTrips(trips);
+        return;
       }
 
       // If no valid stored trips, generate new ones
@@ -226,8 +231,19 @@ const Home: React.FC = () => {
 
   const clearStorageAndFetchNewTrips = async () => {
     try {
-      await AsyncStorage.removeItem("recommendedTrips");
-      await AsyncStorage.removeItem("tripsTimestamp");
+      const user = getAuth().currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      const userTripsCollection = collection(FIREBASE_DB, `users/${user.uid}/suggestedTrips`);
+      const userTripsSnapshot = await getDocs(userTripsCollection);
+
+      const batch = writeBatch(FIREBASE_DB);
+      userTripsSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+
       await generateRecommendedTrips();
     } catch (error) {
       console.error("Error clearing storage and fetching new trips:", error);
