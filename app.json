@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "sdkVersion": "52.0.0",
     "icon": "./src/assets/icon.png",
-    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "contain",
@@ -29,20 +28,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth",
-      "@react-native-firebase/crashlytics",
-      "expo-apple-authentication",
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "useFrameworks": "static"
-          }
-        }
-      ]
-    ],
+    "plugins": ["expo-apple-authentication"],
     "extra": {
       "eas": {
         "projectId": "cf7b3e9e-07c0-457e-b3b0-d4179b54b637"

@@ -125,15 +125,27 @@ const Profile: React.FC = () => {
           </Pressable>
 
           <View style={styles.userInfoContainer}>
-            <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
+            <Text
+              style={[styles.userName, { color: currentTheme.textPrimary }]}
+            >
               {displayName || userName}
             </Text>
             <Pressable
               style={styles.locationContainer}
               onPress={handleLocationPress}
             >
-              <Ionicons name="location-sharp" size={24} color="white" />
-              <Text style={[styles.locationText, { color: "white" }]}>
+              <Ionicons
+                name="location-sharp"
+                size={24}
+                color={currentTheme.textPrimary}
+                style={styles.locationIcon}
+              />
+              <Text
+                style={[
+                  styles.locationText,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
                 {location}
               </Text>
             </Pressable>
@@ -151,7 +163,7 @@ const Profile: React.FC = () => {
         <ActivityIndicator size="large" color={currentTheme.alternate} />
       ) : (
         <View style={{ padding: 20 }}>
-          {/* <View style={styles.ongoingBadgeContainer}>
+          <View style={styles.ongoingBadgeContainer}>
             <Text
               style={[
                 styles.ongoingBadge,
@@ -160,8 +172,8 @@ const Profile: React.FC = () => {
             >
               Ongoing
             </Text>
-          </View> */}
-          <CurrentTripCard userTrips={userTrips} />
+            <CurrentTripCard userTrips={userTrips} />
+          </View>
         </View>
       )}
 
@@ -252,14 +264,14 @@ const styles = StyleSheet.create({
   locationContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(128, 128, 128, 0.5)",
-    padding: 5,
-    borderRadius: 5,
     marginTop: 5,
+    marginLeft: -20,
+  },
+  locationIcon: {
+    marginRight: 3,
   },
   locationText: {
     fontSize: 18,
-    marginLeft: 5,
   },
   divider: {
     height: 1,
@@ -277,16 +289,18 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   ongoingBadgeContainer: {
-    position: "absolute",
-    top: 50,
-    left: 30,
-    zIndex: 1,
+    position: "relative",
   },
   ongoingBadge: {
     padding: 5,
-    borderRadius: 5,
+    width: "20%",
+    textAlign: "center",
     color: "white",
     fontWeight: "bold",
+    position: "absolute",
+    top: "10%",
+    left: "5%",
+    zIndex: 1,
   },
   modalOverlay: {
     flex: 1,

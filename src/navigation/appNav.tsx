@@ -51,7 +51,7 @@ export type RootStackParamList = {
   AppNav: undefined;
   Preferences: { fromSignUp: boolean };
   App: undefined;
-  Home: undefined;
+  HomeMain: undefined;
   RecommendedTripDetails: { trip: string; photoRef: string };
   MyTripsMain: undefined;
   BuildTrip: undefined;
@@ -74,7 +74,7 @@ const HomeStack: React.FC = () => {
   return (
     <RootStack.Navigator>
       <RootStack.Screen
-        name="Home"
+        name="HomeMain"
         component={Home}
         options={{ headerShown: false }}
       />

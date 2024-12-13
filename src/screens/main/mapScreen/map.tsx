@@ -1,51 +1,64 @@
-import { View } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Pressable } from "react-native";
+import React, { useState, useCallback, useRef } from "react";
 import MapView, { Marker } from "react-native-maps";
 import { useTheme } from "../../../context/themeContext";
 import { getAuth } from "firebase/auth";
 import { collection, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
+import { useFocusEffect } from "@react-navigation/native";
+import DraggableFlatList from "react-native-draggable-flatlist";
+import { RenderItemParams } from "react-native-draggable-flatlist";
+import { Ionicons } from "@expo/vector-icons";
 
 const Map: React.FC = () => {
   const { currentTheme } = useTheme();
   const [geoCoordinates, setGeoCoordinates] = useState<
     Array<{ latitude: number; longitude: number; destinationName: string }>
   >([]);
+  const [selectedLocationIndex, setSelectedLocationIndex] = useState<
+    number | null
+  >(null);
+  const mapRef = useRef<MapView>(null);
 
-  useEffect(() => {
-    const fetchGeoCoordinates = async () => {
-      try {
-        const user = getAuth().currentUser;
-        if (user) {
-          const querySnapshot = await getDocs(
-            collection(FIREBASE_DB, `users/${user.uid}/userTrips`)
-          );
-          const coordinates = querySnapshot.docs
-            .map((doc) => {
-              const data = doc.data();
-              const coord = data.tripData?.locationInfo?.coordinates;
-              const destinationName =
-                data.tripData?.locationInfo?.name || "Unknown Destination";
-              if (coord && coord.lat !== undefined && coord.lng !== undefined) {
-                return {
-                  latitude: coord.lat,
-                  longitude: coord.lng,
-                  destinationName,
-                };
-              }
-              return null;
-            })
-            .filter((coord) => coord !== null);
-          console.log("Fetched geoCoordinates:", coordinates); // Log the fetched geo coordinates
-          setGeoCoordinates(coordinates);
+  const fetchGeoCoordinates = useCallback(async () => {
+    try {
+      const user = getAuth().currentUser;
+      if (user) {
+        const querySnapshot = await getDocs(
+          collection(FIREBASE_DB, `users/${user.uid}/userTrips`)
+        );
+        const coordinates = querySnapshot.docs
+          .map((doc) => {
+            const data = doc.data();
+            const coord = data.tripData?.locationInfo?.coordinates;
+            const destinationName =
+              data.tripData?.locationInfo?.name || "Unknown Destination";
+            if (coord && coord.lat !== undefined && coord.lng !== undefined) {
+              return {
+                latitude: coord.lat,
+                longitude: coord.lng,
+                destinationName,
+              };
+            }
+            return null;
+          })
+          .filter((coord) => coord !== null);
+        console.log("Fetched geoCoordinates:", coordinates);
+        setGeoCoordinates(coordinates);
+        if (coordinates.length > 0) {
+          setSelectedLocationIndex(0);
         }
-      } catch (error) {
-        console.error("Failed to fetch geoCoordinates:", error);
       }
-    };
-
-    fetchGeoCoordinates();
+    } catch (error) {
+      console.error("Failed to fetch geoCoordinates:", error);
+    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchGeoCoordinates();
+    }, [fetchGeoCoordinates])
+  );
 
   const calculateRegion = () => {
     if (geoCoordinates.length === 0) {
@@ -57,32 +70,73 @@ const Map: React.FC = () => {
       };
     }
 
-    const latitudes = geoCoordinates.map((coord) => coord.latitude);
-    const longitudes = geoCoordinates.map((coord) => coord.longitude);
-    const minLat = Math.min(...latitudes);
-    const maxLat = Math.max(...latitudes);
-    const minLng = Math.min(...longitudes);
-    const maxLng = Math.max(...longitudes);
-
+    const firstTrip = geoCoordinates[0];
     return {
-      latitude: (minLat + maxLat) / 2,
-      longitude: (minLng + maxLng) / 2,
-      latitudeDelta: maxLat - minLat + 0.1,
-      longitudeDelta: maxLng - minLng + 0.1,
+      latitude: firstTrip.latitude,
+      longitude: firstTrip.longitude,
+      latitudeDelta: 0.1,
+      longitudeDelta: 0.1,
     };
+  };
+
+  const navigateToMarker = (
+    latitude: number,
+    longitude: number,
+    index: number
+  ) => {
+    mapRef.current?.animateToRegion({
+      latitude,
+      longitude,
+      latitudeDelta: 0.1,
+      longitudeDelta: 0.1,
+    });
+    setSelectedLocationIndex(index);
+  };
+
+  const renderItem = ({
+    item,
+    drag,
+    isActive,
+  }: RenderItemParams<{
+    latitude: number;
+    longitude: number;
+    destinationName: string;
+  }>) => {
+    const index = geoCoordinates.findIndex((coord) => coord === item);
+    return (
+      <Pressable
+        style={[
+          styles.tripItem,
+          index === selectedLocationIndex && styles.selectedTripItem,
+          isActive && styles.activeItem,
+        ]}
+        onPress={() => navigateToMarker(item.latitude, item.longitude, index)}
+      >
+        <Text style={{ color: currentTheme.textPrimary }}>
+          {item.destinationName}
+        </Text>
+        <Pressable onLongPress={drag} style={styles.dragIconContainer}>
+          <Ionicons
+            name="reorder-three-outline"
+            size={24}
+            color={currentTheme.textPrimary}
+            style={styles.dragIcon}
+          />
+        </Pressable>
+      </Pressable>
+    );
   };
 
   return (
     <View
       style={{
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
         backgroundColor: currentTheme.background,
       }}
     >
       <MapView
-        style={{ width: "100%", height: "100%" }}
+        ref={mapRef}
+        style={{ width: "100%", height: "80%" }}
         region={calculateRegion()}
       >
         {geoCoordinates.map((coordinate, index) => (
@@ -96,8 +150,38 @@ const Map: React.FC = () => {
           />
         ))}
       </MapView>
+      <DraggableFlatList
+        data={geoCoordinates}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={renderItem}
+        onDragEnd={({ data }) => setGeoCoordinates(data)}
+        style={{ width: "100%", height: "20%" }}
+      />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  tripItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  selectedTripItem: {
+    backgroundColor: "#e0e0e0",
+  },
+  activeItem: {
+    backgroundColor: "#d0d0d0",
+  },
+  dragIconContainer: {
+    padding: 5,
+  },
+  dragIcon: {
+    marginLeft: 10,
+  },
+});
 
 export default Map;

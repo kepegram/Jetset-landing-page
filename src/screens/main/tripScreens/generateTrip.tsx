@@ -95,7 +95,7 @@ const GenerateTrip: React.FC = () => {
           [
             {
               text: "OK",
-              onPress: () => navigation.navigate("Home"),
+              onPress: () => navigation.navigate("HomeMain"),
             },
           ]
         );

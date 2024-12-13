@@ -14,7 +14,15 @@ import { useTheme } from "../../../context/themeContext";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { Dropdown } from "react-native-element-dropdown";
 import { getAuth } from "firebase/auth";
-import { doc, setDoc, getDoc, collection, addDoc, getDocs, writeBatch } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  addDoc,
+  getDocs,
+  writeBatch,
+} from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "../../../components/ui/button";
@@ -30,6 +38,7 @@ import {
 } from "../../../constants/constants";
 import { RECOMMEND_TRIP_AI_PROMPT } from "../../../api/ai-prompt";
 import { chatSession } from "../../../../AI-Model";
+// import * as Location from 'expo-location';
 
 // Define the type for tripData
 interface TripData {
@@ -64,6 +73,7 @@ const Home: React.FC = () => {
     []
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [userLocation, setUserLocation] = useState("Your Location");
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -142,7 +152,10 @@ const Home: React.FC = () => {
       if (!user) {
         throw new Error("User not authenticated");
       }
-      const userTripsCollection = collection(FIREBASE_DB, `users/${user.uid}/suggestedTrips`);
+      const userTripsCollection = collection(
+        FIREBASE_DB,
+        `users/${user.uid}/suggestedTrips`
+      );
 
       for (let i = 0; i < 3; i++) {
         const FINAL_PROMPT = RECOMMEND_TRIP_AI_PROMPT.replace(
@@ -213,11 +226,16 @@ const Home: React.FC = () => {
       if (!user) {
         throw new Error("User not authenticated");
       }
-      const userTripsCollection = collection(FIREBASE_DB, `users/${user.uid}/suggestedTrips`);
+      const userTripsCollection = collection(
+        FIREBASE_DB,
+        `users/${user.uid}/suggestedTrips`
+      );
       const userTripsSnapshot = await getDocs(userTripsCollection);
 
       if (!userTripsSnapshot.empty) {
-        const trips = userTripsSnapshot.docs.map(doc => doc.data() as RecommendedTrip);
+        const trips = userTripsSnapshot.docs.map(
+          (doc) => doc.data() as RecommendedTrip
+        );
         setRecommendedTrips(trips);
         return;
       }
@@ -235,11 +253,14 @@ const Home: React.FC = () => {
       if (!user) {
         throw new Error("User not authenticated");
       }
-      const userTripsCollection = collection(FIREBASE_DB, `users/${user.uid}/suggestedTrips`);
+      const userTripsCollection = collection(
+        FIREBASE_DB,
+        `users/${user.uid}/suggestedTrips`
+      );
       const userTripsSnapshot = await getDocs(userTripsCollection);
 
       const batch = writeBatch(FIREBASE_DB);
-      userTripsSnapshot.forEach(doc => {
+      userTripsSnapshot.forEach((doc) => {
         batch.delete(doc.ref);
       });
       await batch.commit();
@@ -249,6 +270,33 @@ const Home: React.FC = () => {
       console.error("Error clearing storage and fetching new trips:", error);
     }
   };
+
+  // const getUserLocation = async () => {
+  //   try {
+  //     let { status } = await Location.requestForegroundPermissionsAsync();
+  //     if (status !== 'granted') {
+  //       console.error('Permission to access location was denied');
+  //       return;
+  //     }
+
+  //     let location = await Location.getCurrentPositionAsync({});
+  //     const user = getAuth().currentUser;
+  //     if (user) {
+  //       const locationData = {
+  //         latitude: location.coords.latitude,
+  //         longitude: location.coords.longitude,
+  //       };
+  //       await setDoc(
+  //         doc(FIREBASE_DB, `users/${user.uid}/userLocation`, user.uid),
+  //         locationData
+  //       );
+  //       setUserLocation(`Lat: ${location.coords.latitude}, Lon: ${location.coords.longitude}`);
+  //       setIsLocationEditing(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error getting user location:", error);
+  //   }
+  // };
 
   useFocusEffect(
     useCallback(() => {
@@ -306,6 +354,7 @@ const Home: React.FC = () => {
         <Pressable
           onPress={() => {
             // Handle location press
+            // getUserLocation();
             console.log("Location pressed");
           }}
           style={{
@@ -324,11 +373,17 @@ const Home: React.FC = () => {
             style={{
               fontSize: 16,
               color: currentTheme.textPrimary,
-              marginLeft: 10,
+              marginLeft: 5,
             }}
           >
-            Your Location
+            {userLocation}
           </Text>
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={currentTheme.textPrimary}
+            style={{ marginLeft: 5 }}
+          />
         </Pressable>
       </View>
       <ScrollView
