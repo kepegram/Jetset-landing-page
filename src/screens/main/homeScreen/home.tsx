@@ -59,7 +59,7 @@ interface RecommendedTrip {
 
 const Home: React.FC = () => {
   const { currentTheme } = useTheme();
-  const { setTripData, tripData } = useContext(CreateTripContext);
+  const { setTripData } = useContext(CreateTripContext);
   const [preferences, setPreferences] = useState<TripData>({
     budget: null,
     travelerType: null,

@@ -79,6 +79,27 @@ const Map: React.FC = () => {
     };
   };
 
+  const calculateBoundingRegion = () => {
+    if (geoCoordinates.length === 0) {
+      return calculateRegion();
+    }
+
+    const latitudes = geoCoordinates.map((coord) => coord.latitude);
+    const longitudes = geoCoordinates.map((coord) => coord.longitude);
+
+    const minLatitude = Math.min(...latitudes);
+    const maxLatitude = Math.max(...latitudes);
+    const minLongitude = Math.min(...longitudes);
+    const maxLongitude = Math.max(...longitudes);
+
+    return {
+      latitude: (minLatitude + maxLatitude) / 2,
+      longitude: (minLongitude + maxLongitude) / 2,
+      latitudeDelta: maxLatitude - minLatitude + 0.1,
+      longitudeDelta: maxLongitude - minLongitude + 0.1,
+    };
+  };
+
   const navigateToMarker = (
     latitude: number,
     longitude: number,
@@ -150,6 +171,17 @@ const Map: React.FC = () => {
           />
         ))}
       </MapView>
+      <Pressable
+        style={[
+          styles.seeAllButton,
+          { backgroundColor: currentTheme.alternate },
+        ]}
+        onPress={() =>
+          mapRef.current?.animateToRegion(calculateBoundingRegion())
+        }
+      >
+        <Text style={{ color: "white" }}>See All</Text>
+      </Pressable>
       <DraggableFlatList
         data={geoCoordinates}
         keyExtractor={(item, index) => index.toString()}
@@ -181,6 +213,14 @@ const styles = StyleSheet.create({
   },
   dragIcon: {
     marginLeft: 10,
+  },
+  seeAllButton: {
+    position: "absolute",
+    top: 50,
+    right: 10,
+    padding: 10,
+    borderRadius: 5,
+    elevation: 3,
   },
 });
 

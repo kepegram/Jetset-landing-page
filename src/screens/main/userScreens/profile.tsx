@@ -104,7 +104,7 @@ const Profile: React.FC = () => {
         />
         <View style={styles.overlay} />
         <Pressable
-          style={styles.settingsIcon}
+          style={styles.settingsIconContainer}
           onPress={() => navigation.navigate("Settings")}
         >
           <Ionicons name="settings-sharp" size={28} color="white" />
@@ -227,10 +227,13 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
-  settingsIcon: {
+  settingsIconContainer: {
     position: "absolute",
     top: 50,
     right: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 20,
+    padding: 5,
   },
   profileContainer: {
     position: "absolute",
