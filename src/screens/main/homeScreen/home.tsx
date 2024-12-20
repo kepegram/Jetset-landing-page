@@ -29,7 +29,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { RECOMMEND_TRIP_AI_PROMPT } from "../../../api/ai-prompt";
 import { chatSession } from "../../../../AI-Model";
-// import * as Location from 'expo-location';
 
 interface TripData {
   budget: string | null;
@@ -276,36 +275,19 @@ const Home: React.FC = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: currentTheme.background }]}>
-      <View style={[styles.header, { backgroundColor: currentTheme.background }]}>
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
+      <View
+        style={[styles.header, { backgroundColor: currentTheme.background }]}
+      >
         <View style={styles.headerContent}>
-          <Text style={[styles.greetingText, { color: currentTheme.textPrimary }]}>
+          <Text
+            style={[styles.greetingText, { color: currentTheme.textPrimary }]}
+          >
             {getGreeting()}
           </Text>
         </View>
-        <Pressable
-          onPress={() => {
-            // Handle location press
-            // getUserLocation();
-            console.log("Location pressed");
-          }}
-          style={styles.locationPressable}
-        >
-          <Ionicons
-            name="location-outline"
-            size={20}
-            color={currentTheme.textPrimary}
-          />
-          <Text style={[styles.locationText, { color: currentTheme.textPrimary }]}>
-            {userLocation}
-          </Text>
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={currentTheme.textPrimary}
-            style={styles.chevronIcon}
-          />
-        </Pressable>
       </View>
       <ScrollView
         style={styles.scrollView}
@@ -313,7 +295,12 @@ const Home: React.FC = () => {
       >
         <View style={styles.recommendedTripsContainer}>
           <View style={styles.recommendedTripsHeader}>
-            <Text style={[styles.recommendedTripsTitle, { color: currentTheme.textPrimary }]}>
+            <Text
+              style={[
+                styles.recommendedTripsTitle,
+                { color: currentTheme.textPrimary },
+              ]}
+            >
               Recommended Trips
             </Text>
             <Pressable onPress={clearStorageAndFetchNewTrips}>
@@ -354,7 +341,10 @@ const Home: React.FC = () => {
                           photoRef: trip.photoRef,
                         });
                       }}
-                      style={[styles.tripCard, { backgroundColor: currentTheme.accentBackground }]}
+                      style={[
+                        styles.tripCard,
+                        { backgroundColor: currentTheme.accentBackground },
+                      ]}
                     >
                       {trip.photoRef && (
                         <Image
@@ -372,7 +362,10 @@ const Home: React.FC = () => {
                           style={styles.tripLocationIcon}
                         />
                         <Text
-                          style={[styles.tripName, { color: currentTheme.textPrimary }]}
+                          style={[
+                            styles.tripName,
+                            { color: currentTheme.textPrimary },
+                          ]}
                           numberOfLines={1}
                           ellipsizeMode="tail"
                         >
