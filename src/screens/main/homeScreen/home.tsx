@@ -7,16 +7,15 @@ import {
   FlatList,
   Button,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
-import React, { useState, useContext, useCallback, useEffect } from "react";
+import React, { useState, useContext, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
 import { CreateTripContext } from "../../../context/createTripContext";
-import { Dropdown } from "react-native-element-dropdown";
 import { getAuth } from "firebase/auth";
 import {
   doc,
-  setDoc,
   getDoc,
   collection,
   addDoc,
@@ -25,22 +24,13 @@ import {
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
-import { MainButton } from "../../../components/ui/button";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
-import {
-  budgetOptions,
-  travelerTypes,
-  preferredClimates,
-  accommodationTypes,
-  activityLevels,
-} from "../../../constants/constants";
 import { RECOMMEND_TRIP_AI_PROMPT } from "../../../api/ai-prompt";
 import { chatSession } from "../../../../AI-Model";
 // import * as Location from 'expo-location';
 
-// Define the type for tripData
 interface TripData {
   budget: string | null;
   travelerType: string | null;
@@ -60,6 +50,12 @@ interface RecommendedTrip {
 const Home: React.FC = () => {
   const { currentTheme } = useTheme();
   const { setTripData } = useContext(CreateTripContext);
+  const [userName, setUserName] = useState("");
+  const [recommendedTrips, setRecommendedTrips] = useState<RecommendedTrip[]>(
+    []
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [userLocation, setUserLocation] = useState("Your Location");
   const [preferences, setPreferences] = useState<TripData>({
     budget: null,
     travelerType: null,
@@ -67,13 +63,6 @@ const Home: React.FC = () => {
     activityLevel: null,
     preferredClimate: null,
   });
-  const [isEditing, setIsEditing] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [recommendedTrips, setRecommendedTrips] = useState<RecommendedTrip[]>(
-    []
-  );
-  const [isLoading, setIsLoading] = useState(false);
-  const [userLocation, setUserLocation] = useState("Your Location");
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -118,29 +107,6 @@ const Home: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching preferences:", error);
-    }
-  };
-
-  const savePreferences = async () => {
-    try {
-      const user = getAuth().currentUser;
-      if (user) {
-        await setDoc(
-          doc(FIREBASE_DB, `users/${user.uid}/userPreferences`, user.uid),
-          preferences
-        );
-
-        setTripData((prevTripData: TripData) => {
-          const updatedTripData = { ...prevTripData, ...preferences };
-          console.log("Trip data after saving preferences:", updatedTripData);
-          return updatedTripData;
-        });
-        console.log("Saved preferences:", preferences);
-        setIsEditing(false);
-        await generateRecommendedTrips(); // Fetch new recommended trips after saving preferences
-      }
-    } catch (error) {
-      console.error("Error saving preferences:", error);
     }
   };
 
@@ -270,8 +236,6 @@ const Home: React.FC = () => {
       console.error("Error clearing storage and fetching new trips:", error);
     }
   };
-
-  // const getUserLocation = async () => {
   //   try {
   //     let { status } = await Location.requestForegroundPermissionsAsync();
   //     if (status !== 'granted') {
@@ -300,56 +264,24 @@ const Home: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      fetchPreferences();
       checkAndGenerateTrips();
+      fetchPreferences();
     }, [])
   );
 
-  const allPreferencesSelected =
-    preferences.budget &&
-    preferences.travelerType &&
-    preferences.accommodationType &&
-    preferences.activityLevel &&
-    preferences.preferredClimate;
+  const isRecommendedTrip = (
+    trip: RecommendedTrip | { id: string }
+  ): trip is RecommendedTrip => {
+    return (trip as RecommendedTrip).fullResponse !== undefined;
+  };
 
   return (
-    <View style={{ flex: 1, backgroundColor: currentTheme.background }}>
-      <View
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1,
-          backgroundColor: currentTheme.background,
-          padding: 20,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            paddingTop: 40,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 30,
-              fontWeight: "bold",
-              color: currentTheme.textPrimary,
-            }}
-          >
+    <View style={[styles.container, { backgroundColor: currentTheme.background }]}>
+      <View style={[styles.header, { backgroundColor: currentTheme.background }]}>
+        <View style={styles.headerContent}>
+          <Text style={[styles.greetingText, { color: currentTheme.textPrimary }]}>
             {getGreeting()}
           </Text>
-          <Pressable onPress={() => setIsEditing(true)}>
-            <Ionicons
-              name="pencil"
-              size={30}
-              color={currentTheme.textPrimary}
-            />
-          </Pressable>
         </View>
         <Pressable
           onPress={() => {
@@ -357,213 +289,59 @@ const Home: React.FC = () => {
             // getUserLocation();
             console.log("Location pressed");
           }}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            width: "100%",
-            marginTop: 10,
-          }}
+          style={styles.locationPressable}
         >
           <Ionicons
             name="location-outline"
             size={20}
             color={currentTheme.textPrimary}
           />
-          <Text
-            style={{
-              fontSize: 16,
-              color: currentTheme.textPrimary,
-              marginLeft: 5,
-            }}
-          >
+          <Text style={[styles.locationText, { color: currentTheme.textPrimary }]}>
             {userLocation}
           </Text>
           <Ionicons
             name="chevron-down"
             size={20}
             color={currentTheme.textPrimary}
-            style={{ marginLeft: 5 }}
+            style={styles.chevronIcon}
           />
         </Pressable>
       </View>
       <ScrollView
-        style={{
-          flex: 1,
-          paddingTop: 0,
-        }}
-        contentContainerStyle={{
-          justifyContent: "center",
-          alignItems: "center",
-          paddingBottom: 40,
-        }}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
       >
-        {!isEditing ? (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            {/* Preferences */}
-            <View style={{ marginTop: 150 }}>
-              <Text
-                style={{
-                  fontSize: 20,
-                  color: currentTheme.textPrimary,
-                  alignSelf: "flex-start",
-                }}
-              >
-                About you:
-              </Text>
-
-              <Text
-                style={{
-                  fontSize: 30,
-                  color: currentTheme.textPrimary,
-                  marginBottom: 40,
-                }}
-              >
-                You have a{" "}
-                <Text
-                  style={{
-                    fontWeight: "bold",
-                    color: currentTheme.alternate,
-                    fontSize: 38,
-                  }}
-                >
-                  {preferences.budget
-                    ? preferences.budget.toLowerCase()
-                    : "unknown"}
-                </Text>{" "}
-                budget
-              </Text>
-              <Text
-                style={{
-                  fontSize: 30,
-                  color: currentTheme.textPrimary,
-                  marginBottom: 40,
-                  textAlign: "right",
-                }}
-              >
-                and you are{" "}
-                <Text
-                  style={{
-                    fontSize: 38,
-                    fontWeight: "bold",
-                    color: currentTheme.alternate,
-                  }}
-                >
-                  {preferences.travelerType
-                    ? preferences.travelerType.toLowerCase()
-                    : "unknown"}
-                </Text>
-                .
-              </Text>
-              <Text
-                style={{
-                  fontSize: 30,
-                  color: currentTheme.textPrimary,
-                  marginBottom: 40,
-                }}
-              >
-                You stay in{" "}
-                <Text
-                  style={{
-                    fontSize: 38,
-                    fontWeight: "bold",
-                    color: currentTheme.alternate,
-                  }}
-                >
-                  {preferences.accommodationType
-                    ? preferences.accommodationType.toLowerCase() + "s"
-                    : "unknown"}
-                </Text>
-                ,
-              </Text>
-              <Text
-                style={{
-                  fontSize: 30,
-                  color: currentTheme.textPrimary,
-                  marginBottom: 40,
-                  textAlign: "right",
-                }}
-              >
-                your activity level is{" "}
-                <Text
-                  style={{
-                    fontSize: 38,
-                    fontWeight: "bold",
-                    color: currentTheme.alternate,
-                  }}
-                >
-                  {preferences.activityLevel
-                    ? preferences.activityLevel.toLowerCase()
-                    : "unknown"}
-                </Text>
-              </Text>
-              <Text
-                style={{
-                  fontSize: 30,
-                  color: currentTheme.textPrimary,
-                  marginBottom: 10,
-                }}
-              >
-                and you enjoy a{" "}
-                <Text
-                  style={{
-                    fontSize: 38,
-                    fontWeight: "bold",
-                    color: currentTheme.alternate,
-                  }}
-                >
-                  {preferences.preferredClimate
-                    ? preferences.preferredClimate.toLowerCase()
-                    : "unknown"}
-                </Text>{" "}
-                climate.
-              </Text>
-            </View>
-
-            {/* Recommended Trips Section */}
-
-            <View style={{ width: "100%", padding: 20 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: 20,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 24,
-                    fontWeight: "bold",
-                    color: currentTheme.textPrimary,
-                  }}
-                >
-                  Recommended Trips
-                </Text>
-                <Pressable onPress={clearStorageAndFetchNewTrips}>
-                  <Ionicons
-                    name="refresh"
-                    size={28}
-                    color={currentTheme.textPrimary}
-                  />
-                </Pressable>
-              </View>
-              {isLoading ? (
-                <ActivityIndicator
-                  size="large"
-                  color={currentTheme.alternate}
-                />
-              ) : (
-                <FlatList
-                  horizontal
-                  data={recommendedTrips}
-                  keyExtractor={(trip) => trip.id}
-                  renderItem={({ item: trip }) => (
+        <View style={styles.recommendedTripsContainer}>
+          <View style={styles.recommendedTripsHeader}>
+            <Text style={[styles.recommendedTripsTitle, { color: currentTheme.textPrimary }]}>
+              Recommended Trips
+            </Text>
+            <Pressable onPress={clearStorageAndFetchNewTrips}>
+              <Ionicons
+                name="refresh"
+                size={28}
+                color={currentTheme.textPrimary}
+              />
+            </Pressable>
+          </View>
+          {isLoading ? (
+            <ActivityIndicator size="large" color={currentTheme.alternate} />
+          ) : (
+            <FlatList
+              horizontal
+              data={[...recommendedTrips, { id: "dont-like-button" }]}
+              keyExtractor={(trip) => trip.id}
+              renderItem={({ item: trip }) =>
+                trip.id === "dont-like-button" ? (
+                  <View style={styles.dontLikeButtonContainer}>
+                    <Button
+                      title="Don't like? Build your own here!"
+                      onPress={() => navigation.navigate("BuildTrip")}
+                      color={currentTheme.alternate}
+                    />
+                  </View>
+                ) : (
+                  isRecommendedTrip(trip) && (
                     <Pressable
                       onPress={() => {
                         const tripInfo = trip.fullResponse;
@@ -576,48 +354,25 @@ const Home: React.FC = () => {
                           photoRef: trip.photoRef,
                         });
                       }}
-                      style={{
-                        backgroundColor: currentTheme.accentBackground,
-                        borderRadius: 10,
-                        marginRight: 20,
-                        width: 260,
-                      }}
+                      style={[styles.tripCard, { backgroundColor: currentTheme.accentBackground }]}
                     >
                       {trip.photoRef && (
                         <Image
                           source={{
                             uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${trip.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
                           }}
-                          style={{
-                            width: 250,
-                            height: 150,
-                            borderRadius: 10,
-                            marginBottom: 10,
-                            alignSelf: "center",
-                          }}
+                          style={styles.tripImage}
                         />
                       )}
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          paddingHorizontal: 10,
-                          marginBottom: 10,
-                        }}
-                      >
+                      <View style={styles.tripInfoContainer}>
                         <Ionicons
                           name="location-outline"
                           size={20}
                           color={currentTheme.textPrimary}
-                          style={{ marginRight: 5 }}
+                          style={styles.tripLocationIcon}
                         />
                         <Text
-                          style={{
-                            fontSize: 20,
-                            fontWeight: "bold",
-                            color: currentTheme.textPrimary,
-                            alignSelf: "flex-start",
-                          }}
+                          style={[styles.tripName, { color: currentTheme.textPrimary }]}
                           numberOfLines={1}
                           ellipsizeMode="tail"
                         >
@@ -625,219 +380,107 @@ const Home: React.FC = () => {
                         </Text>
                       </View>
                     </Pressable>
-                  )}
-                  showsHorizontalScrollIndicator={false}
-                />
-              )}
-            </View>
-            <Button
-              title="Start Booking!"
-              onPress={() => navigation.navigate("BuildTrip")}
-              color={currentTheme.alternate}
-            />
-          </View>
-        ) : (
-          <View style={{ width: "100%", marginTop: 200, padding: 20 }}>
-            <Pressable
-              onPress={() => setIsEditing(false)}
-              style={{
-                position: "absolute",
-                top: "-10%",
-              }}
-            >
-              <Ionicons
-                name="close"
-                size={35}
-                color={currentTheme.textPrimary}
-              />
-            </Pressable>
-            <Text
-              style={{
-                color: currentTheme.textPrimary,
-                marginBottom: 10,
-                alignSelf: "flex-start",
-              }}
-            >
-              Budget:
-            </Text>
-            <Dropdown
-              data={budgetOptions}
-              labelField="label"
-              valueField="value"
-              placeholder="Select budget"
-              value={preferences.budget}
-              onChange={(item) =>
-                setPreferences((prev) => ({ ...prev, budget: item.value }))
+                  )
+                )
               }
-              style={{
-                width: "100%",
-                borderColor: currentTheme.textPrimary,
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 10,
-                marginBottom: 20,
-              }}
-              containerStyle={{
-                backgroundColor: currentTheme.background,
-                borderRadius: 10,
-                padding: 10,
-              }}
-              placeholderStyle={{ color: currentTheme.textPrimary }}
-              selectedTextStyle={{ color: currentTheme.textPrimary }}
+              showsHorizontalScrollIndicator={false}
             />
-            <Text
-              style={{
-                color: currentTheme.textPrimary,
-                marginBottom: 10,
-                alignSelf: "flex-start",
-              }}
-            >
-              Traveler Type:
-            </Text>
-            <Dropdown
-              data={travelerTypes}
-              labelField="label"
-              valueField="value"
-              placeholder="Select traveler type"
-              value={preferences.travelerType}
-              onChange={(item) =>
-                setPreferences((prev) => ({
-                  ...prev,
-                  travelerType: item.value,
-                }))
-              }
-              style={{
-                width: "100%",
-                borderColor: currentTheme.textPrimary,
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 10,
-                marginBottom: 20,
-              }}
-              containerStyle={{
-                backgroundColor: currentTheme.background,
-                borderRadius: 10,
-                padding: 10,
-              }}
-              placeholderStyle={{ color: currentTheme.textPrimary }}
-              selectedTextStyle={{ color: currentTheme.textPrimary }}
-            />
-            <Text
-              style={{
-                color: currentTheme.textPrimary,
-                marginBottom: 10,
-                alignSelf: "flex-start",
-              }}
-            >
-              Accommodation Type:
-            </Text>
-            <Dropdown
-              data={accommodationTypes}
-              labelField="label"
-              valueField="value"
-              placeholder="Select accommodation type"
-              value={preferences.accommodationType}
-              onChange={(item) =>
-                setPreferences((prev) => ({
-                  ...prev,
-                  accommodationType: item.value,
-                }))
-              }
-              style={{
-                width: "100%",
-                borderColor: currentTheme.textPrimary,
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 10,
-                marginBottom: 20,
-              }}
-              containerStyle={{
-                backgroundColor: currentTheme.background,
-                borderRadius: 10,
-                padding: 10,
-              }}
-              placeholderStyle={{ color: currentTheme.textPrimary }}
-              selectedTextStyle={{ color: currentTheme.textPrimary }}
-            />
-            <Text
-              style={{
-                color: currentTheme.textPrimary,
-                marginBottom: 10,
-                alignSelf: "flex-start",
-              }}
-            >
-              Activity Level:
-            </Text>
-            <Dropdown
-              data={activityLevels}
-              labelField="label"
-              valueField="value"
-              placeholder="Select activity level"
-              value={preferences.activityLevel}
-              onChange={(item) =>
-                setPreferences((prev) => ({
-                  ...prev,
-                  activityLevel: item.value,
-                }))
-              }
-              style={{
-                width: "100%",
-                borderColor: currentTheme.textPrimary,
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 10,
-                marginBottom: 20,
-              }}
-              containerStyle={{
-                backgroundColor: currentTheme.background,
-                borderRadius: 10,
-                padding: 10,
-              }}
-              placeholderStyle={{ color: currentTheme.textPrimary }}
-              selectedTextStyle={{ color: currentTheme.textPrimary }}
-            />
-            <Text style={{ color: currentTheme.textPrimary, marginBottom: 10 }}>
-              Preferred Climate:
-            </Text>
-            <Dropdown
-              data={preferredClimates}
-              labelField="label"
-              valueField="value"
-              placeholder="Select preferred climate"
-              value={preferences.preferredClimate}
-              onChange={(item) =>
-                setPreferences((prev) => ({
-                  ...prev,
-                  preferredClimate: item.value,
-                }))
-              }
-              style={{
-                width: "100%",
-                borderColor: currentTheme.textPrimary,
-                borderWidth: 1,
-                borderRadius: 10,
-                padding: 10,
-                marginBottom: 20,
-              }}
-              containerStyle={{
-                backgroundColor: currentTheme.background,
-                borderRadius: 10,
-                padding: 10,
-              }}
-              placeholderStyle={{ color: currentTheme.textPrimary }}
-              selectedTextStyle={{ color: currentTheme.textPrimary }}
-            />
-            <MainButton
-              buttonText="Save Preferences"
-              onPress={savePreferences}
-              disabled={!allPreferencesSelected}
-              style={{ width: "80%", marginTop: 20, alignSelf: "center" }}
-            />
-          </View>
-        )}
+          )}
+        </View>
       </ScrollView>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    padding: 20,
+  },
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingTop: 40,
+  },
+  greetingText: {
+    fontSize: 30,
+    fontWeight: "bold",
+  },
+  locationPressable: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginTop: 10,
+  },
+  locationText: {
+    fontSize: 16,
+    marginLeft: 5,
+  },
+  chevronIcon: {
+    marginLeft: 5,
+  },
+  scrollView: {
+    flex: 1,
+    paddingTop: 140,
+  },
+  scrollViewContent: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 40,
+  },
+  recommendedTripsContainer: {
+    width: "100%",
+    padding: 20,
+  },
+  recommendedTripsHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  recommendedTripsTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  dontLikeButtonContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  tripCard: {
+    borderRadius: 10,
+    marginRight: 20,
+    width: 260,
+  },
+  tripImage: {
+    width: 250,
+    height: 250,
+    borderRadius: 10,
+    marginBottom: 10,
+    alignSelf: "center",
+  },
+  tripInfoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  tripLocationIcon: {
+    marginRight: 5,
+  },
+  tripName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    alignSelf: "flex-start",
+  },
+});
 
 export default Home;
