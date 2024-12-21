@@ -62,7 +62,7 @@ const Profile: React.FC = () => {
     preferredClimate: null,
   });
   const [userTrips, setUserTrips] = useState<any[]>([]);
-  const [location, setLocation] = useState<string>("Location");
+  const [location, setLocation] = useState<string>("Set location");
 
   const user = getAuth().currentUser;
   const navigation = useNavigation<ProfileScreenNavigationProp>();
@@ -254,7 +254,8 @@ const Profile: React.FC = () => {
           </View>
 
           {/* Preferences */}
-          <View style={[styles.preferencesContainer, { marginTop: 60 }]}>
+
+          <View style={[styles.preferencesContainer, { marginTop: 70 }]}>
             <Text
               style={[
                 styles.preferencesTitle,
@@ -362,26 +363,16 @@ const Profile: React.FC = () => {
             </Text>
           </View>
 
-          {/* My Trips */}
+          {/* Ongoing Trips */}
 
           <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-            My Trips
+            Ongoing Trips
           </Text>
           {loading ? (
             <ActivityIndicator size="large" color={currentTheme.alternate} />
           ) : (
             <View style={{ padding: 20 }}>
-              <View style={styles.ongoingBadgeContainer}>
-                <Text
-                  style={[
-                    styles.ongoingBadge,
-                    { backgroundColor: currentTheme.alternate },
-                  ]}
-                >
-                  Ongoing
-                </Text>
-                <CurrentTripCard userTrips={userTrips} />
-              </View>
+              <CurrentTripCard userTrips={userTrips} />
             </View>
           )}
 
@@ -683,7 +674,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 5,
-    marginLeft: -20,
+    marginLeft: -10,
   },
   locationIcon: {
     marginRight: 3,

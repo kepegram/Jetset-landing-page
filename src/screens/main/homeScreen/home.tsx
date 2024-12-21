@@ -299,6 +299,9 @@ const Home: React.FC = () => {
         <View style={styles.recommendedTripsContainer}>
           <GooglePlacesAutocomplete
             placeholder="Search for places"
+            textInputProps={{
+              placeholderTextColor: currentTheme.textPrimary,
+            }}
             onPress={(data, details = null) => {
               console.log(data, details);
             }}
@@ -307,7 +310,12 @@ const Home: React.FC = () => {
               language: "en",
             }}
             styles={{
-              textInput: styles.searchInput,
+              textInput: [
+                styles.searchInput,
+                { color: currentTheme.textPrimary },
+                { backgroundColor: currentTheme.background },
+              ],
+              listView: { backgroundColor: currentTheme.background },
             }}
           />
           <FlatList
@@ -323,7 +331,14 @@ const Home: React.FC = () => {
                   source={{ uri: item.image }}
                   style={styles.popularDestinationImage}
                 />
-                <Text style={styles.popularDestinationText}>{item.name}</Text>
+                <Text
+                  style={[
+                    styles.popularDestinationText,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
+                  {item.name}
+                </Text>
               </Pressable>
             )}
             showsHorizontalScrollIndicator={false}

@@ -9,8 +9,9 @@ import { useFocusEffect } from "@react-navigation/native";
 import DraggableFlatList from "react-native-draggable-flatlist";
 import { RenderItemParams } from "react-native-draggable-flatlist";
 import { Ionicons } from "@expo/vector-icons";
+import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
 
-const Map: React.FC = () => {
+const Map: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { currentTheme } = useTheme();
   const [geoCoordinates, setGeoCoordinates] = useState<
     Array<{ latitude: number; longitude: number; destinationName: string }>
@@ -171,17 +172,28 @@ const Map: React.FC = () => {
           />
         ))}
       </MapView>
-      <Pressable
-        style={[
-          styles.seeAllButton,
-          { backgroundColor: currentTheme.alternate },
-        ]}
-        onPress={() =>
-          mapRef.current?.animateToRegion(calculateBoundingRegion())
-        }
-      >
-        <Text style={{ color: "white" }}>See All</Text>
-      </Pressable>
+      {geoCoordinates.length === 0 && (
+        <View style={styles.overlay}>
+          <StartNewTripCard
+            navigation={navigation}
+            textColor="white"
+            subTextColor="white"
+          />
+        </View>
+      )}
+      {geoCoordinates.length > 0 && (
+        <Pressable
+          style={[
+            styles.seeAllButton,
+            { backgroundColor: currentTheme.alternate },
+          ]}
+          onPress={() =>
+            mapRef.current?.animateToRegion(calculateBoundingRegion())
+          }
+        >
+          <Text style={{ color: "white" }}>See All</Text>
+        </Pressable>
+      )}
       <DraggableFlatList
         data={geoCoordinates}
         keyExtractor={(item, index) => index.toString()}
@@ -194,6 +206,12 @@ const Map: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   tripItem: {
     padding: 10,
     borderBottomWidth: 1,

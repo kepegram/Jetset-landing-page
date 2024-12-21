@@ -8,15 +8,19 @@ import { MainButton } from "../ui/button";
 
 type StartNewTripCardProps = {
   navigation: NativeStackNavigationProp<RootStackParamList>;
+  textColor?: string; // Allow text color to be editable
+  subTextColor?: string; // Allow subtext color to be editable
 };
 
-const StartNewTripCard: React.FC<StartNewTripCardProps> = ({ navigation }) => {
+const StartNewTripCard: React.FC<StartNewTripCardProps> = ({
+  navigation,
+  textColor, // Destructure textColor from props
+  subTextColor, // Destructure subTextColor from props
+}) => {
   const { currentTheme } = useTheme();
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: currentTheme.background }]}
-    >
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
       <View
         style={{
           padding: 20,
@@ -27,14 +31,14 @@ const StartNewTripCard: React.FC<StartNewTripCardProps> = ({ navigation }) => {
       >
         <Ionicons
           name="location-sharp"
-          size={30}
+          size={50}
           color={currentTheme.alternate}
         />
         <Text
           style={{
             fontSize: 25,
             fontWeight: "bold",
-            color: currentTheme.textPrimary,
+            color: textColor || currentTheme.textPrimary,
           }}
         >
           No trips planned yet
@@ -44,10 +48,10 @@ const StartNewTripCard: React.FC<StartNewTripCardProps> = ({ navigation }) => {
           style={{
             fontSize: 20,
             textAlign: "center",
-            color: "gray",
+            color: subTextColor || "gray",
           }}
         >
-          Looks like its time to plan a new travel experinece! Get Started below
+          Looks like its time to plan a new travel experience! Get Started below
         </Text>
 
         <MainButton

@@ -100,7 +100,7 @@ const MyTrips: React.FC = () => {
     });
 
   return (
-    <View style={{ flex: 1, backgroundColor: currentTheme.background }}>
+    <View style={{ flex: 1 }}>
       {/* Header */}
       <View
         style={{
