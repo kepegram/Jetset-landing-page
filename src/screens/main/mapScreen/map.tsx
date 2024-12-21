@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, LogBox } from "react-native";
 import React, { useState, useCallback, useRef } from "react";
 import MapView, { Marker } from "react-native-maps";
 import { useTheme } from "../../../context/themeContext";
@@ -10,6 +10,8 @@ import DraggableFlatList from "react-native-draggable-flatlist";
 import { RenderItemParams } from "react-native-draggable-flatlist";
 import { Ionicons } from "@expo/vector-icons";
 import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
+
+LogBox.ignoreAllLogs();
 
 const Map: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { currentTheme } = useTheme();
