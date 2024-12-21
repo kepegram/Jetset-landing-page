@@ -6,20 +6,19 @@ import {
   Alert,
   Pressable,
   Linking,
+  StyleSheet,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { doc, deleteDoc } from "firebase/firestore";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
-import moment from "moment";
-import FlightInfo from "../../../components/tripDetails/flightInfo";
 import HotelList from "../../../components/tripDetails/hotelList";
 import PlannedTrip from "../../../components/tripDetails/plannedTrip";
 import { MainButton } from "../../../components/ui/button";
+import { FIREBASE_DB, FIREBASE_AUTH } from "../../../../firebase.config";
+import { doc, setDoc } from "firebase/firestore";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -56,6 +55,28 @@ const RecommendedTripDetails: React.FC = () => {
     }
   }, [trip, navigation]);
 
+  const handleHeartPress = async () => {
+    setIsHearted(!isHearted);
+    if (!isHearted) {
+      const user = FIREBASE_AUTH.currentUser;
+      if (user) {
+        try {
+          const tripDocRef = doc(
+            FIREBASE_DB,
+            `users/${user.uid}/userTrips`,
+            tripDetails.travelPlan.destination
+          );
+          await setDoc(tripDocRef, tripDetails);
+          navigation.navigate("MyTripsMain");
+        } catch (error) {
+          console.error("Error saving trip details:", error);
+        }
+      } else {
+        Alert.alert("User not authenticated");
+      }
+    }
+  };
+
   if (!tripDetails) {
     return (
       <View
@@ -81,18 +102,19 @@ const RecommendedTripDetails: React.FC = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+      <View style={styles.imageContainer}>
         <Image
           source={{
             uri: photoRef
               ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
               : "https://via.placeholder.com/400",
           }}
-          style={{
-            width: "100%",
-            height: 330,
-          }}
+          style={styles.image}
         />
+      </View>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 100, marginTop: 330 }}
+      >
         <View
           style={{
             padding: 15,
@@ -118,7 +140,7 @@ const RecommendedTripDetails: React.FC = () => {
             >
               {tripDetails?.travelPlan?.destination || "Unknown Location"}
             </Text>
-            <Pressable onPress={() => setIsHearted(!isHearted)}>
+            <Pressable onPress={handleHeartPress}>
               <Ionicons
                 name={isHearted ? "heart" : "heart-outline"}
                 size={30}
@@ -236,5 +258,19 @@ const RecommendedTripDetails: React.FC = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  imageContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: -1,
+  },
+  image: {
+    width: "100%",
+    height: 330,
+  },
+});
 
 export default RecommendedTripDetails;

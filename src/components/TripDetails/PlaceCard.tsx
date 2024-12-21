@@ -1,4 +1,4 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { GetPhotoRef } from "../../api/googlePlaceApi";
 import { useTheme } from "../../context/themeContext";
@@ -7,6 +7,8 @@ import { useTheme } from "../../context/themeContext";
 interface Place {
   placeName: string;
   placeDetails: string;
+  placeExtendedDetails: string;
+  placeUrl: string;
   ticketPrice: string;
 }
 
@@ -27,8 +29,15 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
     setPhotoRef(result);
   };
 
+  const handlePress = () => {
+    console.log("Place URL:", place.placeUrl);
+    console.log("Place Details:", place.placeDetails);
+    console.log("Place Extended Details:", place.placeExtendedDetails);
+  };
+
   return (
-    <View
+    <Pressable
+      onPress={handlePress}
       style={{
         backgroundColor: currentTheme.accentBackground,
         padding: 10,
@@ -86,7 +95,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
           🎟️: ${place.ticketPrice}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

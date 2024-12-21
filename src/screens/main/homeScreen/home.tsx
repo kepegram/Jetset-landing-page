@@ -23,12 +23,14 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
+import { usePopularDestinations } from "../../../constants/constants";
 import { RECOMMEND_TRIP_AI_PROMPT } from "../../../api/ai-prompt";
 import { chatSession } from "../../../../AI-Model";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 interface TripData {
   budget: string | null;
@@ -54,7 +56,6 @@ const Home: React.FC = () => {
     []
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [userLocation, setUserLocation] = useState("Your Location");
   const [preferences, setPreferences] = useState<TripData>({
     budget: null,
     travelerType: null,
@@ -235,31 +236,6 @@ const Home: React.FC = () => {
       console.error("Error clearing storage and fetching new trips:", error);
     }
   };
-  //   try {
-  //     let { status } = await Location.requestForegroundPermissionsAsync();
-  //     if (status !== 'granted') {
-  //       console.error('Permission to access location was denied');
-  //       return;
-  //     }
-
-  //     let location = await Location.getCurrentPositionAsync({});
-  //     const user = getAuth().currentUser;
-  //     if (user) {
-  //       const locationData = {
-  //         latitude: location.coords.latitude,
-  //         longitude: location.coords.longitude,
-  //       };
-  //       await setDoc(
-  //         doc(FIREBASE_DB, `users/${user.uid}/userLocation`, user.uid),
-  //         locationData
-  //       );
-  //       setUserLocation(`Lat: ${location.coords.latitude}, Lon: ${location.coords.longitude}`);
-  //       setIsLocationEditing(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error getting user location:", error);
-  //   }
-  // };
 
   useFocusEffect(
     useCallback(() => {
@@ -275,25 +251,83 @@ const Home: React.FC = () => {
   };
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: currentTheme.background }]}
-    >
-      <View
-        style={[styles.header, { backgroundColor: currentTheme.background }]}
-      >
-        <View style={styles.headerContent}>
-          <Text
-            style={[styles.greetingText, { color: currentTheme.textPrimary }]}
-          >
-            {getGreeting()}
-          </Text>
-        </View>
-      </View>
+    <View style={{ flex: 1 }}>
       <ScrollView
-        style={styles.scrollView}
+        style={[{ backgroundColor: currentTheme.background }]}
         contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
       >
+        <View style={styles.header}>
+          <View style={styles.imageContainer}>
+            <Image
+              source={require("../../../assets/travel.jpg")}
+              style={styles.image}
+            />
+            <View style={styles.overlay} />
+          </View>
+          <View style={styles.headerContent}>
+            <Text style={styles.greetingText}>{getGreeting()}</Text>
+            <Text style={styles.subGreetingText}>
+              Where would you like to go?
+            </Text>
+            <View style={styles.buttonContainer}>
+              {[
+                { label: "Beach", icon: "umbrella-beach" },
+                { label: "Mountain", icon: "mountain" },
+                {
+                  label: "City",
+                  icon: "city",
+                },
+                { label: "Country", icon: "globe-americas" },
+              ].map(({ label, icon }) => (
+                <Pressable
+                  key={label}
+                  onPress={() => console.log(label)}
+                  style={[
+                    styles.button,
+                    { borderColor: currentTheme.alternate },
+                  ]}
+                >
+                  <FontAwesome5 name={icon} size={28} color="white" />
+                  <Text style={styles.buttonText}>{label}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        </View>
+
         <View style={styles.recommendedTripsContainer}>
+          <GooglePlacesAutocomplete
+            placeholder="Search for places"
+            onPress={(data, details = null) => {
+              console.log(data, details);
+            }}
+            query={{
+              key: process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
+              language: "en",
+            }}
+            styles={{
+              textInput: styles.searchInput,
+            }}
+          />
+          <FlatList
+            horizontal
+            data={usePopularDestinations()}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => console.log(item.name)}
+                style={styles.popularDestinationContainer}
+              >
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.popularDestinationImage}
+                />
+                <Text style={styles.popularDestinationText}>{item.name}</Text>
+              </Pressable>
+            )}
+            showsHorizontalScrollIndicator={false}
+          />
           <View style={styles.recommendedTripsHeader}>
             <Text
               style={[
@@ -390,40 +424,62 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    width: "100%",
+    height: 330,
+    zIndex: -1,
+  },
+  imageContainer: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 1,
-    padding: 20,
+  },
+  image: {
+    width: "100%",
+    height: 330,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
   headerContent: {
-    flexDirection: "row",
+    position: "absolute",
+    top: 80,
+    left: 20,
+    right: 20,
     alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingTop: 40,
   },
   greetingText: {
     fontSize: 30,
+    color: "white",
     fontWeight: "bold",
+    alignSelf: "flex-start",
   },
-  locationPressable: {
+  subGreetingText: {
+    fontSize: 18,
+    color: "white",
+    fontWeight: "normal",
+    alignSelf: "flex-start",
+  },
+  buttonContainer: {
     flexDirection: "row",
+    marginTop: 20,
+  },
+  button: {
+    padding: 10,
+    backgroundColor: "rgba(5, 5, 5, 0.6)",
+    borderRadius: 15,
+    borderWidth: 1,
+    width: 90,
+    height: 120,
+    marginHorizontal: 5,
     alignItems: "center",
-    width: "100%",
-    marginTop: 10,
+    justifyContent: "center",
   },
-  locationText: {
-    fontSize: 16,
-    marginLeft: 5,
-  },
-  chevronIcon: {
-    marginLeft: 5,
-  },
-  scrollView: {
-    flex: 1,
-    paddingTop: 140,
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    marginTop: 20,
   },
   scrollViewContent: {
     justifyContent: "center",
@@ -433,6 +489,38 @@ const styles = StyleSheet.create({
   recommendedTripsContainer: {
     width: "100%",
     padding: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginTop: -50,
+  },
+  searchInput: {
+    width: "100%",
+    padding: 10,
+    height: 70,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 15,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  popularDestinationContainer: {
+    alignItems: "center",
+    marginRight: 10,
+    marginBottom: 20,
+  },
+  popularDestinationImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 55,
+  },
+  popularDestinationText: {
+    marginTop: 5,
+    fontSize: 12,
+    color: "#000",
   },
   recommendedTripsHeader: {
     flexDirection: "row",

@@ -57,11 +57,13 @@ export const AI_PROMPT = `
             {
               "placeName": "",
               "placeDetails": "",
+              "placeExtendedDetails": "",
               "geoCoordinates": {
                 "latitude": "",
                 "longitude": ""
               },
               "ticketPrice": "",
+              "placeUrl": ""
             }
           ]
         }
@@ -69,8 +71,9 @@ export const AI_PROMPT = `
     }
   }
 
-  Ensure the JSON format is consistent and includes a daily plan with the best times to visit each location. 
-  Provide multiple hotel options in the "hotels" array.
+  Ensure the JSON format is consistent. Provide a placeUrl for each place that takes the user to a google search of the place. 
+  Also provide a placeExtendedDetails for each place that provides more information and facts about the place
+  the user can read and learn. Also provide multiple hotel options in the "hotels" array.
 `;
 
 export const RECOMMEND_TRIP_AI_PROMPT = `
@@ -134,11 +137,13 @@ export const RECOMMEND_TRIP_AI_PROMPT = `
             {
               "placeName": "",
               "placeDetails": "",
+              "placeExtendedDetails": "",
               "geoCoordinates": {
                 "latitude": "",
                 "longitude": ""
               },
               "ticketPrice": "",
+              "placeUrl": ""
             }
           ]
         }
@@ -146,6 +151,7 @@ export const RECOMMEND_TRIP_AI_PROMPT = `
     }
   }
 
-  Ensure the JSON format is consistent and includes a daily plan with the best times to visit each location. 
-  Provide multiple hotel options in the "hotels" array.
+  Ensure the JSON format is consistent. Provide a placeUrl for each place that takes the user to a google search of the place. 
+  Also provide a placeExtendedDetails for each place that provides more information and facts about the place
+  the user can read and learn. Also provide multiple hotel options in the "hotels" array.
 `;

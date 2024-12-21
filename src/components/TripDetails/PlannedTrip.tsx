@@ -18,6 +18,8 @@ interface PlannedTripProps {
           latitude: number;
           longitude: number;
         };
+        placeExtendedDetails: string;
+        placeUrl: string;
       }[];
     }[];
     budget: string;
@@ -98,6 +100,8 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
                     ...place,
                     placeDetails: place.placeDetails,
                     ticketPrice: place.ticketPrice,
+                    placeExtendedDetails: place.placeExtendedDetails,
+                    placeUrl: place.placeUrl,
                   }}
                 />
               </Pressable>
