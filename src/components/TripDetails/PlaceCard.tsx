@@ -9,7 +9,6 @@ interface Place {
   placeDetails: string;
   placeExtendedDetails: string;
   placeUrl: string;
-  ticketPrice: string;
 }
 
 interface PlaceCardProps {
@@ -83,16 +82,6 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
           }}
         >
           {place.placeDetails}
-        </Text>
-        <Text
-          style={{
-            fontFamily: "outfit",
-            fontSize: 14,
-            color: currentTheme.textSecondary,
-            marginTop: 5,
-          }}
-        >
-          🎟️: ${place.ticketPrice}
         </Text>
       </View>
     </Pressable>

@@ -12,7 +12,6 @@ interface PlannedTripProps {
       places: {
         placeName: string;
         placeDetails: string;
-        ticketPrice: string;
         timeToTravel: string;
         geoCoordinates: {
           latitude: number;
@@ -90,7 +89,7 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
               color: currentTheme.textPrimary,
             }}
           >
-            {day}
+            Day {day}
           </Text>
           {Array.isArray(places) && places.length > 0 ? (
             places.map((place, index) => (
@@ -99,7 +98,6 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
                   place={{
                     ...place,
                     placeDetails: place.placeDetails,
-                    ticketPrice: place.ticketPrice,
                     placeExtendedDetails: place.placeExtendedDetails,
                     placeUrl: place.placeUrl,
                   }}

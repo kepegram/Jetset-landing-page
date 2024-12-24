@@ -113,7 +113,7 @@ const RecommendedTripDetails: React.FC = () => {
         />
       </View>
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 100, marginTop: 330 }}
+        contentContainerStyle={{ paddingBottom: 450, marginTop: 330 }}
       >
         <View
           style={{

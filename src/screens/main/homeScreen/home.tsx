@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
-import React, { useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
 import { CreateTripContext } from "../../../context/createTripContext";
@@ -28,7 +28,10 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { usePopularDestinations } from "../../../constants/constants";
-import { RECOMMEND_TRIP_AI_PROMPT } from "../../../api/ai-prompt";
+import {
+  RECOMMEND_TRIP_AI_PROMPT,
+  SPECIFIC_CITY_TRIP_AI_PROMPT,
+} from "../../../api/ai-prompt";
 import { chatSession } from "../../../../AI-Model";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
@@ -55,6 +58,8 @@ const Home: React.FC = () => {
   const [recommendedTrips, setRecommendedTrips] = useState<RecommendedTrip[]>(
     []
   );
+  const [terrainTrips, setTerrainTrips] = useState<RecommendedTrip[]>([]);
+  const [cityTrips, setCityTrips] = useState<RecommendedTrip[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [preferences, setPreferences] = useState<TripData>({
     budget: null,
@@ -166,7 +171,7 @@ const Home: React.FC = () => {
           photoData.candidates[0]?.photos[0]?.photo_reference || null;
 
         const trip = {
-          id: `trip-${i}`,
+          id: `trip-${i}-${new Date().getTime()}`,
           name: placeName,
           description:
             tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
@@ -185,7 +190,7 @@ const Home: React.FC = () => {
       setIsLoading(false);
     }
   };
-
+  
   const checkAndGenerateTrips = async () => {
     try {
       const user = getAuth().currentUser;
@@ -237,6 +242,170 @@ const Home: React.FC = () => {
     }
   };
 
+  const generateSetTerrainTrip = async (terrainType: string) => {
+    try {
+      setIsLoading(true);
+      const terrainTrips = [];
+      const user = getAuth().currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      const terrainTripsCollection = collection(
+        FIREBASE_DB,
+        `users/${user.uid}/terrainTrips`
+      );
+
+      for (let i = 0; i < 3; i++) {
+        const FINAL_PROMPT = SPECIFIC_CITY_TRIP_AI_PROMPT.replace(
+          "{terrainType}",
+          terrainType
+        )
+          .replace("{travelerType}", preferences.travelerType)
+          .replace("{accommodationType}", preferences.accommodationType)
+          .replace("{activityLevel}", preferences.activityLevel)
+          .replace("{preferredClimate}", preferences.preferredClimate);
+
+        console.log("Generated AI Prompt for Terrain Trip:", FINAL_PROMPT);
+
+        const result = await chatSession.sendMessage(FINAL_PROMPT);
+        const responseText = await result.response.text();
+        console.log("AI Response for Terrain Trip:", responseText);
+
+        if (!responseText) {
+          console.error("AI response is empty or undefined");
+          continue;
+        }
+
+        const tripResp = JSON.parse(responseText);
+        const placeName = tripResp.travelPlan.destination;
+
+        // Fetch photo reference using Google Places API
+        const photoResponse = await fetch(
+          `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
+            placeName
+          )}&inputtype=textquery&fields=photos&key=${
+            process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY
+          }`
+        );
+        const photoData = await photoResponse.json();
+        const photoRef =
+          photoData.candidates[0]?.photos[0]?.photo_reference || null;
+
+        const trip = {
+          id: `trip-${i}-${new Date().getTime()}`,
+          name: placeName,
+          description:
+            tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
+            "No description available",
+          photoRef,
+          fullResponse: responseText, // Store the full AI response
+        };
+
+        terrainTrips.push(trip);
+        await addDoc(terrainTripsCollection, trip);
+      }
+      setTerrainTrips(terrainTrips);
+
+      // Navigate to the RecommendedTripDetails screen with the generated trip information
+      if (terrainTrips.length > 0) {
+        const tripInfo = terrainTrips[0].fullResponse;
+        console.log("Navigating to TripDetails with tripInfo:", tripInfo);
+        navigation.navigate("RecommendedTripDetails", {
+          trip: tripInfo,
+          photoRef: terrainTrips[0].photoRef,
+        });
+      }
+    } catch (error) {
+      console.error("Error generating recommended trips:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generateSetCityTrip = async (cityName: string) => {
+    try {
+      setIsLoading(true);
+      const user = getAuth().currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      const cityTripsCollection = collection(
+        FIREBASE_DB,
+        `users/${user.uid}/cityTrips`
+      );
+
+      for (let i = 0; i < 3; i++) {
+        const FINAL_PROMPT = SPECIFIC_CITY_TRIP_AI_PROMPT.replace(
+          "{cityName}",
+          cityName
+        )
+          .replace("{travelerType}", preferences.travelerType)
+          .replace("{accommodationType}", preferences.accommodationType)
+          .replace("{activityLevel}", preferences.activityLevel)
+          .replace("{preferredClimate}", preferences.preferredClimate);
+
+        console.log("Generated AI Prompt for City Trip:", FINAL_PROMPT);
+
+        const result = await chatSession.sendMessage(FINAL_PROMPT);
+        const responseText = await result.response.text();
+        console.log("AI Response for City Trip:", responseText);
+
+        if (!responseText) {
+          console.error("AI response is empty or undefined");
+          continue;
+        }
+
+        const tripResp = JSON.parse(responseText);
+        const placeName = tripResp.travelPlan.destination;
+
+        // Fetch photo reference using Google Places API
+        const photoResponse = await fetch(
+          `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
+            placeName
+          )}&inputtype=textquery&fields=photos&key=${
+            process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY
+          }`
+        );
+        const photoData = await photoResponse.json();
+        const photoRef =
+          photoData.candidates[0]?.photos[0]?.photo_reference || null;
+
+        const trip = {
+          id: `trip-${i}-${new Date().getTime()}`,
+          name: placeName,
+          description:
+            tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
+            "No description available",
+          photoRef,
+          fullResponse: responseText, // Store the full AI response
+        };
+
+        await addDoc(cityTripsCollection, trip);
+      }
+
+      const cityTripsSnapshot = await getDocs(cityTripsCollection);
+      const cityTrips = cityTripsSnapshot.docs.map(
+        (doc) => doc.data() as RecommendedTrip
+      );
+
+      setCityTrips(cityTrips);
+
+      // Navigate to the RecommendedTripDetails screen with the generated trip information
+      if (cityTrips.length > 0) {
+        const tripInfo = cityTrips[0].fullResponse;
+        console.log("Navigating to TripDetails with tripInfo:", tripInfo);
+        navigation.navigate("RecommendedTripDetails", {
+          trip: tripInfo,
+          photoRef: cityTrips[0].photoRef,
+        });
+      }
+    } catch (error) {
+      console.error("Error generating recommended trips:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       checkAndGenerateTrips();
@@ -270,7 +439,7 @@ const Home: React.FC = () => {
             <Text style={styles.subGreetingText}>
               Where would you like to go?
             </Text>
-            <View style={styles.buttonContainer}>
+            <View style={styles.terrainContainer}>
               {[
                 { label: "Beach", icon: "umbrella-beach" },
                 { label: "Mountain", icon: "mountain" },
@@ -282,7 +451,7 @@ const Home: React.FC = () => {
               ].map(({ label, icon }) => (
                 <Pressable
                   key={label}
-                  onPress={() => console.log(label)}
+                  onPress={() => generateSetTerrainTrip(label)}
                   style={[
                     styles.button,
                     { borderColor: currentTheme.alternate },
@@ -324,7 +493,7 @@ const Home: React.FC = () => {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <Pressable
-                onPress={() => console.log(item.name)}
+                onPress={() => generateSetCityTrip(item.name)}
                 style={styles.popularDestinationContainer}
               >
                 <Image
@@ -476,7 +645,7 @@ const styles = StyleSheet.create({
     fontWeight: "normal",
     alignSelf: "flex-start",
   },
-  buttonContainer: {
+  terrainContainer: {
     flexDirection: "row",
     marginTop: 20,
   },

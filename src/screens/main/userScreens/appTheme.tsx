@@ -34,12 +34,12 @@ const AppTheme: React.FC = () => {
           <Animated.Text style={[styles.label, { color: animatedTextColor }]}>
             Light Theme
           </Animated.Text>
-          {/* <Pressable onPress={() => toggleTheme("light")}>
+          <Pressable onPress={() => toggleTheme("light")}>
             <Image
-              source={require("../../../assets/app-light.png")}
+              source={require("../../../assets/light.png")}
               style={styles.image}
             />
-          </Pressable> */}
+          </Pressable>
           <Pressable
             style={[
               styles.radioButton,
@@ -49,16 +49,18 @@ const AppTheme: React.FC = () => {
           />
         </View>
 
+        <View style={styles.spacer} />
+
         <View style={styles.themeOption}>
           <Animated.Text style={[styles.label, { color: animatedTextColor }]}>
             Dark Theme
           </Animated.Text>
-          {/* <Pressable onPress={() => toggleTheme("dark")}>
+          <Pressable onPress={() => toggleTheme("dark")}>
             <Image
-              source={require("../../../assets/app-dark.png")}
+              source={require("../../../assets/dark.png")}
               style={styles.image}
             />
-          </Pressable> */}
+          </Pressable>
           <Pressable
             style={[
               styles.radioButton,
@@ -83,17 +85,26 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "80%",
+    padding: 20,
+    width: "100%",
   },
   themeOption: {
     alignItems: "center",
     flex: 1,
     padding: 10,
   },
+  spacer: {
+    width: 40,
+  },
   label: {
     fontSize: 16,
     marginBottom: 10,
     fontWeight: "bold",
+  },
+  image: {
+    width: 200,
+    height: 410,
+    marginBottom: 10,
   },
   radioButton: {
     width: 25,
