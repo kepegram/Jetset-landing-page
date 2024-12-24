@@ -89,7 +89,7 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
               color: currentTheme.textPrimary,
             }}
           >
-            Day {day}
+            {day}
           </Text>
           {Array.isArray(places) && places.length > 0 ? (
             places.map((place, index) => (

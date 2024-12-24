@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
-import React, { useState, useContext, useCallback, useEffect } from "react";
+import React, { useState, useContext, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
 import { CreateTripContext } from "../../../context/createTripContext";
@@ -61,6 +61,8 @@ const Home: React.FC = () => {
   const [terrainTrips, setTerrainTrips] = useState<RecommendedTrip[]>([]);
   const [cityTrips, setCityTrips] = useState<RecommendedTrip[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTerrainLoading, setIsTerrainLoading] = useState(false);
+  const [isCityLoading, setIsCityLoading] = useState(false);
   const [preferences, setPreferences] = useState<TripData>({
     budget: null,
     travelerType: null,
@@ -190,7 +192,7 @@ const Home: React.FC = () => {
       setIsLoading(false);
     }
   };
-  
+
   const checkAndGenerateTrips = async () => {
     try {
       const user = getAuth().currentUser;
@@ -244,7 +246,7 @@ const Home: React.FC = () => {
 
   const generateSetTerrainTrip = async (terrainType: string) => {
     try {
-      setIsLoading(true);
+      setIsTerrainLoading(true);
       const terrainTrips = [];
       const user = getAuth().currentUser;
       if (!user) {
@@ -318,13 +320,13 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Error generating recommended trips:", error);
     } finally {
-      setIsLoading(false);
+      setIsTerrainLoading(false);
     }
   };
 
   const generateSetCityTrip = async (cityName: string) => {
     try {
-      setIsLoading(true);
+      setIsCityLoading(true);
       const user = getAuth().currentUser;
       if (!user) {
         throw new Error("User not authenticated");
@@ -379,7 +381,6 @@ const Home: React.FC = () => {
           photoRef,
           fullResponse: responseText, // Store the full AI response
         };
-
         await addDoc(cityTripsCollection, trip);
       }
 
@@ -402,7 +403,7 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Error generating recommended trips:", error);
     } finally {
-      setIsLoading(false);
+      setIsCityLoading(false);
     }
   };
 
@@ -596,6 +597,12 @@ const Home: React.FC = () => {
               }
               showsHorizontalScrollIndicator={false}
             />
+          )}
+          {isTerrainLoading && (
+            <ActivityIndicator size="large" color={currentTheme.alternate} />
+          )}
+          {isCityLoading && (
+            <ActivityIndicator size="large" color={currentTheme.alternate} />
           )}
         </View>
       </ScrollView>
