@@ -21,7 +21,12 @@ type ButtonProps = {
   textColor?: string;
 };
 
-const CustomButton: React.FC<ButtonProps> = ({ buttonText, onPress, children, disabled }) => {
+const CustomButton: React.FC<ButtonProps> = ({
+  buttonText,
+  onPress,
+  children,
+  disabled,
+}) => {
   const { currentTheme } = useTheme();
 
   return (
@@ -36,7 +41,7 @@ const CustomButton: React.FC<ButtonProps> = ({ buttonText, onPress, children, di
       {children ? (
         children
       ) : (
-        <Text style={[styles.buttonText, { color: currentTheme.buttonText }]}>
+        <Text style={[styles.buttonText, { color: currentTheme.textPrimary }]}>
           {buttonText}
         </Text>
       )}
@@ -91,7 +96,12 @@ const MainButton: React.FC<ButtonProps> = ({
       {children ? (
         children
       ) : (
-        <Text style={[styles.mainButtonText, { color: textColor || currentTheme.buttonText }]}>
+        <Text
+          style={[
+            styles.mainButtonText,
+            { color: textColor || currentTheme.buttonText },
+          ]}
+        >
           {buttonText}
         </Text>
       )}

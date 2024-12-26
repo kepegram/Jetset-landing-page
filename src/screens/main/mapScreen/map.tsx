@@ -10,6 +10,7 @@ import DraggableFlatList from "react-native-draggable-flatlist";
 import { RenderItemParams } from "react-native-draggable-flatlist";
 import { Ionicons } from "@expo/vector-icons";
 import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 LogBox.ignoreAllLogs();
 
@@ -22,6 +23,7 @@ const Map: React.FC<{ navigation: any }> = ({ navigation }) => {
     number | null
   >(null);
   const mapRef = useRef<MapView>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const fetchGeoCoordinates = useCallback(async () => {
     try {
@@ -196,13 +198,19 @@ const Map: React.FC<{ navigation: any }> = ({ navigation }) => {
           <Text style={{ color: "white" }}>See All</Text>
         </Pressable>
       )}
-      <DraggableFlatList
-        data={geoCoordinates}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={renderItem}
-        onDragEnd={({ data }) => setGeoCoordinates(data)}
-        style={{ width: "100%", height: "20%" }}
-      />
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={0}
+        snapPoints={["25%", "50%", "75%"]}
+      >
+        <DraggableFlatList
+          data={geoCoordinates}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderItem}
+          onDragEnd={({ data }) => setGeoCoordinates(data)}
+          style={{ width: "100%", height: "100%" }}
+        />
+      </BottomSheet>
     </View>
   );
 };

@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { AltButton, Button } from "../../../components/ui/button";
+import { AltButton, CustomButton } from "../../../components/ui/button";
 import {
   getAuth,
   EmailAuthProvider,
@@ -140,7 +140,7 @@ const ChangePassword: React.FC = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <Button onPress={handleCancel} buttonText="Cancel" />
+        <CustomButton onPress={handleCancel} buttonText="Cancel" />
         <AltButton onPress={handleSave} buttonText="Save" />
       </View>
     </View>

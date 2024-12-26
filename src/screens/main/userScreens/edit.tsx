@@ -17,7 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { Button, AltButton } from "../../../components/ui/button";
+import { CustomButton, AltButton } from "../../../components/ui/button";
 import { useTheme } from "../../../context/themeContext";
 
 type EditScreenNavigationProp = NativeStackNavigationProp<
@@ -160,7 +160,7 @@ const Edit: React.FC = () => {
 
       {/* Save and Cancel Buttons */}
       <View style={styles.buttonContainer}>
-        <Button onPress={handleCancel} buttonText="Cancel" />
+        <CustomButton onPress={handleCancel} buttonText="Cancel" />
         <AltButton onPress={handleSave} buttonText="Save" />
       </View>
     </View>
