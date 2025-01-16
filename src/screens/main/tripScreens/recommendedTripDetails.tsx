@@ -140,13 +140,6 @@ const RecommendedTripDetails: React.FC = () => {
             >
               {tripDetails?.travelPlan?.destination || "Unknown Location"}
             </Text>
-            <Pressable onPress={handleHeartPress}>
-              <Ionicons
-                name={isHearted ? "heart" : "heart-outline"}
-                size={30}
-                color={isHearted ? "red" : currentTheme.textPrimary}
-              />
-            </Pressable>
           </View>
           <View
             style={{
@@ -176,27 +169,6 @@ const RecommendedTripDetails: React.FC = () => {
               {tripDetails?.travelPlan?.numberOfNights} nights
             </Text>
           </View>
-          <View
-            style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}
-          >
-            <Text
-              style={{
-                fontFamily: "outfit",
-                fontSize: 17,
-                marginRight: 5,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              Traveling as: {tripDetails?.whoIsGoing || "Unknown"}
-            </Text>
-            <Pressable onPress={() => Alert.alert("Edit Traveling As")}>
-              <Ionicons
-                name="pencil"
-                size={18}
-                color={currentTheme.textSecondary}
-              />
-            </Pressable>
-          </View>
 
           {/* Hotels List */}
           <HotelList hotelList={tripDetails?.travelPlan?.hotels} />
@@ -206,7 +178,7 @@ const RecommendedTripDetails: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* Flight Price and Booking */}
+      {/* Flight Price and Save Trip */}
       <View
         style={{
           position: "absolute",
@@ -243,15 +215,8 @@ const RecommendedTripDetails: React.FC = () => {
           </Text>
         </View>
         <MainButton
-          onPress={() => {
-            const url = tripDetails?.travelPlan?.flights?.airlineUrl;
-            if (url) {
-              Linking.openURL(url);
-            } else {
-              Alert.alert("Booking URL not available");
-            }
-          }}
-          buttonText="Book Now"
+          onPress={handleHeartPress}
+          buttonText="Save Trip"
           width={200}
         />
       </View>

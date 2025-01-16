@@ -36,3 +36,7 @@ yarn-error.*
 
 # personal
 .env
+firebase.config.ts
+AI-Model.tsx
+google-services.json
+GoogleService-Info.plist

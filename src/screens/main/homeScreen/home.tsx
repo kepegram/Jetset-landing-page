@@ -34,6 +34,7 @@ import {
 } from "../../../api/ai-prompt";
 import { chatSession } from "../../../../AI-Model";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface TripData {
   budget: string | null;
@@ -186,37 +187,12 @@ const Home: React.FC = () => {
         await addDoc(userTripsCollection, trip);
       }
       setRecommendedTrips(trips);
+      await AsyncStorage.setItem("lastFetchTime", new Date().toISOString());
+      console.log("Stored current time as last fetch time.");
     } catch (error) {
       console.error("Error generating recommended trips:", error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const checkAndGenerateTrips = async () => {
-    try {
-      const user = getAuth().currentUser;
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-      const userTripsCollection = collection(
-        FIREBASE_DB,
-        `users/${user.uid}/suggestedTrips`
-      );
-      const userTripsSnapshot = await getDocs(userTripsCollection);
-
-      if (!userTripsSnapshot.empty) {
-        const trips = userTripsSnapshot.docs.map(
-          (doc) => doc.data() as RecommendedTrip
-        );
-        setRecommendedTrips(trips);
-        return;
-      }
-
-      // If no valid stored trips, generate new ones
-      await generateRecommendedTrips();
-    } catch (error) {
-      console.error("Error checking and generating trips:", error);
     }
   };
 
@@ -244,10 +220,39 @@ const Home: React.FC = () => {
     }
   };
 
+  const checkTimeAndFetchReccomendedTrips = async () => {
+    try {
+      const lastFetchTime = await AsyncStorage.getItem("lastFetchTime");
+      if (lastFetchTime) {
+        const lastFetchDate = new Date(lastFetchTime);
+        const currentTime = new Date();
+        const timeDifference = currentTime.getTime() - lastFetchDate.getTime();
+        const hoursDifference = timeDifference / (1000 * 3600);
+        console.log(
+          `Time difference since last fetch: ${hoursDifference} hours`
+        );
+        if (hoursDifference >= 12) {
+          console.log(
+            "More than 12 hours since last fetch, fetching new trips."
+          );
+          await clearStorageAndFetchNewTrips();
+        } else {
+          console.log(
+            "Less than 12 hours since last fetch, using stored trips."
+          );
+        }
+      } else {
+        console.log("No last fetch time found, generating new trips.");
+        await generateRecommendedTrips();
+      }
+    } catch (error) {
+      console.error("Error checking time and fetching trips:", error);
+    }
+  };
+
   const generateSetTerrainTrip = async (terrainType: string) => {
     try {
       setIsTerrainLoading(true);
-      const terrainTrips = [];
       const user = getAuth().currentUser;
       if (!user) {
         throw new Error("User not authenticated");
@@ -257,66 +262,61 @@ const Home: React.FC = () => {
         `users/${user.uid}/terrainTrips`
       );
 
-      for (let i = 0; i < 3; i++) {
-        const FINAL_PROMPT = SPECIFIC_CITY_TRIP_AI_PROMPT.replace(
-          "{terrainType}",
-          terrainType
-        )
-          .replace("{travelerType}", preferences.travelerType)
-          .replace("{accommodationType}", preferences.accommodationType)
-          .replace("{activityLevel}", preferences.activityLevel)
-          .replace("{preferredClimate}", preferences.preferredClimate);
+      const FINAL_PROMPT = SPECIFIC_CITY_TRIP_AI_PROMPT.replace(
+        "{terrainType}",
+        terrainType
+      )
+        .replace("{travelerType}", preferences.travelerType)
+        .replace("{accommodationType}", preferences.accommodationType)
+        .replace("{activityLevel}", preferences.activityLevel)
+        .replace("{preferredClimate}", preferences.preferredClimate);
 
-        console.log("Generated AI Prompt for Terrain Trip:", FINAL_PROMPT);
+      console.log("Generated AI Prompt for Terrain Trip:", FINAL_PROMPT);
 
-        const result = await chatSession.sendMessage(FINAL_PROMPT);
-        const responseText = await result.response.text();
-        console.log("AI Response for Terrain Trip:", responseText);
+      const result = await chatSession.sendMessage(FINAL_PROMPT);
+      const responseText = await result.response.text();
+      console.log("AI Response for Terrain Trip:", responseText);
 
-        if (!responseText) {
-          console.error("AI response is empty or undefined");
-          continue;
-        }
-
-        const tripResp = JSON.parse(responseText);
-        const placeName = tripResp.travelPlan.destination;
-
-        // Fetch photo reference using Google Places API
-        const photoResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
-            placeName
-          )}&inputtype=textquery&fields=photos&key=${
-            process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY
-          }`
-        );
-        const photoData = await photoResponse.json();
-        const photoRef =
-          photoData.candidates[0]?.photos[0]?.photo_reference || null;
-
-        const trip = {
-          id: `trip-${i}-${new Date().getTime()}`,
-          name: placeName,
-          description:
-            tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
-            "No description available",
-          photoRef,
-          fullResponse: responseText, // Store the full AI response
-        };
-
-        terrainTrips.push(trip);
-        await addDoc(terrainTripsCollection, trip);
+      if (!responseText) {
+        console.error("AI response is empty or undefined");
+        return;
       }
-      setTerrainTrips(terrainTrips);
+
+      const tripResp = JSON.parse(responseText);
+      const placeName = tripResp.travelPlan.destination;
+
+      // Fetch photo reference using Google Places API
+      const photoResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
+          placeName
+        )}&inputtype=textquery&fields=photos&key=${
+          process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY
+        }`
+      );
+      const photoData = await photoResponse.json();
+      const photoRef =
+        photoData.candidates[0]?.photos[0]?.photo_reference || null;
+
+      const trip = {
+        id: `trip-${terrainType}-${new Date().getTime()}`,
+        name: placeName,
+        description:
+          tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
+          "No description available",
+        photoRef,
+        fullResponse: responseText, // Store the full AI response
+      };
+
+      await addDoc(terrainTripsCollection, trip);
+      setTerrainTrips([trip]);
 
       // Navigate to the RecommendedTripDetails screen with the generated trip information
-      if (terrainTrips.length > 0) {
-        const tripInfo = terrainTrips[0].fullResponse;
-        console.log("Navigating to TripDetails with tripInfo:", tripInfo);
-        navigation.navigate("RecommendedTripDetails", {
-          trip: tripInfo,
-          photoRef: terrainTrips[0].photoRef,
-        });
-      }
+      const tripInfo = trip.fullResponse;
+      console.log("Navigating to TripDetails with tripInfo:", tripInfo);
+      navigation.navigate("RecommendedTripDetails", {
+        trip: tripInfo,
+        photoRef: trip.photoRef,
+      });
     } catch (error) {
       console.error("Error generating recommended trips:", error);
     } finally {
@@ -409,7 +409,7 @@ const Home: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      checkAndGenerateTrips();
+      checkTimeAndFetchReccomendedTrips();
       fetchPreferences();
     }, [])
   );
@@ -474,6 +474,13 @@ const Home: React.FC = () => {
             }}
             onPress={(data, details = null) => {
               console.log(data, details);
+              if (details) {
+                setTripData((prevTripData: TripData) => ({
+                  ...prevTripData,
+                  name: data.description,
+                }));
+                navigation.navigate("BuildTrip");
+              }
             }}
             query={{
               key: process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
