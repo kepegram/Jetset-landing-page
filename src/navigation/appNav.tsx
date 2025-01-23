@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Alert, Image, Pressable, Text } from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
@@ -22,8 +22,6 @@ import {
 } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { CreateTripContext } from "../context/createTripContext";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebase.config";
-import { doc, getDoc } from "firebase/firestore";
 import Home from "../screens/main/homeScreen/home";
 import RecommendedTripDetails from "../screens/main/tripScreens/recommendedTripDetails";
 import Profile from "../screens/main/userScreens/profile";
@@ -38,7 +36,6 @@ import GenerateTrip from "../screens/main/tripScreens/generateTrip";
 import TripDetails from "../screens/main/tripScreens/tripDetails";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyTrips from "../screens/main/tripScreens/myTrips";
-import Preferences from "../screens/onboarding/welcome/preferences";
 import Map from "../screens/main/mapScreen/map";
 import CurrentTripDetails from "../screens/main/tripScreens/currentTripDetails";
 
@@ -49,7 +46,6 @@ export type RootStackParamList = {
   SignUp: undefined;
   ForgotPassword: undefined;
   AppNav: undefined;
-  Preferences: { fromSignUp: boolean };
   App: undefined;
   HomeMain: undefined;
   RecommendedTripDetails: { trip: string; photoRef: string };
@@ -492,52 +488,12 @@ const TabNavigator: React.FC = () => {
 const AppNav: React.FC = () => {
   const { theme } = useTheme();
   const [tripData, setTripData] = useState<any>([]);
-  const [preferencesSet, setPreferencesSet] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const checkPreferencesSet = async () => {
-      const user = FIREBASE_AUTH.currentUser;
-      if (user) {
-        const docRef = doc(
-          FIREBASE_DB,
-          `users/${user.uid}/userPreferences`,
-          user.uid
-        );
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setPreferencesSet(true);
-          console.log("(APPNAV CHECK) Preferences: ", docSnap.data());
-        } else {
-          setPreferencesSet(false);
-          console.log("(APPNAV CHECK) Preferences are not set");
-        }
-      } else {
-        setPreferencesSet(false);
-        console.log("(APPNAV CHECK) No user is signed in");
-      }
-    };
-
-    checkPreferencesSet();
-  }, []);
-
-  if (preferencesSet === null) {
-    return null;
-  }
 
   return (
     <ProfileProvider>
       <CreateTripContext.Provider value={{ tripData, setTripData }}>
         <StatusBar style={theme === "dark" ? "light" : "dark"} />
-        <RootStack.Navigator
-          initialRouteName={preferencesSet ? "App" : "Preferences"}
-        >
-          {!preferencesSet && (
-            <RootStack.Screen
-              name="Preferences"
-              component={Preferences}
-              options={{ headerShown: false }}
-            />
-          )}
+        <RootStack.Navigator initialRouteName="App">
           <RootStack.Screen
             name="App"
             component={TabNavigator}

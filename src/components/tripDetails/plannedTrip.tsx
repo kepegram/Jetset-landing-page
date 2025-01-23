@@ -59,7 +59,7 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }
-      : null;
+      : undefined;
 
   return (
     <View

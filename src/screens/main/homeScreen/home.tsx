@@ -54,7 +54,7 @@ interface RecommendedTrip {
 
 const Home: React.FC = () => {
   const { currentTheme } = useTheme();
-  const { setTripData } = useContext(CreateTripContext);
+  const { setTripData } = useContext(CreateTripContext) || {};
   const [userName, setUserName] = useState("");
   const [recommendedTrips, setRecommendedTrips] = useState<RecommendedTrip[]>(
     []
@@ -64,13 +64,6 @@ const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isTerrainLoading, setIsTerrainLoading] = useState(false);
   const [isCityLoading, setIsCityLoading] = useState(false);
-  const [preferences, setPreferences] = useState<TripData>({
-    budget: null,
-    travelerType: null,
-    accommodationType: null,
-    activityLevel: null,
-    preferredClimate: null,
-  });
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -85,43 +78,27 @@ const Home: React.FC = () => {
     }
   };
 
-  const fetchPreferences = async () => {
+  const getUserName = async () => {
     try {
       const user = getAuth().currentUser;
-      if (user) {
-        const docRef = doc(
-          FIREBASE_DB,
-          `users/${user.uid}/userPreferences`,
-          user.uid
-        );
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const data = docSnap.data() as TripData;
-          setPreferences(data);
-          setTripData((prevTripData: TripData) => {
-            const updatedTripData = { ...prevTripData, ...data };
-            return updatedTripData;
-          });
-        } else {
-          console.log("No such document!");
-        }
-
-        const userDoc = await getDoc(doc(FIREBASE_DB, "users", user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUserName(userData?.name || "");
-        }
+      if (!user) {
+        console.error("User not authenticated");
+        return;
+      }
+      const userDoc = await getDoc(doc(FIREBASE_DB, "users", user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setUserName(userData?.name || "");
       }
     } catch (error) {
-      console.error("Error fetching preferences:", error);
+      console.error("Error fetching username", error);
     }
   };
 
   const generateRecommendedTrips = async () => {
     try {
       setIsLoading(true);
-      const trips = [];
+      const trips: RecommendedTrip[] = [];
       const user = getAuth().currentUser;
       if (!user) {
         throw new Error("User not authenticated");
@@ -131,25 +108,24 @@ const Home: React.FC = () => {
         `users/${user.uid}/suggestedTrips`
       );
 
+      const userTripsSnapshot = await getDocs(userTripsCollection);
+      if (!userTripsSnapshot.empty) {
+        userTripsSnapshot.forEach((doc) => {
+          const tripData = doc.data();
+          trips.push(tripData as RecommendedTrip);
+        });
+        setRecommendedTrips(trips);
+        setIsLoading(false);
+        return;
+      }
+
       for (let i = 0; i < 3; i++) {
-        const FINAL_PROMPT = RECOMMEND_TRIP_AI_PROMPT.replace(
-          "{budget}",
-          preferences.budget || "Modest"
-        )
-          .replace("{travelerType}", preferences.travelerType || "Cultural")
-          .replace(
-            "{accommodationType}",
-            preferences.accommodationType || "Hotel"
-          )
-          .replace("{activityLevel}", preferences.activityLevel || "Medium")
-          .replace(
-            "{preferredClimate}",
-            preferences.preferredClimate || "Mild"
-          );
+        console.log(
+          "Generated AI Prompt for Recommended Trip:",
+          RECOMMEND_TRIP_AI_PROMPT
+        );
 
-        console.log("Generated AI Prompt for Recommended Trip:", FINAL_PROMPT);
-
-        const result = await chatSession.sendMessage(FINAL_PROMPT);
+        const result = await chatSession.sendMessage(RECOMMEND_TRIP_AI_PROMPT);
         const responseText = await result.response.text();
         console.log("AI Response for Recommended Trip:", responseText);
 
@@ -173,14 +149,14 @@ const Home: React.FC = () => {
         const photoRef =
           photoData.candidates[0]?.photos[0]?.photo_reference || null;
 
-        const trip = {
+        const trip: RecommendedTrip = {
           id: `trip-${i}-${new Date().getTime()}`,
           name: placeName,
           description:
             tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
             "No description available",
           photoRef,
-          fullResponse: responseText, // Store the full AI response
+          fullResponse: responseText,
         };
 
         trips.push(trip);
@@ -220,36 +196,6 @@ const Home: React.FC = () => {
     }
   };
 
-  const checkTimeAndFetchReccomendedTrips = async () => {
-    try {
-      const lastFetchTime = await AsyncStorage.getItem("lastFetchTime");
-      if (lastFetchTime) {
-        const lastFetchDate = new Date(lastFetchTime);
-        const currentTime = new Date();
-        const timeDifference = currentTime.getTime() - lastFetchDate.getTime();
-        const hoursDifference = timeDifference / (1000 * 3600);
-        console.log(
-          `Time difference since last fetch: ${hoursDifference} hours`
-        );
-        if (hoursDifference >= 12) {
-          console.log(
-            "More than 12 hours since last fetch, fetching new trips."
-          );
-          await clearStorageAndFetchNewTrips();
-        } else {
-          console.log(
-            "Less than 12 hours since last fetch, using stored trips."
-          );
-        }
-      } else {
-        console.log("No last fetch time found, generating new trips.");
-        await generateRecommendedTrips();
-      }
-    } catch (error) {
-      console.error("Error checking time and fetching trips:", error);
-    }
-  };
-
   const generateSetTerrainTrip = async (terrainType: string) => {
     try {
       setIsTerrainLoading(true);
@@ -265,11 +211,7 @@ const Home: React.FC = () => {
       const FINAL_PROMPT = SPECIFIC_CITY_TRIP_AI_PROMPT.replace(
         "{terrainType}",
         terrainType
-      )
-        .replace("{travelerType}", preferences.travelerType)
-        .replace("{accommodationType}", preferences.accommodationType)
-        .replace("{activityLevel}", preferences.activityLevel)
-        .replace("{preferredClimate}", preferences.preferredClimate);
+      );
 
       console.log("Generated AI Prompt for Terrain Trip:", FINAL_PROMPT);
 
@@ -304,18 +246,17 @@ const Home: React.FC = () => {
           tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
           "No description available",
         photoRef,
-        fullResponse: responseText, // Store the full AI response
+        fullResponse: responseText,
       };
 
       await addDoc(terrainTripsCollection, trip);
       setTerrainTrips([trip]);
 
-      // Navigate to the RecommendedTripDetails screen with the generated trip information
       const tripInfo = trip.fullResponse;
       console.log("Navigating to TripDetails with tripInfo:", tripInfo);
       navigation.navigate("RecommendedTripDetails", {
         trip: tripInfo,
-        photoRef: trip.photoRef,
+        photoRef: trip.photoRef ?? "",
       });
     } catch (error) {
       console.error("Error generating recommended trips:", error);
@@ -340,12 +281,7 @@ const Home: React.FC = () => {
         const FINAL_PROMPT = SPECIFIC_CITY_TRIP_AI_PROMPT.replace(
           "{cityName}",
           cityName
-        )
-          .replace("{travelerType}", preferences.travelerType)
-          .replace("{accommodationType}", preferences.accommodationType)
-          .replace("{activityLevel}", preferences.activityLevel)
-          .replace("{preferredClimate}", preferences.preferredClimate);
-
+        );
         console.log("Generated AI Prompt for City Trip:", FINAL_PROMPT);
 
         const result = await chatSession.sendMessage(FINAL_PROMPT);
@@ -397,7 +333,7 @@ const Home: React.FC = () => {
         console.log("Navigating to TripDetails with tripInfo:", tripInfo);
         navigation.navigate("RecommendedTripDetails", {
           trip: tripInfo,
-          photoRef: cityTrips[0].photoRef,
+          photoRef: cityTrips[0].photoRef ?? "",
         });
       }
     } catch (error) {
@@ -409,8 +345,8 @@ const Home: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      checkTimeAndFetchReccomendedTrips();
-      fetchPreferences();
+      generateRecommendedTrips();
+      getUserName();
     }, [])
   );
 
@@ -475,10 +411,12 @@ const Home: React.FC = () => {
             onPress={(data, details = null) => {
               console.log(data, details);
               if (details) {
-                setTripData((prevTripData: TripData) => ({
-                  ...prevTripData,
-                  name: data.description,
-                }));
+                if (setTripData) {
+                  setTripData((prevTripData: TripData) => ({
+                    ...prevTripData,
+                    name: data.description,
+                  }));
+                }
                 navigation.navigate("BuildTrip");
               }
             }}
@@ -544,27 +482,29 @@ const Home: React.FC = () => {
               horizontal
               data={[...recommendedTrips, { id: "dont-like-button" }]}
               keyExtractor={(trip) => trip.id}
-              renderItem={({ item: trip }) =>
-                trip.id === "dont-like-button" ? (
-                  <View style={styles.dontLikeButtonContainer}>
-                    <Button
-                      title="Don't like? Build your own here!"
-                      onPress={() => navigation.navigate("BuildTrip")}
-                      color={currentTheme.alternate}
-                    />
-                  </View>
-                ) : (
-                  isRecommendedTrip(trip) && (
+              renderItem={({ item: trip }) => {
+                if (trip.id === "dont-like-button") {
+                  return (
+                    <View style={styles.dontLikeButtonContainer}>
+                      <Button
+                        title="Don't like? Build your own here!"
+                        onPress={() => navigation.navigate("BuildTrip")}
+                        color={currentTheme.alternate}
+                      />
+                    </View>
+                  );
+                } else if (isRecommendedTrip(trip)) {
+                  const tripInfo = trip.fullResponse;
+                  return (
                     <Pressable
                       onPress={() => {
-                        const tripInfo = trip.fullResponse;
                         console.log(
                           "Navigating to TripDetails with tripInfo:",
                           tripInfo
                         );
                         navigation.navigate("RecommendedTripDetails", {
                           trip: tripInfo,
-                          photoRef: trip.photoRef,
+                          photoRef: trip.photoRef ?? "",
                         });
                       }}
                       style={[
@@ -599,9 +539,10 @@ const Home: React.FC = () => {
                         </Text>
                       </View>
                     </Pressable>
-                  )
-                )
-              }
+                  );
+                }
+                return null;
+              }}
               showsHorizontalScrollIndicator={false}
             />
           )}

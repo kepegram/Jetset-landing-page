@@ -1,3 +1,8 @@
 import { createContext } from "react";
 
-export const CreateTripContext = createContext(null);
+interface TripContextType {
+  tripData: any;
+  setTripData: React.Dispatch<any>;
+}
+
+export const CreateTripContext = createContext<TripContextType | null>(null);

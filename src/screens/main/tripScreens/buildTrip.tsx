@@ -22,6 +22,7 @@ import {
 } from "react-native-google-places-autocomplete";
 import { MainButton } from "../../../components/ui/button";
 import Slider from "@react-native-community/slider";
+import { Dropdown } from "react-native-element-dropdown";
 
 type BuildTripNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -39,13 +40,17 @@ interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
 
 const BuildTrip: React.FC = () => {
   const { currentTheme } = useTheme();
-  const { tripData, setTripData } = useContext(CreateTripContext);
+  const { tripData = {}, setTripData = () => {} } =
+    useContext(CreateTripContext) || {};
   const [focusedInput, setFocusedInput] = useState<number | null>(null);
   const [startDate, setStartDate] = useState<Moment | undefined>();
   const [endDate, setEndDate] = useState<Moment | undefined>();
   const [showSelectDates, setShowSelectDates] = useState(false);
   const [photoRef, setPhotoRef] = useState<string | null>(null);
   const [whoIsGoing, setWhoIsGoing] = useState<number>(1);
+  const [travelerType, setTravelerType] = useState<string>("Average");
+  const [accommodationType, setAccommodationType] = useState<string>("Hotel");
+  const [activityLevel, setActivityLevel] = useState<string>("Normal");
   const navigation = useNavigation<BuildTripNavigationProp>();
 
   useEffect(() => {
@@ -148,8 +153,6 @@ const BuildTrip: React.FC = () => {
     startDate &&
     endDate &&
     tripData.whoIsGoing !== null;
-
-  const isPlaceSelected = !!tripData.locationInfo;
 
   return (
     <View style={{ flex: 1, backgroundColor: currentTheme.background }}>
@@ -297,17 +300,6 @@ const BuildTrip: React.FC = () => {
           {/* Location */}
 
           <View style={{ width: "100%" }}>
-            {!isPlaceSelected && (
-              <View
-                style={[
-                  StyleSheet.absoluteFill,
-                  {
-                    backgroundColor: currentTheme.background,
-                    zIndex: 1,
-                  },
-                ]}
-              />
-            )}
             <View style={{ width: "100%", marginBottom: 20 }}>
               <Ionicons
                 name="calendar-outline"
@@ -340,7 +332,6 @@ const BuildTrip: React.FC = () => {
                       )}`
                     : ""
                 }
-                editable={isPlaceSelected}
               />
             </View>
 
@@ -411,9 +402,130 @@ const BuildTrip: React.FC = () => {
                   : "A group"}
               </Text>
             </View>
+
+            {/* Traveler Type */}
+            <View style={{ width: "100%", marginBottom: 20 }}>
+              <Ionicons
+                name="person-outline"
+                size={22}
+                color={currentTheme.textSecondary}
+                style={{ position: "absolute", left: 10, top: 10 }}
+              />
+              <Text
+                style={{
+                  color: currentTheme.textSecondary,
+                  marginBottom: 10,
+                  alignSelf: "flex-start",
+                  paddingLeft: 40,
+                  paddingTop: 10,
+                  fontSize: 18,
+                }}
+              >
+                Traveler Type
+              </Text>
+              <Dropdown
+                data={[
+                  { label: "Average", value: "Average" },
+                  { label: "Adventurous", value: "Adventurous" },
+                  { label: "Relaxed", value: "Relaxed" },
+                ]}
+                labelField="label"
+                valueField="value"
+                value={travelerType}
+                onChange={(item) => setTravelerType(item.value)}
+                containerStyle={{ height: 50, width: "100%" }}
+                style={{ backgroundColor: currentTheme.background }}
+                itemTextStyle={{ color: currentTheme.textSecondary }}
+                selectedTextStyle={{ color: currentTheme.textSecondary }}
+                placeholderStyle={{ color: currentTheme.textSecondary }}
+              />
+            </View>
+
+            {/* Accommodation Type */}
+            <View style={{ width: "100%", marginBottom: 20 }}>
+              <Ionicons
+                name="bed-outline"
+                size={22}
+                color={currentTheme.textSecondary}
+                style={{ position: "absolute", left: 10, top: 10 }}
+              />
+              <Text
+                style={{
+                  color: currentTheme.textSecondary,
+                  marginBottom: 10,
+                  alignSelf: "flex-start",
+                  paddingLeft: 40,
+                  paddingTop: 10,
+                  fontSize: 18,
+                }}
+              >
+                Accommodation Type
+              </Text>
+              <Dropdown
+                data={[
+                  { label: "Hotel", value: "Hotel" },
+                  { label: "Hostel", value: "Hostel" },
+                  { label: "Airbnb", value: "Airbnb" },
+                ]}
+                labelField="label"
+                valueField="value"
+                value={accommodationType}
+                onChange={(item) => setAccommodationType(item.value)}
+                containerStyle={{ height: 50, width: "100%" }}
+                style={{ backgroundColor: currentTheme.background }}
+                itemTextStyle={{ color: currentTheme.textSecondary }}
+                selectedTextStyle={{ color: currentTheme.textSecondary }}
+                placeholderStyle={{ color: currentTheme.textSecondary }}
+              />
+            </View>
+
+            {/* Activity Level */}
+            <View style={{ width: "100%", marginBottom: 20 }}>
+              <Ionicons
+                name="walk-outline"
+                size={22}
+                color={currentTheme.textSecondary}
+                style={{ position: "absolute", left: 10, top: 10 }}
+              />
+              <Text
+                style={{
+                  color: currentTheme.textSecondary,
+                  marginBottom: 10,
+                  alignSelf: "flex-start",
+                  paddingLeft: 40,
+                  paddingTop: 10,
+                  fontSize: 18,
+                }}
+              >
+                Activity Level
+              </Text>
+              <Dropdown
+                data={[
+                  { label: "Normal", value: "Normal" },
+                  { label: "High", value: "High" },
+                  { label: "Low", value: "Low" },
+                ]}
+                labelField="label"
+                valueField="value"
+                value={activityLevel}
+                onChange={(item) => setActivityLevel(item.value)}
+                containerStyle={{ height: 50, width: "100%" }}
+                style={{ backgroundColor: currentTheme.background }}
+                itemTextStyle={{ color: currentTheme.textSecondary }}
+                selectedTextStyle={{ color: currentTheme.textSecondary }}
+                placeholderStyle={{ color: currentTheme.textSecondary }}
+              />
+            </View>
+
             <MainButton
               buttonText="Start My Trip"
               onPress={() => {
+                setTripData({
+                  ...tripData,
+                  travelerType,
+                  accommodationType,
+                  activityLevel,
+                });
                 navigation.navigate("ReviewTrip");
                 console.log(
                   "LOCATION",
@@ -424,9 +536,12 @@ const BuildTrip: React.FC = () => {
                   tripData.endDate,
                   "WHO IS GOING",
                   tripData.whoIsGoing,
-                  "BUDGET",
-                  tripData.budget,
-                  "TRAVELER TYPE"
+                  "TRAVELER TYPE",
+                  tripData.travelerType,
+                  "ACCOMMODATION TYPE",
+                  tripData.accommodationType,
+                  "ACTIVITY LEVEL",
+                  tripData.activityLevel
                 );
               }}
               width="80%"

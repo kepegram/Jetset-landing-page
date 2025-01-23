@@ -23,8 +23,6 @@ import SignUp from "./src/screens/onboarding/userAuth/signup";
 import ForgotPassword from "./src/screens/onboarding/userAuth/forgotPassword";
 import AppNav from "./src/navigation/appNav";
 import Carousel from "./src/screens/onboarding/carousel/carousel";
-import Preferences from "./src/screens/onboarding/welcome/preferences";
-import { doc, getDoc } from "firebase/firestore";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -102,30 +100,6 @@ const App: React.FC = () => {
     prepare();
   }, []);
 
-  useEffect(() => {
-    const checkPreferencesSet = async () => {
-      const user = FIREBASE_AUTH.currentUser;
-      if (user) {
-        const docRef = doc(
-          FIREBASE_DB,
-          `users/${user.uid}/userPreferences`,
-          user.uid
-        );
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          console.log("(APP CHECK) Preferences: ", docSnap.data());
-          setUser(user);
-        } else {
-          console.log("(APP CHECK) Preferences are not set");
-        }
-      }
-    };
-
-    if (user) {
-      checkPreferencesSet();
-    }
-  }, [user]);
-
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
       await SplashScreen.hideAsync();
@@ -189,11 +163,6 @@ const App: React.FC = () => {
                 name="ForgotPassword"
                 component={ForgotPassword}
                 options={screenOptions}
-              />
-              <Stack.Screen
-                name="Preferences"
-                component={Preferences}
-                options={{ headerShown: false }}
               />
             </>
           )}

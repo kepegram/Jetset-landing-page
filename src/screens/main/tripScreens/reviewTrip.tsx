@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -16,7 +16,7 @@ type ReviewTripScreenNavigationProp = NativeStackNavigationProp<
 const ReviewTrip: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<ReviewTripScreenNavigationProp>();
-  const { tripData } = useContext(CreateTripContext);
+  const { tripData } = useContext(CreateTripContext) || {};
   const [localTripData, setLocalTripData] = useState(tripData);
 
   useEffect(() => {
