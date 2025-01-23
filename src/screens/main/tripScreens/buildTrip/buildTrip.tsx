@@ -6,21 +6,21 @@ import {
   ImageBackground,
   StyleSheet,
 } from "react-native";
-import { useTheme } from "../../../context/themeContext";
+import { useTheme } from "../../../../context/themeContext";
 import React, { useState, useContext, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CreateTripContext } from "../../../context/createTripContext";
+import { CreateTripContext } from "../../../../context/createTripContext";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../../navigation/appNav";
+import { RootStackParamList } from "../../../../navigation/appNav";
 import CalendarPicker from "react-native-calendar-picker";
 import moment, { Moment } from "moment";
 import {
   GooglePlaceDetail,
   GooglePlacesAutocomplete,
 } from "react-native-google-places-autocomplete";
-import { MainButton } from "../../../components/ui/button";
+import { MainButton } from "../../../../components/ui/button";
 import Slider from "@react-native-community/slider";
 import { Dropdown } from "react-native-element-dropdown";
 

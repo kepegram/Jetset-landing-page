@@ -14,12 +14,7 @@ import {
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import { ProfileProvider, useProfile } from "../context/profileContext";
-import {
-  Ionicons,
-  MaterialCommunityIcons,
-  MaterialIcons,
-  FontAwesome,
-} from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { CreateTripContext } from "../context/createTripContext";
 import Home from "../screens/main/homeScreen/home";
@@ -30,14 +25,20 @@ import Settings from "../screens/main/userScreens/settings";
 import ChangePassword from "../screens/main/userScreens/changePassword";
 import AppTheme from "../screens/main/userScreens/appTheme";
 import DeleteAccount from "../screens/main/userScreens/deleteAccount";
-import BuildTrip from "../screens/main/tripScreens/buildTrip";
+import BuildTrip from "../screens/main/tripScreens/buildTrip/buildTrip";
 import ReviewTrip from "../screens/main/tripScreens/reviewTrip";
 import GenerateTrip from "../screens/main/tripScreens/generateTrip";
 import TripDetails from "../screens/main/tripScreens/tripDetails";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyTrips from "../screens/main/tripScreens/myTrips";
-import Map from "../screens/main/mapScreen/map";
+//import Map from "../screens/main/mapScreen/map";
 import CurrentTripDetails from "../screens/main/tripScreens/currentTripDetails";
+import DoYouKnow from "../screens/main/tripScreens/buildTrip/doYouKnow";
+import SearchPlaces from "../screens/main/tripScreens/buildTrip/searchPlaces";
+import ChoosePlaces from "../screens/main/tripScreens/buildTrip/choosePlaces";
+import ChooseDate from "../screens/main/tripScreens/buildTrip/chooseDate";
+import WhosGoing from "../screens/main/tripScreens/buildTrip/whosGoing";
+import MoreInfo from "../screens/main/tripScreens/buildTrip/moreInfo";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -51,6 +52,12 @@ export type RootStackParamList = {
   RecommendedTripDetails: { trip: string; photoRef: string };
   MyTripsMain: undefined;
   BuildTrip: undefined;
+  DoYouKnow: undefined;
+  ChoosePlaces: undefined;
+  SearchPlaces: undefined;
+  ChooseDate: undefined;
+  WhosGoing: undefined;
+  MoreInfo: undefined;
   ReviewTrip: undefined;
   GenerateTrip: undefined;
   TripDetails: { trip: string };
@@ -140,7 +147,7 @@ const MyTripsStack: React.FC = () => {
                 text: "Confirm",
                 onPress: async () => {
                   await AsyncStorage.clear();
-                  navigation.navigate("BuildTrip");
+                  navigation.navigate("DoYouKnow");
                 },
               },
             ]
@@ -168,7 +175,7 @@ const MyTripsStack: React.FC = () => {
         component={MyTrips}
         options={{ headerShown: false }}
       />
-      <RootStack.Screen
+      {/* <RootStack.Screen
         name="BuildTrip"
         component={BuildTrip}
         options={{
@@ -195,10 +202,50 @@ const MyTripsStack: React.FC = () => {
           },
           headerShown: false,
         }}
+      /> */}
+      <RootStack.Screen
+        name="DoYouKnow"
+        component={DoYouKnow}
+        options={({ navigation }) => ({
+          ...tripBuilderScreenOptions({ navigation }),
+          title: "",
+        })}
       />
       <RootStack.Screen
-        name="ReviewTrip"
-        component={ReviewTrip}
+        name="ChoosePlaces"
+        component={ChoosePlaces}
+        options={({ navigation }) => ({
+          ...tripBuilderScreenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="SearchPlaces"
+        component={SearchPlaces}
+        options={({ navigation }) => ({
+          ...tripBuilderScreenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="ChooseDate"
+        component={ChooseDate}
+        options={({ navigation }) => ({
+          ...tripBuilderScreenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="WhosGoing"
+        component={WhosGoing}
+        options={({ navigation }) => ({
+          ...tripBuilderScreenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="MoreInfo"
+        component={MoreInfo}
         options={({ navigation }) => ({
           ...tripBuilderScreenOptions({ navigation }),
           title: "",
@@ -424,8 +471,8 @@ const TabNavigator: React.FC = () => {
             tabBarStyle,
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
-              <MaterialCommunityIcons
-                name={focused ? "bag-suitcase" : "bag-suitcase-outline"}
+              <Ionicons
+                name={focused ? "airplane" : "airplane-outline"}
                 color={color}
                 size={33}
               />
@@ -433,7 +480,7 @@ const TabNavigator: React.FC = () => {
           } as BottomTabNavigationOptions;
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Map"
         component={Map}
         options={({ route }) => {
@@ -453,7 +500,7 @@ const TabNavigator: React.FC = () => {
             ),
           } as BottomTabNavigationOptions;
         }}
-      />
+      /> */}
       <Tab.Screen
         name="ProfileStack"
         component={ProfileStack}

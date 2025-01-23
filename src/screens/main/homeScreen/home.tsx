@@ -36,14 +36,6 @@ import { chatSession } from "../../../../AI-Model";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-interface TripData {
-  budget: string | null;
-  travelerType: string | null;
-  accommodationType: string | null;
-  activityLevel: string | null;
-  preferredClimate: string | null;
-}
-
 interface RecommendedTrip {
   id: string;
   name: string;
@@ -412,8 +404,7 @@ const Home: React.FC = () => {
               console.log(data, details);
               if (details) {
                 if (setTripData) {
-                  setTripData((prevTripData: TripData) => ({
-                    ...prevTripData,
+                  setTripData(() => ({
                     name: data.description,
                   }));
                 }

@@ -56,7 +56,7 @@ const StartNewTripCard: React.FC<StartNewTripCardProps> = ({
 
         <MainButton
           buttonText="Start a new trip"
-          onPress={() => navigation.navigate("BuildTrip")}
+          onPress={() => navigation.navigate("DoYouKnow")}
           width={200}
           backgroundColor={currentTheme.alternate}
         />
