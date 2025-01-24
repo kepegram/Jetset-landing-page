@@ -19,7 +19,7 @@ type GenerateTripScreenNavigationProp = NativeStackNavigationProp<
 const GenerateTrip: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<GenerateTripScreenNavigationProp>();
-  const { tripData } = useContext(CreateTripContext);
+  const { tripData } = useContext(CreateTripContext) || {};
   const [loading, setLoading] = useState(false);
   const isMounted = useRef(true);
 
@@ -29,16 +29,16 @@ const GenerateTrip: React.FC = () => {
     setLoading(true);
 
     const FINAL_PROMPT = AI_PROMPT.replace(
-      "{location}",
-      tripData?.locationInfo?.name || ""
+      "{destinationType}",
+      tripData?.destinationType || ""
     )
-      .replace("{locationFrom}", tripData?.locationFromInfo?.name || "")
       .replace("{totalDays}", tripData.totalNoOfDays?.toString() || "0")
       .replace("{totalNight}", (tripData.totalNoOfDays - 1).toString() || "0")
-      .replace("{traveler}", tripData.traveler?.title || "")
+      .replace("{whoIsGoing}", tripData.whoIsGoing || "")
       .replace("{budget}", tripData.budget?.toString() || "")
-      .replace("{totalDays}", tripData.totalNoOfDays?.toString() || "0")
-      .replace("{totalNight}", (tripData.totalNoOfDays - 1).toString() || "0");
+      .replace("{travelerType}", tripData.travelerType || "")
+      .replace("{accommodationType}", tripData.accommodationType || "")
+      .replace("{activityLevel}", tripData.activityLevel || "");
 
     console.log("Generated Prompt:", FINAL_PROMPT);
 

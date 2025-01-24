@@ -24,14 +24,12 @@ import {
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { Fontisto } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
-import { usePopularDestinations } from "../../../constants/constants";
-import {
-  RECOMMEND_TRIP_AI_PROMPT,
-  SPECIFIC_CITY_TRIP_AI_PROMPT,
-} from "../../../api/ai-prompt";
+import { popularDestinations } from "../../../constants/constants";
+import { RECOMMEND_TRIP_AI_PROMPT } from "../../../api/ai-prompt";
 import { chatSession } from "../../../../AI-Model";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -51,11 +49,7 @@ const Home: React.FC = () => {
   const [recommendedTrips, setRecommendedTrips] = useState<RecommendedTrip[]>(
     []
   );
-  const [terrainTrips, setTerrainTrips] = useState<RecommendedTrip[]>([]);
-  const [cityTrips, setCityTrips] = useState<RecommendedTrip[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isTerrainLoading, setIsTerrainLoading] = useState(false);
-  const [isCityLoading, setIsCityLoading] = useState(false);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -188,151 +182,9 @@ const Home: React.FC = () => {
     }
   };
 
+  // TODO: NAVIGATE THE USER STRAIGHT TO THE CHOOSE DATE PAGE WITH TERRAIN INFO SET
   const generateSetTerrainTrip = async (terrainType: string) => {
-    try {
-      setIsTerrainLoading(true);
-      const user = getAuth().currentUser;
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-      const terrainTripsCollection = collection(
-        FIREBASE_DB,
-        `users/${user.uid}/terrainTrips`
-      );
-
-      const FINAL_PROMPT = SPECIFIC_CITY_TRIP_AI_PROMPT.replace(
-        "{terrainType}",
-        terrainType
-      );
-
-      console.log("Generated AI Prompt for Terrain Trip:", FINAL_PROMPT);
-
-      const result = await chatSession.sendMessage(FINAL_PROMPT);
-      const responseText = await result.response.text();
-      console.log("AI Response for Terrain Trip:", responseText);
-
-      if (!responseText) {
-        console.error("AI response is empty or undefined");
-        return;
-      }
-
-      const tripResp = JSON.parse(responseText);
-      const placeName = tripResp.travelPlan.destination;
-
-      // Fetch photo reference using Google Places API
-      const photoResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
-          placeName
-        )}&inputtype=textquery&fields=photos&key=${
-          process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY
-        }`
-      );
-      const photoData = await photoResponse.json();
-      const photoRef =
-        photoData.candidates[0]?.photos[0]?.photo_reference || null;
-
-      const trip = {
-        id: `trip-${terrainType}-${new Date().getTime()}`,
-        name: placeName,
-        description:
-          tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
-          "No description available",
-        photoRef,
-        fullResponse: responseText,
-      };
-
-      await addDoc(terrainTripsCollection, trip);
-      setTerrainTrips([trip]);
-
-      const tripInfo = trip.fullResponse;
-      console.log("Navigating to TripDetails with tripInfo:", tripInfo);
-      navigation.navigate("RecommendedTripDetails", {
-        trip: tripInfo,
-        photoRef: trip.photoRef ?? "",
-      });
-    } catch (error) {
-      console.error("Error generating recommended trips:", error);
-    } finally {
-      setIsTerrainLoading(false);
-    }
-  };
-
-  const generateSetCityTrip = async (cityName: string) => {
-    try {
-      setIsCityLoading(true);
-      const user = getAuth().currentUser;
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-      const cityTripsCollection = collection(
-        FIREBASE_DB,
-        `users/${user.uid}/cityTrips`
-      );
-
-      for (let i = 0; i < 3; i++) {
-        const FINAL_PROMPT = SPECIFIC_CITY_TRIP_AI_PROMPT.replace(
-          "{cityName}",
-          cityName
-        );
-        console.log("Generated AI Prompt for City Trip:", FINAL_PROMPT);
-
-        const result = await chatSession.sendMessage(FINAL_PROMPT);
-        const responseText = await result.response.text();
-        console.log("AI Response for City Trip:", responseText);
-
-        if (!responseText) {
-          console.error("AI response is empty or undefined");
-          continue;
-        }
-
-        const tripResp = JSON.parse(responseText);
-        const placeName = tripResp.travelPlan.destination;
-
-        // Fetch photo reference using Google Places API
-        const photoResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
-            placeName
-          )}&inputtype=textquery&fields=photos&key=${
-            process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY
-          }`
-        );
-        const photoData = await photoResponse.json();
-        const photoRef =
-          photoData.candidates[0]?.photos[0]?.photo_reference || null;
-
-        const trip = {
-          id: `trip-${i}-${new Date().getTime()}`,
-          name: placeName,
-          description:
-            tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
-            "No description available",
-          photoRef,
-          fullResponse: responseText, // Store the full AI response
-        };
-        await addDoc(cityTripsCollection, trip);
-      }
-
-      const cityTripsSnapshot = await getDocs(cityTripsCollection);
-      const cityTrips = cityTripsSnapshot.docs.map(
-        (doc) => doc.data() as RecommendedTrip
-      );
-
-      setCityTrips(cityTrips);
-
-      // Navigate to the RecommendedTripDetails screen with the generated trip information
-      if (cityTrips.length > 0) {
-        const tripInfo = cityTrips[0].fullResponse;
-        console.log("Navigating to TripDetails with tripInfo:", tripInfo);
-        navigation.navigate("RecommendedTripDetails", {
-          trip: tripInfo,
-          photoRef: cityTrips[0].photoRef ?? "",
-        });
-      }
-    } catch (error) {
-      console.error("Error generating recommended trips:", error);
-    } finally {
-      setIsCityLoading(false);
-    }
+    console.log(terrainType);
   };
 
   useFocusEffect(
@@ -370,23 +222,34 @@ const Home: React.FC = () => {
             </Text>
             <View style={styles.terrainContainer}>
               {[
-                { label: "Beach", icon: "umbrella-beach" },
-                { label: "Mountain", icon: "mountain" },
+                { label: "Beach", icon: "umbrella-beach", type: "fa" },
+                { label: "Mountain", icon: "mountain", type: "fa" },
                 {
-                  label: "City",
-                  icon: "city",
+                  label: "Island",
+                  icon: "island",
+                  type: "fo",
                 },
-                { label: "Country", icon: "globe-americas" },
-              ].map(({ label, icon }) => (
+                {
+                  label: "Landmark",
+                  icon: "globe-americas",
+                  type: "fa",
+                  width: 100,
+                },
+              ].map(({ label, icon, type, width }) => (
                 <Pressable
                   key={label}
                   onPress={() => generateSetTerrainTrip(label)}
                   style={[
                     styles.button,
                     { borderColor: currentTheme.alternate },
+                    width ? { width } : null,
                   ]}
                 >
-                  <FontAwesome5 name={icon} size={28} color="white" />
+                  {type === "fa" ? (
+                    <FontAwesome5 name={icon} size={28} color="white" />
+                  ) : (
+                    <Fontisto name={icon as any} size={28} color="white" />
+                  )}
                   <Text style={styles.buttonText}>{label}</Text>
                 </Pressable>
               ))}
@@ -408,7 +271,7 @@ const Home: React.FC = () => {
                     name: data.description,
                   }));
                 }
-                navigation.navigate("BuildTrip");
+                navigation.navigate("ChooseDate");
               }
             }}
             query={{
@@ -426,15 +289,16 @@ const Home: React.FC = () => {
           />
           <FlatList
             horizontal
-            data={usePopularDestinations()}
+            data={popularDestinations}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <Pressable
-                onPress={() => generateSetCityTrip(item.name)}
+                //TODO: MAKE A PAGE THAT GIVES DETAIL ABOUT THE CITY
+                onPress={() => console.log(item.name)}
                 style={styles.popularDestinationContainer}
               >
                 <Image
-                  source={{ uri: item.image }}
+                  source={item.image}
                   style={styles.popularDestinationImage}
                 />
                 <Text
@@ -479,7 +343,7 @@ const Home: React.FC = () => {
                     <View style={styles.dontLikeButtonContainer}>
                       <Button
                         title="Don't like? Build your own here!"
-                        onPress={() => navigation.navigate("BuildTrip")}
+                        onPress={() => navigation.navigate("ChoosePlaces")}
                         color={currentTheme.alternate}
                       />
                     </View>
@@ -536,12 +400,6 @@ const Home: React.FC = () => {
               }}
               showsHorizontalScrollIndicator={false}
             />
-          )}
-          {isTerrainLoading && (
-            <ActivityIndicator size="large" color={currentTheme.alternate} />
-          )}
-          {isCityLoading && (
-            <ActivityIndicator size="large" color={currentTheme.alternate} />
           )}
         </View>
       </ScrollView>

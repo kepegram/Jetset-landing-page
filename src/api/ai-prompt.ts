@@ -1,8 +1,7 @@
 export const AI_PROMPT = `
-  Generate a structured JSON Travel Plan for a trip to {location}, lasting {totalDays} days and {totalNight} nights.
+  Generate a structured JSON Travel Plan for a trip to a random {destinationType} destination, lasting {totalDays} days and {totalNight} nights.
   The trip will be for {whoIsGoing} with a {budget} budget. The traveler type is {travelerType}, 
-  accommodation type is {accommodationType}, activity level is {activityLevel}, 
-  and preferred climate is {preferredClimate} so plan the trip accordingly.
+  accommodation type is {accommodationType}, and activity level is {activityLevel} so plan the trip accordingly.
   
   The JSON should have the following structure:
 

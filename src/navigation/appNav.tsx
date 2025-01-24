@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, Image, Pressable, Text } from "react-native";
+import { Image, Pressable, Text } from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
   createNativeStackNavigator,
@@ -51,7 +51,6 @@ export type RootStackParamList = {
   HomeMain: undefined;
   RecommendedTripDetails: { trip: string; photoRef: string };
   MyTripsMain: undefined;
-  BuildTrip: undefined;
   DoYouKnow: undefined;
   ChoosePlaces: undefined;
   SearchPlaces: undefined;
@@ -112,61 +111,57 @@ const HomeStack: React.FC = () => {
 
 const MyTripsStack: React.FC = () => {
   const { currentTheme } = useTheme();
+  const screens = [
+    "DoYouKnow",
+    "ChoosePlaces",
+    "SearchPlaces",
+    "ChooseDate",
+    "WhosGoing",
+    "MoreInfo",
+    "ReviewTrip",
+    "GenerateTrip",
+    "TripDetails",
+  ];
 
   const tripBuilderScreenOptions = ({
     navigation,
+    route,
   }: {
     navigation: any;
-  }): NativeStackNavigationOptions => ({
-    headerStyle: {
-      backgroundColor: currentTheme.background,
-    },
-    headerShadowVisible: false,
-    headerLeft: () => (
-      <Pressable onPress={() => navigation.goBack()}>
-        <Ionicons
-          name="arrow-back"
-          size={28}
-          color={currentTheme.textPrimary}
-          style={{ marginLeft: 10 }}
-        />
-      </Pressable>
-    ),
-    headerRight: () => (
-      <Pressable
-        onPress={() => {
-          Alert.alert(
-            "Reset",
-            "Are you sure you want to reset your trip? All progress will be lost.",
-            [
-              {
-                text: "Cancel",
-                style: "cancel",
-              },
-              {
-                text: "Confirm",
-                onPress: async () => {
-                  await AsyncStorage.clear();
-                  navigation.navigate("DoYouKnow");
-                },
-              },
-            ]
-          );
-        }}
-      >
+    route: any;
+  }): NativeStackNavigationOptions => {
+    const currentScreenIndex = screens.indexOf(route.name) + 1;
+    const totalScreens = screens.length;
+
+    return {
+      headerStyle: {
+        backgroundColor: currentTheme.background,
+      },
+      headerShadowVisible: false,
+      headerLeft: () => (
+        <Pressable onPress={() => navigation.goBack()}>
+          <Ionicons
+            name="arrow-back"
+            size={28}
+            color={currentTheme.textPrimary}
+            style={{ marginLeft: 10 }}
+          />
+        </Pressable>
+      ),
+      headerRight: () => (
         <Text
           style={{
-            color: currentTheme.alternate,
+            color: currentTheme.textPrimary,
             marginRight: 10,
             fontSize: 20,
             textAlign: "center",
           }}
         >
-          Reset
+          {`${currentScreenIndex} of ${totalScreens}`}
         </Text>
-      </Pressable>
-    ),
-  });
+      ),
+    };
+  };
 
   return (
     <RootStack.Navigator>
@@ -175,79 +170,59 @@ const MyTripsStack: React.FC = () => {
         component={MyTrips}
         options={{ headerShown: false }}
       />
-      {/* <RootStack.Screen
-        name="BuildTrip"
-        component={BuildTrip}
-        options={{
-          headerLeft: () => {
-            const navigation = useNavigation();
-            return (
-              <Pressable
-                onPress={async () => {
-                  await AsyncStorage.clear();
-                  navigation.goBack();
-                }}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <MaterialIcons name="arrow-back" size={24} color="white" />
-              </Pressable>
-            );
-          },
-          headerShown: false,
-        }}
-      /> */}
       <RootStack.Screen
         name="DoYouKnow"
         component={DoYouKnow}
-        options={({ navigation }) => ({
-          ...tripBuilderScreenOptions({ navigation }),
+        options={({ navigation, route }) => ({
+          ...tripBuilderScreenOptions({ navigation, route }),
           title: "",
         })}
       />
       <RootStack.Screen
         name="ChoosePlaces"
         component={ChoosePlaces}
-        options={({ navigation }) => ({
-          ...tripBuilderScreenOptions({ navigation }),
+        options={({ navigation, route }) => ({
+          ...tripBuilderScreenOptions({ navigation, route }),
           title: "",
         })}
       />
       <RootStack.Screen
         name="SearchPlaces"
         component={SearchPlaces}
-        options={({ navigation }) => ({
-          ...tripBuilderScreenOptions({ navigation }),
+        options={({ navigation, route }) => ({
+          ...tripBuilderScreenOptions({ navigation, route }),
           title: "",
         })}
       />
       <RootStack.Screen
         name="ChooseDate"
         component={ChooseDate}
-        options={({ navigation }) => ({
-          ...tripBuilderScreenOptions({ navigation }),
+        options={({ navigation, route }) => ({
+          ...tripBuilderScreenOptions({ navigation, route }),
           title: "",
         })}
       />
       <RootStack.Screen
         name="WhosGoing"
         component={WhosGoing}
-        options={({ navigation }) => ({
-          ...tripBuilderScreenOptions({ navigation }),
+        options={({ navigation, route }) => ({
+          ...tripBuilderScreenOptions({ navigation, route }),
           title: "",
         })}
       />
       <RootStack.Screen
         name="MoreInfo"
         component={MoreInfo}
-        options={({ navigation }) => ({
-          ...tripBuilderScreenOptions({ navigation }),
+        options={({ navigation, route }) => ({
+          ...tripBuilderScreenOptions({ navigation, route }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="ReviewTrip"
+        component={ReviewTrip}
+        options={({ navigation, route }) => ({
+          ...tripBuilderScreenOptions({ navigation, route }),
           title: "",
         })}
       />
@@ -410,6 +385,12 @@ const getTabBarStyle = (route: any): { display?: string } | undefined => {
   if (
     routeName === "SearchPlace" ||
     routeName === "BuildTrip" ||
+    routeName === "DoYouKnow" ||
+    routeName === "ChoosePlaces" ||
+    routeName === "SearchPlaces" ||
+    routeName === "ChooseDate" ||
+    routeName === "WhosGoing" ||
+    routeName === "MoreInfo" ||
     routeName === "ReviewTrip" ||
     routeName === "GenerateTrip" ||
     routeName === "RecommendedTripDetails" ||
@@ -434,7 +415,7 @@ const TabNavigator: React.FC = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
         tabBarActiveTintColor: currentTheme.tabIcon,
         tabBarInactiveTintColor: currentTheme.inactiveTabIcon,
       }}
@@ -449,6 +430,7 @@ const TabNavigator: React.FC = () => {
           };
           return {
             tabBarStyle,
+            tabBarLabel: "Home",
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "home" : "home-outline"}
@@ -470,6 +452,7 @@ const TabNavigator: React.FC = () => {
           return {
             tabBarStyle,
             headerShown: false,
+            tabBarLabel: "My Trips",
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "airplane" : "airplane-outline"}
@@ -491,6 +474,7 @@ const TabNavigator: React.FC = () => {
           return {
             tabBarStyle,
             headerShown: false,
+            tabBarLabel: "Map",
             tabBarIcon: ({ color, focused }) => (
               <FontAwesome
                 name={focused ? "map" : "map-o"}
@@ -511,6 +495,7 @@ const TabNavigator: React.FC = () => {
           };
           return {
             tabBarStyle,
+            tabBarLabel: "Profile",
             tabBarIcon: ({ focused }) => (
               <Image
                 source={{ uri: profilePicture }}
