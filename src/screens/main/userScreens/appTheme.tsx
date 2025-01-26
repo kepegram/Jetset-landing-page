@@ -34,12 +34,6 @@ const AppTheme: React.FC = () => {
           <Animated.Text style={[styles.label, { color: animatedTextColor }]}>
             Light Theme
           </Animated.Text>
-          <Pressable onPress={() => toggleTheme("light")}>
-            <Image
-              source={require("../../../assets/light.png")}
-              style={styles.image}
-            />
-          </Pressable>
           <Pressable
             style={[
               styles.radioButton,
@@ -55,12 +49,6 @@ const AppTheme: React.FC = () => {
           <Animated.Text style={[styles.label, { color: animatedTextColor }]}>
             Dark Theme
           </Animated.Text>
-          <Pressable onPress={() => toggleTheme("dark")}>
-            <Image
-              source={require("../../../assets/dark.png")}
-              style={styles.image}
-            />
-          </Pressable>
           <Pressable
             style={[
               styles.radioButton,
