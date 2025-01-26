@@ -287,6 +287,16 @@ const Home: React.FC = () => {
               listView: { backgroundColor: currentTheme.background },
             }}
           />
+          <View style={styles.recommendedTripsHeader}>
+            <Text
+              style={[
+                styles.recommendedTripsTitle,
+                { color: currentTheme.textPrimary },
+              ]}
+            >
+              Popular Destinations
+            </Text>
+          </View>
           <FlatList
             horizontal
             data={popularDestinations}

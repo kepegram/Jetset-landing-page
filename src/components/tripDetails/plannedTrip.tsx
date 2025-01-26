@@ -105,7 +105,7 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
               </Pressable>
             ))
           ) : (
-            <Text style={{ color: "red" }}>
+            <Text style={{ color: "red", marginBottom: 10 }}>
               No places planned for this day.
             </Text>
           )}

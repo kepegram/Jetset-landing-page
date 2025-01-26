@@ -23,10 +23,8 @@ import PastTripListCard from "../../../components/myTrips/pastTripListCard";
 import { useProfile } from "../../../context/profileContext";
 import moment from "moment";
 
-type MyTripsScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "MyTripsMain"
->;
+type MyTripsScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 const MyTrips: React.FC = () => {
   const { currentTheme } = useTheme();
@@ -69,6 +67,8 @@ const MyTrips: React.FC = () => {
     try {
       setLoading(true);
       setUserTrips([]);
+
+      if (!user) return;
 
       const tripsQuery = query(
         collection(FIREBASE_DB, `users/${user.uid}/userTrips`)
@@ -132,13 +132,7 @@ const MyTrips: React.FC = () => {
             {userName || displayName}'s Trips ✈️
           </Text>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Pressable
-              onPress={() => console.log("TODO")}
-              style={{ marginRight: 10 }}
-            >
-              <Fontisto name="search" size={30} color={currentTheme.icon} />
-            </Pressable>
-            <Pressable onPress={() => navigation.navigate("BuildTrip")}>
+            <Pressable onPress={() => navigation.navigate("DoYouKnow")}>
               <Fontisto name="plus-a" size={30} color={currentTheme.icon} />
             </Pressable>
           </View>

@@ -1,68 +1,55 @@
 export const AI_PROMPT = `
-  Generate a structured JSON Travel Plan for a trip to a random {destinationType} destination, lasting {totalDays} days and {totalNight} nights.
-  The trip will be for {whoIsGoing} with a {budget} budget. The traveler type is {travelerType}, 
-  accommodation type is {accommodationType}, and activity level is {activityLevel} so plan the trip accordingly.
+  Generate a detailed and realistic JSON Travel Plan for a trip to a {destinationType} destination, lasting {totalDays} days and {totalNight} nights.
+  The trip is designed for {whoIsGoing} with a {budget} budget level. The preferred accommodation type is {accommodationType} 
+  and the desired activity level is {activityLevel}. Please tailor all recommendations accordingly.
+
+  Important requirements:
+  - All prices should be realistic and match the specified budget level
+  - Hotel ratings should be between 3-5 stars
+  - Include 2-4 activities/places per day in the itinerary
+  - All coordinates must be real and accurate
+  - All URLs should link to official websites when possible
+  - Descriptions should be detailed and factual
   
-  The JSON should have the following structure:
+  The JSON must strictly follow this structure:
 
   {
     "travelPlan": {
-      "budget": "",
-      "destination": "",
+      "budget": "Total estimated cost in USD",
+      "destination": "Full destination name including country",
+      "photoRef": "Google Places photo reference for destination",
       "flights": {
-        "airlineName": "",
-        "flightPrice": "",
-        "airlineUrl": ""
+        "airlineName": "Major airline name",
+        "flightPrice": "Price in USD",
+        "airlineUrl": "Airline's official booking URL"
       },
       "hotels": [
         {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
+          "hotelName": "Full hotel name",
+          "hotelAddress": "Complete street address",
+          "price": "Price per night in USD",
           "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
+            "latitude": "Precise decimal coordinates",
+            "longitude": "Precise decimal coordinates"
           },
-          "rating": "",
-          "description": ""
-        },
-        {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
-          "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
-          },
-          "rating": "",
-          "description": ""
-        },
-        {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
-          "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
-          },
-          "rating": "",
-          "description": ""
+          "rating": "Rating out of 5",
+          "description": "Detailed 2-3 sentence description"
         }
       ],
       "itinerary": [
         {
-          "day": "",
+          "day": "Day number and title",
           "places": [
             {
-              "placeName": "",
-              "placeDetails": "",
-              "placeExtendedDetails": "",
+              "placeName": "Full attraction name",
+              "placeDetails": "Brief 1-2 sentence overview",
+              "placeExtendedDetails": "Detailed 3-4 sentence description with historical facts",
               "geoCoordinates": {
-                "latitude": "",
-                "longitude": ""
+                "latitude": "Precise decimal coordinates",
+                "longitude": "Precise decimal coordinates"
               },
-              "ticketPrice": "",
-              "placeUrl": ""
+              "ticketPrice": "Price in USD or 'Free'",
+              "placeUrl": "Official website URL or Google Maps URL"
             }
           ]
         }
@@ -70,78 +57,69 @@ export const AI_PROMPT = `
     }
   }
 
-  Ensure the JSON format is consistent. Provide a placeUrl for each place that takes the user to a google search of the place. 
-  Also provide a placeExtendedDetails for each place that provides more information and facts about the place
-  the user can read and learn. Also provide multiple hotel options in the "hotels" array.
+  Ensure all data is realistic, accurate and properly formatted. Each place should have complete and engaging descriptions.
+  Include at least 3 hotel options of varying price points within the specified budget range.
+  The itinerary should be logically organized to minimize travel time between locations.
 `;
 
 export const RECOMMEND_TRIP_AI_PROMPT = `
-  Generate a structured JSON Travel Plan for a trip with a randomly chosen location, lasting a random number of days and nights.
-  The trip will be for a random number group of people with a average budget. The accommodation type is hotel, activity level is normal, 
-  and preferred climate is average so plan the trip accordingly.
-  
-  The JSON should have the following structure:
+  Generate a detailed and realistic JSON Travel Plan for an exciting destination, with the following parameters:
+  - Choose a popular tourist destination
+  - Duration: 4-7 days
+  - Group size: 2-4 people
+  - Budget level: Average ($200-400 per person per day)
+  - Accommodation: Mid-range hotels
+  - Activity level: Moderate with a mix of sightseeing and activities
+
+  Important requirements:
+  - All prices should be realistic for 2023
+  - Hotel ratings should be 3.5+ stars
+  - Include 2-4 activities per day
+  - All coordinates must be real and accurate
+  - All URLs should link to official websites when possible
+  - Descriptions should be detailed and factual
+
+  The JSON must strictly follow this structure:
 
   {
     "travelPlan": {
-      "budget": "",
-      "numberOfDays": "",
-      "numberOfNights": "",
-      "destination": "",
+      "budget": "Total estimated cost in USD",
+      "numberOfDays": "Integer between 4-7",
+      "numberOfNights": "Days minus 1",
+      "destination": "Full destination name including country",
+      "photoRef": "Google Places photo reference for destination",
       "flights": {
-        "airlineName": "",
-        "flightPrice": "",
-        "airlineUrl": ""
+        "airlineName": "Major airline name",
+        "flightPrice": "Average price in USD",
+        "airlineUrl": "Airline's official booking URL"
       },
       "hotels": [
         {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
+          "hotelName": "Full hotel name",
+          "hotelAddress": "Complete street address",
+          "price": "Price per night in USD",
           "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
+            "latitude": "Precise decimal coordinates",
+            "longitude": "Precise decimal coordinates"
           },
-          "rating": "",
-          "description": ""
-        },
-        {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
-          "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
-          },
-          "rating": "",
-          "description": ""
-        },
-        {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
-          "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
-          },
-          "rating": "",
-          "description": ""
+          "rating": "Rating out of 5",
+          "description": "Detailed 2-3 sentence description"
         }
       ],
       "itinerary": [
         {
-          "day": "",
+          "day": "Day number and title",
           "places": [
             {
-              "placeName": "",
-              "placeDetails": "",
-              "placeExtendedDetails": "",
+              "placeName": "Full attraction name",
+              "placeDetails": "Brief 1-2 sentence overview",
+              "placeExtendedDetails": "Detailed 3-4 sentence description with historical facts",
               "geoCoordinates": {
-                "latitude": "",
-                "longitude": ""
+                "latitude": "Precise decimal coordinates",
+                "longitude": "Precise decimal coordinates"
               },
-              "ticketPrice": "",
-              "placeUrl": ""
+              "ticketPrice": "Price in USD or 'Free'",
+              "placeUrl": "Official website URL or Google Maps URL"
             }
           ]
         }
@@ -149,167 +127,6 @@ export const RECOMMEND_TRIP_AI_PROMPT = `
     }
   }
 
-  Ensure the JSON format is consistent. Provide a placeUrl for each place that takes the user to a google search of the place. 
-  Also provide a placeExtendedDetails for each place that provides more information and facts about the place
-  the user can read and learn. Also provide multiple hotel options in the "hotels" array.
-`;
-
-export const SPECIFIC_TERRAIN_TRIP_AI_PROMPT = `
-  Generate a structured JSON Travel Plan for a trip to a random {terrainType} terrain, lasting a random number of days and nights.
-  The trip will be for a random number group of people with a average budget. The accommodation type is hotel, 
-  activity level is normal, 
-  and preferred climate is average so plan the trip accordingly.
-  
-  The JSON should have the following structure:
-
-  {
-    "travelPlan": {
-      "budget": "",
-      "numberOfDays": "",
-      "numberOfNights": "",
-      "destination": "",
-      "flights": {
-        "airlineName": "",
-        "flightPrice": "",
-        "airlineUrl": ""
-      },
-      "hotels": [
-        {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
-          "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
-          },
-          "rating": "",
-          "description": ""
-        },
-        {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
-          "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
-          },
-          "rating": "",
-          "description": ""
-        },
-        {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
-          "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
-          },
-          "rating": "",
-          "description": ""
-        }
-      ],
-      "itinerary": [
-        {
-          "day": "",
-          "places": [
-            {
-              "placeName": "",
-              "placeDetails": "",
-              "placeExtendedDetails": "",
-              "geoCoordinates": {
-                "latitude": "",
-                "longitude": ""
-              },
-              "ticketPrice": "",
-              "placeUrl": ""
-            }
-          ]
-        }
-      ]
-    }
-  }
-
-  Ensure the JSON format is consistent. Provide a placeUrl for each place that takes the user to a google search of the place. 
-  Also provide a placeExtendedDetails for each place that provides more information and facts about the place
-  the user can read and learn. Also provide multiple hotel options in the "hotels" array.
-`;
-
-export const SPECIFIC_CITY_TRIP_AI_PROMPT = `
-  Generate a structured JSON Travel Plan to {cityName}, lasting a random number of days and nights.
-  The trip will be for a random number group of people with a average budget. The accommodation type is hotel, 
-  activity level is normal, 
-  and preferred climate is average so plan the trip accordingly.
-  
-  The JSON should have the following structure:
-
-  {
-    "travelPlan": {
-      "budget": "",
-      "numberOfDays": "",
-      "numberOfNights": "",
-      "destination": "",
-      "flights": {
-        "airlineName": "",
-        "flightPrice": "",
-        "airlineUrl": ""
-      },
-      "hotels": [
-        {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
-          "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
-          },
-          "rating": "",
-          "description": ""
-        },
-        {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
-          "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
-          },
-          "rating": "",
-          "description": ""
-        },
-        {
-          "hotelName": "",
-          "hotelAddress": "",
-          "price": "",
-          "geoCoordinates": {
-            "latitude": "",
-            "longitude": ""
-          },
-          "rating": "",
-          "description": ""
-        }
-      ],
-      "itinerary": [
-        {
-          "day": "",
-          "places": [
-            {
-              "placeName": "",
-              "placeDetails": "",
-              "placeExtendedDetails": "",
-              "geoCoordinates": {
-                "latitude": "",
-                "longitude": ""
-              },
-              "ticketPrice": "",
-              "placeUrl": ""
-            }
-          ]
-        }
-      ]
-    }
-  }
-
-  Ensure the JSON format is consistent. Provide a placeUrl for each place that takes the user to a google search of the place. 
-  Also provide a placeExtendedDetails for each place that provides more information and facts about the place
-  the user can read and learn. Also provide multiple hotel options in the "hotels" array.
+  Ensure all data is realistic, accurate and properly formatted. Each place should have complete and engaging descriptions.
+  Include exactly 3 hotel options of varying price points. The itinerary should be logically organized to minimize travel time.
 `;

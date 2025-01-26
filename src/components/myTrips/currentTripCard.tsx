@@ -97,14 +97,26 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
           />
         </Pressable>
       ) : (
-        <Image
-          source={require("../../assets/placeholder.jpeg")}
-          style={{
-            width: "100%",
-            height: 240,
-            borderRadius: 15,
+        <Pressable
+          onPress={() => {
+            console.log(parsedCurrentPlan);
+            navigation.navigate("CurrentTripDetails", {
+              trip: JSON.stringify({
+                ...parsedCurrentTrip,
+                travelPlan: parsedCurrentPlan?.travelPlan || {},
+              }),
+            });
           }}
-        />
+        >
+          <Image
+            source={require("../../assets/placeholder.jpeg")}
+            style={{
+              width: "100%",
+              height: 240,
+              borderRadius: 15,
+            }}
+          />
+        </Pressable>
       )}
       <View style={{ marginTop: 10 }}>
         <Text
@@ -114,7 +126,7 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
             color: currentTheme.textPrimary,
           }}
         >
-          {parsedCurrentTrip?.locationInfo?.name || "No Location Name"}
+          {parsedCurrentPlan?.travelPlan?.destination || "No Location Name"}
         </Text>
         <View
           style={{

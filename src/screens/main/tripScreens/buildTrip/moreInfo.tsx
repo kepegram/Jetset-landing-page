@@ -37,9 +37,7 @@ const MoreInfo: React.FC = () => {
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <View style={styles.headerContainer}>
-        <Text
-          style={[styles.subheading, { color: currentTheme.textSecondary }]}
-        >
+        <Text style={[styles.subheading, { color: currentTheme.textPrimary }]}>
           More Info
         </Text>
         <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
@@ -48,53 +46,16 @@ const MoreInfo: React.FC = () => {
       </View>
 
       <View style={styles.dropdownsContainer}>
-        {/* Traveler Type */}
-        <View style={styles.inputContainer}>
-          <View style={styles.labelContainer}>
-            <Ionicons
-              name="person-outline"
-              size={22}
-              color={currentTheme.textSecondary}
-            />
-            <Text
-              style={[styles.labelText, { color: currentTheme.textSecondary }]}
-            >
-              Traveler Type
-            </Text>
-          </View>
-          <Dropdown
-            data={[
-              { label: "Average", value: "Average" },
-              { label: "Adventurous", value: "Adventurous" },
-              { label: "Relaxed", value: "Relaxed" },
-            ]}
-            labelField="label"
-            valueField="value"
-            value={travelerType}
-            onChange={(item) => setTravelerType(item.value)}
-            style={[
-              styles.dropdown,
-              {
-                backgroundColor: currentTheme.background,
-                borderColor: currentTheme.textSecondary,
-              },
-            ]}
-            itemTextStyle={{ color: currentTheme.textSecondary }}
-            selectedTextStyle={{ color: currentTheme.textSecondary }}
-            placeholderStyle={{ color: currentTheme.textSecondary }}
-          />
-        </View>
-
         {/* Accommodation Type */}
         <View style={styles.inputContainer}>
           <View style={styles.labelContainer}>
             <Ionicons
               name="bed-outline"
               size={22}
-              color={currentTheme.textSecondary}
+              color={currentTheme.textPrimary}
             />
             <Text
-              style={[styles.labelText, { color: currentTheme.textSecondary }]}
+              style={[styles.labelText, { color: currentTheme.textPrimary }]}
             >
               Accommodation Type
             </Text>
@@ -113,12 +74,12 @@ const MoreInfo: React.FC = () => {
               styles.dropdown,
               {
                 backgroundColor: currentTheme.background,
-                borderColor: currentTheme.textSecondary,
+                borderColor: currentTheme.textPrimary,
               },
             ]}
-            itemTextStyle={{ color: currentTheme.textSecondary }}
-            selectedTextStyle={{ color: currentTheme.textSecondary }}
-            placeholderStyle={{ color: currentTheme.textSecondary }}
+            itemTextStyle={{ color: currentTheme.textPrimary }}
+            selectedTextStyle={{ color: currentTheme.textPrimary }}
+            placeholderStyle={{ color: currentTheme.textPrimary }}
           />
         </View>
 
@@ -128,10 +89,10 @@ const MoreInfo: React.FC = () => {
             <Ionicons
               name="walk-outline"
               size={22}
-              color={currentTheme.textSecondary}
+              color={currentTheme.textPrimary}
             />
             <Text
-              style={[styles.labelText, { color: currentTheme.textSecondary }]}
+              style={[styles.labelText, { color: currentTheme.textPrimary }]}
             >
               Activity Level
             </Text>
@@ -150,12 +111,12 @@ const MoreInfo: React.FC = () => {
               styles.dropdown,
               {
                 backgroundColor: currentTheme.background,
-                borderColor: currentTheme.textSecondary,
+                borderColor: currentTheme.textPrimary,
               },
             ]}
-            itemTextStyle={{ color: currentTheme.textSecondary }}
-            selectedTextStyle={{ color: currentTheme.textSecondary }}
-            placeholderStyle={{ color: currentTheme.textSecondary }}
+            itemTextStyle={{ color: currentTheme.textPrimary }}
+            selectedTextStyle={{ color: currentTheme.textPrimary }}
+            placeholderStyle={{ color: currentTheme.textPrimary }}
           />
         </View>
 
@@ -165,10 +126,10 @@ const MoreInfo: React.FC = () => {
             <Ionicons
               name="wallet-outline"
               size={22}
-              color={currentTheme.textSecondary}
+              color={currentTheme.textPrimary}
             />
             <Text
-              style={[styles.labelText, { color: currentTheme.textSecondary }]}
+              style={[styles.labelText, { color: currentTheme.textPrimary }]}
             >
               Budget
             </Text>
@@ -187,29 +148,25 @@ const MoreInfo: React.FC = () => {
               styles.dropdown,
               {
                 backgroundColor: currentTheme.background,
-                borderColor: currentTheme.textSecondary,
+                borderColor: currentTheme.textPrimary,
               },
             ]}
-            itemTextStyle={{ color: currentTheme.textSecondary }}
-            selectedTextStyle={{ color: currentTheme.textSecondary }}
-            placeholderStyle={{ color: currentTheme.textSecondary }}
+            itemTextStyle={{ color: currentTheme.textPrimary }}
+            selectedTextStyle={{ color: currentTheme.textPrimary }}
+            placeholderStyle={{ color: currentTheme.textPrimary }}
           />
         </View>
-      </View>
 
-      <View style={styles.buttonContainer}>
         <MainButton
           onPress={() => {
             setTripData({
               ...tripData,
-              travelerType,
               accommodationType,
               activityLevel,
               budget,
             });
             console.log("Trip Data:", {
               ...tripData,
-              travelerType,
               accommodationType,
               activityLevel,
               budget,
@@ -231,6 +188,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     position: "absolute",
+    paddingTop: 10,
     top: 100,
     left: 20,
     right: 20,
@@ -245,7 +203,8 @@ const styles = StyleSheet.create({
   dropdownsContainer: {
     flex: 1,
     justifyContent: "center",
-    marginTop: 150,
+    marginTop: 50,
+    alignItems: "center",
   },
   inputContainer: {
     width: "100%",
@@ -265,11 +224,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     height: 50,
-  },
-  buttonContainer: {
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 40,
   },
 });
 

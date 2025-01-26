@@ -36,7 +36,6 @@ const GenerateTrip: React.FC = () => {
       .replace("{totalNight}", (tripData.totalNoOfDays - 1).toString() || "0")
       .replace("{whoIsGoing}", tripData.whoIsGoing || "")
       .replace("{budget}", tripData.budget?.toString() || "")
-      .replace("{travelerType}", tripData.travelerType || "")
       .replace("{accommodationType}", tripData.accommodationType || "")
       .replace("{activityLevel}", tripData.activityLevel || "");
 

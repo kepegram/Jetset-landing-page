@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Image, Pressable, Text } from "react-native";
+import React, { useContext, useState } from "react";
+import { Alert, Image, Pressable, Text, View } from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
   createNativeStackNavigator,
@@ -25,11 +25,9 @@ import Settings from "../screens/main/userScreens/settings";
 import ChangePassword from "../screens/main/userScreens/changePassword";
 import AppTheme from "../screens/main/userScreens/appTheme";
 import DeleteAccount from "../screens/main/userScreens/deleteAccount";
-import BuildTrip from "../screens/main/tripScreens/buildTrip/buildTrip";
 import ReviewTrip from "../screens/main/tripScreens/reviewTrip";
 import GenerateTrip from "../screens/main/tripScreens/generateTrip";
 import TripDetails from "../screens/main/tripScreens/tripDetails";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyTrips from "../screens/main/tripScreens/myTrips";
 //import Map from "../screens/main/mapScreen/map";
 import CurrentTripDetails from "../screens/main/tripScreens/currentTripDetails";
@@ -111,9 +109,10 @@ const HomeStack: React.FC = () => {
 
 const MyTripsStack: React.FC = () => {
   const { currentTheme } = useTheme();
+  const { setTripData } = useContext(CreateTripContext) || {};
   const screens = [
     "DoYouKnow",
-    "ChoosePlaces",
+    "ChoosePlaces", 
     "SearchPlaces",
     "ChooseDate",
     "WhosGoing",
@@ -132,6 +131,7 @@ const MyTripsStack: React.FC = () => {
   }): NativeStackNavigationOptions => {
     const currentScreenIndex = screens.indexOf(route.name) + 1;
     const totalScreens = screens.length;
+    const isFirstScreen = route.name === "DoYouKnow";
 
     return {
       headerStyle: {
@@ -139,14 +139,46 @@ const MyTripsStack: React.FC = () => {
       },
       headerShadowVisible: false,
       headerLeft: () => (
-        <Pressable onPress={() => navigation.goBack()}>
-          <Ionicons
-            name="arrow-back"
-            size={28}
-            color={currentTheme.textPrimary}
-            style={{ marginLeft: 10 }}
-          />
-        </Pressable>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <Ionicons
+              name="arrow-back"
+              size={28}
+              color={currentTheme.textPrimary}
+              style={{ marginLeft: 10 }}
+            />
+          </Pressable>
+          {!isFirstScreen && (
+            <Pressable 
+              onPress={() => {
+                Alert.alert(
+                  "Reset Trip",
+                  "Are you sure you want to reset? All progress will be lost.",
+                  [
+                    {
+                      text: "Cancel",
+                      style: "cancel"
+                    },
+                    {
+                      text: "OK",
+                      onPress: () => {
+                        setTripData?.({});
+                        navigation.navigate("MyTripsMain");
+                      }
+                    }
+                  ]
+                );
+              }}
+            >
+              <Ionicons
+                name="refresh"
+                size={25}
+                color={currentTheme.textPrimary}
+                style={{ marginLeft: 8 }}
+              />
+            </Pressable>
+          )}
+        </View>
       ),
       headerRight: () => (
         <Text

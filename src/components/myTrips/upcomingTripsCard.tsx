@@ -71,7 +71,7 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
 
   return (
     <View style={{ marginVertical: 20, width: 250 }}>
-      {UpcomingTrip?.locationInfo?.photoRef ? (
+      {UpcomingPlan?.travelPlan?.photoRef ? (
         <Pressable
           onPress={() =>
             navigation.navigate("TripDetails", {
@@ -84,7 +84,7 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
         >
           <Image
             source={{
-              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${UpcomingTrip.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
+              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${UpcomingPlan?.travelPlan?.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
             }}
             style={{
               width: "100%",
@@ -94,14 +94,25 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
           />
         </Pressable>
       ) : (
-        <Image
-          source={require("../../assets/placeholder.jpeg")}
-          style={{
-            width: "100%",
-            height: 240,
-            borderRadius: 15,
-          }}
-        />
+        <Pressable
+          onPress={() =>
+            navigation.navigate("TripDetails", {
+              trip: JSON.stringify({
+                ...UpcomingTrip,
+                travelPlan: UpcomingPlan?.travelPlan || {},
+              }),
+            })
+          }
+        >
+          <Image
+            source={require("../../assets/placeholder.jpeg")}
+            style={{
+              width: "100%",
+              height: 240,
+              borderRadius: 15,
+            }}
+          />
+        </Pressable>
       )}
       <View style={{ marginTop: 10 }}>
         <Text
@@ -111,7 +122,7 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
             color: currentTheme.textPrimary,
           }}
         >
-          {UpcomingTrip?.locationInfo?.name || "No Location Name"}
+          {UpcomingPlan?.travelPlan?.destination || "No Location Name"}
         </Text>
         {daysUntilTrip !== null && (
           <Text

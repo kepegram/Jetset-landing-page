@@ -168,17 +168,18 @@ const Profile: React.FC = () => {
         </View>
 
         {/* Ongoing Trips */}
-
-        <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-          Ongoing Trips
-        </Text>
-        {loading ? (
-          <ActivityIndicator size="large" color={currentTheme.alternate} />
-        ) : (
-          <View style={{ padding: 20 }}>
-            <CurrentTripCard userTrips={userTrips} />
-          </View>
-        )}
+        <View style={styles.ongoingTripsContainer}>
+          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+            Ongoing Trips
+          </Text>
+          {loading ? (
+            <ActivityIndicator size="large" color={currentTheme.alternate} />
+          ) : (
+            <View style={styles.currentTripContainer}>
+              <CurrentTripCard userTrips={userTrips} />
+            </View>
+          )}
+        </View>
 
         <Modal
           animationType="fade"
@@ -288,14 +289,16 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 18,
   },
+  ongoingTripsContainer: {
+    marginTop: 100,
+    paddingHorizontal: 20,
+  },
   heading: {
     fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
-    alignSelf: "flex-start",
-    marginTop: -10,
-    marginBottom: -20,
-    paddingLeft: 20,
+  },
+  currentTripContainer: {
+    width: "100%",
   },
   ongoingBadgeContainer: {
     position: "relative",

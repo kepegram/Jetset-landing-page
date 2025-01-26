@@ -55,6 +55,7 @@ const TripDetails: React.FC = () => {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
+            if (!user) return;
             const tripDocRef = doc(
               FIREBASE_DB,
               `users/${user.uid}/userTrips/${tripId}`
@@ -125,7 +126,7 @@ const TripDetails: React.FC = () => {
                 color: currentTheme.textPrimary,
               }}
             >
-              {tripDetails?.locationInfo?.name || "Unknown Location"}
+              {tripDetails?.travelPlan?.destination || "Unknown Location"}
             </Text>
             <Ionicons
               name="trash-bin-outline"

@@ -1,4 +1,4 @@
-import { View, Text, Image, ScrollView, Alert, Pressable } from "react-native";
+import { View, Text, Image, ScrollView, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -77,11 +77,13 @@ const CurrentTripDetails: React.FC = () => {
     <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         <Image
-          source={{
-            uri: tripDetails?.locationInfo?.photoRef
-              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripDetails?.locationInfo?.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
-              : "https://via.placeholder.com/400",
-          }}
+          source={
+            tripDetails?.locationInfo?.photoRef
+              ? {
+                  uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripDetails?.locationInfo?.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+                }
+              : require("../../../assets/placeholder.jpeg")
+          }
           style={{
             width: "100%",
             height: 330,
