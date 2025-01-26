@@ -10,9 +10,9 @@ import {
 } from "firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { FIREBASE_AUTH, FIREBASE_DB } from "./firebase.config";
+import { FIREBASE_AUTH } from "./firebase.config";
 import { useColorScheme } from "react-native";
-import { ThemeProvider } from "./src/context/themeContext";
+import { ThemeProvider, useTheme } from "./src/context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 import * as SplashScreen from "expo-splash-screen";
 import * as Google from "expo-auth-session/providers/google";
@@ -44,7 +44,7 @@ WebBrowser.maybeCompleteAuthSession();
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [appIsReady, setAppIsReady] = useState(false);
-
+  const { currentTheme } = useTheme();
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId:
       "500450400417-sqtsj83q075sduha6dsrk3c19c9ac1ci.apps.googleusercontent.com",
@@ -108,7 +108,7 @@ const App: React.FC = () => {
 
   const screenOptions = ({ navigation }: any) => ({
     headerStyle: {
-      backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
+      backgroundColor: currentTheme.background,
       borderBottomWidth: 0,
       shadowColor: "transparent",
       elevation: 0,
@@ -118,7 +118,7 @@ const App: React.FC = () => {
         <Ionicons
           name="arrow-back"
           size={28}
-          color={colorScheme === "dark" ? "#fff" : "black"}
+          color={currentTheme.textPrimary}
           style={{ marginLeft: 15 }}
         />
       </Pressable>
