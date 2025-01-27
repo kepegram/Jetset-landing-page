@@ -7,10 +7,17 @@ import {
   ScrollView,
   Alert,
   TextInput,
+  SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
-import { deleteDoc, doc, setDoc, collection, getDocs } from "firebase/firestore";
+import {
+  deleteDoc,
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+} from "firebase/firestore";
 import {
   reauthenticateWithCredential,
   EmailAuthProvider,
@@ -87,7 +94,10 @@ const DeleteAccount: React.FC = () => {
 
                 // Function to delete all subcollections
                 const deleteSubcollections = async (docRef: any) => {
-                  const subcollectionNames = ["subcollection1", "subcollection2"];
+                  const subcollectionNames = [
+                    "subcollection1",
+                    "subcollection2",
+                  ];
                   for (const name of subcollectionNames) {
                     const subcollectionRef = collection(docRef, name);
                     const subcollectionDocs = await getDocs(subcollectionRef);
@@ -142,14 +152,22 @@ const DeleteAccount: React.FC = () => {
   );
 
   return (
-    <View
+    <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <Text style={[styles.subTitle, { color: currentTheme.textPrimary }]}>
-        Please let us know why you're leaving:
-      </Text>
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+          Delete Account
+        </Text>
+        <Text style={[styles.subTitle, { color: currentTheme.textSecondary }]}>
+          We're sorry to see you go. Please let us know why you're leaving:
+        </Text>
+      </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
         {reasons.map((reason, index) => (
           <Pressable
             key={index}
@@ -158,8 +176,12 @@ const DeleteAccount: React.FC = () => {
               {
                 backgroundColor:
                   selectedReason === reason
-                    ? currentTheme.background
+                    ? currentTheme.alternate + "20"
                     : "transparent",
+                borderColor:
+                  selectedReason === reason
+                    ? currentTheme.alternate
+                    : currentTheme.inactive,
               },
             ]}
             onPress={() => setSelectedReason(reason)}
@@ -192,12 +214,14 @@ const DeleteAccount: React.FC = () => {
               {
                 color: currentTheme.textPrimary,
                 borderColor: currentTheme.inactive,
+                backgroundColor: currentTheme.accentBackground,
               },
             ]}
             placeholder="Please specify your reason"
             placeholderTextColor={currentTheme.secondary}
             value={otherReason}
             onChangeText={(text) => setOtherReason(text)}
+            multiline
           />
         )}
 
@@ -208,6 +232,8 @@ const DeleteAccount: React.FC = () => {
               {
                 color: currentTheme.textPrimary,
                 borderColor: currentTheme.inactive,
+                backgroundColor: currentTheme.accentBackground,
+                marginTop: 20,
               },
             ]}
             placeholder="Enter password to confirm"
@@ -218,13 +244,19 @@ const DeleteAccount: React.FC = () => {
           />
         )}
 
-        <Pressable style={styles.deleteButton} onPress={handleDeleteAccount}>
-          <Text style={[styles.deleteButtonText, { color: "red" }]}>
-            Delete Account
-          </Text>
+        <Pressable
+          style={[
+            styles.deleteButton,
+            {
+              backgroundColor: "#FF3B30" + "20",
+            },
+          ]}
+          onPress={handleDeleteAccount}
+        >
+          <Text style={styles.deleteButtonText}>Delete Account</Text>
         </Pressable>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -233,41 +265,54 @@ export default DeleteAccount;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    justifyContent: "center",
+  },
+  header: {
+    padding: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: "outfit-bold",
+    marginBottom: 10,
   },
   subTitle: {
-    fontSize: 18,
-    marginVertical: 20,
+    fontSize: 16,
+    fontFamily: "outfit",
+    lineHeight: 22,
   },
   scrollContainer: {
-    flexGrow: 1,
+    padding: 20,
+    paddingTop: 10,
   },
   radioContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
-    borderRadius: 8,
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 10,
+    borderWidth: 1,
   },
   radioLabel: {
     fontSize: 16,
-    marginLeft: 10,
+    marginLeft: 12,
+    fontFamily: "outfit",
   },
   textInput: {
-    marginTop: 10,
-    padding: 10,
+    padding: 15,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     fontSize: 16,
+    fontFamily: "outfit",
+    minHeight: 50,
   },
   deleteButton: {
-    padding: 15,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 12,
     alignItems: "center",
-    marginTop: 5,
+    marginTop: 30,
   },
   deleteButtonText: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "outfit-bold",
+    color: "#FF3B30",
   },
 });

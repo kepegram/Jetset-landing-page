@@ -1,6 +1,7 @@
 import { StyleSheet, View, Animated, Image, Pressable } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { useTheme } from "../../../context/themeContext";
+import { Ionicons } from "@expo/vector-icons";
 
 const AppTheme: React.FC = () => {
   const { theme, currentTheme, toggleTheme } = useTheme();
@@ -29,33 +30,51 @@ const AppTheme: React.FC = () => {
     <Animated.View
       style={[styles.container, { backgroundColor: animatedBackgroundColor }]}
     >
-      <View style={styles.buttonContainer}>
-        <View style={styles.themeOption}>
-          <Animated.Text style={[styles.label, { color: animatedTextColor }]}>
-            Light Theme
-          </Animated.Text>
+      <View style={styles.themeContainer}>
+        <Animated.Text style={[styles.title, { color: animatedTextColor }]}>
+          Choose Your Theme
+        </Animated.Text>
+
+        <View style={styles.optionsContainer}>
           <Pressable
             style={[
-              styles.radioButton,
-              isDarkTheme ? styles.inactiveButton : styles.activeButton,
+              styles.themeOption,
+              !isDarkTheme && styles.activeThemeOption,
+              { borderColor: isDarkTheme ? "#666" : "#387694" }
             ]}
             onPress={() => toggleTheme("light")}
-          />
-        </View>
+          >
+            <Ionicons name="sunny" size={32} color={isDarkTheme ? "#666" : "#387694"} />
+            <Animated.Text style={[styles.optionText, { color: animatedTextColor }]}>
+              Light Mode
+            </Animated.Text>
+            <View style={[
+              styles.checkmark,
+              !isDarkTheme && styles.activeCheckmark
+            ]}>
+              {!isDarkTheme && <Ionicons name="checkmark" size={16} color="#fff" />}
+            </View>
+          </Pressable>
 
-        <View style={styles.spacer} />
-
-        <View style={styles.themeOption}>
-          <Animated.Text style={[styles.label, { color: animatedTextColor }]}>
-            Dark Theme
-          </Animated.Text>
           <Pressable
             style={[
-              styles.radioButton,
-              isDarkTheme ? styles.activeButton : styles.inactiveButton,
+              styles.themeOption,
+              isDarkTheme && styles.activeThemeOption,
+              { borderColor: isDarkTheme ? "#387694" : "#666" }
             ]}
             onPress={() => toggleTheme("dark")}
-          />
+          >
+            <Ionicons name="moon" size={32} color={isDarkTheme ? "#387694" : "#666"} />
+            <Animated.Text style={[styles.optionText, { color: animatedTextColor }]}>
+              Dark Mode
+            </Animated.Text>
+            <View style={[
+              styles.checkmark,
+              isDarkTheme && styles.activeCheckmark
+            ]}>
+              {isDarkTheme && <Ionicons name="checkmark" size={16} color="#fff" />}
+            </View>
+          </Pressable>
         </View>
       </View>
     </Animated.View>
@@ -70,42 +89,48 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  themeContainer: {
+    width: "90%",
+    maxWidth: 400,
     padding: 20,
-    width: "100%",
+  },
+  title: {
+    fontSize: 24,
+    fontFamily: "outfit-bold",
+    marginBottom: 30,
+    textAlign: "center",
+  },
+  optionsContainer: {
+    gap: 20,
   },
   themeOption: {
+    flexDirection: "row",
     alignItems: "center",
-    flex: 1,
-    padding: 10,
-  },
-  spacer: {
-    width: 40,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 10,
-    fontWeight: "bold",
-  },
-  image: {
-    width: 200,
-    height: 410,
-    marginBottom: 10,
-  },
-  radioButton: {
-    width: 25,
-    height: 25,
-    borderRadius: 12.5,
+    padding: 20,
+    borderRadius: 12,
     borderWidth: 2,
-    borderColor: "grey",
     backgroundColor: "transparent",
   },
-  activeButton: {
+  activeThemeOption: {
+    backgroundColor: "rgba(56, 118, 148, 0.1)",
+  },
+  optionText: {
+    fontSize: 18,
+    fontFamily: "outfit",
+    marginLeft: 15,
+    flex: 1,
+  },
+  checkmark: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#666",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  activeCheckmark: {
     backgroundColor: "#387694",
-  },
-  inactiveButton: {
-    backgroundColor: "transparent",
-  },
+    borderColor: "#387694",
+  }
 });

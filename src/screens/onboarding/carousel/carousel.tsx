@@ -5,6 +5,8 @@ import {
   View,
   Pressable,
   ImageBackground,
+  Dimensions,
+  Platform,
 } from "react-native";
 import Swiper from "react-native-swiper";
 import { useNavigation } from "@react-navigation/native";
@@ -13,17 +15,60 @@ import { RootStackParamList } from "../../../../App";
 import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from '@expo/vector-icons';
 import { MainButton } from "../../../components/ui/button";
+import { LinearGradient } from 'expo-linear-gradient';
 
 type CarouselScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Carousel"
 >;
 
+const { width, height } = Dimensions.get('window');
+
 const Carousel: React.FC = () => {
   const navigation = useNavigation<CarouselScreenNavigationProp>();
   const { currentTheme } = useTheme();
 
   let swiperRef: Swiper | null = null;
+
+  const renderSlide = (
+    image: any,
+    title: string,
+    subtitle: string,
+    isLastSlide: boolean = false
+  ) => (
+    <ImageBackground source={image} style={styles.backgroundImage}>
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.8)']}
+        style={styles.gradient}
+      >
+        <View style={styles.slideContent}>
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.subtitle}>{subtitle}</Text>
+          </View>
+          
+          {isLastSlide ? (
+            <View style={styles.buttonContainer}>
+              <MainButton
+                onPress={() => navigation.navigate("SignUp")}
+                buttonText="Get Started"
+                style={styles.authButton}
+                textColor={currentTheme.buttonText}
+                backgroundColor={currentTheme.buttonBackground}
+              />
+            </View>
+          ) : (
+            <Pressable
+              style={styles.arrowButton}
+              onPress={() => swiperRef?.scrollBy(1)}
+            >
+              <Ionicons name="arrow-forward" size={30} color="white" />
+            </Pressable>
+          )}
+        </View>
+      </LinearGradient>
+    </ImageBackground>
+  );
 
   return (
     <Swiper
@@ -35,92 +80,26 @@ const Carousel: React.FC = () => {
       dotColor={currentTheme.inactive}
       dotStyle={styles.dotStyle}
       activeDotStyle={styles.activeDotStyle}
-      paginationStyle={styles.paginationStyle} // Added this line
+      paginationStyle={styles.paginationStyle}
     >
-      {/* Slide 1 */}
+      {renderSlide(
+        require("../../../assets/onboarding-imgs/city.jpeg"),
+        "Create your dream travel list",
+        "Curate your own personalized travel bucket list"
+      )}
 
-      <ImageBackground
-        source={require("../../../assets/onboarding-imgs/city.jpeg")}
-        style={styles.backgroundImage}
-      >
-        <View style={styles.slide1}>
-          <View style={styles.slide1textContainer}>
-            <Text style={[styles.title1, { color: "white" }]}>
-              Create your dream travel list
-            </Text>
-            <Text style={[styles.paragraph1, { color: "#d1d1d1" }]}>
-              Curate your own personalized travel bucket list
-            </Text>
-          </View>
-          <Pressable
-            style={styles.arrowButton}
-            onPress={() => swiperRef?.scrollBy(1)}
-          >
-            <Ionicons name="arrow-forward" size={30} color="white" />
-          </Pressable>
-        </View>
-      </ImageBackground>
+      {renderSlide(
+        require("../../../assets/onboarding-imgs/igloo.jpg"),
+        "Plan trips and explore destinations",
+        "Simple tools and a powerful interface to help you plan your dream trip."
+      )}
 
-      {/* Slide 2 */}
-
-      <ImageBackground
-        source={require("../../../assets/onboarding-imgs/igloo.jpg")}
-        style={styles.backgroundImage}
-      >
-        <View style={styles.slide2}>
-          <View style={styles.shadow} />
-          <View style={styles.slide2textContainer}>
-            <Text style={[styles.title2, { color: "white" }]}>
-              Plan trips and explore destinations
-            </Text>
-            <Text style={[styles.paragraph2, { color: "#d1d1d1" }]}>
-              Simple tools and a powerful interface to help you plan your dream
-              trip.
-            </Text>
-          </View>
-          <Pressable
-            style={styles.arrowButton}
-            onPress={() => swiperRef?.scrollBy(1)}
-          >
-            <Ionicons name="arrow-forward" size={30} color="white" />
-          </Pressable>
-        </View>
-      </ImageBackground>
-
-      {/* Slide 3 */}
-
-      <ImageBackground
-        source={require("../../../assets/onboarding-imgs/beautiful.jpeg")}
-        style={styles.backgroundImage}
-      >
-        <View style={styles.slide3}>
-          <View style={styles.slide3textContainer}>
-            <Text style={[styles.title3, { color: "white" }]}>
-              Become{"\n"}
-              <Text style={{ fontSize: 60, color: currentTheme.alternate }}>
-                Jetset
-              </Text>{"\n"}
-              Today
-            </Text>
-
-            <Text style={[styles.paragraph3, { color: "#d1d1d1" }]}>
-              Join our community to start planning your travel list and explore
-              the world
-            </Text>
-            <View style={styles.buttonContainer}>
-              <MainButton
-                onPress={() => {
-                  navigation.navigate("SignUp");
-                }}
-                buttonText="Get Started"
-                style={styles.authButton}
-                textColor={currentTheme.buttonText}
-                backgroundColor={currentTheme.buttonBackground}
-              />
-            </View>
-          </View>
-        </View>
-      </ImageBackground>
+      {renderSlide(
+        require("../../../assets/onboarding-imgs/beautiful.jpeg"),
+        "Become\nJetset\nToday",
+        "Join our community to start planning your travel list and explore the world",
+        true
+      )}
     </Swiper>
   );
 };
@@ -130,110 +109,67 @@ export default Carousel;
 const styles = StyleSheet.create({
   wrapper: {},
   backgroundImage: {
-    flex: 1,
+    width,
+    height,
     resizeMode: "cover",
-    justifyContent: "center",
+  },
+  gradient: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingBottom: Platform.OS === 'ios' ? 50 : 30,
+  },
+  slideContent: {
+    padding: 24,
+  },
+  textContainer: {
+    marginBottom: 30,
+  },
+  title: {
+    fontSize: 42,
+    fontWeight: "800",
+    color: "white",
+    marginBottom: 16,
+    lineHeight: 52,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: "#E0E0E0",
+    lineHeight: 26,
   },
   dotStyle: {
-    width: 16,
+    width: 8,
     height: 8,
     borderRadius: 4,
+    marginLeft: 4,
+    marginRight: 4,
   },
   activeDotStyle: {
     width: 24,
     height: 8,
     borderRadius: 4,
-  },
-  shadow: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 260,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    marginLeft: 4,
+    marginRight: 4,
   },
   paginationStyle: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 50 : 160, // Increased bottom spacing to avoid overlap
+    left: 24,
     justifyContent: 'flex-start',
-    marginLeft: 30,
-    marginBottom: 10,
   },
   arrowButton: {
-    position: "absolute",
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    padding: 10,
-    borderRadius: 25,
-    bottom: 20,
-    right: 30,
-  },
-
-  // Slide 1
-  slide1: {
-    padding: 20,
-    flex: 1,
-  },
-  slide1textContainer: {
-    top: "75%",
-  },
-  title1: {
-    fontSize: 38,
-    marginBottom: 25,
-    fontWeight: "bold",
-    textAlign: "left",
-  },
-  paragraph1: {
-    fontSize: 16,
-    textAlign: "left",
-  },
-
-  // Slide 2
-  slide2: {
-    padding: 20,
-    flex: 1,
-  },
-  slide2textContainer: {
-    top: "75%",
-  },
-  title2: {
-    fontSize: 38,
-    marginBottom: 15,
-    fontWeight: "bold",
-    textAlign: "left",
-  },
-  paragraph2: {
-    fontSize: 16,
-    textAlign: "left",
-  },
-
-  // Slide 3
-  slide3: {
-    padding: 20,
-    flex: 1,
-  },
-  slide3textContainer: {
-    top: "65%",
-  },
-  title3: {
-    fontSize: 28,
-    marginBottom: 10,
-    fontWeight: "bold",
-    textAlign: "left",
-  },
-  paragraph3: {
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: "left",
+    position: 'absolute',
+    alignSelf: 'flex-end',
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    padding: 16,
+    borderRadius: 30,
+    bottom: Platform.OS === 'ios' ? -20 : -10,
+    right: 24,
   },
   buttonContainer: {
-    width: "100%",
-    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 20,
   },
   authButton: {
-    width: "70%",
-    padding: 15,
-    alignItems: "center",
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    width: "100%",
   },
 });

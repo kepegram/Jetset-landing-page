@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../../navigation/appNav";
@@ -66,22 +66,41 @@ const ChooseDate: React.FC = () => {
     navigation.navigate("WhosGoing");
   };
 
+  const getDateRangeText = () => {
+    if (startDate && endDate) {
+      return `${startDate.format("MMM D")} - ${endDate.format("MMM D, YYYY")}`;
+    }
+    return "Select your travel dates";
+  };
+
   return (
     <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <Text style={[styles.subheading, { color: currentTheme.textSecondary }]}>
-        When?
-      </Text>
-      <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-        Choose your dates
-      </Text>
-      <View style={styles.calendarContainer}>
+      <View style={styles.headerContainer}>
+        <Text
+          style={[styles.subheading, { color: currentTheme.textSecondary }]}
+        >
+          When?
+        </Text>
+        <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+          Choose your dates
+        </Text>
+        <Text
+          style={[styles.dateRangeText, { color: currentTheme.textSecondary }]}
+        >
+          {getDateRangeText()}
+        </Text>
+      </View>
+
+      <View style={styles.calendarWrapper}>
         <CalendarPicker
           onDateChange={onDateChange}
           allowRangeSelection={true}
           minDate={new Date()}
           todayBackgroundColor={currentTheme.alternate}
+          selectedStartDate={startDate?.toDate()}
+          selectedEndDate={endDate?.toDate()}
           previousComponent={
             <Ionicons
               name="chevron-back"
@@ -99,18 +118,31 @@ const ChooseDate: React.FC = () => {
           selectedRangeStyle={{
             backgroundColor: currentTheme.alternate,
           }}
+          selectedDayStyle={{
+            backgroundColor: currentTheme.alternate,
+            borderRadius: 8,
+          }}
           selectedDayTextStyle={styles.selectedDayText}
           dayTextStyle={{ color: currentTheme.textPrimary }}
-          monthTitleStyle={{ color: currentTheme.textPrimary }}
-          yearTitleStyle={{ color: currentTheme.textPrimary }}
+          monthTitleStyle={{
+            ...styles.monthTitle,
+            color: currentTheme.textPrimary,
+          }}
+          yearTitleStyle={{
+            ...styles.yearTitle,
+            color: currentTheme.textPrimary,
+          }}
           disabledDatesTextStyle={styles.disabledDates}
           textStyle={{ color: currentTheme.textPrimary }}
+          width={Dimensions.get("window").width - 60}
         />
+      </View>
+
+      <View style={styles.buttonContainer}>
         <MainButton
-          style={styles.continueButton}
           buttonText="Continue"
           onPress={OnDateSelectionContinue}
-          width="100%"
+          width="85%"
           backgroundColor={currentTheme.alternate}
         />
       </View>
@@ -123,29 +155,51 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  subheading: {
-    fontSize: 16,
+  headerContainer: {
     marginTop: 100,
+    paddingHorizontal: 10,
+  },
+  subheading: {
+    fontSize: 18,
     marginBottom: 8,
-    marginLeft: 10,
   },
   heading: {
-    fontSize: 32,
+    fontSize: 34,
     fontWeight: "bold",
-    marginLeft: 10,
+    marginBottom: 12,
   },
-  calendarContainer: {
-    padding: 30,
-    marginTop: 40,
+  dateRangeText: {
+    fontSize: 16,
+    marginTop: 8,
+  },
+  calendarWrapper: {
+    marginTop: 30,
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderRadius: 16,
+    padding: 15,
+  },
+  monthTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  yearTitle: {
+    fontSize: 18,
+    fontWeight: "600",
   },
   selectedDayText: {
     color: "white",
+    fontWeight: "600",
   },
   disabledDates: {
-    color: "grey",
+    color: "rgba(128,128,128,0.5)",
   },
-  continueButton: {
-    marginTop: 80,
+  buttonContainer: {
+    position: "absolute",
+    bottom: 40,
+    left: 0,
+    right: 0,
+    alignItems: "center",
   },
 });
 

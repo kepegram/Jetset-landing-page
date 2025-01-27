@@ -44,7 +44,8 @@ interface RecommendedTrip {
 
 const Home: React.FC = () => {
   const { currentTheme } = useTheme();
-  const { setTripData } = useContext(CreateTripContext) || {};
+  const { tripData = {}, setTripData = () => {} } =
+    useContext(CreateTripContext) || {};
   const [userName, setUserName] = useState("");
   const [recommendedTrips, setRecommendedTrips] = useState<RecommendedTrip[]>(
     []
@@ -182,9 +183,12 @@ const Home: React.FC = () => {
     }
   };
 
-  // TODO: NAVIGATE THE USER STRAIGHT TO THE CHOOSE DATE PAGE WITH TERRAIN INFO SET
   const generateSetTerrainTrip = async (terrainType: string) => {
-    console.log(terrainType);
+    setTripData({
+      ...tripData,
+      destinationType: terrainType,
+    });
+    navigation.navigate("ChooseDate");
   };
 
   useFocusEffect(
@@ -353,7 +357,7 @@ const Home: React.FC = () => {
                     <View style={styles.dontLikeButtonContainer}>
                       <Button
                         title="Don't like? Build your own here!"
-                        onPress={() => navigation.navigate("ChoosePlaces")}
+                        onPress={() => navigation.navigate("DoYouKnow")}
                         color={currentTheme.alternate}
                       />
                     </View>

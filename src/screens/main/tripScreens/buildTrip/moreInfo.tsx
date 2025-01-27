@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import { View, Text, StyleSheet, Animated } from "react-native";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
@@ -23,6 +23,7 @@ const MoreInfo: React.FC = () => {
   const [accommodationType, setAccommodationType] = useState<string>("Hotel");
   const [activityLevel, setActivityLevel] = useState<string>("Normal");
   const [budget, setBudget] = useState<string>("Average");
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     navigation.setOptions({
@@ -30,34 +31,66 @@ const MoreInfo: React.FC = () => {
       headerTransparent: true,
       headerTitle: "",
     });
+
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
   }, [navigation]);
+
+  const handleOptionChange = (value: string, setter: (value: string) => void) => {
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0.5,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    setter(value);
+  };
 
   return (
     <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <View style={styles.headerContainer}>
-        <Text style={[styles.subheading, { color: currentTheme.textPrimary }]}>
-          More Info
+      <Animated.View 
+        style={[
+          styles.headerContainer,
+          { opacity: fadeAnim }
+        ]}
+      >
+        <Text style={[styles.subheading, { color: currentTheme.textSecondary }]}>
+          Almost there!
         </Text>
         <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-          Choose other options so we can generate the best trip for you
+          Let's customize your perfect trip
         </Text>
-      </View>
+      </Animated.View>
 
-      <View style={styles.dropdownsContainer}>
+      <Animated.View 
+        style={[
+          styles.dropdownsContainer,
+          { opacity: fadeAnim }
+        ]}
+      >
         {/* Accommodation Type */}
         <View style={styles.inputContainer}>
           <View style={styles.labelContainer}>
             <Ionicons
               name="bed-outline"
-              size={22}
-              color={currentTheme.textPrimary}
+              size={24}
+              color={currentTheme.alternate}
             />
             <Text
               style={[styles.labelText, { color: currentTheme.textPrimary }]}
             >
-              Accommodation Type
+              Where would you like to stay?
             </Text>
           </View>
           <Dropdown
@@ -69,17 +102,18 @@ const MoreInfo: React.FC = () => {
             labelField="label"
             valueField="value"
             value={accommodationType}
-            onChange={(item) => setAccommodationType(item.value)}
+            onChange={(item) => handleOptionChange(item.value, setAccommodationType)}
             style={[
               styles.dropdown,
               {
-                backgroundColor: currentTheme.background,
-                borderColor: currentTheme.textPrimary,
+                backgroundColor: currentTheme.accentBackground,
+                borderColor: currentTheme.alternate,
               },
             ]}
             itemTextStyle={{ color: currentTheme.textPrimary }}
             selectedTextStyle={{ color: currentTheme.textPrimary }}
-            placeholderStyle={{ color: currentTheme.textPrimary }}
+            placeholderStyle={{ color: currentTheme.textSecondary }}
+            activeColor={currentTheme.accentBackground}
           />
         </View>
 
@@ -88,35 +122,36 @@ const MoreInfo: React.FC = () => {
           <View style={styles.labelContainer}>
             <Ionicons
               name="walk-outline"
-              size={22}
-              color={currentTheme.textPrimary}
+              size={24}
+              color={currentTheme.alternate}
             />
             <Text
               style={[styles.labelText, { color: currentTheme.textPrimary }]}
             >
-              Activity Level
+              How active do you want to be?
             </Text>
           </View>
           <Dropdown
             data={[
-              { label: "Normal", value: "Normal" },
-              { label: "High", value: "High" },
-              { label: "Low", value: "Low" },
+              { label: "Take it easy", value: "Low" },
+              { label: "Balanced mix", value: "Normal" },
+              { label: "Adventure packed", value: "High" },
             ]}
             labelField="label"
             valueField="value"
             value={activityLevel}
-            onChange={(item) => setActivityLevel(item.value)}
+            onChange={(item) => handleOptionChange(item.value, setActivityLevel)}
             style={[
               styles.dropdown,
               {
-                backgroundColor: currentTheme.background,
-                borderColor: currentTheme.textPrimary,
+                backgroundColor: currentTheme.accentBackground,
+                borderColor: currentTheme.alternate,
               },
             ]}
             itemTextStyle={{ color: currentTheme.textPrimary }}
             selectedTextStyle={{ color: currentTheme.textPrimary }}
-            placeholderStyle={{ color: currentTheme.textPrimary }}
+            placeholderStyle={{ color: currentTheme.textSecondary }}
+            activeColor={currentTheme.accentBackground}
           />
         </View>
 
@@ -125,35 +160,36 @@ const MoreInfo: React.FC = () => {
           <View style={styles.labelContainer}>
             <Ionicons
               name="wallet-outline"
-              size={22}
-              color={currentTheme.textPrimary}
+              size={24}
+              color={currentTheme.alternate}
             />
             <Text
               style={[styles.labelText, { color: currentTheme.textPrimary }]}
             >
-              Budget
+              What's your budget like?
             </Text>
           </View>
           <Dropdown
             data={[
-              { label: "Frugal", value: "Frugal" },
-              { label: "Average", value: "Average" },
-              { label: "Luxury", value: "Luxury" },
+              { label: "Budget friendly", value: "Frugal" },
+              { label: "Mid-range", value: "Average" },
+              { label: "High-end", value: "Luxury" },
             ]}
             labelField="label"
             valueField="value"
             value={budget}
-            onChange={(item) => setBudget(item.value)}
+            onChange={(item) => handleOptionChange(item.value, setBudget)}
             style={[
               styles.dropdown,
               {
-                backgroundColor: currentTheme.background,
-                borderColor: currentTheme.textPrimary,
+                backgroundColor: currentTheme.accentBackground,
+                borderColor: currentTheme.alternate,
               },
             ]}
             itemTextStyle={{ color: currentTheme.textPrimary }}
             selectedTextStyle={{ color: currentTheme.textPrimary }}
-            placeholderStyle={{ color: currentTheme.textPrimary }}
+            placeholderStyle={{ color: currentTheme.textSecondary }}
+            activeColor={currentTheme.accentBackground}
           />
         </View>
 
@@ -173,10 +209,11 @@ const MoreInfo: React.FC = () => {
             });
             navigation.navigate("ReviewTrip");
           }}
-          buttonText="Review"
-          width="80%"
+          buttonText="Review Your Trip"
+          width="85%"
+          backgroundColor={currentTheme.alternate}
         />
-      </View>
+      </Animated.View>
     </View>
   );
 };
@@ -194,11 +231,13 @@ const styles = StyleSheet.create({
     right: 20,
   },
   subheading: {
-    fontSize: 16,
+    fontSize: 18,
+    marginBottom: 8,
   },
   heading: {
     fontSize: 32,
     fontWeight: "bold",
+    lineHeight: 38,
   },
   dropdownsContainer: {
     flex: 1,
@@ -208,22 +247,24 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: "100%",
-    marginBottom: 40,
+    marginBottom: 35,
   },
   labelContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 12,
   },
   labelText: {
-    paddingLeft: 10,
+    paddingLeft: 12,
     fontSize: 18,
+    fontWeight: "500",
   },
   dropdown: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    height: 50,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    height: 55,
   },
 });
 

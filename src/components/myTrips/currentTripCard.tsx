@@ -81,13 +81,14 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
               trip: JSON.stringify({
                 ...parsedCurrentTrip,
                 travelPlan: parsedCurrentPlan?.travelPlan || {},
+                photoRef: parsedCurrentPlan?.travelPlan?.photoRef,
               }),
             })
           }
         >
           <Image
             source={{
-              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${parsedCurrentTrip.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
+              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${parsedCurrentPlan.travelPlan.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
             }}
             style={{
               width: "100%",
@@ -104,6 +105,7 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
               trip: JSON.stringify({
                 ...parsedCurrentTrip,
                 travelPlan: parsedCurrentPlan?.travelPlan || {},
+                photoRef: parsedCurrentPlan?.travelPlan?.photoRef,
               }),
             });
           }}

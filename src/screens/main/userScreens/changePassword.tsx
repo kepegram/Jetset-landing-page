@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View, SafeAreaView, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { AltButton, CustomButton } from "../../../components/ui/button";
@@ -25,7 +25,8 @@ const ChangePassword: React.FC = () => {
   const [email, setEmail] = useState<string | null>("");
   const [password, setPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
-  const [hidden, setHidden] = useState<boolean>(true);
+  const [oldPasswordHidden, setOldPasswordHidden] = useState<boolean>(true);
+  const [newPasswordHidden, setNewPasswordHidden] = useState<boolean>(true);
   const navigation = useNavigation<ChangePasswordScreenNavigationProp>();
 
   useEffect(() => {
@@ -76,74 +77,68 @@ const ChangePassword: React.FC = () => {
   };
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: currentTheme.background }]}
-    >
-      <Text style={[styles.inputLabel, { color: currentTheme.textPrimary }]}>
-        Old Password
-      </Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              color: currentTheme.textPrimary,
-              borderColor: currentTheme.inactive,
-            },
-          ]}
-          placeholder="Enter old password"
-          placeholderTextColor={currentTheme.secondary}
-          value={password}
-          secureTextEntry={hidden}
-          onChangeText={setPassword}
-        />
-        <Pressable
-          style={styles.hiddenButton}
-          onPress={() => setHidden(!hidden)}
-        >
-          <Ionicons
-            name={hidden ? "eye-off-outline" : "eye-outline"}
-            size={24}
-            color={currentTheme.inactive}
-          />
-        </Pressable>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
+      <View style={styles.contentContainer}>
+        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+          Change Password
+        </Text>
+        
+        <View style={styles.formContainer}>
+          <Text style={[styles.inputLabel, { color: currentTheme.textPrimary }]}>
+            Current Password
+          </Text>
+          <View style={[styles.inputWrapper, { borderColor: currentTheme.inactive }]}>
+            <TextInput
+              style={[styles.input, { color: currentTheme.textPrimary }]}
+              placeholder="Enter current password"
+              placeholderTextColor={currentTheme.secondary}
+              value={password}
+              secureTextEntry={oldPasswordHidden}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity
+              style={styles.eyeButton}
+              onPress={() => setOldPasswordHidden(!oldPasswordHidden)}
+            >
+              <Ionicons
+                name={oldPasswordHidden ? "eye-off-outline" : "eye-outline"}
+                size={24}
+                color={currentTheme.inactive}
+              />
+            </TouchableOpacity>
+          </View>
 
-      <Text style={[styles.inputLabel, { color: currentTheme.textPrimary }]}>
-        New Password
-      </Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              color: currentTheme.textPrimary,
-              borderColor: currentTheme.inactive,
-            },
-          ]}
-          placeholder="Enter new password"
-          placeholderTextColor={currentTheme.secondary}
-          value={newPassword}
-          secureTextEntry={hidden}
-          onChangeText={setNewPassword}
-        />
-        <Pressable
-          style={styles.hiddenButton}
-          onPress={() => setHidden(!hidden)}
-        >
-          <Ionicons
-            name={hidden ? "eye-off-outline" : "eye-outline"}
-            size={24}
-            color={currentTheme.inactive}
-          />
-        </Pressable>
-      </View>
+          <Text style={[styles.inputLabel, { color: currentTheme.textPrimary }]}>
+            New Password
+          </Text>
+          <View style={[styles.inputWrapper, { borderColor: currentTheme.inactive }]}>
+            <TextInput
+              style={[styles.input, { color: currentTheme.textPrimary }]}
+              placeholder="Enter new password"
+              placeholderTextColor={currentTheme.secondary}
+              value={newPassword}
+              secureTextEntry={newPasswordHidden}
+              onChangeText={setNewPassword}
+            />
+            <TouchableOpacity
+              style={styles.eyeButton}
+              onPress={() => setNewPasswordHidden(!newPasswordHidden)}
+            >
+              <Ionicons
+                name={newPasswordHidden ? "eye-off-outline" : "eye-outline"}
+                size={24}
+                color={currentTheme.inactive}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <CustomButton onPress={handleCancel} buttonText="Cancel" />
-        <AltButton onPress={handleSave} buttonText="Save" />
+        <View style={styles.buttonContainer}>
+          <CustomButton onPress={handleCancel} buttonText="Cancel" />
+          <AltButton onPress={handleSave} buttonText="Save" />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -152,33 +147,44 @@ export default ChangePassword;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
+  },
+  contentContainer: {
+    flex: 1,
+    padding: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: 'outfit-bold',
+    marginBottom: 30,
+    textAlign: 'center'
+  },
+  formContainer: {
+    width: '100%',
   },
   inputLabel: {
-    alignSelf: "flex-start",
     fontSize: 16,
-    marginTop: 20,
-    marginLeft: 25,
+    marginBottom: 8,
+    fontFamily: 'outfit',
   },
   inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    marginBottom: 24,
   },
   input: {
-    width: "90%",
-    padding: 15,
-    marginVertical: 5,
-    borderBottomWidth: 1,
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 16,
+    fontFamily: 'outfit',
   },
-  hiddenButton: {
-    padding: 5,
-    left: 320,
-    position: "absolute",
+  eyeButton: {
+    padding: 8,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    width: "100%",
-    marginTop: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 'auto',
+    paddingHorizontal: 20,
   },
 });

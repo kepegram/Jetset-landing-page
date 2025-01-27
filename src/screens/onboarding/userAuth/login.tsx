@@ -72,52 +72,26 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
-          Login
-        </Text>
-        <Text style={[styles.subTitle, { color: currentTheme.textSecondary }]}>
-          Welcome back, please login below
-        </Text>
+        <View style={styles.headerContainer}>
+          <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+            Welcome Back
+          </Text>
+          <Text
+            style={[styles.subTitle, { color: currentTheme.textSecondary }]}
+          >
+            Sign in to continue your journey
+          </Text>
+        </View>
 
         <View style={styles.loginContainer}>
-          <Text
-            style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
-          >
-            Email
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: currentTheme.background,
-                color: currentTheme.textPrimary,
-                borderColor: currentTheme.secondary,
-              },
-            ]}
-            placeholder="user@example.com"
-            placeholderTextColor={currentTheme.textSecondary}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            editable={!loading}
-          />
-          <Pressable
-            onPress={() => navigation.navigate("ForgotPassword")}
-            style={styles.forgotPasswordContainer}
-            disabled={loading}
-          >
-            <Text style={{ color: currentTheme.primary }}>
-              Forgot Password?
+          <View style={styles.inputWrapper}>
+            <Text
+              style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
+            >
+              Email
             </Text>
-          </Pressable>
-          <Text
-            style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
-          >
-            Password
-          </Text>
-          <View style={styles.passwordContainer}>
             <TextInput
               style={[
                 styles.input,
@@ -127,39 +101,84 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                   borderColor: currentTheme.secondary,
                 },
               ]}
-              placeholder="••••••••••"
+              placeholder="user@example.com"
               placeholderTextColor={currentTheme.textSecondary}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!passwordVisible}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
               autoCapitalize="none"
               editable={!loading}
             />
-            <Pressable
-              onPress={() => setPasswordVisible(!passwordVisible)}
-              style={styles.eyeIcon}
-              disabled={loading}
-            >
-              <Ionicons
-                name={passwordVisible ? "eye-off" : "eye"}
-                size={24}
-                color="grey"
-              />
-            </Pressable>
           </View>
+
+          <View style={styles.inputWrapper}>
+            <Text
+              style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
+            >
+              Password
+            </Text>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: currentTheme.background,
+                    color: currentTheme.textPrimary,
+                    borderColor: currentTheme.secondary,
+                  },
+                ]}
+                placeholder="••••••••••"
+                placeholderTextColor={currentTheme.textSecondary}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!passwordVisible}
+                autoCapitalize="none"
+                editable={!loading}
+              />
+              <Pressable
+                onPress={() => setPasswordVisible(!passwordVisible)}
+                style={styles.eyeIcon}
+                disabled={loading}
+              >
+                <Ionicons
+                  name={passwordVisible ? "eye-off" : "eye"}
+                  size={24}
+                  color={currentTheme.textSecondary}
+                />
+              </Pressable>
+            </View>
+          </View>
+
+          <Pressable
+            onPress={() => navigation.navigate("ForgotPassword")}
+            style={styles.forgotPasswordContainer}
+            disabled={loading}
+          >
+            <Text
+              style={[
+                styles.forgotPasswordText,
+                { color: currentTheme.primary },
+              ]}
+            >
+              Forgot Password?
+            </Text>
+          </Pressable>
+
           <MainButton
-            buttonText="Login"
+            buttonText="Sign In"
             onPress={handleLogin}
             backgroundColor={currentTheme.buttonBackground}
             textColor={currentTheme.buttonText}
             disabled={loading}
             style={styles.button}
           />
+
           {errorMessage && (
-            <Text style={[styles.errorText, { color: "red" }]}>
+            <Text style={[styles.errorText, { color: currentTheme.error }]}>
               {errorMessage}
             </Text>
           )}
+
           <View style={styles.createAccountContainer}>
             <Text
               style={[
@@ -169,13 +188,14 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
             >
               New to Jetset?{" "}
               <Text
-                style={{ color: currentTheme.alternate, fontWeight: "bold" }}
+                style={[styles.signUpLink, { color: currentTheme.alternate }]}
                 onPress={() => navigation.navigate("SignUp")}
               >
                 Sign up here
               </Text>
             </Text>
           </View>
+
           <View style={styles.dividerContainer}>
             <View
               style={[
@@ -198,39 +218,44 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               ]}
             />
           </View>
+
           <View style={styles.socialIconsContainer}>
             <MainButton
               onPress={() => promptAsync()}
               backgroundColor={currentTheme.accentBackground}
               textColor={currentTheme.textPrimary}
-              style={styles.iconButton}
+              style={styles.socialButton}
               disabled={loading}
             >
               <Image
                 source={require("../../../assets/google.png")}
-                style={{ width: 22, height: 22 }}
+                style={styles.socialIcon}
               />
               <Text
                 style={[
-                  styles.iconButtonText,
+                  styles.socialButtonText,
                   { color: currentTheme.textPrimary },
                 ]}
               >
                 Continue with Google
               </Text>
             </MainButton>
-            <View style={{ height: 10 }} />
+
             <MainButton
               onPress={() => console.log("Apple Sign-In")}
               backgroundColor={currentTheme.accentBackground}
               textColor={currentTheme.textPrimary}
-              style={styles.iconButton}
+              style={styles.socialButton}
               disabled={loading}
             >
-              <Ionicons name="logo-apple" size={25} color="grey" />
+              <Ionicons
+                name="logo-apple"
+                size={25}
+                color={currentTheme.textPrimary}
+              />
               <Text
                 style={[
-                  styles.iconButtonText,
+                  styles.socialButtonText,
                   { color: currentTheme.textPrimary },
                 ]}
               >
@@ -252,35 +277,39 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
+    paddingHorizontal: 24,
+  },
+  headerContainer: {
+    marginTop: 80,
+    marginBottom: 40,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "bold",
-    marginTop: 100,
+    marginBottom: 8,
   },
   subTitle: {
     fontSize: 16,
-    marginTop: 10,
+    opacity: 0.8,
   },
-  loginContainer: { marginTop: 30 },
+  loginContainer: {
+    width: "100%",
+  },
+  inputWrapper: {
+    marginBottom: 20,
+  },
   inputHeader: {
     fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 15,
+    fontWeight: "600",
+    marginBottom: 8,
   },
   input: {
     width: "100%",
-    height: 50,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 15,
+    height: 54,
+    borderRadius: 12,
+    paddingHorizontal: 16,
     borderWidth: 1,
-  },
-  forgotPasswordContainer: {
-    alignSelf: "flex-end",
-    top: 20,
-    zIndex: 10,
+    fontSize: 16,
   },
   passwordContainer: {
     position: "relative",
@@ -288,60 +317,69 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     position: "absolute",
-    right: 15,
+    right: 16,
     top: 15,
+    padding: 4,
+  },
+  forgotPasswordContainer: {
+    alignSelf: "flex-end",
+    marginBottom: 24,
+  },
+  forgotPasswordText: {
+    fontSize: 14,
+    fontWeight: "600",
   },
   button: {
     width: "100%",
-    padding: 15,
-    borderRadius: 25,
-    alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   errorText: {
     textAlign: "center",
-    marginBottom: 10,
+    fontSize: 14,
+    marginBottom: 16,
   },
   createAccountContainer: {
-    marginTop: 5,
+    marginBottom: 32,
     alignItems: "center",
   },
   createAccountText: {
-    fontSize: 16,
-    textAlign: "center",
+    fontSize: 15,
+  },
+  signUpLink: {
+    fontWeight: "600",
   },
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 25,
+    marginBottom: 32,
   },
   divider: {
     flex: 1,
     height: 1,
   },
   dividerText: {
-    marginHorizontal: 10,
+    marginHorizontal: 16,
     fontSize: 14,
+    fontWeight: "500",
   },
   socialIconsContainer: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 30,
+    gap: 12,
   },
-  iconButton: {
-    marginHorizontal: 20,
-    padding: 15,
+  socialButton: {
     width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    height: 54,
+    borderRadius: 12,
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  iconButtonText: {
-    marginLeft: 10,
+  socialIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 12,
+  },
+  socialButtonText: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "grey",
+    fontWeight: "600",
   },
 });

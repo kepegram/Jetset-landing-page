@@ -16,6 +16,10 @@ declare module "react-native-calendar-picker" {
     yearTitleStyle?: TextStyle;
     disabledDatesTextStyle?: TextStyle;
     textStyle?: TextStyle;
+    selectedDayStyle?: ViewStyle;
+    width?: number;
+    selectedStartDate?: Date;
+    selectedEndDate?: Date;
   }
 
   export default class CalendarPicker extends Component<CalendarPickerProps> {}

@@ -73,14 +73,17 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
     <View style={{ marginVertical: 20, width: 250 }}>
       {UpcomingPlan?.travelPlan?.photoRef ? (
         <Pressable
-          onPress={() =>
+          onPress={() => {
+            console.log("PHOTO REF", UpcomingPlan?.travelPlan?.photoRef);
+            console.log("TRAVEL PLAN", UpcomingPlan?.travelPlan);
             navigation.navigate("TripDetails", {
               trip: JSON.stringify({
                 ...UpcomingTrip,
                 travelPlan: UpcomingPlan?.travelPlan || {},
+                photoRef: UpcomingPlan?.travelPlan?.photoRef,
               }),
-            })
-          }
+            });
+          }}
         >
           <Image
             source={{
@@ -100,6 +103,7 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
               trip: JSON.stringify({
                 ...UpcomingTrip,
                 travelPlan: UpcomingPlan?.travelPlan || {},
+                photoRef: UpcomingPlan?.travelPlan?.photoRef,
               }),
             })
           }

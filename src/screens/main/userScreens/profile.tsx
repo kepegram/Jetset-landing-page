@@ -8,6 +8,7 @@ import {
   Button,
   ActivityIndicator,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import React, { useCallback, useContext, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
@@ -22,6 +23,7 @@ import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 import CurrentTripCard from "../../../components/myTrips/currentTripCard";
 import { CreateTripContext } from "../../../context/createTripContext";
+import { LinearGradient } from 'expo-linear-gradient';
 
 // Define the type for tripData
 interface TripData {
@@ -109,6 +111,7 @@ const Profile: React.FC = () => {
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
+      showsVerticalScrollIndicator={false}
     >
       <>
         <View style={styles.header}>
@@ -116,58 +119,51 @@ const Profile: React.FC = () => {
             source={require("../../../assets/placeholder.jpeg")}
             style={styles.headerImage}
           />
-          <View style={styles.overlay} />
-          <Pressable
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.7)']}
+            style={styles.overlay}
+          />
+          <TouchableOpacity
             style={styles.settingsIconContainer}
             onPress={() => navigation.navigate("Settings")}
           >
             <Ionicons name="settings-sharp" size={28} color="white" />
-          </Pressable>
+          </TouchableOpacity>
           <View style={styles.profileContainer}>
-            <Pressable onPress={() => setModalVisible(true)}>
-              <View
-                style={[
-                  styles.profilePictureBackground,
-                  { backgroundColor: currentTheme.background },
-                ]}
-              >
+            <TouchableOpacity 
+              onPress={() => setModalVisible(true)}
+              style={styles.profileImageContainer}
+            >
+              <View style={styles.profilePictureBackground}>
                 <Image
                   source={{ uri: profilePicture }}
                   style={styles.profilePicture}
                 />
               </View>
-            </Pressable>
+            </TouchableOpacity>
 
             <View style={styles.userInfoContainer}>
-              <Text
-                style={[styles.userName, { color: currentTheme.textPrimary }]}
-              >
+              <Text style={styles.userName}>
                 {displayName || userName}
               </Text>
-              <Pressable
+              <TouchableOpacity
                 style={styles.locationContainer}
                 onPress={handleLocationPress}
               >
                 <Ionicons
                   name="location-sharp"
-                  size={24}
-                  color={currentTheme.textPrimary}
+                  size={20}
+                  color="white"
                   style={styles.locationIcon}
                 />
-                <Text
-                  style={[
-                    styles.locationText,
-                    { color: currentTheme.textPrimary },
-                  ]}
-                >
+                <Text style={styles.locationText}>
                   {location}
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
 
-        {/* Ongoing Trips */}
         <View style={styles.ongoingTripsContainer}>
           <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
             Ongoing Trips
@@ -188,21 +184,21 @@ const Profile: React.FC = () => {
           onRequestClose={() => setModalVisible(false)}
         >
           <Pressable
-            style={[
-              styles.modalOverlay,
-              { backgroundColor: currentTheme.background },
-            ]}
+            style={styles.modalOverlay}
             onPress={() => setModalVisible(false)}
           >
-            <Image source={{ uri: profilePicture }} style={styles.modalImage} />
-            <Button
-              title="Edit"
-              color={currentTheme.primary}
-              onPress={() => {
-                setModalVisible(false);
-                navigation.navigate("Edit");
-              }}
-            />
+            <View style={styles.modalContent}>
+              <Image source={{ uri: profilePicture }} style={styles.modalImage} />
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => {
+                  setModalVisible(false);
+                  navigation.navigate("Edit");
+                }}
+              >
+                <Text style={styles.editButtonText}>Edit Profile</Text>
+              </TouchableOpacity>
+            </View>
           </Pressable>
         </Modal>
       </>
@@ -218,9 +214,8 @@ const styles = StyleSheet.create({
   },
   header: {
     width: "100%",
-    height: 200,
-    justifyContent: "center",
-    alignItems: "center",
+    height: 280,
+    justifyContent: "flex-end",
     position: "relative",
   },
   headerImage: {
@@ -230,99 +225,120 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
   settingsIconContainer: {
     position: "absolute",
     top: 50,
     right: 20,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    borderRadius: 20,
-    padding: 5,
-  },
-  pencilIconContainer: {
-    position: "absolute",
-    top: 50,
-    right: 60,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    borderRadius: 20,
-    padding: 5,
+    borderRadius: 25,
+    padding: 8,
   },
   profileContainer: {
     position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
-    top: 160,
-    left: 0,
-    paddingHorizontal: 10,
+  },
+  profileImageContainer: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   profilePictureBackground: {
     width: 100,
     height: 100,
     borderRadius: 50,
     marginRight: 15,
+    borderWidth: 3,
+    borderColor: "white",
   },
   profilePicture: {
-    width: 100,
-    height: 100,
+    width: "100%",
+    height: "100%",
     borderRadius: 50,
   },
   userInfoContainer: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    marginTop: 5,
+    flex: 1,
   },
   userName: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "bold",
-    marginTop: 40,
+    color: "white",
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: {width: -1, height: 1},
+    textShadowRadius: 10,
   },
   locationContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 5,
-    marginLeft: -10,
   },
   locationIcon: {
-    marginRight: 3,
+    marginRight: 5,
   },
   locationText: {
-    fontSize: 18,
+    fontSize: 16,
+    color: "white",
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: {width: -1, height: 1},
+    textShadowRadius: 10,
   },
   ongoingTripsContainer: {
-    marginTop: 100,
+    marginTop: 20,
     paddingHorizontal: 20,
   },
   heading: {
     fontSize: 24,
     fontWeight: "bold",
+    marginBottom: 15,
   },
   currentTripContainer: {
     width: "100%",
   },
-  ongoingBadgeContainer: {
-    position: "relative",
-  },
-  ongoingBadge: {
-    padding: 5,
-    width: "20%",
-    textAlign: "center",
-    color: "white",
-    fontWeight: "bold",
-    position: "absolute",
-    top: "10%",
-    left: "5%",
-    zIndex: 1,
-  },
   modalOverlay: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
     justifyContent: "center",
     alignItems: "center",
   },
+  modalContent: {
+    alignItems: "center",
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   modalImage: {
-    width: 350,
-    height: 350,
-    borderRadius: 200,
-    marginBottom: 15,
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    marginBottom: 20,
+  },
+  editButton: {
+    backgroundColor: "#387694",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+  },
+  editButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

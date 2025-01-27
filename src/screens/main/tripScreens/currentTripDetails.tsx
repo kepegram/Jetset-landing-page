@@ -77,13 +77,11 @@ const CurrentTripDetails: React.FC = () => {
     <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         <Image
-          source={
-            tripDetails?.locationInfo?.photoRef
-              ? {
-                  uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripDetails?.locationInfo?.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
-                }
-              : require("../../../assets/placeholder.jpeg")
-          }
+          source={{
+            uri: photoRef
+              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+              : "https://via.placeholder.com/400",
+          }}
           style={{
             width: "100%",
             height: 330,

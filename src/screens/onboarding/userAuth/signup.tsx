@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -36,6 +37,37 @@ interface SignUpProps {
   promptAsync: (
     options?: AuthRequestPromptOptions
   ) => Promise<AuthSessionResult>;
+}
+
+interface InputFieldProps {
+  label: string;
+  theme: {
+    textPrimary: string;
+    background: string;
+    secondary: string;
+    textSecondary: string;
+  };
+  placeholder?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
+  keyboardType?: "default" | "email-address";
+  autoCapitalize?: "none" | "sentences";
+  editable?: boolean;
+}
+
+interface PasswordFieldProps {
+  label: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  visible: boolean;
+  toggleVisible: () => void;
+  theme: {
+    textPrimary: string;
+    background: string;
+    secondary: string;
+    textSecondary: string;
+  };
+  editable: boolean;
 }
 
 const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
@@ -139,7 +171,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             email: email || authResult.user.email,
             createdAt: new Date().toISOString(),
           },
-          { merge: true } // Merge to avoid overwriting existing data
+          { merge: true }
         );
 
         await AsyncStorage.setItem("userName", fullName?.givenName || "User");
@@ -159,154 +191,80 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
       style={[styles.container, { backgroundColor: currentTheme.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={styles.contentContainer}>
-        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
-          Sign Up
-        </Text>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.headerContainer}>
+          <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+            Create Account
+          </Text>
+          <Text
+            style={[styles.subtitle, { color: currentTheme.textSecondary }]}
+          >
+            Sign up to get started
+          </Text>
+        </View>
 
         <View style={styles.signUpContainer}>
-          <Text
-            style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
-          >
-            Name
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: currentTheme.background,
-                color: currentTheme.textPrimary,
-                borderColor: currentTheme.secondary,
-              },
-            ]}
+          <InputField
+            label="Name"
             placeholder="Jane Doe"
-            placeholderTextColor={currentTheme.textSecondary}
             value={name}
             onChangeText={setName}
             editable={!loading}
+            theme={currentTheme}
           />
 
-          <Text
-            style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
-          >
-            Email
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: currentTheme.background,
-                color: currentTheme.textPrimary,
-                borderColor: currentTheme.secondary,
-              },
-            ]}
+          <InputField
+            label="Email"
             placeholder="example@mail.com"
-            placeholderTextColor={currentTheme.textSecondary}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
             editable={!loading}
+            theme={currentTheme}
           />
 
-          <Text
-            style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
-          >
-            Password
-          </Text>
-          <View style={styles.passwordContainer}>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: currentTheme.background,
-                  color: currentTheme.textPrimary,
-                  borderColor: currentTheme.secondary,
-                },
-              ]}
-              placeholder="••••••••••"
-              placeholderTextColor={currentTheme.textSecondary}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!passwordVisible}
-              autoCapitalize="none"
-              editable={!loading}
-            />
-            <Pressable
-              style={styles.eyeIcon}
-              onPress={() => setPasswordVisible(!passwordVisible)}
-            >
-              <Ionicons
-                name={passwordVisible ? "eye-off" : "eye"}
-                size={24}
-                color="grey"
-              />
-            </Pressable>
-          </View>
+          <PasswordField
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            visible={passwordVisible}
+            toggleVisible={() => setPasswordVisible(!passwordVisible)}
+            editable={!loading}
+            theme={currentTheme}
+          />
 
-          <Text
-            style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
-          >
-            Confirm Password
-          </Text>
-          <View style={styles.passwordContainer}>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: currentTheme.background,
-                  color: currentTheme.textPrimary,
-                  borderColor: currentTheme.secondary,
-                },
-              ]}
-              placeholder="••••••••••"
-              placeholderTextColor={currentTheme.textSecondary}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry={!confirmPasswordVisible}
-              autoCapitalize="none"
-              editable={!loading}
-            />
-            <Pressable
-              style={styles.eyeIcon}
-              onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
-            >
-              <Ionicons
-                name={confirmPasswordVisible ? "eye-off" : "eye"}
-                size={24}
-                color="grey"
-              />
-            </Pressable>
-          </View>
+          <PasswordField
+            label="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            visible={confirmPasswordVisible}
+            toggleVisible={() =>
+              setConfirmPasswordVisible(!confirmPasswordVisible)
+            }
+            editable={!loading}
+            theme={currentTheme}
+          />
 
           <MainButton
-            buttonText="Sign Up"
+            buttonText="Create Account"
             onPress={handleSignUp}
             backgroundColor={currentTheme.buttonBackground}
             textColor={currentTheme.buttonText}
             disabled={loading}
             style={styles.button}
           />
+
           {errorMessage && (
             <Text style={[styles.errorText, { color: "red" }]}>
               {errorMessage}
             </Text>
           )}
         </View>
-
-        <Pressable onPress={() => navigation.navigate("Login")} disabled={loading}>
-          <Text
-            style={[
-              styles.createAccountText,
-              { color: currentTheme.textPrimary },
-            ]}
-          >
-            Already a member?{" "}
-            <Text style={[styles.loginText, { color: currentTheme.alternate }]}>
-              Log in
-            </Text>
-          </Text>
-        </Pressable>
 
         <View style={styles.dividerContainer}>
           <View
@@ -318,7 +276,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           <Text
             style={[styles.dividerText, { color: currentTheme.textSecondary }]}
           >
-            OR
+            or continue with
           </Text>
           <View
             style={[
@@ -328,50 +286,135 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           />
         </View>
 
-        <View style={styles.socialIconsContainer}>
+        <View style={styles.socialButtonsContainer}>
           <MainButton
             onPress={() => promptAsync()}
             backgroundColor={currentTheme.accentBackground}
             textColor={currentTheme.textPrimary}
-            style={styles.iconButton}
+            style={styles.socialButton}
             disabled={loading}
           >
             <Image
               source={require("../../../assets/google.png")}
-              style={{ width: 22, height: 22 }}
+              style={styles.socialIcon}
             />
             <Text
               style={[
-                styles.iconButtonText,
+                styles.socialButtonText,
                 { color: currentTheme.textPrimary },
               ]}
             >
-              Continue with Google
+              Google
             </Text>
           </MainButton>
-          <View style={{ height: 10 }} />
+
           <MainButton
-            onPress={() => console.log("Apple Sign-In")}
+            onPress={handleAppleSignIn}
             backgroundColor={currentTheme.accentBackground}
             textColor={currentTheme.textPrimary}
-            style={styles.iconButton}
+            style={styles.socialButton}
             disabled={loading}
           >
-            <Ionicons name="logo-apple" size={23} color="black" />
+            <Ionicons
+              name="logo-apple"
+              size={24}
+              color={currentTheme.textPrimary}
+            />
             <Text
               style={[
-                styles.iconButtonText,
+                styles.socialButtonText,
                 { color: currentTheme.textPrimary },
               ]}
             >
-              Continue with Apple
+              Apple
             </Text>
           </MainButton>
         </View>
-      </View>
+
+        <Pressable
+          onPress={() => navigation.navigate("Login")}
+          disabled={loading}
+          style={styles.loginLink}
+        >
+          <Text
+            style={[styles.loginText, { color: currentTheme.textSecondary }]}
+          >
+            Already have an account?{" "}
+            <Text style={{ color: currentTheme.alternate, fontWeight: "bold" }}>
+              Log in
+            </Text>
+          </Text>
+        </Pressable>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
+
+const InputField: React.FC<InputFieldProps> = ({ label, theme, ...props }) => (
+  <View style={styles.inputWrapper}>
+    <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
+      {label}
+    </Text>
+    <TextInput
+      style={[
+        styles.input,
+        {
+          backgroundColor: theme.background,
+          color: theme.textPrimary,
+          borderColor: theme.secondary,
+        },
+      ]}
+      placeholderTextColor={theme.textSecondary}
+      {...props}
+    />
+  </View>
+);
+
+const PasswordField: React.FC<PasswordFieldProps> = ({
+  label,
+  value,
+  onChangeText,
+  visible,
+  toggleVisible,
+  theme,
+  editable,
+}) => (
+  <View style={styles.inputWrapper}>
+    <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
+      {label}
+    </Text>
+    <View style={styles.passwordContainer}>
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: theme.background,
+            color: theme.textPrimary,
+            borderColor: theme.secondary,
+          },
+        ]}
+        placeholder="••••••••••"
+        placeholderTextColor={theme.textSecondary}
+        value={value}
+        onChangeText={onChangeText}
+        secureTextEntry={!visible}
+        autoCapitalize="none"
+        editable={editable}
+      />
+      <Pressable
+        style={styles.eyeIcon}
+        onPress={toggleVisible}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Ionicons
+          name={visible ? "eye-off" : "eye"}
+          size={24}
+          color={theme.textSecondary}
+        />
+      </Pressable>
+    </View>
+  </View>
+);
 
 export default SignUp;
 
@@ -379,27 +422,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollView: {
+    flex: 1,
+  },
   contentContainer: {
     flexGrow: 1,
-    padding: 20,
+    padding: 24,
+  },
+  headerContainer: {
+    marginBottom: 32,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "bold",
+    marginBottom: 8,
   },
-  signUpContainer: { marginTop: 20 },
-  inputHeader: {
+  subtitle: {
     fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 15,
+  },
+  signUpContainer: {
+    marginBottom: 24,
+  },
+  inputWrapper: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 8,
   },
   input: {
     width: "100%",
-    height: 50,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 15,
+    height: 48,
+    borderRadius: 12,
+    paddingHorizontal: 16,
     borderWidth: 1,
+    fontSize: 16,
   },
   passwordContainer: {
     position: "relative",
@@ -407,59 +465,59 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     position: "absolute",
-    right: 15,
-    top: 15,
+    right: 16,
+    top: 12,
   },
   button: {
     width: "100%",
-    padding: 15,
-    alignItems: "center",
-    marginBottom: 20,
-    marginTop: 15,
+    marginTop: 8,
   },
   errorText: {
     textAlign: "center",
-    marginBottom: 10,
+    marginTop: 8,
+    fontSize: 14,
   },
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 5,
+    marginVertical: 24,
   },
   divider: {
     flex: 1,
     height: 1,
   },
   dividerText: {
-    marginHorizontal: 10,
+    marginHorizontal: 16,
     fontSize: 14,
   },
-  socialIconsContainer: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-  iconButton: {
-    marginHorizontal: 20,
-    padding: 15,
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+  socialButtonsContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 24,
   },
-  iconButtonText: {
-    marginLeft: 10,
-    fontSize: 16,
-    fontWeight: "bold",
+  socialButton: {
+    flex: 1,
+    marginHorizontal: 6,
+    height: 48,
+    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  createAccountText: {
+  socialIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
+  },
+  socialButtonText: {
     fontSize: 16,
-    textAlign: "center",
-    marginBottom: 15,
+    fontWeight: "600",
+  },
+  loginLink: {
+    alignItems: "center",
+    paddingVertical: 16,
   },
   loginText: {
     fontSize: 16,
-    fontWeight: "bold",
   },
 });

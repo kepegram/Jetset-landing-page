@@ -1,5 +1,5 @@
 import React, { useContext, useState, useCallback, useRef } from "react";
-import { View, Text, Image, Alert } from "react-native";
+import { View, Text, Image, Alert, Pressable } from "react-native";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { AI_PROMPT } from "../../../api/ai-prompt";
 import { chatSession } from "../../../../AI-Model";
@@ -10,6 +10,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from '@expo/vector-icons';
 
 type GenerateTripScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -19,15 +20,14 @@ type GenerateTripScreenNavigationProp = NativeStackNavigationProp<
 const GenerateTrip: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<GenerateTripScreenNavigationProp>();
-  const { tripData } = useContext(CreateTripContext) || {};
+  const { tripData = {}, setTripData = () => {} } =
+    useContext(CreateTripContext) || {};
   const [loading, setLoading] = useState(false);
   const isMounted = useRef(true);
 
   const user = FIREBASE_AUTH.currentUser;
 
-  const GenerateAiTrip = async (retryCount = 0) => {
-    setLoading(true);
-
+  const getFinalPrompt = () => {
     const FINAL_PROMPT = AI_PROMPT.replace(
       "{destinationType}",
       tripData?.destinationType || ""
@@ -38,7 +38,13 @@ const GenerateTrip: React.FC = () => {
       .replace("{budget}", tripData.budget?.toString() || "")
       .replace("{accommodationType}", tripData.accommodationType || "")
       .replace("{activityLevel}", tripData.activityLevel || "");
+    
+    return FINAL_PROMPT;
+  };
 
+  const GenerateAiTrip = async (retryCount = 0) => {
+    setLoading(true);
+    const FINAL_PROMPT = getFinalPrompt();
     console.log("Generated Prompt:", FINAL_PROMPT);
 
     try {
@@ -47,7 +53,19 @@ const GenerateTrip: React.FC = () => {
       const responseText = await result.response.text();
       console.log("AI Response:", responseText);
 
-      const tripResp = JSON.parse(responseText);
+      let tripResp;
+      try {
+        // Try to clean the response before parsing
+        const cleanedResponse = responseText.trim();
+        tripResp = JSON.parse(cleanedResponse);
+      } catch (parseError) {
+        console.error("JSON parsing error:", parseError);
+        throw new Error("Failed to parse AI response");
+      }
+
+      if (!tripResp?.travelPlan) {
+        throw new Error("Invalid AI response format");
+      }
 
       const docId = Date.now().toString();
       const userTripRef = doc(
@@ -94,7 +112,10 @@ const GenerateTrip: React.FC = () => {
           [
             {
               text: "OK",
-              onPress: () => navigation.navigate("HomeMain"),
+              onPress: () => {
+                setTripData({});
+                navigation.navigate("MyTripsMain");
+              },
             },
           ]
         );
@@ -109,8 +130,6 @@ const GenerateTrip: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       isMounted.current = true;
-      GenerateAiTrip();
-
       return () => {
         isMounted.current = false;
       };
@@ -127,15 +146,28 @@ const GenerateTrip: React.FC = () => {
         justifyContent: "center",
       }}
     >
+      <Pressable
+        onPress={() => navigation.goBack()}
+        style={{
+          position: 'absolute',
+          top: 50,
+          left: 25,
+          zIndex: 1
+        }}
+      >
+        <Ionicons name="arrow-back" size={24} color={currentTheme.textPrimary} />
+      </Pressable>
+
       <Text
         style={{
           fontFamily: "outfit-bold",
           fontSize: 20,
           textAlign: "center",
           color: currentTheme.textPrimary,
+          marginBottom: 20,
         }}
       >
-        Please wait, we are building your dream trip
+        Ready to generate your dream trip?
       </Text>
       <Image
         source={require("../../../assets/plane.gif")}
@@ -146,6 +178,51 @@ const GenerateTrip: React.FC = () => {
           marginTop: 40,
         }}
       />
+      <View style={{ marginTop: 40, gap: 20, alignItems: 'center' }}>
+        <Pressable
+          onPress={() => GenerateAiTrip()}
+          style={{
+            backgroundColor: currentTheme.alternate,
+            padding: 15,
+            borderRadius: 10,
+            width: '80%',
+            opacity: loading ? 0.5 : 1,
+          }}
+          disabled={loading}
+        >
+          <Text
+            style={{
+              color: '#fff',
+              textAlign: 'center',
+              fontSize: 16,
+              fontFamily: 'outfit-medium',
+            }}
+          >
+            {loading ? 'Generating...' : 'Generate Trip'}
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => console.log('Final Prompt:', getFinalPrompt())}
+          style={{
+            backgroundColor: currentTheme.accentBackground,
+            padding: 15,
+            borderRadius: 10,
+            width: '80%',
+          }}
+        >
+          <Text
+            style={{
+              color: currentTheme.textPrimary,
+              textAlign: 'center',
+              fontSize: 16,
+              fontFamily: 'outfit-medium',
+            }}
+          >
+            Log Prompt
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 };

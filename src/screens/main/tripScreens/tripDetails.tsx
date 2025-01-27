@@ -19,13 +19,14 @@ type NavigationProp = NativeStackNavigationProp<
 
 interface RouteParams {
   trip: string;
+  photoRef: string;
 }
 
 const TripDetails: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
-  const { trip } = route.params as RouteParams;
+  const { trip, photoRef } = route.params as RouteParams;
 
   const [tripDetails, setTripDetails] = useState<any>(null);
 
@@ -99,8 +100,8 @@ const TripDetails: React.FC = () => {
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         <Image
           source={{
-            uri: tripDetails?.locationInfo?.photoRef
-              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripDetails.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+            uri: photoRef
+              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
               : "https://via.placeholder.com/400",
           }}
           style={{

@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import { View, Text, StyleSheet, Animated } from "react-native";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
@@ -7,6 +7,7 @@ import { CreateTripContext } from "../../../../context/createTripContext";
 import { useTheme } from "../../../../context/themeContext";
 import Slider from "@react-native-community/slider";
 import { MainButton } from "../../../../components/ui/button";
+import { Ionicons } from "@expo/vector-icons";
 
 type WhosGoingNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -19,6 +20,7 @@ const WhosGoing: React.FC = () => {
   const { tripData = {}, setTripData = () => {} } =
     useContext(CreateTripContext) || {};
   const [whoIsGoing, setWhoIsGoing] = useState<number>(1);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     navigation.setOptions({
@@ -26,6 +28,13 @@ const WhosGoing: React.FC = () => {
       headerTransparent: true,
       headerTitle: "",
     });
+
+    // Set default trip data for solo traveler
+    const updatedTripData = {
+      ...tripData,
+      whoIsGoing: "Solo",
+    };
+    setTripData(updatedTripData);
   }, [navigation]);
 
   const handleWhoIsGoingChange = (value: number) => {
@@ -41,6 +50,26 @@ const WhosGoing: React.FC = () => {
       whoIsGoing: whoIsGoingText,
     };
     setTripData(updatedTripData);
+
+    // Animate the selection text
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.2,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const getIconForSelection = () => {
+    if (whoIsGoing === 1) return "person-outline";
+    if (whoIsGoing === 2) return "people-outline";
+    return "people-circle-outline";
   };
 
   return (
@@ -59,6 +88,26 @@ const WhosGoing: React.FC = () => {
       </View>
 
       <View style={styles.sliderContainer}>
+        <View style={styles.iconContainer}>
+          <Ionicons
+            name={getIconForSelection()}
+            size={60}
+            color={currentTheme.alternate}
+          />
+        </View>
+        
+        <Animated.Text
+          style={[
+            styles.selectionText,
+            { 
+              color: currentTheme.textPrimary,
+              transform: [{ scale: scaleAnim }] 
+            }
+          ]}
+        >
+          {whoIsGoing === 1 ? "Solo" : whoIsGoing === 2 ? "Couple" : "Group"}
+        </Animated.Text>
+
         <Slider
           style={styles.slider}
           minimumValue={1}
@@ -70,21 +119,24 @@ const WhosGoing: React.FC = () => {
           maximumTrackTintColor={currentTheme.accentBackground}
           thumbTintColor={currentTheme.alternate}
         />
+        
         <View style={styles.markerContainer}>
           {[...Array(6)].map((_, index) => (
             <Text
               key={index}
-              style={[styles.markerText, { color: currentTheme.textSecondary }]}
+              style={[
+                styles.markerText, 
+                { 
+                  color: whoIsGoing === index + 1 ? currentTheme.alternate : currentTheme.textSecondary,
+                  fontWeight: whoIsGoing === index + 1 ? 'bold' : 'normal'
+                }
+              ]}
             >
               {index < 5 ? index + 1 : "6+"}
             </Text>
           ))}
         </View>
-        <Text
-          style={[styles.selectionText, { color: currentTheme.textSecondary }]}
-        >
-          {whoIsGoing === 1 ? "Solo" : whoIsGoing === 2 ? "Couple" : "Group"}
-        </Text>
+
         <View style={styles.buttonContainer}>
           <MainButton
             onPress={() => {
@@ -107,40 +159,49 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     marginTop: 100,
+    paddingHorizontal: 10,
   },
   subheading: {
-    fontSize: 16,
+    fontSize: 18,
+    marginBottom: 8,
   },
   heading: {
     fontSize: 32,
     fontWeight: "bold",
+    lineHeight: 40,
   },
   sliderContainer: {
-    marginTop: 100,
+    marginTop: 80,
     width: "100%",
+    alignItems: "center",
+  },
+  iconContainer: {
+    marginBottom: 20,
   },
   slider: {
     width: "100%",
     height: 40,
+    marginTop: 20,
   },
   markerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    width: "100%",
     paddingHorizontal: 0,
   },
   markerText: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: "center",
     width: `${100 / 6}%`,
   },
   selectionText: {
-    alignSelf: "center",
-    marginTop: 10,
-    marginBottom: 30,
+    fontSize: 24,
+    fontWeight: "bold",
   },
   buttonContainer: {
     alignItems: "center",
-    marginTop: 140,
+    marginTop: 100,
+    width: "100%",
   },
 });
 
