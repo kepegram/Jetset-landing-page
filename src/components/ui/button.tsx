@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
+    textAlign: "center",
   },
   altButton: {
     paddingVertical: 5,
@@ -132,6 +133,7 @@ const styles = StyleSheet.create({
   altButtonText: {
     fontSize: 16,
     fontWeight: "bold",
+    textAlign: "center",
   },
   mainButton: {
     padding: 15,
@@ -141,6 +143,7 @@ const styles = StyleSheet.create({
   mainButtonText: {
     fontSize: 18,
     fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

@@ -29,7 +29,6 @@ import ReviewTrip from "../screens/main/tripScreens/reviewTrip";
 import GenerateTrip from "../screens/main/tripScreens/generateTrip";
 import TripDetails from "../screens/main/tripScreens/tripDetails";
 import MyTrips from "../screens/main/tripScreens/myTrips";
-//import Map from "../screens/main/mapScreen/map";
 import CurrentTripDetails from "../screens/main/tripScreens/currentTripDetails";
 import DoYouKnow from "../screens/main/tripScreens/buildTrip/doYouKnow";
 import SearchPlaces from "../screens/main/tripScreens/buildTrip/searchPlaces";
@@ -69,6 +68,7 @@ export type RootStackParamList = {
 };
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator();
 
 const HomeStack: React.FC = () => {
   return (
@@ -112,7 +112,7 @@ const MyTripsStack: React.FC = () => {
   const { setTripData } = useContext(CreateTripContext) || {};
   const screens = [
     "DoYouKnow",
-    "ChoosePlaces", 
+    "ChoosePlaces",
     "SearchPlaces",
     "ChooseDate",
     "WhosGoing",
@@ -132,6 +132,8 @@ const MyTripsStack: React.FC = () => {
     const currentScreenIndex = screens.indexOf(route.name) + 1;
     const totalScreens = screens.length;
     const isFirstScreen = route.name === "DoYouKnow";
+    const currentScreen = route.name;
+    const previousScreen = screens[screens.indexOf(currentScreen) - 1];
 
     return {
       headerStyle: {
@@ -139,8 +141,16 @@ const MyTripsStack: React.FC = () => {
       },
       headerShadowVisible: false,
       headerLeft: () => (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Pressable onPress={() => navigation.goBack()}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Pressable
+            onPress={() => {
+              if (isFirstScreen) {
+                navigation.navigate("MyTripsMain");
+              } else {
+                navigation.navigate(previousScreen);
+              }
+            }}
+          >
             <Ionicons
               name="arrow-back"
               size={28}
@@ -149,7 +159,7 @@ const MyTripsStack: React.FC = () => {
             />
           </Pressable>
           {!isFirstScreen && (
-            <Pressable 
+            <Pressable
               onPress={() => {
                 Alert.alert(
                   "Reset Trip",
@@ -157,15 +167,15 @@ const MyTripsStack: React.FC = () => {
                   [
                     {
                       text: "Cancel",
-                      style: "cancel"
+                      style: "cancel",
                     },
                     {
                       text: "OK",
                       onPress: () => {
                         setTripData?.({});
                         navigation.navigate("MyTripsMain");
-                      }
-                    }
+                      },
+                    },
                   ]
                 );
               }}
@@ -196,7 +206,11 @@ const MyTripsStack: React.FC = () => {
   };
 
   return (
-    <RootStack.Navigator>
+    <RootStack.Navigator
+      screenOptions={{
+        animation: "slide_from_right",
+      }}
+    >
       <RootStack.Screen
         name="MyTripsMain"
         component={MyTrips}
@@ -410,8 +424,6 @@ const ProfileStack: React.FC = () => {
   );
 };
 
-const Tab = createBottomTabNavigator();
-
 const getTabBarStyle = (route: any): { display?: string } | undefined => {
   const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
   if (
@@ -495,28 +507,6 @@ const TabNavigator: React.FC = () => {
           } as BottomTabNavigationOptions;
         }}
       />
-      {/* <Tab.Screen
-        name="Map"
-        component={Map}
-        options={({ route }) => {
-          const tabBarStyle = {
-            backgroundColor: currentTheme.background,
-            ...(getTabBarStyle(route) || {}),
-          };
-          return {
-            tabBarStyle,
-            headerShown: false,
-            tabBarLabel: "Map",
-            tabBarIcon: ({ color, focused }) => (
-              <FontAwesome
-                name={focused ? "map" : "map-o"}
-                color={color}
-                size={26}
-              />
-            ),
-          } as BottomTabNavigationOptions;
-        }}
-      /> */}
       <Tab.Screen
         name="ProfileStack"
         component={ProfileStack}

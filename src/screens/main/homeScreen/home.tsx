@@ -42,6 +42,8 @@ interface RecommendedTrip {
   fullResponse: string;
 }
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "HomeMain">;
+
 const Home: React.FC = () => {
   const { currentTheme } = useTheme();
   const { tripData = {}, setTripData = () => {} } =
@@ -51,8 +53,7 @@ const Home: React.FC = () => {
     []
   );
   const [isLoading, setIsLoading] = useState(false);
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NavigationProp>();
 
   const getGreeting = () => {
     const currentHour = new Date().getHours();
@@ -188,7 +189,10 @@ const Home: React.FC = () => {
       ...tripData,
       destinationType: terrainType,
     });
-    navigation.navigate("ChooseDate");
+    // @ts-ignore - Nested navigation type issue
+    navigation.navigate("MyTrips", {
+      screen: "ChooseDate",
+    });
   };
 
   useFocusEffect(

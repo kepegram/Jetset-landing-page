@@ -7,8 +7,6 @@ import {
   Image,
   TextInput,
   SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -119,48 +117,32 @@ const Edit: React.FC = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <Text
-            style={[styles.headerText, { color: currentTheme.textPrimary }]}
+      <View style={styles.profilePictureContainer}>
+        <Pressable onPress={handlePickImage} style={styles.imageWrapper}>
+          <Image
+            source={{ uri: selectedImage || profilePicture }}
+            style={styles.profilePicture}
+          />
+          <View
+            style={[
+              styles.editIconContainer,
+              { backgroundColor: currentTheme.alternate },
+            ]}
           >
-            Edit Profile
-          </Text>
-        </View>
-
-        <View style={styles.profilePictureContainer}>
-          <TouchableOpacity
-            onPress={handlePickImage}
-            style={styles.imageWrapper}
-          >
-            <Image
-              source={{ uri: selectedImage || profilePicture }}
-              style={styles.profilePicture}
+            <MaterialIcons
+              name="edit"
+              size={24}
+              color={currentTheme.buttonText}
             />
-            <View
-              style={[
-                styles.editIconContainer,
-                { backgroundColor: currentTheme.alternate },
-              ]}
-            >
-              <MaterialIcons
-                name="edit"
-                size={24}
-                color={currentTheme.buttonText}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
+          </View>
+        </Pressable>
+      </View>
 
-        <View style={styles.formContainer}>
-          <Text
-            style={[styles.inputLabel, { color: currentTheme.textPrimary }]}
-          >
-            Name
-          </Text>
+      <View style={styles.formContainer}>
+        <Text style={[styles.inputLabel, { color: currentTheme.textPrimary }]}>
+          Name
+        </Text>
+        <View style={styles.inputContainer}>
           <TextInput
             style={[
               styles.input,
@@ -174,20 +156,11 @@ const Edit: React.FC = () => {
             value={userName || ""}
             onChangeText={setUserName}
           />
+          <View style={styles.buttonContainer}>
+            <CustomButton onPress={handleCancel} buttonText="Cancel" />
+            <AltButton onPress={handleSave} buttonText="Save" />
+          </View>
         </View>
-      </ScrollView>
-
-      <View style={styles.buttonContainer}>
-        <CustomButton
-          onPress={handleCancel}
-          buttonText="Cancel"
-          style={styles.button}
-        />
-        <AltButton
-          onPress={handleSave}
-          buttonText="Save Changes"
-          style={styles.button}
-        />
       </View>
     </SafeAreaView>
   );
@@ -198,18 +171,6 @@ export default Edit;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingBottom: 20,
-  },
-  header: {
-    paddingVertical: 20,
-    paddingHorizontal: 24,
-  },
-  headerText: {
-    fontSize: 28,
-    fontFamily: "outfit-bold",
   },
   profilePictureContainer: {
     alignItems: "center",
@@ -242,30 +203,29 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   formContainer: {
+    flex: 1,
     paddingHorizontal: 24,
     marginTop: 20,
+  },
+  inputContainer: {
+    width: "100%",
+    alignItems: "center",
   },
   inputLabel: {
     fontSize: 16,
     marginBottom: 8,
-    fontFamily: "outfit-medium",
   },
   input: {
-    width: "100%",
-    padding: 16,
-    borderRadius: 12,
-    fontSize: 16,
-    fontFamily: "outfit",
+    width: "90%",
+    padding: 15,
+    marginVertical: 5,
+    borderBottomWidth: 1,
+    alignSelf: "center",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 24,
-    paddingBottom: 34,
-    backgroundColor: "transparent",
-  },
-  button: {
-    flex: 1,
-    marginHorizontal: 8,
+    width: "90%",
+    marginTop: 20,
   },
 });

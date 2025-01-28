@@ -46,13 +46,17 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
       }}
     >
       <Image
-        source={{
-          uri:
-            "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" +
-            photoRef +
-            "&key=" +
-            process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
-        }}
+        source={
+          photoRef
+            ? {
+                uri:
+                  "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" +
+                  photoRef +
+                  "&key=" +
+                  process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
+              }
+            : require("../../assets/place-placeholder.jpg")
+        }
         style={{
           width: "100%",
           height: 140,

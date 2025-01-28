@@ -1,4 +1,4 @@
-import { StyleSheet, View, Animated, Image, Pressable } from "react-native";
+import { StyleSheet, View, Animated, Pressable } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -40,19 +40,26 @@ const AppTheme: React.FC = () => {
             style={[
               styles.themeOption,
               !isDarkTheme && styles.activeThemeOption,
-              { borderColor: isDarkTheme ? "#666" : "#387694" }
+              { borderColor: isDarkTheme ? "#666" : "#387694" },
             ]}
             onPress={() => toggleTheme("light")}
           >
-            <Ionicons name="sunny" size={32} color={isDarkTheme ? "#666" : "#387694"} />
-            <Animated.Text style={[styles.optionText, { color: animatedTextColor }]}>
+            <Ionicons
+              name="sunny"
+              size={32}
+              color={isDarkTheme ? "#666" : "#387694"}
+            />
+            <Animated.Text
+              style={[styles.optionText, { color: animatedTextColor }]}
+            >
               Light Mode
             </Animated.Text>
-            <View style={[
-              styles.checkmark,
-              !isDarkTheme && styles.activeCheckmark
-            ]}>
-              {!isDarkTheme && <Ionicons name="checkmark" size={16} color="#fff" />}
+            <View
+              style={[styles.checkmark, !isDarkTheme && styles.activeCheckmark]}
+            >
+              {!isDarkTheme && (
+                <Ionicons name="checkmark" size={16} color="#fff" />
+              )}
             </View>
           </Pressable>
 
@@ -60,19 +67,26 @@ const AppTheme: React.FC = () => {
             style={[
               styles.themeOption,
               isDarkTheme && styles.activeThemeOption,
-              { borderColor: isDarkTheme ? "#387694" : "#666" }
+              { borderColor: isDarkTheme ? "#387694" : "#666" },
             ]}
             onPress={() => toggleTheme("dark")}
           >
-            <Ionicons name="moon" size={32} color={isDarkTheme ? "#387694" : "#666"} />
-            <Animated.Text style={[styles.optionText, { color: animatedTextColor }]}>
+            <Ionicons
+              name="moon"
+              size={32}
+              color={isDarkTheme ? "#387694" : "#666"}
+            />
+            <Animated.Text
+              style={[styles.optionText, { color: animatedTextColor }]}
+            >
               Dark Mode
             </Animated.Text>
-            <View style={[
-              styles.checkmark,
-              isDarkTheme && styles.activeCheckmark
-            ]}>
-              {isDarkTheme && <Ionicons name="checkmark" size={16} color="#fff" />}
+            <View
+              style={[styles.checkmark, isDarkTheme && styles.activeCheckmark]}
+            >
+              {isDarkTheme && (
+                <Ionicons name="checkmark" size={16} color="#fff" />
+              )}
             </View>
           </Pressable>
         </View>
@@ -132,5 +146,5 @@ const styles = StyleSheet.create({
   activeCheckmark: {
     backgroundColor: "#387694",
     borderColor: "#387694",
-  }
+  },
 });

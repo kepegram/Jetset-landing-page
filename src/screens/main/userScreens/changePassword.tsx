@@ -1,4 +1,11 @@
-import { Pressable, StyleSheet, Text, TextInput, View, SafeAreaView, TouchableOpacity } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  SafeAreaView,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { AltButton, CustomButton } from "../../../components/ui/button";
@@ -77,17 +84,22 @@ const ChangePassword: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
       <View style={styles.contentContainer}>
-        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
-          Change Password
-        </Text>
-        
         <View style={styles.formContainer}>
-          <Text style={[styles.inputLabel, { color: currentTheme.textPrimary }]}>
+          <Text
+            style={[styles.inputLabel, { color: currentTheme.textPrimary }]}
+          >
             Current Password
           </Text>
-          <View style={[styles.inputWrapper, { borderColor: currentTheme.inactive }]}>
+          <View
+            style={[
+              styles.inputWrapper,
+              { borderColor: currentTheme.inactive },
+            ]}
+          >
             <TextInput
               style={[styles.input, { color: currentTheme.textPrimary }]}
               placeholder="Enter current password"
@@ -96,7 +108,7 @@ const ChangePassword: React.FC = () => {
               secureTextEntry={oldPasswordHidden}
               onChangeText={setPassword}
             />
-            <TouchableOpacity
+            <Pressable
               style={styles.eyeButton}
               onPress={() => setOldPasswordHidden(!oldPasswordHidden)}
             >
@@ -105,13 +117,20 @@ const ChangePassword: React.FC = () => {
                 size={24}
                 color={currentTheme.inactive}
               />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
-          <Text style={[styles.inputLabel, { color: currentTheme.textPrimary }]}>
+          <Text
+            style={[styles.inputLabel, { color: currentTheme.textPrimary }]}
+          >
             New Password
           </Text>
-          <View style={[styles.inputWrapper, { borderColor: currentTheme.inactive }]}>
+          <View
+            style={[
+              styles.inputWrapper,
+              { borderColor: currentTheme.inactive },
+            ]}
+          >
             <TextInput
               style={[styles.input, { color: currentTheme.textPrimary }]}
               placeholder="Enter new password"
@@ -120,7 +139,7 @@ const ChangePassword: React.FC = () => {
               secureTextEntry={newPasswordHidden}
               onChangeText={setNewPassword}
             />
-            <TouchableOpacity
+            <Pressable
               style={styles.eyeButton}
               onPress={() => setNewPasswordHidden(!newPasswordHidden)}
             >
@@ -129,7 +148,7 @@ const ChangePassword: React.FC = () => {
                 size={24}
                 color={currentTheme.inactive}
               />
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 
@@ -152,23 +171,17 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  title: {
-    fontSize: 28,
-    fontFamily: 'outfit-bold',
-    marginBottom: 30,
-    textAlign: 'center'
-  },
   formContainer: {
-    width: '100%',
+    width: "100%",
   },
   inputLabel: {
     fontSize: 16,
     marginBottom: 8,
-    fontFamily: 'outfit',
+    fontFamily: "outfit",
   },
   inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderBottomWidth: 1,
     marginBottom: 24,
   },
@@ -176,15 +189,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     fontSize: 16,
-    fontFamily: 'outfit',
+    fontFamily: "outfit",
   },
   eyeButton: {
     padding: 8,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 'auto',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: "auto",
     paddingHorizontal: 20,
   },
 });

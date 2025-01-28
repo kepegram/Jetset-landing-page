@@ -5,12 +5,10 @@ import {
   View,
   Image,
   Modal,
-  Button,
   ActivityIndicator,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -22,17 +20,7 @@ import { collection, getDocs, query } from "firebase/firestore";
 import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 import CurrentTripCard from "../../../components/myTrips/currentTripCard";
-import { CreateTripContext } from "../../../context/createTripContext";
-import { LinearGradient } from 'expo-linear-gradient';
-
-// Define the type for tripData
-interface TripData {
-  budget: string | null;
-  travelerType: string | null;
-  accommodationType: string | null;
-  activityLevel: string | null;
-  preferredClimate: string | null;
-}
+import { LinearGradient } from "expo-linear-gradient";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -42,12 +30,10 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 const Profile: React.FC = () => {
   const { profilePicture, displayName } = useProfile();
   const { currentTheme } = useTheme();
-  const { setTripData } = useContext(CreateTripContext) || {};
   const [loading, setLoading] = useState<boolean>(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [userTrips, setUserTrips] = useState<any[]>([]);
-  const [location, setLocation] = useState<string>("Set location");
 
   const user = getAuth().currentUser;
   const navigation = useNavigation<ProfileScreenNavigationProp>();
@@ -104,10 +90,6 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleLocationPress = () => {
-    console.log("TODO");
-  };
-
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
@@ -120,17 +102,17 @@ const Profile: React.FC = () => {
             style={styles.headerImage}
           />
           <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.7)']}
+            colors={["transparent", "rgba(0,0,0,0.7)"]}
             style={styles.overlay}
           />
-          <TouchableOpacity
+          <Pressable
             style={styles.settingsIconContainer}
             onPress={() => navigation.navigate("Settings")}
           >
             <Ionicons name="settings-sharp" size={28} color="white" />
-          </TouchableOpacity>
+          </Pressable>
           <View style={styles.profileContainer}>
-            <TouchableOpacity 
+            <Pressable
               onPress={() => setModalVisible(true)}
               style={styles.profileImageContainer}
             >
@@ -140,26 +122,10 @@ const Profile: React.FC = () => {
                   style={styles.profilePicture}
                 />
               </View>
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.userInfoContainer}>
-              <Text style={styles.userName}>
-                {displayName || userName}
-              </Text>
-              <TouchableOpacity
-                style={styles.locationContainer}
-                onPress={handleLocationPress}
-              >
-                <Ionicons
-                  name="location-sharp"
-                  size={20}
-                  color="white"
-                  style={styles.locationIcon}
-                />
-                <Text style={styles.locationText}>
-                  {location}
-                </Text>
-              </TouchableOpacity>
+              <Text style={styles.userName}>{displayName || userName}</Text>
             </View>
           </View>
         </View>
@@ -188,8 +154,11 @@ const Profile: React.FC = () => {
             onPress={() => setModalVisible(false)}
           >
             <View style={styles.modalContent}>
-              <Image source={{ uri: profilePicture }} style={styles.modalImage} />
-              <TouchableOpacity
+              <Image
+                source={{ uri: profilePicture }}
+                style={styles.modalImage}
+              />
+              <Pressable
                 style={styles.editButton}
                 onPress={() => {
                   setModalVisible(false);
@@ -197,7 +166,7 @@ const Profile: React.FC = () => {
                 }}
               >
                 <Text style={styles.editButtonText}>Edit Profile</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </Pressable>
         </Modal>
@@ -273,8 +242,8 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     color: "white",
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: {width: -1, height: 1},
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
   },
   locationContainer: {
@@ -288,8 +257,8 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 16,
     color: "white",
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: {width: -1, height: 1},
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
   },
   ongoingTripsContainer: {
@@ -306,7 +275,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: "rgba(0, 0, 0, 0.75)",
     justifyContent: "center",
     alignItems: "center",
   },
