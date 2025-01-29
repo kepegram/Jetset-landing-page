@@ -111,7 +111,7 @@ const WhosGoing: React.FC = () => {
         <Slider
           style={styles.slider}
           minimumValue={1}
-          maximumValue={6}
+          maximumValue={4}
           step={1}
           value={whoIsGoing}
           onValueChange={handleWhoIsGoingChange}
@@ -121,7 +121,7 @@ const WhosGoing: React.FC = () => {
         />
         
         <View style={styles.markerContainer}>
-          {[...Array(6)].map((_, index) => (
+          {[...Array(4)].map((_, index) => (
             <Text
               key={index}
               style={[
@@ -132,7 +132,7 @@ const WhosGoing: React.FC = () => {
                 }
               ]}
             >
-              {index < 5 ? index + 1 : "6+"}
+              {index < 3 ? index + 1 : "4+"}
             </Text>
           ))}
         </View>
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   markerText: {
     fontSize: 16,
     textAlign: "center",
-    width: `${100 / 6}%`,
+    width: `${100 / 4}%`,
   },
   selectionText: {
     fontSize: 24,

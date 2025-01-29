@@ -3,44 +3,33 @@ import {
   Text,
   Image,
   ScrollView,
-  Pressable,
   StyleSheet,
   Dimensions,
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTheme } from "../../../context/themeContext";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import PlannedTrip from "../../../components/tripDetails/plannedTrip";
-import moment from "moment";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 
 const { width, height } = Dimensions.get("window");
 
-type NavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "CurrentTripDetails"
->;
+type RouteParams = {
+  destination: {
+    name: string;
+    description: string;
+    image: number;
+  };
+};
 
-interface RouteParams {
-  trip: string;
-  photoRef: string;
-}
-
-const CurrentTripDetails: React.FC = () => {
+const PopularDestinations: React.FC = () => {
   const { currentTheme } = useTheme();
-  const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
-  const { trip, photoRef } = route.params as RouteParams;
-
-  const [tripDetails, setTripDetails] = useState<any>(null);
-  const [isHearted, setIsHearted] = useState(false);
-  const [daysLeft, setDaysLeft] = useState<number | null>(null);
+  const { destination } = route.params as RouteParams;
+  const navigation = useNavigation();
 
   useEffect(() => {
     navigation.setOptions({
@@ -56,39 +45,7 @@ const CurrentTripDetails: React.FC = () => {
         </TouchableOpacity>
       ),
     });
-
-    try {
-      const parsedTrip = JSON.parse(trip);
-      setTripDetails(parsedTrip);
-
-      const endDate = moment(parsedTrip.endDate);
-      const today = moment().startOf("day");
-      const daysRemaining = endDate.diff(today, "days");
-      setDaysLeft(daysRemaining);
-    } catch (error) {
-      console.error("Error parsing trip details:", error);
-    }
-  }, [trip, navigation]);
-
-  if (!tripDetails) {
-    return (
-      <View
-        style={[
-          styles.loadingContainer,
-          { backgroundColor: currentTheme.background },
-        ]}
-      >
-        <Ionicons
-          name="airplane"
-          size={50}
-          color={currentTheme.alternate}
-        />
-        <Text style={[styles.loadingText, { color: currentTheme.textPrimary }]}>
-          Loading trip details...
-        </Text>
-      </View>
-    );
-  }
+  }, [navigation]);
 
   return (
     <View
@@ -97,12 +54,9 @@ const CurrentTripDetails: React.FC = () => {
       <StatusBar barStyle="light-content" />
       <View style={styles.imageContainer}>
         <Image
-          source={{
-            uri: photoRef
-              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
-              : "https://via.placeholder.com/800",
-          }}
+          source={destination.image}
           style={styles.image}
+          resizeMode="cover"
         />
         <LinearGradient
           colors={["transparent", "rgba(0,0,0,0.7)"]}
@@ -129,19 +83,28 @@ const CurrentTripDetails: React.FC = () => {
                   { color: currentTheme.textPrimary },
                 ]}
               >
-                {tripDetails?.travelPlan?.destination || "Unknown Location"}
+                {destination.name}
               </Text>
-              <Pressable onPress={() => setIsHearted(!isHearted)}>
-                <Ionicons
-                  name={isHearted ? "heart" : "heart-outline"}
-                  size={30}
-                  color={isHearted ? "red" : currentTheme.textPrimary}
-                />
-              </Pressable>
             </View>
           </View>
 
           <View style={styles.tripMetaContainer}>
+            <View
+              style={[
+                styles.tripMetaItem,
+                { backgroundColor: `${currentTheme.alternate}20` },
+              ]}
+            >
+              <Ionicons name="star" size={22} color={currentTheme.alternate} />
+              <Text
+                style={[
+                  styles.tripMetaText,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                4.8
+              </Text>
+            </View>
             <View
               style={[
                 styles.tripMetaItem,
@@ -159,34 +122,43 @@ const CurrentTripDetails: React.FC = () => {
                   { color: currentTheme.textPrimary },
                 ]}
               >
-                {daysLeft !== null
-                  ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left`
-                  : "End date not available"}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.tripMetaItem,
-                { backgroundColor: `${currentTheme.alternate}20` },
-              ]}
-            >
-              <Ionicons
-                name="people-outline"
-                size={22}
-                color={currentTheme.alternate}
-              />
-              <Text
-                style={[
-                  styles.tripMetaText,
-                  { color: currentTheme.textPrimary },
-                ]}
-              >
-                {tripDetails?.whoIsGoing || "Unknown"}
+                Best time to visit
               </Text>
             </View>
           </View>
 
-          <PlannedTrip details={tripDetails?.travelPlan} />
+          <View
+            style={[
+              styles.descriptionContainer,
+              { backgroundColor: `${currentTheme.accentBackground}80` },
+            ]}
+          >
+            <Text
+              style={[
+                styles.descriptionTitle,
+                { color: currentTheme.textPrimary },
+              ]}
+            >
+              About
+            </Text>
+            <Text
+              style={[styles.description, { color: currentTheme.textPrimary }]}
+            >
+              {destination.description}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.exploreButton,
+              { backgroundColor: currentTheme.alternate },
+            ]}
+            onPress={() => {
+              /* Handle explore press */
+            }}
+          >
+            <Text style={styles.exploreButtonText}>Explore More</Text>
+          </TouchableOpacity>
         </BlurView>
       </ScrollView>
     </View>
@@ -196,16 +168,6 @@ const CurrentTripDetails: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 20,
-  },
-  loadingText: {
-    fontFamily: "outfit-medium",
-    fontSize: 18,
   },
   imageContainer: {
     position: "absolute",
@@ -271,6 +233,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 8,
   },
+  descriptionContainer: {
+    padding: 20,
+    borderRadius: 15,
+    marginBottom: 24,
+  },
+  descriptionTitle: {
+    fontSize: 20,
+    fontFamily: "outfit-bold",
+    marginBottom: 12,
+  },
+  description: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontFamily: "outfit",
+  },
+  exploreButton: {
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  exploreButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "outfit-bold",
+  },
 });
 
-export default CurrentTripDetails;
+export default PopularDestinations;

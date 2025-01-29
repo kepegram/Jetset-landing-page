@@ -5,9 +5,10 @@ import {
   ScrollView,
   Image,
   FlatList,
-  Button,
   ActivityIndicator,
   StyleSheet,
+  Dimensions,
+  Platform,
 } from "react-native";
 import React, { useState, useContext, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
@@ -33,6 +34,9 @@ import { RECOMMEND_TRIP_AI_PROMPT } from "../../../api/ai-prompt";
 import { chatSession } from "../../../../AI-Model";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
+
+const { width } = Dimensions.get("window");
 
 interface RecommendedTrip {
   id: string;
@@ -58,11 +62,11 @@ const Home: React.FC = () => {
   const getGreeting = () => {
     const currentHour = new Date().getHours();
     if (currentHour < 12) {
-      return `Morning, ${userName} 🌅`;
+      return `Good Morning, ${userName} 🌅`;
     } else if (currentHour < 18) {
-      return `Afternoon, ${userName} ☀️`;
+      return `Good Afternoon, ${userName} ☀️`;
     } else {
-      return `Evening, ${userName} 🌙`;
+      return `Good Evening, ${userName} 🌙`;
     }
   };
 
@@ -184,7 +188,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const generateSetTerrainTrip = async (terrainType: string) => {
+  const setTerrainTrip = async (terrainType: string) => {
     setTripData({
       ...tripData,
       destinationType: terrainType,
@@ -221,12 +225,15 @@ const Home: React.FC = () => {
               source={require("../../../assets/travel.jpg")}
               style={styles.image}
             />
-            <View style={styles.overlay} />
+            <LinearGradient
+              colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.7)"]}
+              style={styles.overlay}
+            />
           </View>
           <View style={styles.headerContent}>
             <Text style={styles.greetingText}>{getGreeting()}</Text>
             <Text style={styles.subGreetingText}>
-              Where would you like to go?
+              Let's plan your next adventure
             </Text>
             <View style={styles.terrainContainer}>
               {[
@@ -241,16 +248,22 @@ const Home: React.FC = () => {
                   label: "Landmark",
                   icon: "globe-americas",
                   type: "fa",
-                  width: 100,
+                  width: 95,
                 },
               ].map(({ label, icon, type, width }) => (
                 <Pressable
                   key={label}
-                  onPress={() => generateSetTerrainTrip(label)}
-                  style={[
+                  onPress={() => setTerrainTrip(label)}
+                  style={({ pressed }) => [
                     styles.button,
-                    { borderColor: currentTheme.alternate },
-                    width ? { width } : null,
+                    {
+                      transform: [{ scale: pressed ? 0.95 : 1 }],
+                      backgroundColor: pressed
+                        ? "rgba(255,255,255,0.2)"
+                        : "rgba(5, 5, 5, 0.6)",
+                      borderColor: currentTheme.alternate,
+                      width: width,
+                    },
                   ]}
                 >
                   {type === "fa" ? (
@@ -265,9 +278,14 @@ const Home: React.FC = () => {
           </View>
         </View>
 
-        <View style={styles.recommendedTripsContainer}>
+        <View
+          style={[
+            styles.recommendedTripsContainer,
+            { backgroundColor: currentTheme.background },
+          ]}
+        >
           <GooglePlacesAutocomplete
-            placeholder="Search for places"
+            placeholder="Where would you like to go?"
             textInputProps={{
               placeholderTextColor: currentTheme.textPrimary,
             }}
@@ -311,21 +329,27 @@ const Home: React.FC = () => {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <Pressable
-                //TODO: MAKE A PAGE THAT GIVES DETAIL ABOUT THE CITY
-                onPress={() => console.log(item.name)}
-                style={styles.popularDestinationContainer}
+                onPress={() => {
+                  console.log("Selected destination:", item);
+                  navigation.navigate("PopularDestinations", {
+                    destination: item,
+                  });
+                }}
+                style={({ pressed }) => [
+                  styles.popularDestinationContainer,
+                  { opacity: pressed ? 0.8 : 1 },
+                ]}
               >
                 <Image
                   source={item.image}
                   style={styles.popularDestinationImage}
                 />
-                <Text
-                  style={[
-                    styles.popularDestinationText,
-                    { color: currentTheme.textPrimary },
-                  ]}
-                >
-                  {item.name}
+                <LinearGradient
+                  colors={["transparent", "rgba(0,0,0,0.7)"]}
+                  style={styles.popularDestinationGradient}
+                />
+                <Text style={styles.popularDestinationText}>
+                  {item.name.split(",")[0]}
                 </Text>
               </Pressable>
             )}
@@ -340,7 +364,13 @@ const Home: React.FC = () => {
             >
               Recommended Trips
             </Text>
-            <Pressable onPress={clearStorageAndFetchNewTrips}>
+            <Pressable
+              onPress={clearStorageAndFetchNewTrips}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.7 : 1,
+                transform: [{ scale: pressed ? 0.95 : 1 }],
+              })}
+            >
               <Ionicons
                 name="refresh"
                 size={28}
@@ -349,7 +379,17 @@ const Home: React.FC = () => {
             </Pressable>
           </View>
           {isLoading ? (
-            <ActivityIndicator size="large" color={currentTheme.alternate} />
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={currentTheme.alternate} />
+              <Text
+                style={[
+                  styles.loadingText,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                Generating recommendations...
+              </Text>
+            </View>
           ) : (
             <FlatList
               horizontal
@@ -359,11 +399,18 @@ const Home: React.FC = () => {
                 if (trip.id === "dont-like-button") {
                   return (
                     <View style={styles.dontLikeButtonContainer}>
-                      <Button
-                        title="Don't like? Build your own here!"
-                        onPress={() => navigation.navigate("DoYouKnow")}
-                        color={currentTheme.alternate}
-                      />
+                      <Pressable
+                        onPress={() => navigation.navigate("WhereTo")}
+                        style={({ pressed }) => [
+                          styles.dontLikeButton,
+                          { backgroundColor: currentTheme.alternate },
+                          { opacity: pressed ? 0.8 : 1 },
+                        ]}
+                      >
+                        <Text style={styles.dontLikeButtonText}>
+                          Create Your Own Adventure
+                        </Text>
+                      </Pressable>
                     </View>
                   );
                 } else if (isRecommendedTrip(trip)) {
@@ -380,18 +427,27 @@ const Home: React.FC = () => {
                           photoRef: trip.photoRef ?? "",
                         });
                       }}
-                      style={[
+                      style={({ pressed }) => [
                         styles.tripCard,
-                        { backgroundColor: currentTheme.accentBackground },
+                        {
+                          backgroundColor: currentTheme.accentBackground,
+                          transform: [{ scale: pressed ? 0.98 : 1 }],
+                        },
                       ]}
                     >
                       {trip.photoRef && (
-                        <Image
-                          source={{
-                            uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${trip.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
-                          }}
-                          style={styles.tripImage}
-                        />
+                        <View style={styles.tripImageContainer}>
+                          <Image
+                            source={{
+                              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${trip.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
+                            }}
+                            style={styles.tripImage}
+                          />
+                          <LinearGradient
+                            colors={["transparent", "rgba(0,0,0,0.7)"]}
+                            style={styles.tripImageGradient}
+                          />
+                        </View>
                       )}
                       <View style={styles.tripInfoContainer}>
                         <Ionicons
@@ -431,7 +487,7 @@ const styles = StyleSheet.create({
   },
   header: {
     width: "100%",
-    height: 330,
+    height: 380,
     zIndex: -1,
   },
   imageContainer: {
@@ -442,11 +498,10 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 330,
+    height: 380,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
   headerContent: {
     position: "absolute",
@@ -456,40 +511,59 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   greetingText: {
-    fontSize: 30,
+    fontSize: 32,
     color: "white",
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
     fontWeight: "bold",
     alignSelf: "flex-start",
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
   },
   subGreetingText: {
-    fontSize: 18,
+    fontSize: 20,
     color: "white",
-    fontWeight: "normal",
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
     alignSelf: "flex-start",
+    marginTop: 8,
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
   },
   terrainContainer: {
     flexDirection: "row",
-    marginTop: 20,
+    marginTop: 30,
+    justifyContent: "space-between",
+    width: "100%",
   },
   button: {
-    padding: 10,
-    backgroundColor: "rgba(5, 5, 5, 0.6)",
-    borderRadius: 15,
+    padding: 15,
+    borderRadius: 20,
     borderWidth: 1,
-    width: 90,
-    height: 120,
-    marginHorizontal: 5,
+    width: width * 0.2,
+    height: width * 0.3,
     alignItems: "center",
     justifyContent: "center",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
   buttonText: {
     color: "white",
-    fontWeight: "bold",
-    marginTop: 20,
+    fontWeight: "600",
+    marginTop: 12,
+    fontSize: 12,
+    textAlign: "center",
   },
   scrollViewContent: {
-    justifyContent: "center",
-    alignItems: "center",
     paddingBottom: 40,
   },
   recommendedTripsContainer: {
@@ -501,72 +575,159 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     width: "100%",
-    padding: 10,
-    height: 70,
-    borderColor: "#ccc",
-    borderWidth: 1,
+    padding: 15,
+    height: 60,
     borderRadius: 15,
     marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    fontSize: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
   popularDestinationContainer: {
-    alignItems: "center",
-    marginRight: 10,
+    marginRight: 15,
     marginBottom: 20,
+    borderRadius: 15,
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
   popularDestinationImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 55,
+    width: width * 0.35,
+    height: width * 0.35,
+    borderRadius: 15,
+  },
+  popularDestinationGradient: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "50%",
+    borderRadius: 15,
   },
   popularDestinationText: {
-    marginTop: 5,
-    fontSize: 12,
-    color: "#000",
+    position: "absolute",
+    bottom: 10,
+    left: 10,
+    right: 10,
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
   },
   recommendedTripsHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 20,
+    marginTop: 10,
   },
   recommendedTripsTitle: {
     fontSize: 24,
     fontWeight: "bold",
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
+  },
+  loadingContainer: {
+    alignItems: "center",
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
   },
   dontLikeButtonContainer: {
     justifyContent: "center",
     alignItems: "center",
+    width: width * 0.6,
+    height: width * 0.8,
+  },
+  dontLikeButton: {
+    padding: 15,
+    borderRadius: 15,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
+  },
+  dontLikeButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
   },
   tripCard: {
-    borderRadius: 10,
+    borderRadius: 15,
     marginRight: 20,
-    width: 260,
+    width: width * 0.6,
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
+  },
+  tripImageContainer: {
+    position: "relative",
   },
   tripImage: {
-    width: 250,
-    height: 250,
-    borderRadius: 10,
-    marginBottom: 10,
-    alignSelf: "center",
+    width: "100%",
+    height: width * 0.6,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+  },
+  tripImageGradient: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "50%",
   },
   tripInfoContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
-    marginBottom: 10,
+    padding: 15,
   },
   tripLocationIcon: {
-    marginRight: 5,
+    marginRight: 8,
   },
   tripName: {
-    fontSize: 20,
-    fontWeight: "bold",
-    alignSelf: "flex-start",
+    fontSize: 18,
+    fontWeight: "600",
+    flex: 1,
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
   },
 });
 

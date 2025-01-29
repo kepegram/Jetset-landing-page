@@ -40,8 +40,8 @@ const PastTripListCard: React.FC<PastTripListCardProps> = ({ trip }) => {
   const endDate = tripData.endDate ? moment(tripData.endDate) : null;
 
   // Only display the trip if the end date is in the past
-  if (endDate && endDate.isBefore(moment(), 'day')) {
-    const daysFromToday = moment().diff(endDate, 'days');
+  if (endDate && endDate.isBefore(moment(), "day")) {
+    const daysFromToday = moment().diff(endDate, "days");
     return (
       <Pressable
         onPress={() => {
@@ -61,8 +61,8 @@ const PastTripListCard: React.FC<PastTripListCardProps> = ({ trip }) => {
       >
         <Image
           source={{
-            uri: tripData.locationInfo?.photoRef
-              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripData.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+            uri: tripPlan.travelPlan?.photoRef
+              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripPlan.travelPlan.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
               : "https://via.placeholder.com/100",
           }}
           style={{
@@ -80,7 +80,7 @@ const PastTripListCard: React.FC<PastTripListCardProps> = ({ trip }) => {
               color: currentTheme.textPrimary,
             }}
           >
-            {tripData.locationInfo?.name || "No Location Available"}
+            {tripPlan.travelPlan?.destination || "No Location Available"}
           </Text>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
             <Text

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Alert, Image, Pressable, Text, View } from "react-native";
+import { Alert, Image, Pressable, Text, View, Platform } from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
   createNativeStackNavigator,
@@ -25,17 +25,17 @@ import Settings from "../screens/main/userScreens/settings";
 import ChangePassword from "../screens/main/userScreens/changePassword";
 import AppTheme from "../screens/main/userScreens/appTheme";
 import DeleteAccount from "../screens/main/userScreens/deleteAccount";
-import ReviewTrip from "../screens/main/tripScreens/reviewTrip";
-import GenerateTrip from "../screens/main/tripScreens/generateTrip";
+import ReviewTrip from "../screens/main/tripScreens/buildTrip/reviewTrip";
+import GenerateTrip from "../screens/main/tripScreens/buildTrip/generateTrip";
 import TripDetails from "../screens/main/tripScreens/tripDetails";
 import MyTrips from "../screens/main/tripScreens/myTrips";
 import CurrentTripDetails from "../screens/main/tripScreens/currentTripDetails";
-import DoYouKnow from "../screens/main/tripScreens/buildTrip/doYouKnow";
-import SearchPlaces from "../screens/main/tripScreens/buildTrip/searchPlaces";
+import WhereTo from "../screens/main/tripScreens/buildTrip/whereTo";
 import ChoosePlaces from "../screens/main/tripScreens/buildTrip/choosePlaces";
 import ChooseDate from "../screens/main/tripScreens/buildTrip/chooseDate";
 import WhosGoing from "../screens/main/tripScreens/buildTrip/whosGoing";
 import MoreInfo from "../screens/main/tripScreens/buildTrip/moreInfo";
+import PopularDestinations from "../screens/main/homeScreen/popularDestinations";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -46,11 +46,11 @@ export type RootStackParamList = {
   AppNav: undefined;
   App: undefined;
   HomeMain: undefined;
+  PopularDestinations: { destination: any };
   RecommendedTripDetails: { trip: string; photoRef: string };
   MyTripsMain: undefined;
-  DoYouKnow: undefined;
+  WhereTo: undefined;
   ChoosePlaces: undefined;
-  SearchPlaces: undefined;
   ChooseDate: undefined;
   WhosGoing: undefined;
   MoreInfo: undefined;
@@ -79,29 +79,14 @@ const HomeStack: React.FC = () => {
         options={{ headerShown: false }}
       />
       <RootStack.Screen
+        name="PopularDestinations"
+        component={PopularDestinations}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
         name="RecommendedTripDetails"
         component={RecommendedTripDetails}
-        options={{
-          headerLeft: () => {
-            const navigation = useNavigation();
-            return (
-              <Pressable
-                onPress={() => navigation.goBack()}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <MaterialIcons name="arrow-back" size={24} color="white" />
-              </Pressable>
-            );
-          },
-          headerShown: false,
-        }}
+        options={{ headerShown: false }}
       />
     </RootStack.Navigator>
   );
@@ -111,15 +96,13 @@ const MyTripsStack: React.FC = () => {
   const { currentTheme } = useTheme();
   const { setTripData } = useContext(CreateTripContext) || {};
   const screens = [
-    "DoYouKnow",
+    "WhereTo",
     "ChoosePlaces",
-    "SearchPlaces",
     "ChooseDate",
     "WhosGoing",
     "MoreInfo",
     "ReviewTrip",
     "GenerateTrip",
-    "TripDetails",
   ];
 
   const tripBuilderScreenOptions = ({
@@ -131,7 +114,7 @@ const MyTripsStack: React.FC = () => {
   }): NativeStackNavigationOptions => {
     const currentScreenIndex = screens.indexOf(route.name) + 1;
     const totalScreens = screens.length;
-    const isFirstScreen = route.name === "DoYouKnow";
+    const isFirstScreen = route.name === "WhereTo";
     const currentScreen = route.name;
     const previousScreen = screens[screens.indexOf(currentScreen) - 1];
 
@@ -217,8 +200,8 @@ const MyTripsStack: React.FC = () => {
         options={{ headerShown: false }}
       />
       <RootStack.Screen
-        name="DoYouKnow"
-        component={DoYouKnow}
+        name="WhereTo"
+        component={WhereTo}
         options={({ navigation, route }) => ({
           ...tripBuilderScreenOptions({ navigation, route }),
           title: "",
@@ -227,14 +210,6 @@ const MyTripsStack: React.FC = () => {
       <RootStack.Screen
         name="ChoosePlaces"
         component={ChoosePlaces}
-        options={({ navigation, route }) => ({
-          ...tripBuilderScreenOptions({ navigation, route }),
-          title: "",
-        })}
-      />
-      <RootStack.Screen
-        name="SearchPlaces"
-        component={SearchPlaces}
         options={({ navigation, route }) => ({
           ...tripBuilderScreenOptions({ navigation, route }),
           title: "",
@@ -427,11 +402,8 @@ const ProfileStack: React.FC = () => {
 const getTabBarStyle = (route: any): { display?: string } | undefined => {
   const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
   if (
-    routeName === "SearchPlace" ||
-    routeName === "BuildTrip" ||
-    routeName === "DoYouKnow" ||
+    routeName === "WhereTo" ||
     routeName === "ChoosePlaces" ||
-    routeName === "SearchPlaces" ||
     routeName === "ChooseDate" ||
     routeName === "WhosGoing" ||
     routeName === "MoreInfo" ||
@@ -455,13 +427,30 @@ const TabNavigator: React.FC = () => {
   const { currentTheme } = useTheme();
   const { profilePicture } = useProfile();
 
+  const tabBarDefaultStyle = {
+    height: Platform.OS === "ios" ? 85 : 65,
+    paddingBottom: Platform.OS === "ios" ? 25 : 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  };
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: true,
-        tabBarActiveTintColor: currentTheme.tabIcon,
+        tabBarActiveTintColor: currentTheme.alternate,
         tabBarInactiveTintColor: currentTheme.inactiveTabIcon,
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "500",
+          marginTop: -5,
+        },
       }}
     >
       <Tab.Screen
@@ -469,6 +458,7 @@ const TabNavigator: React.FC = () => {
         component={HomeStack}
         options={({ route }) => {
           const tabBarStyle = {
+            ...tabBarDefaultStyle,
             backgroundColor: currentTheme.background,
             ...(getTabBarStyle(route) || {}),
           };
@@ -476,11 +466,21 @@ const TabNavigator: React.FC = () => {
             tabBarStyle,
             tabBarLabel: "Home",
             tabBarIcon: ({ color, focused }) => (
-              <Ionicons
-                name={focused ? "home" : "home-outline"}
-                color={color}
-                size={30}
-              />
+              <View
+                style={{
+                  padding: 5,
+                  borderRadius: 10,
+                  backgroundColor: focused
+                    ? `${currentTheme.alternate}20`
+                    : "transparent",
+                }}
+              >
+                <Ionicons
+                  name={focused ? "home" : "home-outline"}
+                  color={color}
+                  size={28}
+                />
+              </View>
             ),
           } as BottomTabNavigationOptions;
         }}
@@ -490,6 +490,7 @@ const TabNavigator: React.FC = () => {
         component={MyTripsStack}
         options={({ route }) => {
           const tabBarStyle = {
+            ...tabBarDefaultStyle,
             backgroundColor: currentTheme.background,
             ...(getTabBarStyle(route) || {}),
           };
@@ -498,11 +499,21 @@ const TabNavigator: React.FC = () => {
             headerShown: false,
             tabBarLabel: "My Trips",
             tabBarIcon: ({ color, focused }) => (
-              <Ionicons
-                name={focused ? "airplane" : "airplane-outline"}
-                color={color}
-                size={33}
-              />
+              <View
+                style={{
+                  padding: 5,
+                  borderRadius: 10,
+                  backgroundColor: focused
+                    ? `${currentTheme.alternate}20`
+                    : "transparent",
+                }}
+              >
+                <Ionicons
+                  name={focused ? "airplane" : "airplane-outline"}
+                  color={color}
+                  size={30}
+                />
+              </View>
             ),
           } as BottomTabNavigationOptions;
         }}
@@ -512,6 +523,7 @@ const TabNavigator: React.FC = () => {
         component={ProfileStack}
         options={({ route }) => {
           const tabBarStyle = {
+            ...tabBarDefaultStyle,
             backgroundColor: currentTheme.background,
             ...(getTabBarStyle(route) || {}),
           };
@@ -519,18 +531,28 @@ const TabNavigator: React.FC = () => {
             tabBarStyle,
             tabBarLabel: "Profile",
             tabBarIcon: ({ focused }) => (
-              <Image
-                source={{ uri: profilePicture }}
+              <View
                 style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 25,
-                  borderColor: focused
-                    ? currentTheme.alternate
-                    : currentTheme.background,
-                  borderWidth: focused ? 2 : 0,
+                  padding: 3,
+                  borderRadius: 20,
+                  backgroundColor: focused
+                    ? `${currentTheme.alternate}20`
+                    : "transparent",
                 }}
-              />
+              >
+                <Image
+                  source={{ uri: profilePicture }}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 15,
+                    borderColor: focused
+                      ? currentTheme.alternate
+                      : "transparent",
+                    borderWidth: 2,
+                  }}
+                />
+              </View>
             ),
           } as BottomTabNavigationOptions;
         }}

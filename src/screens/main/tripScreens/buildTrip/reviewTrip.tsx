@@ -1,12 +1,12 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
-import { CreateTripContext } from "../../../context/createTripContext";
+import { CreateTripContext } from "../../../../context/createTripContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../navigation/appNav";
+import { RootStackParamList } from "../../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
-import { useTheme } from "../../../context/themeContext";
+import { useTheme } from "../../../../context/themeContext";
 import moment from "moment";
-import { MainButton } from "../../../components/ui/button";
+import { MainButton } from "../../../../components/ui/button";
 
 type ReviewTripScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -27,7 +27,10 @@ const ReviewTrip: React.FC = () => {
     <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.scrollView}
+      >
         <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
           Review your trip
         </Text>
@@ -38,23 +41,38 @@ const ReviewTrip: React.FC = () => {
           </Text>
 
           {/* Destination Info  */}
-          <View style={[styles.infoContainer, { backgroundColor: currentTheme.accentBackground }]}>
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
             <Text style={styles.emoji}>📍</Text>
             <View style={styles.infoTextContainer}>
-              <Text style={[styles.label, { color: currentTheme.textSecondary }]}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
                 Destination
               </Text>
               <Text style={[styles.value, { color: currentTheme.textPrimary }]}>
-                {localTripData?.destinationType}
+                {localTripData?.destinationType ||
+                  localTripData?.locationInfo?.name}
               </Text>
             </View>
           </View>
 
           {/* Date Selected Info  */}
-          <View style={[styles.infoContainer, { backgroundColor: currentTheme.accentBackground }]}>
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
             <Text style={styles.emoji}>🗓️</Text>
             <View style={styles.infoTextContainer}>
-              <Text style={[styles.label, { color: currentTheme.textSecondary }]}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
                 Travel Date
               </Text>
               <Text style={[styles.value, { color: currentTheme.textPrimary }]}>
@@ -68,10 +86,17 @@ const ReviewTrip: React.FC = () => {
           </View>
 
           {/* Travelers Info  */}
-          <View style={[styles.infoContainer, { backgroundColor: currentTheme.accentBackground }]}>
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
             <Text style={styles.emoji}>🚌</Text>
             <View style={styles.infoTextContainer}>
-              <Text style={[styles.label, { color: currentTheme.textSecondary }]}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
                 Who is Traveling
               </Text>
               <Text style={[styles.value, { color: currentTheme.textPrimary }]}>
@@ -81,10 +106,17 @@ const ReviewTrip: React.FC = () => {
           </View>
 
           {/* Budget Info  */}
-          <View style={[styles.infoContainer, { backgroundColor: currentTheme.accentBackground }]}>
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
             <Text style={styles.emoji}>💰</Text>
             <View style={styles.infoTextContainer}>
-              <Text style={[styles.label, { color: currentTheme.textSecondary }]}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
                 Budget
               </Text>
               <Text style={[styles.value, { color: currentTheme.textPrimary }]}>
@@ -94,10 +126,17 @@ const ReviewTrip: React.FC = () => {
           </View>
 
           {/* Accommodation Type Info  */}
-          <View style={[styles.infoContainer, { backgroundColor: currentTheme.accentBackground }]}>
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
             <Text style={styles.emoji}>🏨</Text>
             <View style={styles.infoTextContainer}>
-              <Text style={[styles.label, { color: currentTheme.textSecondary }]}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
                 Accommodation Type
               </Text>
               <Text style={[styles.value, { color: currentTheme.textPrimary }]}>
@@ -107,10 +146,17 @@ const ReviewTrip: React.FC = () => {
           </View>
 
           {/* Activity Level Info  */}
-          <View style={[styles.infoContainer, { backgroundColor: currentTheme.accentBackground }]}>
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
             <Text style={styles.emoji}>🏃‍♂️</Text>
             <View style={styles.infoTextContainer}>
-              <Text style={[styles.label, { color: currentTheme.textSecondary }]}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
                 Activity Level
               </Text>
               <Text style={[styles.value, { color: currentTheme.textPrimary }]}>

@@ -242,7 +242,6 @@ const styles = StyleSheet.create({
   dropdownsContainer: {
     flex: 1,
     justifyContent: "center",
-    marginTop: 50,
     alignItems: "center",
   },
   inputContainer: {

@@ -1,4 +1,15 @@
-import { View, Text, Image, ScrollView, Alert, Linking } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  Alert,
+  Linking,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  StatusBar,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -11,6 +22,10 @@ import moment from "moment";
 import HotelList from "../../../components/tripDetails/hotelList";
 import PlannedTrip from "../../../components/tripDetails/plannedTrip";
 import { MainButton } from "../../../components/ui/button";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
+
+const { width, height } = Dimensions.get("window");
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -29,7 +44,6 @@ const TripDetails: React.FC = () => {
   const { trip, photoRef } = route.params as RouteParams;
 
   const [tripDetails, setTripDetails] = useState<any>(null);
-
   const user = FIREBASE_AUTH.currentUser;
 
   useEffect(() => {
@@ -37,9 +51,16 @@ const TripDetails: React.FC = () => {
       headerShown: true,
       headerTransparent: true,
       headerTitle: "",
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Ionicons name="chevron-back" size={28} color="white" />
+        </TouchableOpacity>
+      ),
     });
 
-    // Parse trip details from JSON
     try {
       const parsedTrip = JSON.parse(trip);
       setTripDetails(parsedTrip);
@@ -75,20 +96,17 @@ const TripDetails: React.FC = () => {
   if (!tripDetails) {
     return (
       <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: currentTheme.background,
-        }}
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: currentTheme.background },
+        ]}
       >
-        <Text
-          style={{
-            fontFamily: "outfit-medium",
-            fontSize: 18,
-            color: currentTheme.textPrimary,
-          }}
-        >
+        <Ionicons
+          name="airplane-clock"
+          size={50}
+          color={currentTheme.alternate}
+        />
+        <Text style={[styles.loadingText, { color: currentTheme.textPrimary }]}>
           Loading trip details...
         </Text>
       </View>
@@ -96,118 +114,113 @@ const TripDetails: React.FC = () => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
+      <StatusBar barStyle="light-content" />
+      <View style={styles.imageContainer}>
         <Image
           source={{
             uri: photoRef
-              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
-              : "https://via.placeholder.com/400",
+              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+              : "https://via.placeholder.com/800",
           }}
-          style={{
-            width: "100%",
-            height: 330,
-          }}
+          style={styles.image}
         />
-        <View
-          style={{
-            padding: 15,
-            backgroundColor: currentTheme.background,
-            height: "100%",
-            marginTop: -30,
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
-          }}
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.7)"]}
+          style={styles.gradient}
+        />
+      </View>
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <BlurView
+          intensity={90}
+          style={[
+            styles.contentContainer,
+            { backgroundColor: `${currentTheme.background}CC` },
+          ]}
         >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text
-              style={{
-                fontSize: 25,
-                fontFamily: "outfit-bold",
-                color: currentTheme.textPrimary,
-              }}
-            >
-              {tripDetails?.travelPlan?.destination || "Unknown Location"}
-            </Text>
-            <Ionicons
-              name="trash-bin-outline"
-              size={24}
-              color={currentTheme.textSecondary}
-              onPress={() => deleteTrip(tripDetails.id)}
-              style={{ marginLeft: 10 }}
-            />
+          <View style={styles.headerContainer}>
+            <View style={styles.titleContainer}>
+              <Text
+                style={[
+                  styles.destinationTitle,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                {tripDetails?.travelPlan?.destination || "Unknown Location"}
+              </Text>
+              <TouchableOpacity onPress={() => deleteTrip(tripDetails.id)}>
+                <Ionicons
+                  name="trash-bin-outline"
+                  size={24}
+                  color={currentTheme.textSecondary}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={{ flexDirection: "row", gap: 5, marginTop: 5 }}>
-            <Text
-              style={{
-                fontFamily: "outfit",
-                fontSize: 18,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              {moment(tripDetails?.startDate).format("MMM DD yyyy")}
-            </Text>
-            <Text
-              style={{
-                fontFamily: "outfit",
-                fontSize: 18,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              {"- "}
-              {moment(tripDetails?.endDate).format("MMM DD yyyy")}
-            </Text>
-          </View>
-          <Text
-            style={{
-              fontFamily: "outfit",
-              fontSize: 17,
-              color: currentTheme.textSecondary,
-            }}
-          >
-            Traveling as: {tripDetails?.whoIsGoing || "Unknown"}
-          </Text>
 
-          {/* Hotels List */}
+          <View style={styles.tripMetaContainer}>
+            <View
+              style={[
+                styles.tripMetaItem,
+                { backgroundColor: `${currentTheme.alternate}20` },
+              ]}
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={22}
+                color={currentTheme.alternate}
+              />
+              <Text
+                style={[
+                  styles.tripMetaText,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                {moment(tripDetails?.startDate).format("MMM DD")}
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.tripMetaItem,
+                { backgroundColor: `${currentTheme.alternate}20` },
+              ]}
+            >
+              <Ionicons
+                name="airplane-outline"
+                size={22}
+                color={currentTheme.alternate}
+              />
+              <Text
+                style={[
+                  styles.tripMetaText,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                {tripDetails?.whoIsGoing || "Unknown"}
+              </Text>
+            </View>
+          </View>
+
           <HotelList hotelList={tripDetails?.travelPlan?.hotels} />
-
-          {/* Planned Trip */}
           <PlannedTrip details={tripDetails?.travelPlan} />
-        </View>
+        </BlurView>
       </ScrollView>
 
-      {/* Flight Price and Booking */}
-      <View
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: currentTheme.background,
-          padding: 20,
-          height: 110,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <View>
+      <BlurView intensity={90} style={styles.bottomBar}>
+        <View style={styles.priceContainer}>
           <Text
-            style={{
-              fontFamily: "outfit-bold",
-              fontSize: 18,
-              color: currentTheme.textPrimary,
-            }}
+            style={[styles.airlineName, { color: currentTheme.textPrimary }]}
           >
-            {tripDetails?.travelPlan?.flights?.airlineName || "Unknown Airline"}
+            {tripDetails?.travelPlan?.flights?.airlineName || "Unknown Airline"}{" "}
+            ✈️
           </Text>
-          <Text
-            style={{
-              fontFamily: "outfit",
-              fontSize: 16,
-              color: currentTheme.textSecondary,
-            }}
-          >
+          <Text style={[styles.price, { color: currentTheme.alternate }]}>
             ${tripDetails?.travelPlan?.flights?.flightPrice || "N/A"}
           </Text>
         </View>
@@ -221,11 +234,127 @@ const TripDetails: React.FC = () => {
             }
           }}
           buttonText="Book Now"
-          width={200}
+          width={width * 0.45}
+          style={[
+            styles.bookButton,
+            { backgroundColor: currentTheme.alternate },
+          ]}
         />
-      </View>
+      </BlurView>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 20,
+  },
+  loadingText: {
+    fontFamily: "outfit-medium",
+    fontSize: 18,
+  },
+  imageContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: height * 0.5,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  gradient: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 200,
+  },
+  backButton: {
+    marginLeft: 16,
+    padding: 12,
+    borderRadius: 25,
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
+  scrollContent: {
+    paddingBottom: 100,
+    marginTop: height * 0.45,
+  },
+  contentContainer: {
+    padding: 24,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginTop: -30,
+  },
+  headerContainer: {
+    marginBottom: 20,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  destinationTitle: {
+    fontSize: 32,
+    fontFamily: "outfit-bold",
+    letterSpacing: 0.5,
+  },
+  tripMetaContainer: {
+    flexDirection: "row",
+    marginBottom: 25,
+    gap: 15,
+  },
+  tripMetaItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  tripMetaText: {
+    fontFamily: "outfit-medium",
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  bottomBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 24,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.1)",
+  },
+  priceContainer: {
+    flex: 1,
+  },
+  airlineName: {
+    fontFamily: "outfit-bold",
+    fontSize: 20,
+    marginBottom: 4,
+  },
+  price: {
+    fontFamily: "outfit-bold",
+    fontSize: 24,
+  },
+  bookButton: {
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.5,
+    borderRadius: 15,
+  },
+});
 
 export default TripDetails;

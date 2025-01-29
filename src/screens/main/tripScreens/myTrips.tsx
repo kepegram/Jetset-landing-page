@@ -132,7 +132,7 @@ const MyTrips: React.FC = () => {
             {userName || displayName}'s Trips ✈️
           </Text>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Pressable onPress={() => navigation.navigate("DoYouKnow")}>
+            <Pressable onPress={() => navigation.navigate("WhereTo")}>
               <Fontisto name="plus-a" size={30} color={currentTheme.icon} />
             </Pressable>
           </View>

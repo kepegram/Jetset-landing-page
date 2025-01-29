@@ -20,7 +20,9 @@ import { collection, getDocs, query } from "firebase/firestore";
 import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 import CurrentTripCard from "../../../components/myTrips/currentTripCard";
+import PastTripListCard from "../../../components/myTrips/pastTripListCard";
 import { LinearGradient } from "expo-linear-gradient";
+import moment from "moment";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -139,6 +141,37 @@ const Profile: React.FC = () => {
           ) : (
             <View style={styles.currentTripContainer}>
               <CurrentTripCard userTrips={userTrips} />
+            </View>
+          )}
+        </View>
+
+        <View style={styles.pastTripsContainer}>
+          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+            Past Trips
+          </Text>
+          {loading ? (
+            <ActivityIndicator size="large" color={currentTheme.alternate} />
+          ) : (
+            <View>
+              {userTrips
+                .filter((trip) =>
+                  moment(trip.tripData?.endDate).isBefore(moment(), "day")
+                )
+                .map((trip, index) => {
+                  if (!trip || !trip.tripData || !trip.tripPlan) {
+                    return null;
+                  }
+                  return (
+                    <PastTripListCard
+                      trip={{
+                        tripData: trip.tripData,
+                        tripPlan: trip.tripPlan,
+                        id: trip.id,
+                      }}
+                      key={index}
+                    />
+                  );
+                })}
             </View>
           )}
         </View>
@@ -272,6 +305,11 @@ const styles = StyleSheet.create({
   },
   currentTripContainer: {
     width: "100%",
+  },
+  pastTripsContainer: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+    marginBottom: 20,
   },
   modalOverlay: {
     flex: 1,
