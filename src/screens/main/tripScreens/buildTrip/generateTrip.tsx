@@ -1,5 +1,5 @@
-import React, { useContext, useState, useCallback, useRef } from "react";
-import { View, Text, Image, Alert, Pressable } from "react-native";
+import React, { useContext, useState, useCallback, useRef, useEffect } from "react";
+import { View, Text, Image, Alert, StyleSheet, SafeAreaView } from "react-native";
 import { CreateTripContext } from "../../../../context/createTripContext";
 import { AI_PROMPT, PLACE_AI_PROMPT } from "../../../../api/ai-prompt";
 import { chatSession } from "../../../../../AI-Model";
@@ -10,7 +10,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
 
 type GenerateTripScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -162,99 +161,67 @@ const GenerateTrip: React.FC = () => {
     }, [])
   );
 
+  useEffect(() => {
+    GenerateAiTrip();
+  }, []);
+
   return (
-    <View
-      style={{
-        padding: 25,
-        paddingTop: 75,
-        backgroundColor: currentTheme.background,
-        height: "100%",
-        justifyContent: "center",
-      }}
-    >
-      <Pressable
-        onPress={() => navigation.goBack()}
-        style={{
-          position: "absolute",
-          top: 50,
-          left: 25,
-          zIndex: 1,
-        }}
-      >
-        <Ionicons
-          name="arrow-back"
-          size={24}
-          color={currentTheme.textPrimary}
+    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
+      <View style={styles.contentContainer}>
+        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+          Creating Your Perfect Trip
+        </Text>
+        <Text style={[styles.subtitle, { color: currentTheme.textSecondary }]}>
+          Our AI is crafting a personalized itinerary just for you...
+        </Text>
+        <Image
+          source={require("../../../../assets/plane.gif")}
+          style={styles.animation}
         />
-      </Pressable>
-
-      <Text
-        style={{
-          fontFamily: "outfit-bold",
-          fontSize: 20,
-          textAlign: "center",
-          color: currentTheme.textPrimary,
-          marginBottom: 20,
-        }}
-      >
-        Ready to generate your dream trip?
-      </Text>
-      <Image
-        source={require("../../../../assets/plane.gif")}
-        style={{
-          width: "100%",
-          height: 200,
-          resizeMode: "contain",
-          marginTop: 40,
-        }}
-      />
-      <View style={{ marginTop: 40, gap: 20, alignItems: "center" }}>
-        <Pressable
-          onPress={() => GenerateAiTrip()}
-          style={{
-            backgroundColor: currentTheme.alternate,
-            padding: 15,
-            borderRadius: 10,
-            width: "80%",
-            opacity: loading ? 0.5 : 1,
-          }}
-          disabled={loading}
-        >
-          <Text
-            style={{
-              color: "#fff",
-              textAlign: "center",
-              fontSize: 16,
-              fontFamily: "outfit-medium",
-            }}
-          >
-            {loading ? "Generating..." : "Generate Trip"}
-          </Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => console.log("Final Prompt:", getFinalPrompt())}
-          style={{
-            backgroundColor: currentTheme.accentBackground,
-            padding: 15,
-            borderRadius: 10,
-            width: "80%",
-          }}
-        >
-          <Text
-            style={{
-              color: currentTheme.textPrimary,
-              textAlign: "center",
-              fontSize: 16,
-              fontFamily: "outfit-medium",
-            }}
-          >
-            Log Prompt
-          </Text>
-        </Pressable>
+        <Text style={[styles.warning, { color: currentTheme.textSecondary }]}>
+          Please do not close the app while we generate your trip
+        </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 25,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: "outfit-bold",
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  subtitle: {
+    fontSize: 16,
+    fontFamily: "outfit",
+    textAlign: "center",
+    marginBottom: 40,
+    paddingHorizontal: 20,
+  },
+  animation: {
+    width: "100%",
+    height: 220,
+    resizeMode: "contain",
+    marginBottom: 40,
+  },
+  warning: {
+    fontSize: 14,
+    fontFamily: "outfit",
+    textAlign: "center",
+    opacity: 0.8,
+    paddingHorizontal: 30,
+  },
+});
 
 export default GenerateTrip;

@@ -18,6 +18,8 @@ declare module "react-native-calendar-picker" {
     textStyle?: TextStyle;
     selectedDayStyle?: ViewStyle;
     width?: number;
+    height?: number;
+    scaleFactor?: number;
     selectedStartDate?: Date;
     selectedEndDate?: Date;
   }

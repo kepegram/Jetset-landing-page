@@ -92,6 +92,10 @@ const Profile: React.FC = () => {
     }
   };
 
+  const pastTrips = userTrips.filter((trip) =>
+    moment(trip.tripData?.endDate).isBefore(moment(), "day")
+  );
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
@@ -145,19 +149,16 @@ const Profile: React.FC = () => {
           )}
         </View>
 
-        <View style={styles.pastTripsContainer}>
-          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-            Past Trips
-          </Text>
-          {loading ? (
-            <ActivityIndicator size="large" color={currentTheme.alternate} />
-          ) : (
-            <View>
-              {userTrips
-                .filter((trip) =>
-                  moment(trip.tripData?.endDate).isBefore(moment(), "day")
-                )
-                .map((trip, index) => {
+        {pastTrips.length > 0 && (
+          <View style={styles.pastTripsContainer}>
+            <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+              Past Trips
+            </Text>
+            {loading ? (
+              <ActivityIndicator size="large" color={currentTheme.alternate} />
+            ) : (
+              <View>
+                {pastTrips.map((trip, index) => {
                   if (!trip || !trip.tripData || !trip.tripPlan) {
                     return null;
                   }
@@ -172,9 +173,10 @@ const Profile: React.FC = () => {
                     />
                   );
                 })}
-            </View>
-          )}
-        </View>
+              </View>
+            )}
+          </View>
+        )}
 
         <Modal
           animationType="fade"

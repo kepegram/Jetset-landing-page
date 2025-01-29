@@ -13,7 +13,8 @@ import {
   Text,
   View,
   FlatList,
-  ScrollView,
+  StyleSheet,
+  Animated,
 } from "react-native";
 import { Fontisto } from "@expo/vector-icons";
 import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
@@ -33,6 +34,7 @@ const MyTrips: React.FC = () => {
   const [userTrips, setUserTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<MyTripsScreenNavigationProp>();
+  const scrollY = new Animated.Value(0);
 
   const user = FIREBASE_AUTH.currentUser;
 
@@ -99,140 +101,208 @@ const MyTrips: React.FC = () => {
       return dateA.diff(dateB);
     });
 
+  const hasCurrentTrip = userTrips.some((trip) => {
+    const startDate = moment(trip.tripData.startDate).startOf("day");
+    const endDate = moment(trip.tripData.endDate).endOf("day");
+    const today = moment().startOf("day");
+    return startDate.isSameOrBefore(today) && endDate.isSameOrAfter(today);
+  });
+
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, 50],
+    outputRange: [1, 0.9],
+    extrapolate: "clamp",
+  });
+
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, -20],
+    extrapolate: "clamp",
+  });
+
   return (
-    <View style={{ flex: 1 }}>
-      {/* Header */}
-      <View
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1,
-          backgroundColor: currentTheme.background,
-          padding: 20,
-        }}
+    <View style={styles.container}>
+      <Animated.View
+        style={[
+          styles.header,
+          {
+            backgroundColor: currentTheme.background,
+            opacity: headerOpacity,
+            transform: [{ translateY: headerTranslateY }],
+          },
+        ]}
       >
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignContent: "center",
-            justifyContent: "space-between",
-            marginTop: 40,
-          }}
-        >
+        <View style={styles.headerContent}>
           <Text
-            style={{
-              fontWeight: "bold",
-              fontSize: 35,
-              color: currentTheme.textPrimary,
-            }}
+            style={[styles.headerTitle, { color: currentTheme.textPrimary }]}
           >
             {userName || displayName}'s Trips ✈️
           </Text>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Pressable onPress={() => navigation.navigate("WhereTo")}>
-              <Fontisto name="plus-a" size={30} color={currentTheme.icon} />
-            </Pressable>
-          </View>
-        </View>
-      </View>
-
-      <ScrollView
-        contentContainerStyle={{
-          padding: 25,
-          paddingTop: 100, // Adjust padding to avoid overlap with the header
-          backgroundColor: currentTheme.background,
-          flexGrow: 1,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Content */}
-        {loading ? (
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          <Pressable
+            style={styles.addButton}
+            onPress={() => navigation.navigate("WhereTo")}
           >
+            <Fontisto name="plus-a" size={24} color={currentTheme.icon} />
+          </Pressable>
+        </View>
+      </Animated.View>
+
+      <Animated.ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { backgroundColor: currentTheme.background },
+        ]}
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+      >
+        {loading ? (
+          <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={currentTheme.alternate} />
           </View>
         ) : userTrips.length === 0 ? (
           <StartNewTripCard navigation={navigation} />
         ) : (
-          <View>
-            <Text
-              style={{
-                fontWeight: "bold",
-                fontSize: 24,
-                color: currentTheme.textPrimary,
-                marginTop: 20,
-                textAlign: "left",
-              }}
-            >
-              Current Trip
-            </Text>
-            <View style={{ alignItems: "center" }}>
-              <CurrentTripsCard userTrips={userTrips} />
-            </View>
+          <View style={styles.tripsContainer}>
+            {hasCurrentTrip && (
+              <>
+                <Text
+                  style={[styles.sectionTitle, { color: currentTheme.textPrimary }]}
+                >
+                  Current Trip
+                </Text>
+                <CurrentTripsCard userTrips={userTrips} />
+              </>
+            )}
 
             {sortedUpcomingTrips.length > 0 && (
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  fontSize: 24,
-                  color: currentTheme.textPrimary,
-                  marginTop: 20,
-                }}
-              >
-                Upcoming Trips
-              </Text>
+              <>
+                <Text
+                  style={[
+                    styles.sectionTitle,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
+                  Upcoming Trips
+                </Text>
+                <FlatList
+                  data={sortedUpcomingTrips}
+                  horizontal
+                  renderItem={({ item }) => (
+                    <View style={styles.upcomingTripCard}>
+                      <UpcomingTripsCard userTrips={[item]} />
+                    </View>
+                  )}
+                  keyExtractor={(item) => item.id}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.upcomingTripsContainer}
+                />
+              </>
             )}
-            <FlatList
-              data={sortedUpcomingTrips}
-              horizontal
-              renderItem={({ item }) => (
-                <View style={{ marginRight: 10 }}>
-                  <UpcomingTripsCard userTrips={[item]} />
-                </View>
-              )}
-              keyExtractor={(item) => item.id}
-              showsHorizontalScrollIndicator={false}
-            />
 
             {userTrips.some((trip) =>
               moment(trip.tripData.endDate).isBefore(moment(), "day")
             ) && (
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  fontSize: 24,
-                  color: currentTheme.textPrimary,
-                  marginTop: 20,
-                }}
-              >
-                Past Trips
-              </Text>
+              <>
+                <Text
+                  style={[
+                    styles.sectionTitle,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
+                  Past Trips
+                </Text>
+                <View style={styles.pastTripsContainer}>
+                  {userTrips.map((trip, index) => {
+                    if (!trip || !trip.tripData || !trip.tripPlan) {
+                      console.warn(
+                        `Skipping invalid trip at index ${index}:`,
+                        trip
+                      );
+                      return null;
+                    }
+                    return (
+                      <PastTripListCard
+                        trip={{
+                          tripData: trip.tripData,
+                          tripPlan: trip.tripPlan,
+                          id: trip.id,
+                        }}
+                        key={index}
+                      />
+                    );
+                  })}
+                </View>
+              </>
             )}
-            {userTrips.map((trip, index) => {
-              if (!trip || !trip.tripData || !trip.tripPlan) {
-                console.warn(`Skipping invalid trip at index ${index}:`, trip);
-                return null;
-              }
-              return (
-                <PastTripListCard
-                  trip={{
-                    tripData: trip.tripData,
-                    tripPlan: trip.tripPlan,
-                    id: trip.id,
-                  }}
-                  key={index}
-                />
-              );
-            })}
           </View>
         )}
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.1)",
+  },
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: "800",
+  },
+  addButton: {
+    padding: 8,
+    borderRadius: 12,
+    backgroundColor: "rgba(0,0,0,0.05)",
+  },
+  scrollContent: {
+    paddingTop: 100,
+    paddingHorizontal: 20,
+    flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  tripsContainer: {
+    flex: 1,
+    gap: 20,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginTop: 30,
+  },
+  upcomingTripCard: {
+    marginRight: 15,
+  },
+  upcomingTripsContainer: {
+    paddingVertical: 10,
+  },
+  pastTripsContainer: {
+    gap: 15,
+  },
+});
 
 export default MyTrips;

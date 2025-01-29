@@ -1,4 +1,4 @@
-import { View, Text, Modal, Pressable, Button } from "react-native";
+import { View, Text, Modal, Pressable, Button, StyleSheet } from "react-native";
 import { useTheme } from "../../context/themeContext";
 import React, { useState } from "react";
 import PlaceCard from "./placeCard";
@@ -13,7 +13,7 @@ interface PlannedTripProps {
         placeName: string;
         placeDetails: string;
         timeToTravel: string;
-        geoCoordinates: {
+        geoCoordinates?: {
           latitude: number;
           longitude: number;
         };
@@ -32,14 +32,8 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
 
   if (!details || typeof details !== "object") {
     return (
-      <View>
-        <Text
-          style={{
-            fontSize: 18,
-            fontFamily: "outfit",
-            color: "red",
-          }}
-        >
+      <View style={styles.errorContainer}>
+        <Text style={[styles.errorText, { color: currentTheme.error }]}>
           No Plan Details Available
         </Text>
       </View>
@@ -50,45 +44,35 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
     setMapVisible(!isMapVisible);
   };
 
-  // Calculate the initial region for the map
+  // Calculate the initial region for the map with fallback coordinates
+  const defaultLocation = {
+    latitude: 37.7749, // San Francisco as default
+    longitude: -122.4194,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  };
+
   const initialRegion =
-    details.itinerary.length > 0 && details.itinerary[0].places.length > 0
+    details.itinerary.length > 0 &&
+    details.itinerary[0].places.length > 0 &&
+    details.itinerary[0].places[0].geoCoordinates
       ? {
           latitude: details.itinerary[0].places[0].geoCoordinates.latitude,
           longitude: details.itinerary[0].places[0].geoCoordinates.longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }
-      : undefined;
+      : defaultLocation;
 
   return (
-    <View
-      style={{
-        marginTop: 20,
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 20,
-          marginBottom: 10,
-          fontFamily: "outfit-bold",
-          color: currentTheme.textPrimary,
-        }}
-      >
+    <View style={styles.container}>
+      <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
         🏕️ Suggested Itinerary
       </Text>
 
       {details.itinerary.map(({ day, places }) => (
         <View key={day}>
-          <Text
-            style={{
-              fontFamily: "outfit-medium",
-              fontSize: 17,
-              marginTop: 10,
-              marginBottom: 10,
-              color: currentTheme.textPrimary,
-            }}
-          >
+          <Text style={[styles.dayText, { color: currentTheme.textPrimary }]}>
             {day}
           </Text>
           {Array.isArray(places) && places.length > 0 ? (
@@ -105,23 +89,23 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
               </Pressable>
             ))
           ) : (
-            <Text style={{ color: "red", marginBottom: 10 }}>
+            <Text style={[styles.errorText, { color: currentTheme.error }]}>
               No places planned for this day.
             </Text>
           )}
         </View>
       ))}
 
-      <Text style={{ color: currentTheme.textPrimary }}>
-        Budget: {details.budget}
-      </Text>
-      <Text style={{ color: currentTheme.textPrimary }}>
-        Destination: {details.destination}
-      </Text>
+      <View style={styles.infoContainer}>
+        <Text style={{ color: currentTheme.textPrimary }}>
+          Budget: {details.budget}
+        </Text>
+        <Text style={{ color: currentTheme.textPrimary }}>
+          Destination: {details.destination}
+        </Text>
+      </View>
 
-      <View
-        style={{ marginTop: 10, alignItems: "flex-start", marginLeft: -10 }}
-      >
+      <View style={styles.mapButtonContainer}>
         <Button
           title="Show Itinerary on Map"
           onPress={toggleMapModal}
@@ -130,28 +114,83 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
       </View>
 
       <Modal visible={isMapVisible} onRequestClose={toggleMapModal}>
-        <MapView style={{ flex: 1 }} initialRegion={initialRegion}>
+        <MapView style={styles.map} initialRegion={initialRegion}>
           {details.itinerary.map(({ places }) =>
-            places.map((place, index) => (
-              <Marker
-                key={index}
-                coordinate={{
-                  latitude: place.geoCoordinates.latitude,
-                  longitude: place.geoCoordinates.longitude,
-                }}
-                title={place.placeName}
-              />
-            ))
+            places.map((place, index) => {
+              if (
+                !place.geoCoordinates?.latitude ||
+                !place.geoCoordinates?.longitude
+              ) {
+                return null;
+              }
+              return (
+                <Marker
+                  key={index}
+                  coordinate={{
+                    latitude: place.geoCoordinates.latitude,
+                    longitude: place.geoCoordinates.longitude,
+                  }}
+                  title={place.placeName}
+                />
+              );
+            })
           )}
         </MapView>
-        <Button
-          title="Close Map"
-          onPress={toggleMapModal}
-          color={currentTheme.alternate}
-        />
+        <View style={styles.closeButtonContainer}>
+          <Button
+            title="Close Map"
+            onPress={toggleMapModal}
+            color={currentTheme.alternate}
+          />
+        </View>
       </Modal>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 20,
+  },
+  errorContainer: {
+    padding: 20,
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 10,
+    fontFamily: "outfit-bold",
+  },
+  dayText: {
+    fontFamily: "outfit-medium",
+    fontSize: 17,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  errorText: {
+    fontSize: 18,
+    fontFamily: "outfit",
+    marginBottom: 10,
+  },
+  infoContainer: {
+    marginTop: 15,
+    gap: 5,
+  },
+  mapButtonContainer: {
+    marginTop: 10,
+    alignItems: "flex-start",
+    marginLeft: -10,
+  },
+  map: {
+    flex: 1,
+  },
+  closeButtonContainer: {
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+});
 
 export default PlannedTrip;

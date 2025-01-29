@@ -1,14 +1,23 @@
-import { View, Text, Image, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  StyleSheet,
+  Animated,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
 import { useTheme } from "../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "TripDetails"
+  "CurrentTripDetails"
 >;
 
 interface CurrentTripCardProps {
@@ -23,6 +32,21 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const [currentTrip, setCurrentTrip] = useState<any>(null);
+  const scaleAnim = new Animated.Value(1);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.98,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
 
   useEffect(() => {
     const today = moment().startOf("day");
@@ -51,15 +75,16 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
 
   if (!currentTrip) {
     return (
-      <View style={{ marginVertical: 20, width: "100%", alignItems: "center" }}>
+      <View style={styles.noTripContainer}>
+        <MaterialIcons
+          name="flight"
+          size={40}
+          color={currentTheme.textSecondary}
+        />
         <Text
-          style={{
-            fontFamily: "outfit-medium",
-            fontSize: 18,
-            color: currentTheme.textSecondary,
-          }}
+          style={[styles.noTripText, { color: currentTheme.textSecondary }]}
         >
-          None. Book something for today!
+          No current trips. Time to plan your next adventure!
         </Text>
       </View>
     );
@@ -73,87 +98,120 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
   const daysRemaining = endDate.diff(today, "days");
 
   return (
-    <View style={{ marginVertical: 20, width: "100%" }}>
-      {parsedCurrentTrip?.locationInfo?.photoRef ? (
-        <Pressable
-          onPress={() =>
-            navigation.navigate("CurrentTripDetails", {
-              trip: JSON.stringify({
-                ...parsedCurrentTrip,
-                travelPlan: parsedCurrentPlan?.travelPlan || {},
-                photoRef: parsedCurrentPlan?.travelPlan?.photoRef,
-              }),
-            })
+    <Animated.View
+      style={[styles.container, { transform: [{ scale: scaleAnim }] }]}
+    >
+      <Pressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={() =>
+          navigation.navigate("CurrentTripDetails", {
+            trip: JSON.stringify({
+              ...parsedCurrentTrip,
+              travelPlan: parsedCurrentPlan?.travelPlan || {},
+            }),
+            photoRef: parsedCurrentTrip?.locationInfo?.photoRef || "",
+          })
+        }
+        style={styles.cardContainer}
+      >
+        <Image
+          source={
+            parsedCurrentTrip?.locationInfo?.photoRef
+              ? {
+                  uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${parsedCurrentTrip.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
+                }
+              : require("../../assets/placeholder.jpeg")
           }
+          style={styles.image}
+        />
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.8)"]}
+          style={styles.gradient}
         >
-          <Image
-            source={{
-              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${parsedCurrentPlan.travelPlan.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
-            }}
-            style={{
-              width: "100%",
-              height: 240,
-              borderRadius: 15,
-            }}
-          />
-        </Pressable>
-      ) : (
-        <Pressable
-          onPress={() => {
-            console.log(parsedCurrentPlan);
-            navigation.navigate("CurrentTripDetails", {
-              trip: JSON.stringify({
-                ...parsedCurrentTrip,
-                travelPlan: parsedCurrentPlan?.travelPlan || {},
-                photoRef: parsedCurrentPlan?.travelPlan?.photoRef,
-              }),
-            });
-          }}
-        >
-          <Image
-            source={require("../../assets/placeholder.jpeg")}
-            style={{
-              width: "100%",
-              height: 240,
-              borderRadius: 15,
-            }}
-          />
-        </Pressable>
-      )}
-      <View style={{ marginTop: 10 }}>
-        <Text
-          style={{
-            fontFamily: "outfit",
-            fontSize: 24,
-            color: currentTheme.textPrimary,
-          }}
-        >
-          {parsedCurrentPlan?.travelPlan?.destination || "No Location Name"}
-        </Text>
-        <View
-          style={{
-            flexDirection: "row",
-            marginTop: 5,
-            alignItems: "center",
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "outfit",
-              fontSize: 17,
-              color: currentTheme.textSecondary,
-            }}
-          >
-            {daysRemaining >= 0
-              ? `${daysRemaining} day${
-                  daysRemaining !== 1 ? "s" : ""
-                } remaining`
-              : "Trip has ended"}
-          </Text>
-        </View>
-      </View>
-    </View>
+          <View style={styles.contentContainer}>
+            <Text style={styles.destinationText}>
+              {parsedCurrentPlan?.travelPlan?.destination || "No Location Name"}
+            </Text>
+            <View style={styles.daysContainer}>
+              <MaterialIcons name="timer" size={20} color="#fff" />
+              <Text style={styles.daysText}>
+                {daysRemaining >= 0
+                  ? `${daysRemaining} day${
+                      daysRemaining !== 1 ? "s" : ""
+                    } remaining`
+                  : "Trip has ended"}
+              </Text>
+            </View>
+          </View>
+        </LinearGradient>
+      </Pressable>
+    </Animated.View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+    marginVertical: 10,
+  },
+  cardContainer: {
+    borderRadius: 20,
+    overflow: "hidden",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  image: {
+    width: "100%",
+    height: 240,
+  },
+  gradient: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "50%",
+    justifyContent: "flex-end",
+    padding: 20,
+  },
+  contentContainer: {
+    gap: 8,
+  },
+  destinationText: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#fff",
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
+  },
+  daysContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  daysText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "500",
+  },
+  noTripContainer: {
+    marginVertical: 20,
+    width: "100%",
+    alignItems: "center",
+    padding: 30,
+    gap: 15,
+    backgroundColor: "rgba(0,0,0,0.05)",
+    borderRadius: 15,
+  },
+  noTripText: {
+    fontSize: 16,
+    textAlign: "center",
+    fontWeight: "500",
+  },
+});
 
 export default CurrentTripCard;

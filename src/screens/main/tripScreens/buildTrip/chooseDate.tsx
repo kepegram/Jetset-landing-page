@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions, SafeAreaView } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../../navigation/appNav";
@@ -68,13 +68,14 @@ const ChooseDate: React.FC = () => {
 
   const getDateRangeText = () => {
     if (startDate && endDate) {
-      return `${startDate.format("MMM D")} - ${endDate.format("MMM D, YYYY")}`;
+      const nights = endDate.diff(startDate, "days");
+      return `${startDate.format("MMM D")} - ${endDate.format("MMM D, YYYY")} • ${nights} ${nights === 1 ? 'night' : 'nights'}`;
     }
     return "Select your travel dates";
   };
 
   return (
-    <View
+    <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <View style={styles.headerContainer}>
@@ -86,14 +87,17 @@ const ChooseDate: React.FC = () => {
         <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
           Choose your dates
         </Text>
-        <Text
-          style={[styles.dateRangeText, { color: currentTheme.textSecondary }]}
-        >
-          {getDateRangeText()}
-        </Text>
+        <View style={[styles.dateRangeContainer, { backgroundColor: currentTheme.alternate + '20' }]}>
+          <Ionicons name="calendar-outline" size={24} color={currentTheme.textSecondary} />
+          <Text
+            style={[styles.dateRangeText, { color: currentTheme.textSecondary }]}
+          >
+            {getDateRangeText()}
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.calendarWrapper}>
+      <View style={[styles.calendarWrapper, { backgroundColor: currentTheme.alternate + '10' }]}>
         <CalendarPicker
           onDateChange={onDateChange}
           allowRangeSelection={true}
@@ -104,23 +108,23 @@ const ChooseDate: React.FC = () => {
           previousComponent={
             <Ionicons
               name="chevron-back"
-              size={30}
+              size={34}
               color={currentTheme.textPrimary}
             />
           }
           nextComponent={
             <Ionicons
               name="chevron-forward"
-              size={30}
+              size={34}
               color={currentTheme.textPrimary}
             />
           }
           selectedRangeStyle={{
-            backgroundColor: currentTheme.alternate,
+            backgroundColor: currentTheme.alternate + '50',
           }}
           selectedDayStyle={{
             backgroundColor: currentTheme.alternate,
-            borderRadius: 8,
+            borderRadius: 12,
           }}
           selectedDayTextStyle={styles.selectedDayText}
           dayTextStyle={{ color: currentTheme.textPrimary }}
@@ -134,19 +138,22 @@ const ChooseDate: React.FC = () => {
           }}
           disabledDatesTextStyle={styles.disabledDates}
           textStyle={{ color: currentTheme.textPrimary }}
-          width={Dimensions.get("window").width - 60}
+          width={Dimensions.get("window").width - 40}
+          height={420}
+          scaleFactor={375}
         />
       </View>
 
       <View style={styles.buttonContainer}>
         <MainButton
-          buttonText="Continue"
+          buttonText={startDate && endDate ? "Continue" : "Select Dates"}
           onPress={OnDateSelectionContinue}
           width="85%"
           backgroundColor={currentTheme.alternate}
+          disabled={!startDate || !endDate}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -166,30 +173,48 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 34,
     fontWeight: "bold",
-    marginBottom: 12,
+    marginBottom: 16,
+  },
+  dateRangeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 8,
   },
   dateRangeText: {
     fontSize: 16,
-    marginTop: 8,
+    marginLeft: 8,
+    fontWeight: '500',
   },
   calendarWrapper: {
-    marginTop: 30,
+    marginTop: 24,
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.05)",
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   monthTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 10,
   },
   yearTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 10,
   },
   selectedDayText: {
     color: "white",
     fontWeight: "600",
+    fontSize: 16,
   },
   disabledDates: {
     color: "rgba(128,128,128,0.5)",

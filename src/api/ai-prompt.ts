@@ -33,6 +33,28 @@ Return ONLY a valid JSON object with this exact structure:
         },
         "rating": "Rating out of 5 to one decimal place",
         "description": "Factual description including room types, amenities and recent renovations"
+      },
+      {
+        "hotelName": "Full official hotel name",
+        "hotelAddress": "Complete street address with postal code", 
+        "price": "Price per night in USD (integer)",
+        "geoCoordinates": {
+          "latitude": "Decimal coordinates to 6 decimal places",
+          "longitude": "Decimal coordinates to 6 decimal places"
+        },
+        "rating": "Rating out of 5 to one decimal place",
+        "description": "Factual description including room types, amenities and recent renovations"
+      },
+      {
+        "hotelName": "Full official hotel name",
+        "hotelAddress": "Complete street address with postal code",
+        "price": "Price per night in USD (integer)", 
+        "geoCoordinates": {
+          "latitude": "Decimal coordinates to 6 decimal places",
+          "longitude": "Decimal coordinates to 6 decimal places"
+        },
+        "rating": "Rating out of 5 to one decimal place",
+        "description": "Factual description including room types, amenities and recent renovations"
       }
     ],
     "itinerary": [
@@ -91,6 +113,28 @@ Return ONLY a valid JSON object with this exact structure:
         },
         "rating": "Rating out of 5 to one decimal place",
         "description": "Factual description including room types, amenities and recent renovations"
+      },
+      {
+        "hotelName": "Full official hotel name",
+        "hotelAddress": "Complete street address with postal code",
+        "price": "Price per night in USD (integer)",
+        "geoCoordinates": {
+          "latitude": "Decimal coordinates to 6 decimal places",
+          "longitude": "Decimal coordinates to 6 decimal places"
+        },
+        "rating": "Rating out of 5 to one decimal place",
+        "description": "Factual description including room types, amenities and recent renovations"
+      },
+      {
+        "hotelName": "Full official hotel name",
+        "hotelAddress": "Complete street address with postal code",
+        "price": "Price per night in USD (integer)",
+        "geoCoordinates": {
+          "latitude": "Decimal coordinates to 6 decimal places",
+          "longitude": "Decimal coordinates to 6 decimal places"
+        },
+        "rating": "Rating out of 5 to one decimal place",
+        "description": "Factual description including room types, amenities and recent renovations"
       }
     ],
     "itinerary": [
@@ -138,6 +182,7 @@ Return ONLY a valid JSON object with this exact structure:
     "numberOfDays": 5,
     "numberOfNights": 4,
     "destination": "Full destination name including city, region and country",
+    "destinationDescription": "Brief overview of the destination's history, culture, and main attractions",
     "photoRef": "Google Places photo reference for destination",
     "flights": {
       "airlineName": "Major international airline name",
@@ -145,6 +190,28 @@ Return ONLY a valid JSON object with this exact structure:
       "airlineUrl": "Direct URL to airline's booking page"
     },
     "hotels": [
+      {
+        "hotelName": "Full official hotel name",
+        "hotelAddress": "Complete street address with postal code",
+        "price": "Price per night in USD (integer)",
+        "geoCoordinates": {
+          "latitude": "Decimal coordinates to 6 decimal places",
+          "longitude": "Decimal coordinates to 6 decimal places"
+        },
+        "rating": "Exactly 4.0",
+        "description": "Factual description including room types, amenities and recent renovations"
+      },
+      {
+        "hotelName": "Full official hotel name",
+        "hotelAddress": "Complete street address with postal code",
+        "price": "Price per night in USD (integer)",
+        "geoCoordinates": {
+          "latitude": "Decimal coordinates to 6 decimal places",
+          "longitude": "Decimal coordinates to 6 decimal places"
+        },
+        "rating": "Exactly 4.0",
+        "description": "Factual description including room types, amenities and recent renovations"
+      },
       {
         "hotelName": "Full official hotel name",
         "hotelAddress": "Complete street address with postal code",

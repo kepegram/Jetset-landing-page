@@ -5,17 +5,20 @@ import {
   ScrollView,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
+  Pressable,
   StatusBar,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useTheme } from "../../../context/themeContext";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
+import { CreateTripContext } from "../../../context/createTripContext";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../navigation/appNav";
 
-const { width, height } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 type RouteParams = {
   destination: {
@@ -25,11 +28,18 @@ type RouteParams = {
   };
 };
 
+type PopularDestinationsScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "PopularDestinations"
+>;
+
 const PopularDestinations: React.FC = () => {
   const { currentTheme } = useTheme();
   const route = useRoute();
+  const { tripData = {}, setTripData = () => {} } =
+    useContext(CreateTripContext) || {};
   const { destination } = route.params as RouteParams;
-  const navigation = useNavigation();
+  const navigation = useNavigation<PopularDestinationsScreenNavigationProp>();
 
   useEffect(() => {
     navigation.setOptions({
@@ -37,12 +47,12 @@ const PopularDestinations: React.FC = () => {
       headerTransparent: true,
       headerTitle: "",
       headerLeft: () => (
-        <TouchableOpacity
+        <Pressable
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
           <Ionicons name="chevron-back" size={28} color="white" />
-        </TouchableOpacity>
+        </Pressable>
       ),
     });
   }, [navigation]);
@@ -148,7 +158,7 @@ const PopularDestinations: React.FC = () => {
             </Text>
           </View>
 
-          <TouchableOpacity
+          <Pressable
             style={[
               styles.exploreButton,
               { backgroundColor: currentTheme.alternate },
@@ -157,8 +167,8 @@ const PopularDestinations: React.FC = () => {
               /* Handle explore press */
             }}
           >
-            <Text style={styles.exploreButtonText}>Explore More</Text>
-          </TouchableOpacity>
+            <Text style={styles.exploreButtonText}>Start Planning!</Text>
+          </Pressable>
         </BlurView>
       </ScrollView>
     </View>

@@ -35,13 +35,14 @@ type NavigationProp = NativeStackNavigationProp<
 interface RouteParams {
   trip: string;
   photoRef: string;
+  docId: string;
 }
 
 const TripDetails: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
-  const { trip, photoRef } = route.params as RouteParams;
+  const { trip, photoRef, docId } = route.params as RouteParams;
 
   const [tripDetails, setTripDetails] = useState<any>(null);
   const user = FIREBASE_AUTH.currentUser;
@@ -101,11 +102,7 @@ const TripDetails: React.FC = () => {
           { backgroundColor: currentTheme.background },
         ]}
       >
-        <Ionicons
-          name="airplane-clock"
-          size={50}
-          color={currentTheme.alternate}
-        />
+        <Ionicons name="airplane" size={50} color={currentTheme.alternate} />
         <Text style={[styles.loadingText, { color: currentTheme.textPrimary }]}>
           Loading trip details...
         </Text>
@@ -154,7 +151,7 @@ const TripDetails: React.FC = () => {
               >
                 {tripDetails?.travelPlan?.destination || "Unknown Location"}
               </Text>
-              <TouchableOpacity onPress={() => deleteTrip(tripDetails.id)}>
+              <TouchableOpacity onPress={() => deleteTrip(docId)}>
                 <Ionicons
                   name="trash-bin-outline"
                   size={24}
@@ -192,7 +189,7 @@ const TripDetails: React.FC = () => {
               ]}
             >
               <Ionicons
-                name="airplane-outline"
+                name="people-outline"
                 size={22}
                 color={currentTheme.alternate}
               />

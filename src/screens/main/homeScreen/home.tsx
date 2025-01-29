@@ -87,6 +87,17 @@ const Home: React.FC = () => {
     }
   };
 
+  const setTerrainTrip = async (terrainType: string) => {
+    setTripData({
+      ...tripData,
+      destinationType: terrainType,
+    });
+    // @ts-ignore - Nested navigation type issue
+    navigation.navigate("MyTrips", {
+      screen: "ChooseDate",
+    });
+  };
+
   const generateRecommendedTrips = async () => {
     try {
       setIsLoading(true);
@@ -188,17 +199,6 @@ const Home: React.FC = () => {
     }
   };
 
-  const setTerrainTrip = async (terrainType: string) => {
-    setTripData({
-      ...tripData,
-      destinationType: terrainType,
-    });
-    // @ts-ignore - Nested navigation type issue
-    navigation.navigate("MyTrips", {
-      screen: "ChooseDate",
-    });
-  };
-
   useFocusEffect(
     useCallback(() => {
       generateRecommendedTrips();
@@ -248,9 +248,8 @@ const Home: React.FC = () => {
                   label: "Landmark",
                   icon: "globe-americas",
                   type: "fa",
-                  width: 95,
                 },
-              ].map(({ label, icon, type, width }) => (
+              ].map(({ label, icon, type }) => (
                 <Pressable
                   key={label}
                   onPress={() => setTerrainTrip(label)}
@@ -262,7 +261,6 @@ const Home: React.FC = () => {
                         ? "rgba(255,255,255,0.2)"
                         : "rgba(5, 5, 5, 0.6)",
                       borderColor: currentTheme.alternate,
-                      width: width,
                     },
                   ]}
                 >
@@ -414,7 +412,7 @@ const Home: React.FC = () => {
                     </View>
                   );
                 } else if (isRecommendedTrip(trip)) {
-                  const tripInfo = trip.fullResponse;
+                  const tripInfo = JSON.parse(trip.fullResponse);
                   return (
                     <Pressable
                       onPress={() => {
@@ -423,7 +421,7 @@ const Home: React.FC = () => {
                           tripInfo
                         );
                         navigation.navigate("RecommendedTripDetails", {
-                          trip: tripInfo,
+                          trip: trip.fullResponse,
                           photoRef: trip.photoRef ?? "",
                         });
                       }}
@@ -456,16 +454,28 @@ const Home: React.FC = () => {
                           color={currentTheme.textPrimary}
                           style={styles.tripLocationIcon}
                         />
-                        <Text
-                          style={[
-                            styles.tripName,
-                            { color: currentTheme.textPrimary },
-                          ]}
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {trip.name}
-                        </Text>
+                        <View style={styles.tripTextContainer}>
+                          <Text
+                            style={[
+                              styles.tripName,
+                              { color: currentTheme.textPrimary },
+                            ]}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {trip.name}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.tripDescription,
+                              { color: currentTheme.textSecondary },
+                            ]}
+                            numberOfLines={2}
+                            ellipsizeMode="tail"
+                          >
+                            {tripInfo.travelPlan.destinationDescription}
+                          </Text>
+                        </View>
                       </View>
                     </Pressable>
                   );
@@ -717,16 +727,25 @@ const styles = StyleSheet.create({
   },
   tripInfoContainer: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     padding: 15,
   },
   tripLocationIcon: {
     marginRight: 8,
+    marginTop: 3,
+  },
+  tripTextContainer: {
+    flex: 1,
   },
   tripName: {
     fontSize: 18,
     fontWeight: "600",
-    flex: 1,
+    marginBottom: 4,
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
+  },
+  tripDescription: {
+    fontSize: 14,
+    lineHeight: 18,
     fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
   },
 });

@@ -218,12 +218,11 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 32,
-    fontFamily: "outfit-bold",
+    fontWeight: "bold",
     marginBottom: 8,
   },
   subheading: {
     fontSize: 16,
-    fontFamily: "outfit",
     opacity: 0.8,
   },
   searchContainer: {

@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../../../context/themeContext";
 import { MainButton } from "../../../../components/ui/button";
 import { CreateTripContext } from "../../../../context/createTripContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type ChoosePlacesNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -20,14 +21,6 @@ const ChoosePlaces: React.FC = () => {
   const [selectedDestination, setSelectedDestination] = useState<string | null>(
     null
   );
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      headerTransparent: true,
-      headerTitle: "",
-    });
-  }, [navigation]);
 
   const destinations = [
     {
@@ -68,62 +61,66 @@ const ChoosePlaces: React.FC = () => {
   };
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: currentTheme.background }]}
     >
-      <View style={styles.headerContainer}>
-        <Text
-          style={[styles.subheading, { color: currentTheme.textSecondary }]}
-        >
-          Where to?
-        </Text>
-        <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-          Pick your destination
-        </Text>
-      </View>
-
-      <View style={styles.destinationsContainer}>
-        {destinations.map((dest) => (
-          <Pressable
-            key={dest.id}
-            onPress={() => setSelectedDestination(dest.id)}
-            style={[
-              styles.destinationButton,
-              selectedDestination === dest.id && styles.selectedDestination,
-            ]}
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Text
+            style={[styles.subheading, { color: currentTheme.textSecondary }]}
           >
-            <Image source={dest.image} style={styles.destinationImage} />
-            <Text
+            Where to?
+          </Text>
+          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+            Pick your destination
+          </Text>
+        </View>
+
+        <View style={styles.destinationsContainer}>
+          {destinations.map((dest) => (
+            <Pressable
+              key={dest.id}
+              onPress={() => setSelectedDestination(dest.id)}
               style={[
-                styles.destinationLabel,
-                { color: currentTheme.textPrimary },
+                styles.destinationButton,
+                selectedDestination === dest.id && styles.selectedDestination,
               ]}
             >
-              {dest.label}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+              <Image source={dest.image} style={styles.destinationImage} />
+              <Text
+                style={[
+                  styles.destinationLabel,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                {dest.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <MainButton
-          onPress={handleContinue}
-          buttonText="Continue"
-          width={"70%"}
-          disabled={!selectedDestination}
-        />
+        <View style={styles.buttonContainer}>
+          <MainButton
+            onPress={handleContinue}
+            buttonText="Continue"
+            width={"70%"}
+            disabled={!selectedDestination}
+          />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     padding: 20,
   },
   headerContainer: {
-    marginTop: 100,
     alignItems: "flex-start",
   },
   subheading: {

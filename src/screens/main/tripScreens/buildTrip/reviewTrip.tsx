@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, SafeAreaView } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import { CreateTripContext } from "../../../../context/createTripContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -24,7 +24,7 @@ const ReviewTrip: React.FC = () => {
   }, [tripData]);
 
   return (
-    <View
+    <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <ScrollView
@@ -176,7 +176,7 @@ const ReviewTrip: React.FC = () => {
           width="85%"
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

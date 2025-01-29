@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Animated } from "react-native";
+import { View, Text, StyleSheet, Animated, SafeAreaView } from "react-native";
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -73,7 +73,7 @@ const WhosGoing: React.FC = () => {
   };
 
   return (
-    <View
+    <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <View style={styles.headerContainer}>
@@ -148,7 +148,7 @@ const WhosGoing: React.FC = () => {
           />
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

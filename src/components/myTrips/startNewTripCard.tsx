@@ -1,6 +1,6 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Animated } from "react-native";
 import React from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/themeContext";
 import { RootStackParamList } from "../../navigation/appNav";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -8,60 +8,78 @@ import { MainButton } from "../ui/button";
 
 type StartNewTripCardProps = {
   navigation: NativeStackNavigationProp<RootStackParamList>;
-  textColor?: string; // Allow text color to be editable
-  subTextColor?: string; // Allow subtext color to be editable
+  textColor?: string;
+  subTextColor?: string;
 };
 
 const StartNewTripCard: React.FC<StartNewTripCardProps> = ({
   navigation,
-  textColor, // Destructure textColor from props
-  subTextColor, // Destructure subTextColor from props
+  textColor,
+  subTextColor,
 }) => {
   const { currentTheme } = useTheme();
+  const scaleAnim = new Animated.Value(1);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.98,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
 
   return (
-    <View style={[styles.container, { backgroundColor: "transparent" }]}>
-      <View
-        style={{
-          padding: 20,
-          display: "flex",
-          alignItems: "center",
-          gap: 25,
-        }}
+    <Animated.View
+      style={[styles.container, { transform: [{ scale: scaleAnim }] }]}
+    >
+      <Pressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={[
+          styles.cardContainer,
+          { backgroundColor: currentTheme.accentBackground },
+        ]}
       >
-        <Ionicons
-          name="location-sharp"
-          size={50}
-          color={currentTheme.alternate}
-        />
-        <Text
-          style={{
-            fontSize: 25,
-            fontWeight: "bold",
-            color: textColor || currentTheme.textPrimary,
-          }}
-        >
-          No trips planned yet
-        </Text>
-
-        <Text
-          style={{
-            fontSize: 20,
-            textAlign: "center",
-            color: subTextColor || "gray",
-          }}
-        >
-          Looks like its time to plan a new travel experience! Get Started below
-        </Text>
-
-        <MainButton
-          buttonText="Start a new trip"
-          onPress={() => navigation.navigate("DoYouKnow")}
-          width={200}
-          backgroundColor={currentTheme.alternate}
-        />
-      </View>
-    </View>
+        <View style={styles.contentContainer}>
+          <MaterialCommunityIcons
+            name="airplane-takeoff"
+            size={50}
+            color={currentTheme.alternate}
+          />
+          <View style={styles.textContainer}>
+            <Text
+              style={[
+                styles.titleText,
+                { color: textColor || currentTheme.textPrimary },
+              ]}
+            >
+              Ready for Your Next Adventure?
+            </Text>
+            <Text
+              style={[
+                styles.subtitleText,
+                { color: subTextColor || currentTheme.textSecondary },
+              ]}
+            >
+              Start planning your dream trip today and create unforgettable
+              memories
+            </Text>
+          </View>
+          <MainButton
+            buttonText="Start Planning"
+            onPress={() => navigation.navigate("WhereTo")}
+            width={200}
+            backgroundColor={currentTheme.alternate}
+          />
+        </View>
+      </Pressable>
+    </Animated.View>
   );
 };
 
@@ -70,19 +88,37 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    padding: 20,
   },
-  iconContainer: {
-    position: "relative",
-    alignItems: "center",
-  },
-  appName: {
-    fontSize: 25,
-    fontWeight: "bold",
-  },
-  profilePicture: {
-    width: 35,
-    height: 35,
+  cardContainer: {
+    width: "100%",
     borderRadius: 20,
+    overflow: "hidden",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  contentContainer: {
+    padding: 30,
+    alignItems: "center",
+    gap: 25,
+  },
+  textContainer: {
+    alignItems: "center",
+    gap: 12,
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  subtitleText: {
+    fontSize: 16,
+    textAlign: "center",
+    lineHeight: 24,
+    paddingHorizontal: 20,
   },
 });
 

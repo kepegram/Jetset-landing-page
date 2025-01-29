@@ -1,5 +1,13 @@
 import React, { useContext, useState } from "react";
-import { Alert, Image, Pressable, Text, View, Platform } from "react-native";
+import {
+  Alert,
+  Image,
+  Pressable,
+  Text,
+  View,
+  Platform,
+  Animated,
+} from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
   createNativeStackNavigator,
@@ -56,8 +64,8 @@ export type RootStackParamList = {
   MoreInfo: undefined;
   ReviewTrip: undefined;
   GenerateTrip: undefined;
-  TripDetails: { trip: string };
-  CurrentTripDetails: { trip: string };
+  TripDetails: { trip: string; photoRef: string; docId: string };
+  CurrentTripDetails: { trip: string; photoRef: string };
   Profile: undefined;
   Edit: undefined;
   Settings: undefined;
@@ -399,28 +407,30 @@ const ProfileStack: React.FC = () => {
   );
 };
 
+// Screens where bottom tab bar should be hidden
+const HIDDEN_TAB_SCREENS = [
+  "WhereTo",
+  "ChoosePlaces",
+  "ChooseDate",
+  "WhosGoing",
+  "MoreInfo",
+  "ReviewTrip",
+  "GenerateTrip",
+  "RecommendedTripDetails",
+  "TripDetails",
+  "CurrentTripDetails",
+  "Edit",
+  "Settings",
+  "ChangePassword",
+  "AppTheme",
+  "DeleteAccount",
+];
+
 const getTabBarStyle = (route: any): { display?: string } | undefined => {
   const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
-  if (
-    routeName === "WhereTo" ||
-    routeName === "ChoosePlaces" ||
-    routeName === "ChooseDate" ||
-    routeName === "WhosGoing" ||
-    routeName === "MoreInfo" ||
-    routeName === "ReviewTrip" ||
-    routeName === "GenerateTrip" ||
-    routeName === "RecommendedTripDetails" ||
-    routeName === "TripDetails" ||
-    routeName === "CurrentTripDetails" ||
-    routeName === "Edit" ||
-    routeName === "Settings" ||
-    routeName === "ChangePassword" ||
-    routeName === "AppTheme" ||
-    routeName === "DeleteAccount"
-  ) {
-    return { display: "none" };
-  }
-  return undefined;
+  return HIDDEN_TAB_SCREENS.includes(routeName)
+    ? { display: "none" }
+    : undefined;
 };
 
 const TabNavigator: React.FC = () => {
@@ -437,6 +447,60 @@ const TabNavigator: React.FC = () => {
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+  };
+
+  const TabIcon = ({
+    focused,
+    color,
+    icon,
+    size = 28,
+  }: {
+    focused: boolean;
+    color: string;
+    icon: keyof typeof Ionicons.glyphMap;
+    size?: number;
+  }) => {
+    const scaleValue = React.useRef(new Animated.Value(1)).current;
+
+    React.useEffect(() => {
+      if (focused) {
+        Animated.sequence([
+          Animated.timing(scaleValue, {
+            toValue: 1.2,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleValue, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }
+    }, [focused]);
+
+    return (
+      <Animated.View
+        style={{
+          padding: 5,
+          borderRadius: 10,
+          backgroundColor: focused
+            ? `${currentTheme.alternate}20`
+            : "transparent",
+          transform: [{ scale: scaleValue }],
+        }}
+      >
+        <Ionicons
+          name={
+            focused
+              ? icon
+              : ((icon + "-outline") as keyof typeof Ionicons.glyphMap)
+          }
+          color={color}
+          size={size}
+        />
+      </Animated.View>
+    );
   };
 
   return (
@@ -466,21 +530,7 @@ const TabNavigator: React.FC = () => {
             tabBarStyle,
             tabBarLabel: "Home",
             tabBarIcon: ({ color, focused }) => (
-              <View
-                style={{
-                  padding: 5,
-                  borderRadius: 10,
-                  backgroundColor: focused
-                    ? `${currentTheme.alternate}20`
-                    : "transparent",
-                }}
-              >
-                <Ionicons
-                  name={focused ? "home" : "home-outline"}
-                  color={color}
-                  size={28}
-                />
-              </View>
+              <TabIcon focused={focused} color={color} icon="home" />
             ),
           } as BottomTabNavigationOptions;
         }}
@@ -499,21 +549,12 @@ const TabNavigator: React.FC = () => {
             headerShown: false,
             tabBarLabel: "My Trips",
             tabBarIcon: ({ color, focused }) => (
-              <View
-                style={{
-                  padding: 5,
-                  borderRadius: 10,
-                  backgroundColor: focused
-                    ? `${currentTheme.alternate}20`
-                    : "transparent",
-                }}
-              >
-                <Ionicons
-                  name={focused ? "airplane" : "airplane-outline"}
-                  color={color}
-                  size={30}
-                />
-              </View>
+              <TabIcon
+                focused={focused}
+                color={color}
+                icon="airplane"
+                size={30}
+              />
             ),
           } as BottomTabNavigationOptions;
         }}
@@ -530,30 +571,52 @@ const TabNavigator: React.FC = () => {
           return {
             tabBarStyle,
             tabBarLabel: "Profile",
-            tabBarIcon: ({ focused }) => (
-              <View
-                style={{
-                  padding: 3,
-                  borderRadius: 20,
-                  backgroundColor: focused
-                    ? `${currentTheme.alternate}20`
-                    : "transparent",
-                }}
-              >
-                <Image
-                  source={{ uri: profilePicture }}
+            tabBarIcon: ({ focused }) => {
+              const scaleValue = React.useRef(new Animated.Value(1)).current;
+
+              React.useEffect(() => {
+                if (focused) {
+                  Animated.sequence([
+                    Animated.timing(scaleValue, {
+                      toValue: 1.2,
+                      duration: 200,
+                      useNativeDriver: true,
+                    }),
+                    Animated.timing(scaleValue, {
+                      toValue: 1,
+                      duration: 200,
+                      useNativeDriver: true,
+                    }),
+                  ]).start();
+                }
+              }, [focused]);
+
+              return (
+                <Animated.View
                   style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 15,
-                    borderColor: focused
-                      ? currentTheme.alternate
+                    padding: 3,
+                    borderRadius: 20,
+                    backgroundColor: focused
+                      ? `${currentTheme.alternate}20`
                       : "transparent",
-                    borderWidth: 2,
+                    transform: [{ scale: scaleValue }],
                   }}
-                />
-              </View>
-            ),
+                >
+                  <Image
+                    source={{ uri: profilePicture }}
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 15,
+                      borderColor: focused
+                        ? currentTheme.alternate
+                        : "transparent",
+                      borderWidth: 2,
+                    }}
+                  />
+                </Animated.View>
+              );
+            },
           } as BottomTabNavigationOptions;
         }}
       />
