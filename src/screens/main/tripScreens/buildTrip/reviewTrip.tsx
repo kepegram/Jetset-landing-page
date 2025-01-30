@@ -61,7 +61,8 @@ const ReviewTrip: React.FC = () => {
                   style={[styles.value, { color: currentTheme.textPrimary }]}
                 >
                   {localTripData?.destinationType ||
-                    localTripData?.locationInfo?.name}
+                    localTripData?.locationInfo?.name ||
+                    localTripData?.name}
                 </Text>
               </View>
             </View>

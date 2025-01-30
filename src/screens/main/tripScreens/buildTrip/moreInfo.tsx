@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, Animated, SafeAreaView } from "react-native";
-import React, { useContext, useEffect, useState, useRef } from "react";
+import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+import React, { useContext, useState } from "react";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
@@ -19,51 +19,16 @@ const MoreInfo: React.FC = () => {
   const { currentTheme } = useTheme();
   const { tripData = {}, setTripData = () => {} } =
     useContext(CreateTripContext) || {};
-  const [travelerType, setTravelerType] = useState<string>("Average");
   const [accommodationType, setAccommodationType] = useState<string>("Hotel");
   const [activityLevel, setActivityLevel] = useState<string>("Normal");
   const [budget, setBudget] = useState<string>("Average");
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      headerTransparent: true,
-      headerTitle: "",
-    });
-
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, [navigation]);
-
-  const handleOptionChange = (
-    value: string,
-    setter: (value: string) => void
-  ) => {
-    Animated.sequence([
-      Animated.timing(fadeAnim, {
-        toValue: 0.5,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
-    setter(value);
-  };
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <View style={styles.contentContainer}>
-        <Animated.View style={[styles.headerContainer, { opacity: fadeAnim }]}>
+        <View style={styles.headerContainer}>
           <Text
             style={[styles.subheading, { color: currentTheme.textSecondary }]}
           >
@@ -72,11 +37,9 @@ const MoreInfo: React.FC = () => {
           <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
             Let's customize your perfect trip
           </Text>
-        </Animated.View>
+        </View>
 
-        <Animated.View
-          style={[styles.dropdownsContainer, { opacity: fadeAnim }]}
-        >
+        <View style={styles.dropdownsContainer}>
           {/* Accommodation Type */}
           <View style={styles.inputContainer}>
             <View style={styles.labelContainer}>
@@ -100,9 +63,7 @@ const MoreInfo: React.FC = () => {
               labelField="label"
               valueField="value"
               value={accommodationType}
-              onChange={(item) =>
-                handleOptionChange(item.value, setAccommodationType)
-              }
+              onChange={(item) => setAccommodationType(item.value)}
               style={[
                 styles.dropdown,
                 {
@@ -140,9 +101,7 @@ const MoreInfo: React.FC = () => {
               labelField="label"
               valueField="value"
               value={activityLevel}
-              onChange={(item) =>
-                handleOptionChange(item.value, setActivityLevel)
-              }
+              onChange={(item) => setActivityLevel(item.value)}
               style={[
                 styles.dropdown,
                 {
@@ -180,7 +139,7 @@ const MoreInfo: React.FC = () => {
               labelField="label"
               valueField="value"
               value={budget}
-              onChange={(item) => handleOptionChange(item.value, setBudget)}
+              onChange={(item) => setBudget(item.value)}
               style={[
                 styles.dropdown,
                 {
@@ -215,7 +174,7 @@ const MoreInfo: React.FC = () => {
             width="85%"
             backgroundColor={currentTheme.alternate}
           />
-        </Animated.View>
+        </View>
       </View>
     </SafeAreaView>
   );

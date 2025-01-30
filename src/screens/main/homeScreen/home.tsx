@@ -10,7 +10,7 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
-import React, { useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback, useRef } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
 import { CreateTripContext } from "../../../context/createTripContext";
@@ -32,9 +32,21 @@ import { RootStackParamList } from "../../../navigation/appNav";
 import { popularDestinations } from "../../../constants/constants";
 import { RECOMMEND_TRIP_AI_PROMPT } from "../../../api/ai-prompt";
 import { chatSession } from "../../../../AI-Model";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import {
+  GooglePlacesAutocomplete,
+  GooglePlaceDetail,
+} from "react-native-google-places-autocomplete";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
+
+interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
+  photos?: Array<{
+    photo_reference: string;
+    height: number;
+    width: number;
+    html_attributions: string[];
+  }>;
+}
 
 const { width } = Dimensions.get("window");
 
@@ -58,6 +70,7 @@ const Home: React.FC = () => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<NavigationProp>();
+  const googlePlacesRef = useRef<any>(null);
 
   const getGreeting = () => {
     const currentHour = new Date().getHours();
@@ -284,19 +297,35 @@ const Home: React.FC = () => {
           ]}
         >
           <GooglePlacesAutocomplete
+            ref={googlePlacesRef}
             placeholder="Where would you like to go?"
             textInputProps={{
               placeholderTextColor: currentTheme.textPrimary,
             }}
-            onPress={(data, details = null) => {
-              console.log(data, details);
+            fetchDetails={true}
+            onPress={(
+              data,
+              details: ExtendedGooglePlaceDetail | null = null
+            ) => {
               if (details) {
-                if (setTripData) {
-                  setTripData(() => ({
+                const photoReference =
+                  details.photos?.[0]?.photo_reference || null;
+                setTripData({
+                  locationInfo: {
                     name: data.description,
-                  }));
+                    coordinates: details.geometry.location,
+                    photoRef: photoReference,
+                    url: details.url,
+                  },
+                });
+                // Clear input
+                if (googlePlacesRef.current) {
+                  googlePlacesRef.current.clear();
                 }
-                navigation.navigate("ChooseDate");
+                // @ts-ignore - Nested navigation type issue
+                navigation.navigate("MyTrips", {
+                  screen: "ChooseDate",
+                });
               }
             }}
             query={{
@@ -309,7 +338,34 @@ const Home: React.FC = () => {
                 { color: currentTheme.textPrimary },
                 { backgroundColor: currentTheme.background },
               ],
-              listView: { backgroundColor: currentTheme.background },
+              listView: {
+                backgroundColor: currentTheme.background,
+                borderRadius: 12,
+                marginTop: 10,
+                marginHorizontal: 0,
+                elevation: 3,
+                shadowColor: "#000",
+                shadowOpacity: 0.1,
+                shadowOffset: { width: 0, height: 2 },
+                shadowRadius: 4,
+              },
+              row: {
+                backgroundColor: currentTheme.background,
+                padding: 15,
+                height: "auto",
+                minHeight: 50,
+              },
+              separator: {
+                backgroundColor: `${currentTheme.textSecondary}20`,
+                height: 0.5,
+              },
+              description: {
+                color: currentTheme.textPrimary,
+                fontSize: 16,
+              },
+              poweredContainer: {
+                backgroundColor: currentTheme.background,
+              },
             }}
           />
           <View style={styles.recommendedTripsHeader}>
@@ -585,6 +641,8 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     width: "100%",
+    borderWidth: 1,
+    borderColor: "grey",
     padding: 15,
     height: 60,
     borderRadius: 15,

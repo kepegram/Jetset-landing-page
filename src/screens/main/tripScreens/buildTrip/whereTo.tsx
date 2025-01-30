@@ -115,7 +115,7 @@ const WhereTo: React.FC = () => {
                 marginLeft: 0,
                 marginRight: 0,
                 borderWidth: 1,
-                borderColor: `${currentTheme.textSecondary}30`,
+                borderColor: "grey",
               },
               listView: {
                 backgroundColor: currentTheme.background,
