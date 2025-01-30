@@ -261,6 +261,7 @@ const Home: React.FC = () => {
                         ? "rgba(255,255,255,0.2)"
                         : "rgba(5, 5, 5, 0.6)",
                       borderColor: currentTheme.alternate,
+                      width: label === "Landmark" ? width * 0.22 : width * 0.2,
                     },
                   ]}
                 >
@@ -550,7 +551,6 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 20,
     borderWidth: 1,
-    width: width * 0.2,
     height: width * 0.3,
     alignItems: "center",
     justifyContent: "center",

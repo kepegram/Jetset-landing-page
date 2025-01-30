@@ -98,6 +98,7 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         onPress={() => {
+          console.log(UpcomingPlan?.travelPlan?.photoRef);
           navigation.navigate("TripDetails", {
             trip: JSON.stringify({
               ...UpcomingTrip,

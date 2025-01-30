@@ -248,10 +248,9 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               style={styles.socialButton}
               disabled={loading}
             >
-              <Ionicons
-                name="logo-apple"
-                size={25}
-                color={currentTheme.textPrimary}
+              <Image
+                source={require("../../../assets/apple.png")}
+                style={styles.socialIcon}
               />
               <Text
                 style={[
@@ -374,8 +373,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   socialIcon: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
     marginRight: 12,
   },
   socialButtonText: {

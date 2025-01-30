@@ -276,9 +276,13 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginLeft: 16,
-    padding: 12,
+    padding: 8,
     borderRadius: 25,
     backgroundColor: "rgba(0,0,0,0.3)",
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   scrollContent: {
     paddingBottom: 100,

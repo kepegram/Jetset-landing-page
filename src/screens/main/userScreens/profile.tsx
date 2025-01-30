@@ -5,7 +5,6 @@ import {
   View,
   Image,
   Modal,
-  ActivityIndicator,
   ScrollView,
 } from "react-native";
 import React, { useCallback, useState } from "react";
@@ -16,10 +15,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useProfile } from "../../../context/profileContext";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { collection, getDocs, query } from "firebase/firestore";
 import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
-import CurrentTripCard from "../../../components/myTrips/currentTripCard";
 import PastTripListCard from "../../../components/myTrips/pastTripListCard";
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
@@ -32,10 +29,8 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 const Profile: React.FC = () => {
   const { profilePicture, displayName } = useProfile();
   const { currentTheme } = useTheme();
-  const [loading, setLoading] = useState<boolean>(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [userTrips, setUserTrips] = useState<any[]>([]);
 
   const user = getAuth().currentUser;
   const navigation = useNavigation<ProfileScreenNavigationProp>();
@@ -49,7 +44,6 @@ const Profile: React.FC = () => {
             if (userDoc.exists()) {
               const data = userDoc.data();
               setUserName(data?.name || "");
-              setUserTrips(data?.trips || []);
             }
           } catch (error) {
             console.error("Error fetching user data:", error);
@@ -59,41 +53,6 @@ const Profile: React.FC = () => {
 
       fetchUserData();
     }, [])
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      if (user) GetMyTrips();
-    }, [user])
-  );
-
-  const GetMyTrips = async () => {
-    try {
-      setLoading(true);
-      setUserTrips([]);
-
-      if (user) {
-        const tripsQuery = query(
-          collection(FIREBASE_DB, `users/${user.uid}/userTrips`)
-        );
-
-        const querySnapshot = await getDocs(tripsQuery);
-        const trips = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setUserTrips(trips);
-      }
-    } catch (error) {
-      console.error("Error fetching user trips:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const pastTrips = userTrips.filter((trip) =>
-    moment(trip.tripData?.endDate).isBefore(moment(), "day")
   );
 
   return (
@@ -135,48 +94,6 @@ const Profile: React.FC = () => {
             </View>
           </View>
         </View>
-
-        <View style={styles.ongoingTripsContainer}>
-          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-            Ongoing Trips
-          </Text>
-          {loading ? (
-            <ActivityIndicator size="large" color={currentTheme.alternate} />
-          ) : (
-            <View style={styles.currentTripContainer}>
-              <CurrentTripCard userTrips={userTrips} />
-            </View>
-          )}
-        </View>
-
-        {pastTrips.length > 0 && (
-          <View style={styles.pastTripsContainer}>
-            <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-              Past Trips
-            </Text>
-            {loading ? (
-              <ActivityIndicator size="large" color={currentTheme.alternate} />
-            ) : (
-              <View>
-                {pastTrips.map((trip, index) => {
-                  if (!trip || !trip.tripData || !trip.tripPlan) {
-                    return null;
-                  }
-                  return (
-                    <PastTripListCard
-                      trip={{
-                        tripData: trip.tripData,
-                        tripPlan: trip.tripPlan,
-                        id: trip.id,
-                      }}
-                      key={index}
-                    />
-                  );
-                })}
-              </View>
-            )}
-          </View>
-        )}
 
         <Modal
           animationType="fade"
@@ -295,23 +212,6 @@ const styles = StyleSheet.create({
     textShadowColor: "rgba(0, 0, 0, 0.75)",
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
-  },
-  ongoingTripsContainer: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 15,
-  },
-  currentTripContainer: {
-    width: "100%",
-  },
-  pastTripsContainer: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-    marginBottom: 20,
   },
   modalOverlay: {
     flex: 1,

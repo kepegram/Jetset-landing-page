@@ -39,7 +39,10 @@ const MoreInfo: React.FC = () => {
     }).start();
   }, [navigation]);
 
-  const handleOptionChange = (value: string, setter: (value: string) => void) => {
+  const handleOptionChange = (
+    value: string,
+    setter: (value: string) => void
+  ) => {
     Animated.sequence([
       Animated.timing(fadeAnim, {
         toValue: 0.5,
@@ -59,161 +62,161 @@ const MoreInfo: React.FC = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <Animated.View 
-        style={[
-          styles.headerContainer,
-          { opacity: fadeAnim }
-        ]}
-      >
-        <Text style={[styles.subheading, { color: currentTheme.textSecondary }]}>
-          Almost there!
-        </Text>
-        <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-          Let's customize your perfect trip
-        </Text>
-      </Animated.View>
+      <View style={styles.contentContainer}>
+        <Animated.View style={[styles.headerContainer, { opacity: fadeAnim }]}>
+          <Text
+            style={[styles.subheading, { color: currentTheme.textSecondary }]}
+          >
+            Almost there!
+          </Text>
+          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+            Let's customize your perfect trip
+          </Text>
+        </Animated.View>
 
-      <Animated.View 
-        style={[
-          styles.dropdownsContainer,
-          { opacity: fadeAnim }
-        ]}
-      >
-        {/* Accommodation Type */}
-        <View style={styles.inputContainer}>
-          <View style={styles.labelContainer}>
-            <Ionicons
-              name="bed-outline"
-              size={24}
-              color={currentTheme.alternate}
+        <Animated.View
+          style={[styles.dropdownsContainer, { opacity: fadeAnim }]}
+        >
+          {/* Accommodation Type */}
+          <View style={styles.inputContainer}>
+            <View style={styles.labelContainer}>
+              <Ionicons
+                name="bed-outline"
+                size={24}
+                color={currentTheme.alternate}
+              />
+              <Text
+                style={[styles.labelText, { color: currentTheme.textPrimary }]}
+              >
+                Where would you like to stay?
+              </Text>
+            </View>
+            <Dropdown
+              data={[
+                { label: "Hotel", value: "Hotel" },
+                { label: "Hostel", value: "Hostel" },
+                { label: "Airbnb", value: "Airbnb" },
+              ]}
+              labelField="label"
+              valueField="value"
+              value={accommodationType}
+              onChange={(item) =>
+                handleOptionChange(item.value, setAccommodationType)
+              }
+              style={[
+                styles.dropdown,
+                {
+                  backgroundColor: currentTheme.accentBackground,
+                  borderColor: currentTheme.alternate,
+                },
+              ]}
+              itemTextStyle={{ color: currentTheme.textPrimary }}
+              selectedTextStyle={{ color: currentTheme.textPrimary }}
+              placeholderStyle={{ color: currentTheme.textSecondary }}
+              activeColor={currentTheme.accentBackground}
             />
-            <Text
-              style={[styles.labelText, { color: currentTheme.textPrimary }]}
-            >
-              Where would you like to stay?
-            </Text>
           </View>
-          <Dropdown
-            data={[
-              { label: "Hotel", value: "Hotel" },
-              { label: "Hostel", value: "Hostel" },
-              { label: "Airbnb", value: "Airbnb" },
-            ]}
-            labelField="label"
-            valueField="value"
-            value={accommodationType}
-            onChange={(item) => handleOptionChange(item.value, setAccommodationType)}
-            style={[
-              styles.dropdown,
-              {
-                backgroundColor: currentTheme.accentBackground,
-                borderColor: currentTheme.alternate,
-              },
-            ]}
-            itemTextStyle={{ color: currentTheme.textPrimary }}
-            selectedTextStyle={{ color: currentTheme.textPrimary }}
-            placeholderStyle={{ color: currentTheme.textSecondary }}
-            activeColor={currentTheme.accentBackground}
-          />
-        </View>
 
-        {/* Activity Level */}
-        <View style={styles.inputContainer}>
-          <View style={styles.labelContainer}>
-            <Ionicons
-              name="walk-outline"
-              size={24}
-              color={currentTheme.alternate}
+          {/* Activity Level */}
+          <View style={styles.inputContainer}>
+            <View style={styles.labelContainer}>
+              <Ionicons
+                name="walk-outline"
+                size={24}
+                color={currentTheme.alternate}
+              />
+              <Text
+                style={[styles.labelText, { color: currentTheme.textPrimary }]}
+              >
+                How active do you want to be?
+              </Text>
+            </View>
+            <Dropdown
+              data={[
+                { label: "Take it easy", value: "Low" },
+                { label: "Balanced mix", value: "Normal" },
+                { label: "Adventure packed", value: "High" },
+              ]}
+              labelField="label"
+              valueField="value"
+              value={activityLevel}
+              onChange={(item) =>
+                handleOptionChange(item.value, setActivityLevel)
+              }
+              style={[
+                styles.dropdown,
+                {
+                  backgroundColor: currentTheme.accentBackground,
+                  borderColor: currentTheme.alternate,
+                },
+              ]}
+              itemTextStyle={{ color: currentTheme.textPrimary }}
+              selectedTextStyle={{ color: currentTheme.textPrimary }}
+              placeholderStyle={{ color: currentTheme.textSecondary }}
+              activeColor={currentTheme.accentBackground}
             />
-            <Text
-              style={[styles.labelText, { color: currentTheme.textPrimary }]}
-            >
-              How active do you want to be?
-            </Text>
           </View>
-          <Dropdown
-            data={[
-              { label: "Take it easy", value: "Low" },
-              { label: "Balanced mix", value: "Normal" },
-              { label: "Adventure packed", value: "High" },
-            ]}
-            labelField="label"
-            valueField="value"
-            value={activityLevel}
-            onChange={(item) => handleOptionChange(item.value, setActivityLevel)}
-            style={[
-              styles.dropdown,
-              {
-                backgroundColor: currentTheme.accentBackground,
-                borderColor: currentTheme.alternate,
-              },
-            ]}
-            itemTextStyle={{ color: currentTheme.textPrimary }}
-            selectedTextStyle={{ color: currentTheme.textPrimary }}
-            placeholderStyle={{ color: currentTheme.textSecondary }}
-            activeColor={currentTheme.accentBackground}
-          />
-        </View>
 
-        {/* Budget */}
-        <View style={styles.inputContainer}>
-          <View style={styles.labelContainer}>
-            <Ionicons
-              name="wallet-outline"
-              size={24}
-              color={currentTheme.alternate}
+          {/* Budget */}
+          <View style={styles.inputContainer}>
+            <View style={styles.labelContainer}>
+              <Ionicons
+                name="wallet-outline"
+                size={24}
+                color={currentTheme.alternate}
+              />
+              <Text
+                style={[styles.labelText, { color: currentTheme.textPrimary }]}
+              >
+                What's your budget like?
+              </Text>
+            </View>
+            <Dropdown
+              data={[
+                { label: "Budget friendly", value: "Frugal" },
+                { label: "Mid-range", value: "Average" },
+                { label: "High-end", value: "Luxury" },
+              ]}
+              labelField="label"
+              valueField="value"
+              value={budget}
+              onChange={(item) => handleOptionChange(item.value, setBudget)}
+              style={[
+                styles.dropdown,
+                {
+                  backgroundColor: currentTheme.accentBackground,
+                  borderColor: currentTheme.alternate,
+                },
+              ]}
+              itemTextStyle={{ color: currentTheme.textPrimary }}
+              selectedTextStyle={{ color: currentTheme.textPrimary }}
+              placeholderStyle={{ color: currentTheme.textSecondary }}
+              activeColor={currentTheme.accentBackground}
             />
-            <Text
-              style={[styles.labelText, { color: currentTheme.textPrimary }]}
-            >
-              What's your budget like?
-            </Text>
           </View>
-          <Dropdown
-            data={[
-              { label: "Budget friendly", value: "Frugal" },
-              { label: "Mid-range", value: "Average" },
-              { label: "High-end", value: "Luxury" },
-            ]}
-            labelField="label"
-            valueField="value"
-            value={budget}
-            onChange={(item) => handleOptionChange(item.value, setBudget)}
-            style={[
-              styles.dropdown,
-              {
-                backgroundColor: currentTheme.accentBackground,
-                borderColor: currentTheme.alternate,
-              },
-            ]}
-            itemTextStyle={{ color: currentTheme.textPrimary }}
-            selectedTextStyle={{ color: currentTheme.textPrimary }}
-            placeholderStyle={{ color: currentTheme.textSecondary }}
-            activeColor={currentTheme.accentBackground}
-          />
-        </View>
 
-        <MainButton
-          onPress={() => {
-            setTripData({
-              ...tripData,
-              accommodationType,
-              activityLevel,
-              budget,
-            });
-            console.log("Trip Data:", {
-              ...tripData,
-              accommodationType,
-              activityLevel,
-              budget,
-            });
-            navigation.navigate("ReviewTrip");
-          }}
-          buttonText="Review Your Trip"
-          width="85%"
-          backgroundColor={currentTheme.alternate}
-        />
-      </Animated.View>
+          <MainButton
+            onPress={() => {
+              setTripData({
+                ...tripData,
+                accommodationType,
+                activityLevel,
+                budget,
+              });
+              console.log("Trip Data:", {
+                ...tripData,
+                accommodationType,
+                activityLevel,
+                budget,
+              });
+              navigation.navigate("ReviewTrip");
+            }}
+            buttonText="Review Your Trip"
+            width="85%"
+            backgroundColor={currentTheme.alternate}
+          />
+        </Animated.View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -221,14 +224,13 @@ const MoreInfo: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
     padding: 20,
   },
   headerContainer: {
-    position: "absolute",
-    paddingTop: 10,
-    top: 100,
-    left: 20,
-    right: 20,
+    marginBottom: 32,
   },
   subheading: {
     fontSize: 18,
@@ -237,10 +239,9 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 32,
     fontWeight: "bold",
-    lineHeight: 38,
+    marginBottom: 16,
   },
   dropdownsContainer: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },

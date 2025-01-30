@@ -25,6 +25,7 @@ type RouteParams = {
     name: string;
     description: string;
     image: number;
+    bestTimeToVisit: string;
   };
 };
 
@@ -102,38 +103,34 @@ const PopularDestinations: React.FC = () => {
             <View
               style={[
                 styles.tripMetaItem,
-                { backgroundColor: `${currentTheme.alternate}20` },
+                { backgroundColor: `${currentTheme.alternate}10` },
               ]}
             >
-              <Ionicons name="star" size={22} color={currentTheme.alternate} />
-              <Text
-                style={[
-                  styles.tripMetaText,
-                  { color: currentTheme.textPrimary },
-                ]}
-              >
-                4.8
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.tripMetaItem,
-                { backgroundColor: `${currentTheme.alternate}20` },
-              ]}
-            >
-              <Ionicons
-                name="time-outline"
-                size={22}
-                color={currentTheme.alternate}
-              />
-              <Text
-                style={[
-                  styles.tripMetaText,
-                  { color: currentTheme.textPrimary },
-                ]}
-              >
-                Best time to visit
-              </Text>
+              <View style={styles.tripMetaIconContainer}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={24}
+                  color={currentTheme.alternate}
+                />
+              </View>
+              <View style={styles.tripMetaTextContainer}>
+                <Text
+                  style={[
+                    styles.tripMetaLabel,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
+                  Best Time to Visit
+                </Text>
+                <Text
+                  style={[
+                    styles.tripMetaText,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
+                  {destination.bestTimeToVisit}
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -227,21 +224,34 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   tripMetaContainer: {
-    flexDirection: "row",
     marginBottom: 25,
-    gap: 15,
   },
   tripMetaItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 12,
+    padding: 16,
+    borderRadius: 16,
+  },
+  tripMetaIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  tripMetaTextContainer: {
+    flex: 1,
+  },
+  tripMetaLabel: {
+    fontSize: 14,
+    marginBottom: 4,
+    fontFamily: "outfit-medium",
   },
   tripMetaText: {
-    fontFamily: "outfit-medium",
     fontSize: 16,
-    marginLeft: 8,
+    fontFamily: "outfit-medium",
   },
   descriptionContainer: {
     padding: 20,
@@ -250,13 +260,11 @@ const styles = StyleSheet.create({
   },
   descriptionTitle: {
     fontSize: 20,
-    fontFamily: "outfit-bold",
     marginBottom: 12,
   },
   description: {
     fontSize: 16,
     lineHeight: 24,
-    fontFamily: "outfit",
   },
   exploreButton: {
     paddingVertical: 15,

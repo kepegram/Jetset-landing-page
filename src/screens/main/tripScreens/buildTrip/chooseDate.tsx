@@ -69,7 +69,9 @@ const ChooseDate: React.FC = () => {
   const getDateRangeText = () => {
     if (startDate && endDate) {
       const nights = endDate.diff(startDate, "days");
-      return `${startDate.format("MMM D")} - ${endDate.format("MMM D, YYYY")} • ${nights} ${nights === 1 ? 'night' : 'nights'}`;
+      return `${startDate.format("MMM D")} - ${endDate.format(
+        "MMM D, YYYY"
+      )} • ${nights} ${nights === 1 ? "night" : "nights"}`;
     }
     return "Select your travel dates";
   };
@@ -78,80 +80,99 @@ const ChooseDate: React.FC = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <View style={styles.headerContainer}>
-        <Text
-          style={[styles.subheading, { color: currentTheme.textSecondary }]}
-        >
-          When?
-        </Text>
-        <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-          Choose your dates
-        </Text>
-        <View style={[styles.dateRangeContainer, { backgroundColor: currentTheme.alternate + '20' }]}>
-          <Ionicons name="calendar-outline" size={24} color={currentTheme.textSecondary} />
+      <View style={styles.contentContainer}>
+        <View style={styles.headerContainer}>
           <Text
-            style={[styles.dateRangeText, { color: currentTheme.textSecondary }]}
+            style={[styles.subheading, { color: currentTheme.textSecondary }]}
           >
-            {getDateRangeText()}
+            When?
           </Text>
+          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+            Choose your dates
+          </Text>
+          <View
+            style={[
+              styles.dateRangeContainer,
+              { backgroundColor: currentTheme.alternate + "20" },
+            ]}
+          >
+            <Ionicons
+              name="calendar-outline"
+              size={24}
+              color={currentTheme.textSecondary}
+            />
+            <Text
+              style={[
+                styles.dateRangeText,
+                { color: currentTheme.textSecondary },
+              ]}
+            >
+              {getDateRangeText()}
+            </Text>
+          </View>
         </View>
-      </View>
 
-      <View style={[styles.calendarWrapper, { backgroundColor: currentTheme.alternate + '10' }]}>
-        <CalendarPicker
-          onDateChange={onDateChange}
-          allowRangeSelection={true}
-          minDate={new Date()}
-          todayBackgroundColor={currentTheme.alternate}
-          selectedStartDate={startDate?.toDate()}
-          selectedEndDate={endDate?.toDate()}
-          previousComponent={
-            <Ionicons
-              name="chevron-back"
-              size={34}
-              color={currentTheme.textPrimary}
-            />
-          }
-          nextComponent={
-            <Ionicons
-              name="chevron-forward"
-              size={34}
-              color={currentTheme.textPrimary}
-            />
-          }
-          selectedRangeStyle={{
-            backgroundColor: currentTheme.alternate + '50',
-          }}
-          selectedDayStyle={{
-            backgroundColor: currentTheme.alternate,
-            borderRadius: 12,
-          }}
-          selectedDayTextStyle={styles.selectedDayText}
-          dayTextStyle={{ color: currentTheme.textPrimary }}
-          monthTitleStyle={{
-            ...styles.monthTitle,
-            color: currentTheme.textPrimary,
-          }}
-          yearTitleStyle={{
-            ...styles.yearTitle,
-            color: currentTheme.textPrimary,
-          }}
-          disabledDatesTextStyle={styles.disabledDates}
-          textStyle={{ color: currentTheme.textPrimary }}
-          width={Dimensions.get("window").width - 40}
-          height={420}
-          scaleFactor={375}
-        />
-      </View>
+        <View
+          style={[
+            styles.calendarWrapper,
+            { backgroundColor: currentTheme.alternate + "10" },
+          ]}
+        >
+          <CalendarPicker
+            onDateChange={onDateChange}
+            allowRangeSelection={true}
+            minDate={new Date()}
+            todayBackgroundColor={currentTheme.alternate}
+            selectedStartDate={startDate?.toDate()}
+            selectedEndDate={endDate?.toDate()}
+            previousComponent={
+              <Ionicons
+                name="chevron-back"
+                size={34}
+                color={currentTheme.textPrimary}
+              />
+            }
+            nextComponent={
+              <Ionicons
+                name="chevron-forward"
+                size={34}
+                color={currentTheme.textPrimary}
+              />
+            }
+            selectedRangeStyle={{
+              backgroundColor: currentTheme.alternate + "50",
+            }}
+            selectedDayStyle={{
+              backgroundColor: currentTheme.alternate,
+              borderRadius: 12,
+            }}
+            selectedDayTextStyle={styles.selectedDayText}
+            dayTextStyle={{ color: currentTheme.textPrimary }}
+            monthTitleStyle={{
+              ...styles.monthTitle,
+              color: currentTheme.textPrimary,
+            }}
+            yearTitleStyle={{
+              ...styles.yearTitle,
+              color: currentTheme.textPrimary,
+            }}
+            disabledDatesTextStyle={styles.disabledDates}
+            textStyle={{ color: currentTheme.textPrimary }}
+            width={Dimensions.get("window").width - 40}
+            height={420}
+            scaleFactor={375}
+          />
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <MainButton
-          buttonText={startDate && endDate ? "Continue" : "Select Dates"}
-          onPress={OnDateSelectionContinue}
-          width="85%"
-          backgroundColor={currentTheme.alternate}
-          disabled={!startDate || !endDate}
-        />
+        <View style={styles.buttonContainer}>
+          <MainButton
+            buttonText={startDate && endDate ? "Continue" : "Select Dates"}
+            onPress={OnDateSelectionContinue}
+            width="85%"
+            backgroundColor={currentTheme.alternate}
+            disabled={!startDate || !endDate}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -160,38 +181,41 @@ const ChooseDate: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
     padding: 20,
   },
   headerContainer: {
-    marginTop: 100,
-    paddingHorizontal: 10,
+    marginBottom: 32,
   },
   subheading: {
     fontSize: 18,
     marginBottom: 8,
   },
   heading: {
-    fontSize: 34,
+    fontSize: 32,
     fontWeight: "bold",
     marginBottom: 16,
   },
   dateRangeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
     borderRadius: 12,
-    marginTop: 8,
+    marginTop: 16,
   },
   dateRangeText: {
     fontSize: 16,
-    marginLeft: 8,
-    fontWeight: '500',
+    marginLeft: 12,
+    fontWeight: "500",
   },
   calendarWrapper: {
-    marginTop: 24,
+    flex: 1,
+    marginTop: 32,
     alignItems: "center",
     borderRadius: 20,
-    padding: 15,
+    padding: 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

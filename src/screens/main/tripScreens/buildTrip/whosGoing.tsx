@@ -76,76 +76,81 @@ const WhosGoing: React.FC = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <View style={styles.headerContainer}>
-        <Text
-          style={[styles.subheading, { color: currentTheme.textSecondary }]}
-        >
-          With who?
-        </Text>
-        <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-          Choose how many people you're traveling with
-        </Text>
-      </View>
-
-      <View style={styles.sliderContainer}>
-        <View style={styles.iconContainer}>
-          <Ionicons
-            name={getIconForSelection()}
-            size={60}
-            color={currentTheme.alternate}
-          />
-        </View>
-        
-        <Animated.Text
-          style={[
-            styles.selectionText,
-            { 
-              color: currentTheme.textPrimary,
-              transform: [{ scale: scaleAnim }] 
-            }
-          ]}
-        >
-          {whoIsGoing === 1 ? "Solo" : whoIsGoing === 2 ? "Couple" : "Group"}
-        </Animated.Text>
-
-        <Slider
-          style={styles.slider}
-          minimumValue={1}
-          maximumValue={4}
-          step={1}
-          value={whoIsGoing}
-          onValueChange={handleWhoIsGoingChange}
-          minimumTrackTintColor={currentTheme.alternate}
-          maximumTrackTintColor={currentTheme.accentBackground}
-          thumbTintColor={currentTheme.alternate}
-        />
-        
-        <View style={styles.markerContainer}>
-          {[...Array(4)].map((_, index) => (
-            <Text
-              key={index}
-              style={[
-                styles.markerText, 
-                { 
-                  color: whoIsGoing === index + 1 ? currentTheme.alternate : currentTheme.textSecondary,
-                  fontWeight: whoIsGoing === index + 1 ? 'bold' : 'normal'
-                }
-              ]}
-            >
-              {index < 3 ? index + 1 : "4+"}
-            </Text>
-          ))}
+      <View style={styles.contentContainer}>
+        <View style={styles.headerContainer}>
+          <Text
+            style={[styles.subheading, { color: currentTheme.textSecondary }]}
+          >
+            With who?
+          </Text>
+          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+            Choose how many people you're traveling with
+          </Text>
         </View>
 
-        <View style={styles.buttonContainer}>
-          <MainButton
-            onPress={() => {
-              console.log("Updated Trip Data:", tripData);
-              navigation.navigate("MoreInfo");
-            }}
-            buttonText="Continue"
-            width={"70%"}
+        <View style={styles.sliderContainer}>
+          <View style={styles.iconContainer}>
+            <Ionicons
+              name={getIconForSelection()}
+              size={60}
+              color={currentTheme.alternate}
+            />
+          </View>
+
+          <Animated.Text
+            style={[
+              styles.selectionText,
+              {
+                color: currentTheme.textPrimary,
+                transform: [{ scale: scaleAnim }],
+              },
+            ]}
+          >
+            {whoIsGoing === 1 ? "Solo" : whoIsGoing === 2 ? "Couple" : "Group"}
+          </Animated.Text>
+
+          <Slider
+            style={styles.slider}
+            minimumValue={1}
+            maximumValue={4}
+            step={1}
+            value={whoIsGoing}
+            onValueChange={handleWhoIsGoingChange}
+            minimumTrackTintColor={currentTheme.alternate}
+            maximumTrackTintColor={currentTheme.accentBackground}
+            thumbTintColor={currentTheme.alternate}
           />
+
+          <View style={styles.markerContainer}>
+            {[...Array(4)].map((_, index) => (
+              <Text
+                key={index}
+                style={[
+                  styles.markerText,
+                  {
+                    color:
+                      whoIsGoing === index + 1
+                        ? currentTheme.alternate
+                        : currentTheme.textSecondary,
+                    fontWeight: whoIsGoing === index + 1 ? "bold" : "normal",
+                  },
+                ]}
+              >
+                {index < 3 ? index + 1 : "4+"}
+              </Text>
+            ))}
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <MainButton
+              onPress={() => {
+                console.log("Updated Trip Data:", tripData);
+                navigation.navigate("MoreInfo");
+              }}
+              buttonText="Continue"
+              width={"70%"}
+            />
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -155,11 +160,13 @@ const WhosGoing: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
     padding: 20,
   },
   headerContainer: {
-    marginTop: 100,
-    paddingHorizontal: 10,
+    marginBottom: 32,
   },
   subheading: {
     fontSize: 18,
@@ -169,11 +176,13 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     lineHeight: 40,
+    marginBottom: 16,
   },
   sliderContainer: {
-    marginTop: 80,
+    flex: 1,
     width: "100%",
     alignItems: "center",
+    justifyContent: "center",
   },
   iconContainer: {
     marginBottom: 20,

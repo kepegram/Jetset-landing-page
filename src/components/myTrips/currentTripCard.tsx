@@ -104,15 +104,16 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
       <Pressable
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        onPress={() =>
+        onPress={() => {
+          console.log(parsedCurrentPlan.photoRef);
           navigation.navigate("CurrentTripDetails", {
             trip: JSON.stringify({
               ...parsedCurrentTrip,
               travelPlan: parsedCurrentPlan?.travelPlan || {},
             }),
             photoRef: parsedCurrentTrip?.locationInfo?.photoRef || "",
-          })
-        }
+          });
+        }}
         style={styles.cardContainer}
       >
         <Image

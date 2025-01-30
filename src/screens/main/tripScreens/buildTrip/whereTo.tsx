@@ -207,13 +207,14 @@ const WhereTo: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
   },
   contentContainer: {
     flex: 1,
-    paddingHorizontal: 32,
+    padding: 20,
   },
   headerContainer: {
-    marginTop: 60,
+    marginTop: 100,
     marginBottom: 32,
   },
   heading: {

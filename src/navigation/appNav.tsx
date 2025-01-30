@@ -1,13 +1,5 @@
 import React, { useContext, useState } from "react";
-import {
-  Alert,
-  Image,
-  Pressable,
-  Text,
-  View,
-  Platform,
-  Animated,
-} from "react-native";
+import { Alert, Image, Pressable, Text, View, Platform } from "react-native";
 import { useTheme } from "../context/themeContext";
 import {
   createNativeStackNavigator,
@@ -175,7 +167,7 @@ const MyTripsStack: React.FC = () => {
                 name="refresh"
                 size={25}
                 color={currentTheme.textPrimary}
-                style={{ marginLeft: 8 }}
+                style={{ marginLeft: 5 }}
               />
             </Pressable>
           )}
@@ -460,34 +452,14 @@ const TabNavigator: React.FC = () => {
     icon: keyof typeof Ionicons.glyphMap;
     size?: number;
   }) => {
-    const scaleValue = React.useRef(new Animated.Value(1)).current;
-
-    React.useEffect(() => {
-      if (focused) {
-        Animated.sequence([
-          Animated.timing(scaleValue, {
-            toValue: 1.2,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(scaleValue, {
-            toValue: 1,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      }
-    }, [focused]);
-
     return (
-      <Animated.View
+      <View
         style={{
           padding: 5,
           borderRadius: 10,
           backgroundColor: focused
             ? `${currentTheme.alternate}20`
             : "transparent",
-          transform: [{ scale: scaleValue }],
         }}
       >
         <Ionicons
@@ -499,7 +471,7 @@ const TabNavigator: React.FC = () => {
           color={color}
           size={size}
         />
-      </Animated.View>
+      </View>
     );
   };
 
@@ -571,52 +543,30 @@ const TabNavigator: React.FC = () => {
           return {
             tabBarStyle,
             tabBarLabel: "Profile",
-            tabBarIcon: ({ focused }) => {
-              const scaleValue = React.useRef(new Animated.Value(1)).current;
-
-              React.useEffect(() => {
-                if (focused) {
-                  Animated.sequence([
-                    Animated.timing(scaleValue, {
-                      toValue: 1.2,
-                      duration: 200,
-                      useNativeDriver: true,
-                    }),
-                    Animated.timing(scaleValue, {
-                      toValue: 1,
-                      duration: 200,
-                      useNativeDriver: true,
-                    }),
-                  ]).start();
-                }
-              }, [focused]);
-
-              return (
-                <Animated.View
+            tabBarIcon: ({ focused }) => (
+              <View
+                style={{
+                  padding: 3,
+                  borderRadius: 20,
+                  backgroundColor: focused
+                    ? `${currentTheme.alternate}20`
+                    : "transparent",
+                }}
+              >
+                <Image
+                  source={{ uri: profilePicture }}
                   style={{
-                    padding: 3,
-                    borderRadius: 20,
-                    backgroundColor: focused
-                      ? `${currentTheme.alternate}20`
+                    width: 30,
+                    height: 30,
+                    borderRadius: 15,
+                    borderColor: focused
+                      ? currentTheme.alternate
                       : "transparent",
-                    transform: [{ scale: scaleValue }],
+                    borderWidth: 2,
                   }}
-                >
-                  <Image
-                    source={{ uri: profilePicture }}
-                    style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 15,
-                      borderColor: focused
-                        ? currentTheme.alternate
-                        : "transparent",
-                      borderWidth: 2,
-                    }}
-                  />
-                </Animated.View>
-              );
-            },
+                />
+              </View>
+            ),
           } as BottomTabNavigationOptions;
         }}
       />

@@ -50,9 +50,39 @@ const ChoosePlaces: React.FC = () => {
       const selectedPlace = destinations.find(
         (dest) => dest.id === selectedDestination
       );
+
+      // Define default coordinates based on destination type
+      let defaultCoordinates = { lat: 0, lng: 0 };
+      let defaultUrl = "";
+
+      switch (selectedDestination) {
+        case "beach":
+          defaultCoordinates = { lat: 8.7832, lng: 83.7115 }; // Costa Rica beaches
+          defaultUrl = "https://maps.google.com/?q=Costa+Rica+Beaches";
+          break;
+        case "mountain":
+          defaultCoordinates = { lat: 45.8326, lng: 6.8652 }; // Mont Blanc
+          defaultUrl = "https://maps.google.com/?q=Mont+Blanc";
+          break;
+        case "islands":
+          defaultCoordinates = { lat: -17.6797, lng: -149.4068 }; // Bora Bora
+          defaultUrl = "https://maps.google.com/?q=Bora+Bora";
+          break;
+        case "landmarks":
+          defaultCoordinates = { lat: 48.8584, lng: 2.2945 }; // Eiffel Tower
+          defaultUrl = "https://maps.google.com/?q=Eiffel+Tower";
+          break;
+      }
+
       const updatedTripData = {
         ...tripData,
         destinationType: selectedPlace?.label,
+        locationInfo: {
+          name: `${selectedPlace?.label} Destination`,
+          coordinates: defaultCoordinates,
+          photoRef: null,
+          url: defaultUrl,
+        },
       };
       setTripData(updatedTripData);
       console.log("Updated Trip Data:", updatedTripData);
@@ -117,7 +147,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    flex: 1,
     padding: 20,
   },
   headerContainer: {
