@@ -399,7 +399,6 @@ const ProfileStack: React.FC = () => {
   );
 };
 
-// Screens where bottom tab bar should be hidden
 const HIDDEN_TAB_SCREENS = [
   "WhereTo",
   "ChoosePlaces",
@@ -433,7 +432,7 @@ const TabNavigator: React.FC = () => {
     height: Platform.OS === "ios" ? 85 : 65,
     paddingBottom: Platform.OS === "ios" ? 25 : 10,
     paddingTop: 10,
-    borderTopWidth: 1,
+    borderTopWidth: 0,
     elevation: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -3 },
