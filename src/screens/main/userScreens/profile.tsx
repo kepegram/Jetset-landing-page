@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     width: "100%",
     alignItems: "center",
-    marginTop: 80,
+    marginTop: 60,
   },
   userInfoContainer: {
     marginBottom: 20,

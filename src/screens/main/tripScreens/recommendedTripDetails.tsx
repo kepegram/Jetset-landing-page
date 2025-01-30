@@ -2,11 +2,10 @@ import {
   View,
   Text,
   Image,
-  ScrollView,
   Alert,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
+  Pressable,
   StatusBar,
   Animated,
 } from "react-native";
@@ -69,12 +68,12 @@ const RecommendedTripDetails: React.FC = () => {
         />
       ),
       headerLeft: () => (
-        <TouchableOpacity
+        <Pressable
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
           <Ionicons name="chevron-back" size={28} color="white" />
-        </TouchableOpacity>
+        </Pressable>
       ),
     });
   }, [navigation, currentTheme.background]);

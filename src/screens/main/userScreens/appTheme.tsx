@@ -4,7 +4,7 @@ import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 
 const AppTheme: React.FC = () => {
-  const { theme, currentTheme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const isDarkTheme = theme === "dark";
   const animation = useRef(new Animated.Value(0)).current;
 
@@ -42,7 +42,7 @@ const AppTheme: React.FC = () => {
               !isDarkTheme && styles.activeThemeOption,
               { borderColor: isDarkTheme ? "#666" : "#387694" },
             ]}
-            onPress={() => toggleTheme("light")}
+            onPress={() => setTheme("light")}
           >
             <Ionicons
               name="sunny"
@@ -69,7 +69,7 @@ const AppTheme: React.FC = () => {
               isDarkTheme && styles.activeThemeOption,
               { borderColor: isDarkTheme ? "#387694" : "#666" },
             ]}
-            onPress={() => toggleTheme("dark")}
+            onPress={() => setTheme("dark")}
           >
             <Ionicons
               name="moon"

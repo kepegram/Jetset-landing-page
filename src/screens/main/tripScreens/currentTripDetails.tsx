@@ -3,10 +3,9 @@ import {
   Text,
   Image,
   ScrollView,
-  Pressable,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
+  Pressable,
   StatusBar,
 } from "react-native";
 import React, { useEffect, useState } from "react";
@@ -20,7 +19,7 @@ import moment from "moment";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 
-const { width, height } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -48,12 +47,12 @@ const CurrentTripDetails: React.FC = () => {
       headerTransparent: true,
       headerTitle: "",
       headerLeft: () => (
-        <TouchableOpacity
+        <Pressable
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
           <Ionicons name="chevron-back" size={28} color="white" />
-        </TouchableOpacity>
+        </Pressable>
       ),
     });
 
@@ -78,11 +77,7 @@ const CurrentTripDetails: React.FC = () => {
           { backgroundColor: currentTheme.background },
         ]}
       >
-        <Ionicons
-          name="airplane"
-          size={50}
-          color={currentTheme.alternate}
-        />
+        <Ionicons name="airplane" size={50} color={currentTheme.alternate} />
         <Text style={[styles.loadingText, { color: currentTheme.textPrimary }]}>
           Loading trip details...
         </Text>

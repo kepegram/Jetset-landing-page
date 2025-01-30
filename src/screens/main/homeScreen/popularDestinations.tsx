@@ -247,11 +247,9 @@ const styles = StyleSheet.create({
   tripMetaLabel: {
     fontSize: 14,
     marginBottom: 4,
-    fontFamily: "outfit-medium",
   },
   tripMetaText: {
     fontSize: 16,
-    fontFamily: "outfit-medium",
   },
   descriptionContainer: {
     padding: 20,

@@ -7,7 +7,7 @@ import {
   Linking,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
+  Pressable,
   StatusBar,
 } from "react-native";
 import React, { useEffect, useState } from "react";
@@ -53,12 +53,12 @@ const TripDetails: React.FC = () => {
       headerTransparent: true,
       headerTitle: "",
       headerLeft: () => (
-        <TouchableOpacity
+        <Pressable
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
           <Ionicons name="chevron-back" size={28} color="white" />
-        </TouchableOpacity>
+        </Pressable>
       ),
     });
 
@@ -151,13 +151,13 @@ const TripDetails: React.FC = () => {
               >
                 {tripDetails?.travelPlan?.destination || "Unknown Location"}
               </Text>
-              <TouchableOpacity onPress={() => deleteTrip(docId)}>
+              <Pressable onPress={() => deleteTrip(docId)}>
                 <Ionicons
                   name="trash-bin-outline"
                   size={24}
                   color={currentTheme.textSecondary}
                 />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
 
@@ -276,13 +276,10 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginLeft: 16,
-    padding: 8,
+    padding: 12,
     borderRadius: 25,
     backgroundColor: "rgba(0,0,0,0.3)",
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center'
+   
   },
   scrollContent: {
     paddingBottom: 100,
