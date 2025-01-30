@@ -21,7 +21,7 @@ import Home from "../screens/main/homeScreen/home";
 import RecommendedTripDetails from "../screens/main/tripScreens/recommendedTripDetails";
 import Profile from "../screens/main/userScreens/profile";
 import Edit from "../screens/main/userScreens/edit";
-import Settings from "../screens/main/userScreens/settings";
+import ChangeUsername from "../screens/main/userScreens/changeUsername";
 import ChangePassword from "../screens/main/userScreens/changePassword";
 import AppTheme from "../screens/main/userScreens/appTheme";
 import DeleteAccount from "../screens/main/userScreens/deleteAccount";
@@ -60,15 +60,12 @@ export type RootStackParamList = {
   CurrentTripDetails: { trip: string; photoRef: string };
   Profile: undefined;
   Edit: undefined;
-  Settings: undefined;
+  ChangeUsername: undefined;
   ChangePassword: undefined;
   AppTheme: undefined;
   DeleteAccount: undefined;
   Map: undefined;
 };
-
-const RootStack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator();
 
 const HomeStack: React.FC = () => {
   return (
@@ -358,13 +355,6 @@ const ProfileStack: React.FC = () => {
         })}
       />
       <RootStack.Screen
-        name="Settings"
-        component={Settings}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-        })}
-      />
-      <RootStack.Screen
         name="Edit"
         component={Edit}
         options={({ navigation }) => ({
@@ -395,27 +385,21 @@ const ProfileStack: React.FC = () => {
           title: "Delete Account",
         })}
       />
+      <RootStack.Screen
+        name="ChangeUsername"
+        component={ChangeUsername}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "Change Username",
+        })}
+      />
     </RootStack.Navigator>
   );
 };
 
-const HIDDEN_TAB_SCREENS = [
-  "WhereTo",
-  "ChoosePlaces",
-  "ChooseDate",
-  "WhosGoing",
-  "MoreInfo",
-  "ReviewTrip",
-  "GenerateTrip",
-  "RecommendedTripDetails",
-  "TripDetails",
-  "CurrentTripDetails",
-  "Edit",
-  "Settings",
-  "ChangePassword",
-  "AppTheme",
-  "DeleteAccount",
-];
+const Tab = createBottomTabNavigator();
+
+const HIDDEN_TAB_SCREENS = ["GenerateTrip"];
 
 const getTabBarStyle = (route: any): { display?: string } | undefined => {
   const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
@@ -572,6 +556,8 @@ const TabNavigator: React.FC = () => {
     </Tab.Navigator>
   );
 };
+
+const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNav: React.FC = () => {
   const { theme } = useTheme();

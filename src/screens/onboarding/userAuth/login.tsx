@@ -9,6 +9,7 @@ import {
   Text,
   TextInput,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -96,9 +97,9 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               style={[
                 styles.input,
                 {
-                  backgroundColor: currentTheme.background,
+                  backgroundColor: currentTheme.accentBackground,
                   color: currentTheme.textPrimary,
-                  borderColor: currentTheme.secondary,
+                  borderColor: currentTheme.inactive,
                 },
               ]}
               placeholder="user@example.com"
@@ -108,6 +109,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               keyboardType="email-address"
               autoCapitalize="none"
               editable={!loading}
+              autoComplete="email"
             />
           </View>
 
@@ -122,9 +124,9 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                 style={[
                   styles.input,
                   {
-                    backgroundColor: currentTheme.background,
+                    backgroundColor: currentTheme.accentBackground,
                     color: currentTheme.textPrimary,
-                    borderColor: currentTheme.secondary,
+                    borderColor: currentTheme.inactive,
                   },
                 ]}
                 placeholder="••••••••••"
@@ -134,6 +136,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                 secureTextEntry={!passwordVisible}
                 autoCapitalize="none"
                 editable={!loading}
+                autoComplete="password"
               />
               <Pressable
                 onPress={() => setPasswordVisible(!passwordVisible)}
@@ -157,21 +160,24 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
             <Text
               style={[
                 styles.forgotPasswordText,
-                { color: currentTheme.primary },
+                { color: currentTheme.alternate },
               ]}
             >
               Forgot Password?
             </Text>
           </Pressable>
 
-          <MainButton
-            buttonText="Sign In"
-            onPress={handleLogin}
-            backgroundColor={currentTheme.buttonBackground}
-            textColor={currentTheme.buttonText}
-            disabled={loading}
-            style={styles.button}
-          />
+          {loading ? (
+            <ActivityIndicator size="large" color={currentTheme.primary} style={styles.button} />
+          ) : (
+            <MainButton
+              buttonText="Sign In"
+              onPress={handleLogin}
+              width="100%"
+              disabled={loading}
+              style={styles.button}
+            />
+          )}
 
           {errorMessage && (
             <Text style={[styles.errorText, { color: currentTheme.error }]}>
@@ -183,7 +189,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
             <Text
               style={[
                 styles.createAccountText,
-                { color: currentTheme.textPrimary },
+                { color: currentTheme.textSecondary },
               ]}
             >
               New to Jetset?{" "}
@@ -209,7 +215,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                 { color: currentTheme.textSecondary },
               ]}
             >
-              OR
+              or continue with
             </Text>
             <View
               style={[
@@ -237,7 +243,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                   { color: currentTheme.textPrimary },
                 ]}
               >
-                Continue with Google
+                Google
               </Text>
             </MainButton>
 
@@ -248,9 +254,10 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               style={styles.socialButton}
               disabled={loading}
             >
-              <Image
-                source={require("../../../assets/apple.png")}
-                style={styles.socialIcon}
+              <Ionicons
+                name="logo-apple"
+                size={24}
+                color={currentTheme.textPrimary}
               />
               <Text
                 style={[
@@ -258,7 +265,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                   { color: currentTheme.textPrimary },
                 ]}
               >
-                Continue with Apple
+                Apple
               </Text>
             </MainButton>
           </View>
@@ -276,7 +283,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingHorizontal: 24,
+    padding: 24,
   },
   headerContainer: {
     marginTop: 80,
@@ -285,11 +292,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   subTitle: {
     fontSize: 16,
-    opacity: 0.8,
+    lineHeight: 24,
   },
   loginContainer: {
     width: "100%",
@@ -304,7 +311,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    height: 54,
+    height: 56,
     borderRadius: 12,
     paddingHorizontal: 16,
     borderWidth: 1,
@@ -317,7 +324,7 @@ const styles = StyleSheet.create({
   eyeIcon: {
     position: "absolute",
     right: 16,
-    top: 15,
+    top: 16,
     padding: 4,
   },
   forgotPasswordContainer: {
@@ -362,20 +369,21 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   socialIconsContainer: {
+    flexDirection: "row",
     gap: 12,
   },
   socialButton: {
-    width: "100%",
-    height: 54,
+    flex: 1,
+    height: 56,
     borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 8,
   },
   socialIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 12,
+    width: 24,
+    height: 24,
   },
   socialButtonText: {
     fontSize: 16,

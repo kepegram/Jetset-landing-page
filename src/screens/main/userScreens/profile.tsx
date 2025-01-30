@@ -4,22 +4,21 @@ import {
   Pressable,
   View,
   Image,
-  Modal,
   ScrollView,
+  Alert,
 } from "react-native";
 import React, { useCallback, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
 import { useProfile } from "../../../context/profileContext";
-import { FIREBASE_DB } from "../../../../firebase.config";
+import { FIREBASE_DB, FIREBASE_AUTH } from "../../../../firebase.config";
 import { useTheme } from "../../../context/themeContext";
-import { Ionicons } from "@expo/vector-icons";
-import PastTripListCard from "../../../components/myTrips/pastTripListCard";
-import { LinearGradient } from "expo-linear-gradient";
-import moment from "moment";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -27,13 +26,69 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const Profile: React.FC = () => {
-  const { profilePicture, displayName } = useProfile();
-  const { currentTheme } = useTheme();
+  const { profilePicture, displayName, setProfilePicture } = useProfile();
+  const { currentTheme, setTheme } = useTheme();
   const [userName, setUserName] = useState<string | null>(null);
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const user = getAuth().currentUser;
   const navigation = useNavigation<ProfileScreenNavigationProp>();
+
+  const handlePickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setProfilePicture(uri);
+
+      if (user) {
+        try {
+          await setDoc(
+            doc(FIREBASE_DB, "users", user.uid),
+            { profilePicture: uri },
+            { merge: true }
+          );
+          console.log("Profile picture updated successfully in Firestore.");
+        } catch (error) {
+          console.error("Failed to save profile picture to Firestore:", error);
+        }
+      }
+
+      await AsyncStorage.setItem("profilePicture", uri);
+    }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Confirm Logout",
+      "Are you sure you want to sign out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => {
+            setTheme('light');
+            FIREBASE_AUTH.signOut();
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -56,74 +111,225 @@ const Profile: React.FC = () => {
   );
 
   return (
-    <ScrollView
+    <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
-      showsVerticalScrollIndicator={false}
     >
-      <>
-        <View style={styles.header}>
-          <Image
-            source={require("../../../assets/placeholder.jpeg")}
-            style={styles.headerImage}
-          />
-          <LinearGradient
-            colors={["transparent", "rgba(0,0,0,0.7)"]}
-            style={styles.overlay}
-          />
-          <Pressable
-            style={styles.settingsIconContainer}
-            onPress={() => navigation.navigate("Settings")}
-          >
-            <Ionicons name="settings-sharp" size={28} color="white" />
-          </Pressable>
-          <View style={styles.profileContainer}>
-            <Pressable
-              onPress={() => setModalVisible(true)}
-              style={styles.profileImageContainer}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.profileContainer}>
+          <View style={styles.userInfoContainer}>
+            <Text
+              style={[styles.userName, { color: currentTheme.textPrimary }]}
             >
-              <View style={styles.profilePictureBackground}>
-                <Image
-                  source={{ uri: profilePicture }}
-                  style={styles.profilePicture}
-                />
-              </View>
-            </Pressable>
-
-            <View style={styles.userInfoContainer}>
-              <Text style={styles.userName}>{displayName || userName}</Text>
-            </View>
+              {displayName || userName}
+            </Text>
           </View>
-        </View>
 
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
           <Pressable
-            style={styles.modalOverlay}
-            onPress={() => setModalVisible(false)}
+            onPress={handlePickImage}
+            style={styles.profileImageContainer}
           >
-            <View style={styles.modalContent}>
+            <View style={styles.profilePictureBackground}>
               <Image
                 source={{ uri: profilePicture }}
-                style={styles.modalImage}
+                style={styles.profilePicture}
               />
-              <Pressable
-                style={styles.editButton}
-                onPress={() => {
-                  setModalVisible(false);
-                  navigation.navigate("Edit");
-                }}
-              >
-                <Text style={styles.editButtonText}>Edit Profile</Text>
-              </Pressable>
+
+              <View style={styles.editIconContainer}>
+                <MaterialIcons name="edit" size={20} color="white" />
+              </View>
             </View>
           </Pressable>
-        </Modal>
-      </>
-    </ScrollView>
+        </View>
+
+        {/* Settings Section */}
+        <View style={styles.settingsContainer}>
+          <View style={styles.optionsContainer}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.settingOption,
+                pressed && styles.optionPressed,
+                {
+                  backgroundColor: pressed
+                    ? currentTheme.inactive + "20"
+                    : "transparent",
+                },
+              ]}
+              onPress={() => navigation.navigate("Edit")}
+            >
+              <View style={styles.optionContent}>
+                <Ionicons
+                  name="person-circle-outline"
+                  size={24}
+                  color={currentTheme.icon}
+                />
+                <Text
+                  style={[
+                    styles.optionText,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
+                  Profile Management
+                </Text>
+              </View>
+              <MaterialIcons
+                name="chevron-right"
+                size={24}
+                color={currentTheme.icon}
+              />
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.settingOption,
+                pressed && styles.optionPressed,
+                {
+                  backgroundColor: pressed
+                    ? currentTheme.inactive + "20"
+                    : "transparent",
+                },
+              ]}
+              onPress={() => navigation.navigate("MyTripsMain")}
+            >
+              <View style={styles.optionContent}>
+                <Ionicons
+                  name="airplane-outline"
+                  size={24}
+                  color={currentTheme.icon}
+                />
+                <Text
+                  style={[
+                    styles.optionText,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
+                  My Trips
+                </Text>
+              </View>
+              <MaterialIcons
+                name="chevron-right"
+                size={24}
+                color={currentTheme.icon}
+              />
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.settingOption,
+                pressed && styles.optionPressed,
+                {
+                  backgroundColor: pressed
+                    ? currentTheme.inactive + "20"
+                    : "transparent",
+                },
+              ]}
+              onPress={() => navigation.navigate("AppTheme")}
+            >
+              <View style={styles.optionContent}>
+                <Ionicons
+                  name="color-palette-outline"
+                  size={24}
+                  color={currentTheme.icon}
+                />
+                <Text
+                  style={[
+                    styles.optionText,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
+                  App Theme
+                </Text>
+              </View>
+              <MaterialIcons
+                name="chevron-right"
+                size={24}
+                color={currentTheme.icon}
+              />
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.settingOption,
+                pressed && styles.optionPressed,
+                {
+                  backgroundColor: pressed
+                    ? currentTheme.inactive + "20"
+                    : "transparent",
+                },
+              ]}
+              onPress={() => console.log("Notifications pressed")}
+            >
+              <View style={styles.optionContent}>
+                <Ionicons
+                  name="notifications-outline"
+                  size={24}
+                  color={currentTheme.icon}
+                />
+                <Text
+                  style={[
+                    styles.optionText,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
+                  Notifications
+                </Text>
+              </View>
+              <MaterialIcons
+                name="chevron-right"
+                size={24}
+                color={currentTheme.icon}
+              />
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.settingOption,
+                pressed && styles.optionPressed,
+                {
+                  backgroundColor: pressed
+                    ? currentTheme.inactive + "20"
+                    : "transparent",
+                },
+              ]}
+              onPress={() => console.log("Security & Privacy pressed")}
+            >
+              <View style={styles.optionContent}>
+                <Ionicons
+                  name="shield-outline"
+                  size={24}
+                  color={currentTheme.icon}
+                />
+                <Text
+                  style={[
+                    styles.optionText,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
+                  Security & Privacy
+                </Text>
+              </View>
+              <MaterialIcons
+                name="chevron-right"
+                size={24}
+                color={currentTheme.icon}
+              />
+            </Pressable>
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Logout Button */}
+      <View style={styles.logoutContainer}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.logoutButton,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={handleLogout}
+        >
+          <Text style={styles.logoutButtonText}>Sign out</Text>
+        </Pressable>
+      </View>
+    </View>
   );
 };
 
@@ -132,37 +338,21 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    width: "100%",
-    height: 280,
-    justifyContent: "flex-end",
-    position: "relative",
-  },
-  headerImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  settingsIconContainer: {
-    position: "absolute",
-    top: 50,
-    right: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    borderRadius: 25,
-    padding: 8,
+    padding: 20,
   },
   profileContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 20,
-    flexDirection: "row",
+    width: "100%",
     alignItems: "center",
+    marginTop: 80,
+  },
+  userInfoContainer: {
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  userName: {
+    fontSize: 28,
+    fontWeight: "bold",
+    fontFamily: "outfit-bold",
   },
   profileImageContainer: {
     shadowColor: "#000",
@@ -175,78 +365,73 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   profilePictureBackground: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginRight: 15,
-    borderWidth: 3,
-    borderColor: "white",
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    position: "relative",
   },
   profilePicture: {
     width: "100%",
     height: "100%",
     borderRadius: 50,
   },
-  userInfoContainer: {
-    flex: 1,
-  },
-  userName: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "white",
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  locationContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 5,
-  },
-  locationIcon: {
-    marginRight: 5,
-  },
-  locationText: {
-    fontSize: 16,
-    color: "white",
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.75)",
+  editIconContainer: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
   },
-  modalContent: {
+  settingsContainer: {
+    flex: 1,
+    width: "90%",
+    alignSelf: "center",
+    marginTop: 20,
+  },
+  optionsContainer: {
+    marginTop: 10,
+    borderRadius: 15,
+    overflow: "hidden",
+  },
+  settingOption: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    paddingVertical: 15,
+    paddingHorizontal: 15,
   },
-  modalImage: {
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    marginBottom: 20,
+  optionContent: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  editButton: {
-    backgroundColor: "#387694",
+  optionPressed: {
+    opacity: 0.8,
+  },
+  optionText: {
+    fontSize: 18,
+    marginLeft: 15,
+  },
+  logoutContainer: {
+    alignItems: "center",
+    width: "100%",
+  },
+  logoutButton: {
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
+    width: "90%",
+    alignItems: "center",
   },
-  editButtonText: {
+  buttonPressed: {
+    opacity: 0.8,
+  },
+  logoutButtonText: {
     color: "white",
+    textDecorationLine: "underline",
     fontSize: 16,
     fontWeight: "600",
   },

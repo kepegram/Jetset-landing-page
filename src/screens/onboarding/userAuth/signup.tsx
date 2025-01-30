@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -46,6 +47,8 @@ interface InputFieldProps {
     background: string;
     secondary: string;
     textSecondary: string;
+    accentBackground: string;
+    inactive: string;
   };
   placeholder?: string;
   value?: string;
@@ -66,9 +69,13 @@ interface PasswordFieldProps {
     background: string;
     secondary: string;
     textSecondary: string;
+    accentBackground: string;
+    inactive: string;
   };
   editable: boolean;
 }
+
+const { width } = Dimensions.get("window");
 
 const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
   const { currentTheme } = useTheme();
@@ -151,18 +158,13 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           return;
         }
 
-        // Create an OAuthProvider for Apple
         const provider = new OAuthProvider("apple.com");
-
-        // Create the credential
         const appleCredential = provider.credential({
           idToken: identityToken,
         });
 
-        // Sign in with Firebase
         const authResult = await signInWithCredential(auth, appleCredential);
 
-        // Store user info in Firestore
         const userRef = doc(db, "users", authResult.user.uid);
         await setDoc(
           userRef,
@@ -256,11 +258,13 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             backgroundColor={currentTheme.buttonBackground}
             textColor={currentTheme.buttonText}
             disabled={loading}
-            style={styles.button}
+            style={[styles.button, { opacity: loading ? 0.7 : 1 }]}
           />
 
           {errorMessage && (
-            <Text style={[styles.errorText, { color: "red" }]}>
+            <Text
+              style={[styles.errorText, { color: currentTheme.error || "red" }]}
+            >
               {errorMessage}
             </Text>
           )}
@@ -291,7 +295,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             onPress={() => promptAsync()}
             backgroundColor={currentTheme.accentBackground}
             textColor={currentTheme.textPrimary}
-            style={styles.socialButton}
+            style={[styles.socialButton, { opacity: loading ? 0.7 : 1 }]}
             disabled={loading}
           >
             <Image
@@ -312,7 +316,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             onPress={handleAppleSignIn}
             backgroundColor={currentTheme.accentBackground}
             textColor={currentTheme.textPrimary}
-            style={styles.socialButton}
+            style={[styles.socialButton, { opacity: loading ? 0.7 : 1 }]}
             disabled={loading}
           >
             <Ionicons
@@ -334,7 +338,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
         <Pressable
           onPress={() => navigation.navigate("Login")}
           disabled={loading}
-          style={styles.loginLink}
+          style={[styles.loginLink, { opacity: loading ? 0.7 : 1 }]}
         >
           <Text
             style={[styles.loginText, { color: currentTheme.textSecondary }]}
@@ -359,9 +363,9 @@ const InputField: React.FC<InputFieldProps> = ({ label, theme, ...props }) => (
       style={[
         styles.input,
         {
-          backgroundColor: theme.background,
+          backgroundColor: theme.accentBackground,
           color: theme.textPrimary,
-          borderColor: theme.secondary,
+          borderColor: theme.inactive,
         },
       ]}
       placeholderTextColor={theme.textSecondary}
@@ -388,9 +392,9 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
         style={[
           styles.input,
           {
-            backgroundColor: theme.background,
+            backgroundColor: theme.accentBackground,
             color: theme.textPrimary,
-            borderColor: theme.secondary,
+            borderColor: theme.inactive,
           },
         ]}
         placeholder="••••••••••"
@@ -430,21 +434,26 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   headerContainer: {
-    marginBottom: 32,
+    marginBottom: 36,
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 12,
+    letterSpacing: 0.5,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 18,
+    opacity: 0.8,
   },
   signUpContainer: {
-    marginBottom: 24,
+    marginBottom: 32,
+    width: "100%",
+    maxWidth: 400,
+    alignSelf: "center",
   },
   inputWrapper: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   inputLabel: {
     fontSize: 16,
@@ -453,7 +462,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    height: 48,
+    height: 56,
     borderRadius: 12,
     paddingHorizontal: 16,
     borderWidth: 1,
@@ -466,40 +475,48 @@ const styles = StyleSheet.create({
   eyeIcon: {
     position: "absolute",
     right: 16,
-    top: 12,
+    top: 16,
+    padding: 4,
   },
   button: {
     width: "100%",
-    marginTop: 8,
+    marginTop: 16,
+    height: 52,
+    borderRadius: 16,
   },
   errorText: {
     textAlign: "center",
-    marginTop: 8,
+    marginTop: 12,
     fontSize: 14,
+    fontWeight: "500",
   },
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 24,
+    marginBottom: 32,
   },
   divider: {
     flex: 1,
-    height: 1,
+    height: 1.5,
   },
   dividerText: {
     marginHorizontal: 16,
     fontSize: 14,
+    fontWeight: "500",
   },
   socialButtonsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 24,
+    marginBottom: 32,
+    width: "100%",
+    maxWidth: 400,
+    alignSelf: "center",
   },
   socialButton: {
     flex: 1,
     marginHorizontal: 6,
-    height: 48,
-    borderRadius: 12,
+    height: 52,
+    borderRadius: 16,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -512,6 +529,7 @@ const styles = StyleSheet.create({
   socialButtonText: {
     fontSize: 16,
     fontWeight: "600",
+    letterSpacing: 0.3,
   },
   loginLink: {
     alignItems: "center",
@@ -519,5 +537,6 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 16,
+    fontWeight: "500",
   },
 });

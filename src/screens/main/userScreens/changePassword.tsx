@@ -97,7 +97,10 @@ const ChangePassword: React.FC = () => {
           <View
             style={[
               styles.inputWrapper,
-              { borderColor: currentTheme.inactive },
+              { 
+                borderColor: currentTheme.inactive,
+                backgroundColor: currentTheme.background === '#FFFFFF' ? '#F5F5F5' : '#2A2A2A'
+              },
             ]}
           >
             <TextInput
@@ -128,7 +131,10 @@ const ChangePassword: React.FC = () => {
           <View
             style={[
               styles.inputWrapper,
-              { borderColor: currentTheme.inactive },
+              { 
+                borderColor: currentTheme.inactive,
+                backgroundColor: currentTheme.background === '#FFFFFF' ? '#F5F5F5' : '#2A2A2A'
+              },
             ]}
           >
             <TextInput
@@ -169,35 +175,41 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    padding: 20,
+    padding: 24,
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
   },
   formContainer: {
     width: "100%",
+    marginTop: 20,
   },
   inputLabel: {
     fontSize: 16,
-    marginBottom: 8,
-    fontFamily: "outfit",
+    marginBottom: 12,
+    fontFamily: "outfit-medium",
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    borderBottomWidth: 1,
+    borderRadius: 12,
     marginBottom: 24,
+    paddingHorizontal: 16,
+    height: 56,
   },
   input: {
     flex: 1,
-    paddingVertical: 12,
     fontSize: 16,
     fontFamily: "outfit",
   },
   eyeButton: {
     padding: 8,
+    marginLeft: 8,
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: "auto",
-    paddingHorizontal: 20,
+    gap: 12,
   },
 });

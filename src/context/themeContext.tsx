@@ -14,9 +14,9 @@ import { lightTheme, darkTheme } from "../theme/theme";
 type Theme = "light" | "dark"; // Define a union type for themes
 
 type ThemeContextType = {
-  theme: Theme; // Use the union type here
+  theme: Theme;
   currentTheme: typeof lightTheme | typeof darkTheme;
-  toggleTheme: (newTheme: Theme) => void; // Update here to accept the specific theme type
+  setTheme: (newTheme: Theme) => void;
 };
 
 type ThemeProviderProps = {
@@ -24,9 +24,9 @@ type ThemeProviderProps = {
 };
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: Appearance.getColorScheme() as Theme, // Default to system UI theme
+  theme: Appearance.getColorScheme() as Theme,
   currentTheme: Appearance.getColorScheme() === "dark" ? darkTheme : lightTheme,
-  toggleTheme: () => {},
+  setTheme: () => {},
 });
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
@@ -46,10 +46,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       const userDocSnap = await getDoc(userDocRef);
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
-        return userData.theme; // Return stored theme
+        return userData.theme;
       }
     }
-    return null; // Return null if no theme is found
+    return null;
   };
 
   // Function to update theme in Firestore
@@ -65,13 +65,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const loadTheme = async () => {
       const storedTheme = await fetchUserTheme();
       if (storedTheme) {
-        setTheme(storedTheme as Theme); // Use the stored theme
+        setTheme(storedTheme as Theme);
       } else {
-        setTheme(Appearance.getColorScheme() as Theme); // Use system theme as fallback
+        setTheme(Appearance.getColorScheme() as Theme);
       }
     };
 
-    loadTheme(); // Load theme when the app starts
+    loadTheme();
 
     const listener = Appearance.addChangeListener(({ colorScheme }) => {
       setTheme(colorScheme as Theme);
@@ -80,14 +80,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return () => listener.remove();
   }, []);
 
-  // Toggle theme and save it to Firestore
-  const toggleTheme = (newTheme: Theme) => {
+  // Wrap setTheme to also save to Firestore
+  const handleSetTheme = (newTheme: Theme) => {
     setTheme(newTheme);
-    saveThemeToFirestore(newTheme); // Save to Firestore
+    saveThemeToFirestore(newTheme);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, currentTheme, toggleTheme }}>
+    <ThemeContext.Provider
+      value={{ theme, currentTheme, setTheme: handleSetTheme }}
+    >
       {children}
     </ThemeContext.Provider>
   );

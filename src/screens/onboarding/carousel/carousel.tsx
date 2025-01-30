@@ -13,16 +13,16 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
 import { useTheme } from "../../../context/themeContext";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "../../../components/ui/button";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
 
 type CarouselScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Carousel"
 >;
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const Carousel: React.FC = () => {
   const navigation = useNavigation<CarouselScreenNavigationProp>();
@@ -38,7 +38,7 @@ const Carousel: React.FC = () => {
   ) => (
     <ImageBackground source={image} style={styles.backgroundImage}>
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.8)']}
+        colors={["transparent", "rgba(0,0,0,0.9)"]}
         style={styles.gradient}
       >
         <View style={styles.slideContent}>
@@ -46,15 +46,13 @@ const Carousel: React.FC = () => {
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.subtitle}>{subtitle}</Text>
           </View>
-          
+
           {isLastSlide ? (
             <View style={styles.buttonContainer}>
               <MainButton
                 onPress={() => navigation.navigate("SignUp")}
                 buttonText="Get Started"
-                style={styles.authButton}
-                textColor={currentTheme.buttonText}
-                backgroundColor={currentTheme.buttonBackground}
+                width="100%"
               />
             </View>
           ) : (
@@ -62,7 +60,7 @@ const Carousel: React.FC = () => {
               style={styles.arrowButton}
               onPress={() => swiperRef?.scrollBy(1)}
             >
-              <Ionicons name="arrow-forward" size={30} color="white" />
+              <Ionicons name="chevron-forward" size={32} color="white" />
             </Pressable>
           )}
         </View>
@@ -91,7 +89,7 @@ const Carousel: React.FC = () => {
       {renderSlide(
         require("../../../assets/onboarding-imgs/igloo.jpg"),
         "Plan trips and explore destinations",
-        "Simple tools and a powerful interface to help you plan your dream trip."
+        "Simple AI tools to help you plan your dream trip."
       )}
 
       {renderSlide(
@@ -115,61 +113,66 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-    justifyContent: 'flex-end',
-    paddingBottom: Platform.OS === 'ios' ? 50 : 30,
+    justifyContent: "flex-end",
+    paddingBottom: Platform.OS === "ios" ? 60 : 40,
   },
   slideContent: {
-    padding: 24,
+    padding: 32,
   },
   textContainer: {
-    marginBottom: 30,
+    marginBottom: 40,
   },
   title: {
-    fontSize: 42,
+    fontSize: 48,
     fontWeight: "800",
     color: "white",
-    marginBottom: 16,
-    lineHeight: 52,
+    marginBottom: 20,
+    lineHeight: 56,
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 18,
-    color: "#E0E0E0",
-    lineHeight: 26,
+    fontSize: 20,
+    color: "#F5F5F5",
+    lineHeight: 28,
+    letterSpacing: 0.2,
   },
   dotStyle: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginLeft: 4,
-    marginRight: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginLeft: 6,
+    marginRight: 6,
+    opacity: 0.6,
   },
   activeDotStyle: {
-    width: 24,
-    height: 8,
-    borderRadius: 4,
-    marginLeft: 4,
-    marginRight: 4,
+    width: 20,
+    height: 6,
+    borderRadius: 3,
+    marginLeft: 6,
+    marginRight: 6,
   },
   paginationStyle: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 50 : 160, // Increased bottom spacing to avoid overlap
-    left: 24,
-    justifyContent: 'flex-start',
+    position: "absolute",
+    bottom: Platform.OS === "ios" ? 40 : 50,
+    left: 32,
+    justifyContent: "flex-start",
   },
   arrowButton: {
-    position: 'absolute',
-    alignSelf: 'flex-end',
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
-    padding: 16,
-    borderRadius: 30,
-    bottom: Platform.OS === 'ios' ? -20 : -10,
-    right: 24,
+    position: "absolute",
+    alignSelf: "flex-end",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    padding: 20,
+    borderRadius: 40,
+    bottom: Platform.OS === "ios" ? -30 : -20,
+    right: 32,
   },
   buttonContainer: {
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   authButton: {
     width: "100%",
+    height: 56,
+    borderRadius: 16,
   },
 });
