@@ -1,5 +1,5 @@
 export const AI_PROMPT = `Generate a detailed and realistic JSON Travel Plan for a trip to a {destinationType} destination, lasting {totalDays} days and {totalNight} nights.
-The trip is designed for {whoIsGoing} with a {budget} budget level. The preferred accommodation type is {accommodationType} 
+The trip is designed for {whoIsGoing} with a {budget} budget level
 and the desired activity level is {activityLevel}. Please tailor all recommendations accordingly.
 
 Important requirements:
@@ -79,7 +79,7 @@ Return ONLY a valid JSON object with this exact structure:
 }`;
 
 export const PLACE_AI_PROMPT = `Generate a detailed and realistic JSON Travel Plan for a trip to {name}, lasting {totalDays} days and {totalNight} nights.
-The trip is designed for {whoIsGoing} with a {budget} budget level. The preferred accommodation type is {accommodationType} 
+The trip is designed for {whoIsGoing} with a {budget} budget level
 and the desired activity level is {activityLevel}. Please tailor all recommendations accordingly.
 
 Important requirements:

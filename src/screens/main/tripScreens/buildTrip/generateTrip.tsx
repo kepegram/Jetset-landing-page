@@ -1,5 +1,19 @@
-import React, { useContext, useState, useCallback, useRef, useEffect } from "react";
-import { View, Text, Image, Alert, StyleSheet, SafeAreaView, Pressable } from "react-native";
+import React, {
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
+import {
+  View,
+  Text,
+  Image,
+  Alert,
+  StyleSheet,
+  SafeAreaView,
+  Pressable,
+} from "react-native";
 import { CreateTripContext } from "../../../../context/createTripContext";
 import { AI_PROMPT, PLACE_AI_PROMPT } from "../../../../api/ai-prompt";
 import { chatSession } from "../../../../../AI-Model";
@@ -49,7 +63,6 @@ const GenerateTrip: React.FC = () => {
       .replace("{totalNight}", (tripData.totalNoOfDays - 1).toString() || "0")
       .replace("{whoIsGoing}", tripData.whoIsGoing || "")
       .replace("{budget}", tripData.budget?.toString() || "")
-      .replace("{accommodationType}", tripData.accommodationType || "")
       .replace("{activityLevel}", tripData.activityLevel || "");
 
     return FINAL_PROMPT;
@@ -167,12 +180,15 @@ const GenerateTrip: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
-      <Pressable
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons name="chevron-back" size={28} color={currentTheme.textPrimary} />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
+      <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons
+          name="chevron-back"
+          size={28}
+          color={currentTheme.textPrimary}
+        />
       </Pressable>
       <View style={styles.contentContainer}>
         <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
@@ -188,14 +204,17 @@ const GenerateTrip: React.FC = () => {
         <Text style={[styles.warning, { color: currentTheme.textSecondary }]}>
           Click the button below to generate your trip
         </Text>
-        <Pressable 
+        <Pressable
           style={[styles.button, { backgroundColor: currentTheme.alternate }]}
           onPress={() => GenerateAiTrip()}
         >
           <Text style={styles.buttonText}>Generate Trip</Text>
         </Pressable>
-        <Pressable 
-          style={[styles.button, { backgroundColor: currentTheme.alternate, marginTop: 10 }]}
+        <Pressable
+          style={[
+            styles.button,
+            { backgroundColor: currentTheme.alternate, marginTop: 10 },
+          ]}
           onPress={logTripData}
         >
           <Text style={styles.buttonText}>Log Trip Data</Text>
@@ -210,7 +229,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     left: 20,
     zIndex: 1,
@@ -260,7 +279,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "outfit-medium",
     textAlign: "center",
-  }
+  },
 });
 
 export default GenerateTrip;

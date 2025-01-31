@@ -345,12 +345,11 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   profileContainer: {
     width: "100%",
     alignItems: "center",
-    marginTop: 60,
+    marginTop: 80,
   },
   userInfoContainer: {
     marginBottom: 20,

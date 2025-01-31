@@ -1,28 +1,23 @@
 declare module "react-native-calendar-picker" {
-  import { Component } from "react";
+  import { ComponentType } from "react";
   import { ViewStyle, TextStyle } from "react-native";
 
   interface CalendarPickerProps {
     onDateChange: (date: Date, type: string) => void;
     allowRangeSelection?: boolean;
+    selectedStartDate?: Date;
+    selectedEndDate?: Date;
     minDate?: Date;
-    todayBackgroundColor?: string;
-    previousComponent?: JSX.Element;
-    nextComponent?: JSX.Element;
-    selectedRangeStyle?: ViewStyle;
+    selectedDayStyle?: ViewStyle;
     selectedDayTextStyle?: TextStyle;
+    selectedRangeStyle?: ViewStyle;
+    textStyle?: TextStyle;
     dayTextStyle?: TextStyle;
     monthTitleStyle?: TextStyle;
     yearTitleStyle?: TextStyle;
-    disabledDatesTextStyle?: TextStyle;
-    textStyle?: TextStyle;
-    selectedDayStyle?: ViewStyle;
-    width?: number;
-    height?: number;
-    scaleFactor?: number;
-    selectedStartDate?: Date;
-    selectedEndDate?: Date;
+    [key: string]: any;
   }
 
-  export default class CalendarPicker extends Component<CalendarPickerProps> {}
+  const CalendarPicker: ComponentType<CalendarPickerProps>;
+  export default CalendarPicker;
 }

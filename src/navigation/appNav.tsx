@@ -179,7 +179,7 @@ const MyTripsStack: React.FC = () => {
             textAlign: "center",
           }}
         >
-          {`${currentScreenIndex} of ${totalScreens}`}
+          {`Step ${currentScreenIndex} of ${totalScreens}`}
         </Text>
       ),
     };
@@ -416,12 +416,7 @@ const TabNavigator: React.FC = () => {
     height: Platform.OS === "ios" ? 85 : 65,
     paddingBottom: Platform.OS === "ios" ? 25 : 10,
     paddingTop: 10,
-    borderTopWidth: 0,
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderTopWidth: 0.5,
   };
 
   const TabIcon = ({

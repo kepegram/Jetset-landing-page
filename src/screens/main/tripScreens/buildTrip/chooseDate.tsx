@@ -140,24 +140,28 @@ const ChooseDate: React.FC = () => {
               />
             }
             selectedRangeStyle={{
-              backgroundColor: currentTheme.alternate + "50",
+              backgroundColor: `${currentTheme.alternate}50`,
             }}
             selectedDayStyle={{
               backgroundColor: currentTheme.alternate,
-              borderRadius: 12,
             }}
-            selectedDayTextStyle={styles.selectedDayText}
+            selectedDayTextStyle={{
+              color: "#FFFFFF",
+              fontWeight: "600",
+            }}
+            textStyle={{ color: currentTheme.textPrimary }}
             dayTextStyle={{ color: currentTheme.textPrimary }}
             monthTitleStyle={{
-              ...styles.monthTitle,
               color: currentTheme.textPrimary,
+              fontSize: 20,
+              fontWeight: "700",
             }}
             yearTitleStyle={{
-              ...styles.yearTitle,
               color: currentTheme.textPrimary,
+              fontSize: 20,
+              fontWeight: "700",
             }}
-            disabledDatesTextStyle={styles.disabledDates}
-            textStyle={{ color: currentTheme.textPrimary }}
+            disabledDatesTextStyle={{ color: "rgba(128,128,128,0.5)" }}
             width={Dimensions.get("window").width - 40}
             height={420}
             scaleFactor={375}
@@ -187,7 +191,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   headerContainer: {
-    marginBottom: 32,
+    marginBottom: 2,
   },
   subheading: {
     fontSize: 18,

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, SafeAreaView } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import { CreateTripContext } from "../../../../context/createTripContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -28,160 +28,133 @@ const ReviewTrip: React.FC = () => {
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <View style={styles.contentContainer}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={styles.scrollView}
-        >
-          <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
-            Review your trip
+        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+          Final step!
+        </Text>
+
+        <View style={styles.reviewContainer}>
+          <Text
+            style={[styles.subtitle, { color: currentTheme.textPrimary }]}
+          >
+            Please review your selections
           </Text>
 
-          <View style={styles.reviewContainer}>
-            <Text
-              style={[styles.subtitle, { color: currentTheme.textPrimary }]}
-            >
-              Before generating your trip, please review your selections
-            </Text>
-
-            {/* Destination Info  */}
-            <View
-              style={[
-                styles.infoContainer,
-                { backgroundColor: currentTheme.accentBackground },
-              ]}
-            >
-              <Text style={styles.emoji}>📍</Text>
-              <View style={styles.infoTextContainer}>
-                <Text
-                  style={[styles.label, { color: currentTheme.textSecondary }]}
-                >
-                  Destination
-                </Text>
-                <Text
-                  style={[styles.value, { color: currentTheme.textPrimary }]}
-                >
-                  {localTripData?.destinationType ||
-                    localTripData?.locationInfo?.name ||
-                    localTripData?.name}
-                </Text>
-              </View>
-            </View>
-
-            {/* Date Selected Info  */}
-            <View
-              style={[
-                styles.infoContainer,
-                { backgroundColor: currentTheme.accentBackground },
-              ]}
-            >
-              <Text style={styles.emoji}>🗓️</Text>
-              <View style={styles.infoTextContainer}>
-                <Text
-                  style={[styles.label, { color: currentTheme.textSecondary }]}
-                >
-                  Travel Date
-                </Text>
-                <Text
-                  style={[styles.value, { color: currentTheme.textPrimary }]}
-                >
-                  {moment(localTripData?.startDate).format("MMM DD") +
-                    " - " +
-                    moment(localTripData?.endDate).format("MMM DD") +
-                    " "}
-                  ({localTripData?.totalNoOfDays} days)
-                </Text>
-              </View>
-            </View>
-
-            {/* Travelers Info  */}
-            <View
-              style={[
-                styles.infoContainer,
-                { backgroundColor: currentTheme.accentBackground },
-              ]}
-            >
-              <Text style={styles.emoji}>🚌</Text>
-              <View style={styles.infoTextContainer}>
-                <Text
-                  style={[styles.label, { color: currentTheme.textSecondary }]}
-                >
-                  Who is Traveling
-                </Text>
-                <Text
-                  style={[styles.value, { color: currentTheme.textPrimary }]}
-                >
-                  {localTripData?.whoIsGoing}
-                </Text>
-              </View>
-            </View>
-
-            {/* Budget Info  */}
-            <View
-              style={[
-                styles.infoContainer,
-                { backgroundColor: currentTheme.accentBackground },
-              ]}
-            >
-              <Text style={styles.emoji}>💰</Text>
-              <View style={styles.infoTextContainer}>
-                <Text
-                  style={[styles.label, { color: currentTheme.textSecondary }]}
-                >
-                  Budget
-                </Text>
-                <Text
-                  style={[styles.value, { color: currentTheme.textPrimary }]}
-                >
-                  {localTripData?.budget}
-                </Text>
-              </View>
-            </View>
-
-            {/* Accommodation Type Info  */}
-            <View
-              style={[
-                styles.infoContainer,
-                { backgroundColor: currentTheme.accentBackground },
-              ]}
-            >
-              <Text style={styles.emoji}>🏨</Text>
-              <View style={styles.infoTextContainer}>
-                <Text
-                  style={[styles.label, { color: currentTheme.textSecondary }]}
-                >
-                  Accommodation Type
-                </Text>
-                <Text
-                  style={[styles.value, { color: currentTheme.textPrimary }]}
-                >
-                  {localTripData?.accommodationType}
-                </Text>
-              </View>
-            </View>
-
-            {/* Activity Level Info  */}
-            <View
-              style={[
-                styles.infoContainer,
-                { backgroundColor: currentTheme.accentBackground },
-              ]}
-            >
-              <Text style={styles.emoji}>🏃‍♂️</Text>
-              <View style={styles.infoTextContainer}>
-                <Text
-                  style={[styles.label, { color: currentTheme.textSecondary }]}
-                >
-                  Activity Level
-                </Text>
-                <Text
-                  style={[styles.value, { color: currentTheme.textPrimary }]}
-                >
-                  {localTripData?.activityLevel}
-                </Text>
-              </View>
+          {/* Destination Info  */}
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
+            <Text style={styles.emoji}>📍</Text>
+            <View style={styles.infoTextContainer}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
+                Destination
+              </Text>
+              <Text
+                style={[styles.value, { color: currentTheme.textPrimary }]}
+              >
+                {localTripData?.destinationType ||
+                  localTripData?.locationInfo?.name ||
+                  localTripData?.name}
+              </Text>
             </View>
           </View>
-        </ScrollView>
+
+          {/* Date Selected Info  */}
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
+            <Text style={styles.emoji}>🗓️</Text>
+            <View style={styles.infoTextContainer}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
+                Travel Date
+              </Text>
+              <Text
+                style={[styles.value, { color: currentTheme.textPrimary }]}
+              >
+                {moment(localTripData?.startDate).format("MMM DD") +
+                  " - " +
+                  moment(localTripData?.endDate).format("MMM DD") +
+                  " "}
+                ({localTripData?.totalNoOfDays} days)
+              </Text>
+            </View>
+          </View>
+
+          {/* Travelers Info  */}
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
+            <Text style={styles.emoji}>🚌</Text>
+            <View style={styles.infoTextContainer}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
+                Who is Traveling
+              </Text>
+              <Text
+                style={[styles.value, { color: currentTheme.textPrimary }]}
+              >
+                {localTripData?.whoIsGoing}
+              </Text>
+            </View>
+          </View>
+
+          {/* Budget Info  */}
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
+            <Text style={styles.emoji}>💰</Text>
+            <View style={styles.infoTextContainer}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
+                Budget
+              </Text>
+              <Text
+                style={[styles.value, { color: currentTheme.textPrimary }]}
+              >
+                {localTripData?.budget}
+              </Text>
+            </View>
+          </View>
+
+          {/* Activity Level Info  */}
+          <View
+            style={[
+              styles.infoContainer,
+              { backgroundColor: currentTheme.accentBackground },
+            ]}
+          >
+            <Text style={styles.emoji}>🏃‍♂️</Text>
+            <View style={styles.infoTextContainer}>
+              <Text
+                style={[styles.label, { color: currentTheme.textSecondary }]}
+              >
+                Activity Level
+              </Text>
+              <Text
+                style={[styles.value, { color: currentTheme.textPrimary }]}
+              >
+                {localTripData?.activityLevel}
+              </Text>
+            </View>
+          </View>
+        </View>
 
         <View style={styles.buttonContainer}>
           <MainButton
@@ -205,11 +178,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  scrollView: {
-    flex: 1,
-  },
   reviewContainer: {
-    paddingBottom: 100,
+    flex: 1,
+    marginTop: 10,
   },
   title: {
     fontSize: 18,
@@ -218,7 +189,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 32,
+    marginBottom: 15,
     lineHeight: 38,
   },
   infoContainer: {

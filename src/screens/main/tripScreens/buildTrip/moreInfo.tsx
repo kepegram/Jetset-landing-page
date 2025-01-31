@@ -1,11 +1,16 @@
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  Pressable,
+} from "react-native";
 import React, { useContext, useState } from "react";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../../../context/themeContext";
 import { MainButton } from "../../../../components/ui/button";
-import { Dropdown } from "react-native-element-dropdown";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { CreateTripContext } from "../../../../context/createTripContext";
 
@@ -19,9 +24,40 @@ const MoreInfo: React.FC = () => {
   const { currentTheme } = useTheme();
   const { tripData = {}, setTripData = () => {} } =
     useContext(CreateTripContext) || {};
-  const [accommodationType, setAccommodationType] = useState<string>("Hotel");
   const [activityLevel, setActivityLevel] = useState<string>("Normal");
   const [budget, setBudget] = useState<string>("Average");
+
+  const SelectionButton = ({
+    selected,
+    onPress,
+    label,
+  }: {
+    selected: boolean;
+    onPress: () => void;
+    label: string;
+  }) => (
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.selectionButton,
+        {
+          backgroundColor: selected
+            ? currentTheme.alternate
+            : currentTheme.accentBackground,
+          borderColor: currentTheme.alternate,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.selectionText,
+          { color: selected ? "#FFFFFF" : currentTheme.textPrimary },
+        ]}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
 
   return (
     <SafeAreaView
@@ -39,45 +75,7 @@ const MoreInfo: React.FC = () => {
           </Text>
         </View>
 
-        <View style={styles.dropdownsContainer}>
-          {/* Accommodation Type */}
-          <View style={styles.inputContainer}>
-            <View style={styles.labelContainer}>
-              <Ionicons
-                name="bed-outline"
-                size={24}
-                color={currentTheme.alternate}
-              />
-              <Text
-                style={[styles.labelText, { color: currentTheme.textPrimary }]}
-              >
-                Where would you like to stay?
-              </Text>
-            </View>
-            <Dropdown
-              data={[
-                { label: "Hotel", value: "Hotel" },
-                { label: "Hostel", value: "Hostel" },
-                { label: "Airbnb", value: "Airbnb" },
-              ]}
-              labelField="label"
-              valueField="value"
-              value={accommodationType}
-              onChange={(item) => setAccommodationType(item.value)}
-              style={[
-                styles.dropdown,
-                {
-                  backgroundColor: currentTheme.accentBackground,
-                  borderColor: currentTheme.alternate,
-                },
-              ]}
-              itemTextStyle={{ color: currentTheme.textPrimary }}
-              selectedTextStyle={{ color: currentTheme.textPrimary }}
-              placeholderStyle={{ color: currentTheme.textSecondary }}
-              activeColor={currentTheme.accentBackground}
-            />
-          </View>
-
+        <View style={styles.selectionsContainer}>
           {/* Activity Level */}
           <View style={styles.inputContainer}>
             <View style={styles.labelContainer}>
@@ -92,28 +90,23 @@ const MoreInfo: React.FC = () => {
                 How active do you want to be?
               </Text>
             </View>
-            <Dropdown
-              data={[
-                { label: "Take it easy", value: "Low" },
-                { label: "Balanced mix", value: "Normal" },
-                { label: "Adventure packed", value: "High" },
-              ]}
-              labelField="label"
-              valueField="value"
-              value={activityLevel}
-              onChange={(item) => setActivityLevel(item.value)}
-              style={[
-                styles.dropdown,
-                {
-                  backgroundColor: currentTheme.accentBackground,
-                  borderColor: currentTheme.alternate,
-                },
-              ]}
-              itemTextStyle={{ color: currentTheme.textPrimary }}
-              selectedTextStyle={{ color: currentTheme.textPrimary }}
-              placeholderStyle={{ color: currentTheme.textSecondary }}
-              activeColor={currentTheme.accentBackground}
-            />
+            <View style={styles.optionsContainer}>
+              <SelectionButton
+                selected={activityLevel === "Low"}
+                onPress={() => setActivityLevel("Low")}
+                label="Take it easy"
+              />
+              <SelectionButton
+                selected={activityLevel === "Normal"}
+                onPress={() => setActivityLevel("Normal")}
+                label="Balanced mix"
+              />
+              <SelectionButton
+                selected={activityLevel === "High"}
+                onPress={() => setActivityLevel("High")}
+                label="Adventure packed"
+              />
+            </View>
           </View>
 
           {/* Budget */}
@@ -130,41 +123,34 @@ const MoreInfo: React.FC = () => {
                 What's your budget like?
               </Text>
             </View>
-            <Dropdown
-              data={[
-                { label: "Budget friendly", value: "Frugal" },
-                { label: "Mid-range", value: "Average" },
-                { label: "High-end", value: "Luxury" },
-              ]}
-              labelField="label"
-              valueField="value"
-              value={budget}
-              onChange={(item) => setBudget(item.value)}
-              style={[
-                styles.dropdown,
-                {
-                  backgroundColor: currentTheme.accentBackground,
-                  borderColor: currentTheme.alternate,
-                },
-              ]}
-              itemTextStyle={{ color: currentTheme.textPrimary }}
-              selectedTextStyle={{ color: currentTheme.textPrimary }}
-              placeholderStyle={{ color: currentTheme.textSecondary }}
-              activeColor={currentTheme.accentBackground}
-            />
+            <View style={styles.optionsContainer}>
+              <SelectionButton
+                selected={budget === "Frugal"}
+                onPress={() => setBudget("Frugal")}
+                label="Budget friendly"
+              />
+              <SelectionButton
+                selected={budget === "Average"}
+                onPress={() => setBudget("Average")}
+                label="Mid-range"
+              />
+              <SelectionButton
+                selected={budget === "Luxury"}
+                onPress={() => setBudget("Luxury")}
+                label="High-end"
+              />
+            </View>
           </View>
 
           <MainButton
             onPress={() => {
               setTripData({
                 ...tripData,
-                accommodationType,
                 activityLevel,
                 budget,
               });
               console.log("Trip Data:", {
                 ...tripData,
-                accommodationType,
                 activityLevel,
                 budget,
               });
@@ -189,7 +175,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   headerContainer: {
-    marginBottom: 32,
+    marginBottom: 10,
   },
   subheading: {
     fontSize: 18,
@@ -198,9 +184,10 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  dropdownsContainer: {
+  selectionsContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -218,12 +205,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "500",
   },
-  dropdown: {
-    borderWidth: 1.5,
+  optionsContainer: {
+    flexDirection: "column",
+    gap: 12,
+  },
+  selectionButton: {
+    padding: 12,
     borderRadius: 12,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    height: 55,
+    borderWidth: 1.5,
+    alignItems: "center",
+  },
+  selectionText: {
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
 
