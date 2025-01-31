@@ -9,7 +9,6 @@ import {
   Platform,
   Image,
   ScrollView,
-  Dimensions,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -75,8 +74,6 @@ interface PasswordFieldProps {
   editable: boolean;
 }
 
-const { width } = Dimensions.get("window");
-
 const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
   const { currentTheme } = useTheme();
   const [name, setName] = useState("");
@@ -92,6 +89,8 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
   const db = FIREBASE_DB;
 
   const navigation = useNavigation<SignUpScreenNavigationProp>();
+
+  const isFormValid = name && email && password && confirmPassword;
 
   const handleSignUp = async () => {
     setErrorMessage(null);
@@ -255,10 +254,10 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           <MainButton
             buttonText="Create Account"
             onPress={handleSignUp}
-            backgroundColor={currentTheme.buttonBackground}
+            backgroundColor={isFormValid ? currentTheme.buttonBackground : currentTheme.inactive}
             textColor={currentTheme.buttonText}
-            disabled={loading}
-            style={[styles.button, { opacity: loading ? 0.7 : 1 }]}
+            disabled={loading || !isFormValid}
+            style={[styles.button]}
           />
 
           {errorMessage && (
@@ -533,7 +532,6 @@ const styles = StyleSheet.create({
   },
   loginLink: {
     alignItems: "center",
-    paddingVertical: 16,
   },
   loginText: {
     fontSize: 16,

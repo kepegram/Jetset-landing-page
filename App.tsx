@@ -46,10 +46,8 @@ const App: React.FC = () => {
   const [appIsReady, setAppIsReady] = useState(false);
   const { currentTheme } = useTheme();
   const [request, response, promptAsync] = Google.useAuthRequest({
-    iosClientId:
-      "500450400417-sqtsj83q075sduha6dsrk3c19c9ac1ci.apps.googleusercontent.com",
-    androidClientId:
-      "500450400417-gg1pf3lqt2k98ov98u85aem2ekc2rsd8.apps.googleusercontent.com",
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
   });
 
   const colorScheme = useColorScheme();

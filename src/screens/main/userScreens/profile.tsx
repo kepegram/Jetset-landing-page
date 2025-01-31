@@ -81,7 +81,7 @@ const Profile: React.FC = () => {
         {
           text: "OK",
           onPress: () => {
-            setTheme('light');
+            setTheme("light");
             FIREBASE_AUTH.signOut();
           },
         },
@@ -326,7 +326,14 @@ const Profile: React.FC = () => {
           ]}
           onPress={handleLogout}
         >
-          <Text style={styles.logoutButtonText}>Sign out</Text>
+          <Text
+            style={[
+              styles.logoutButtonText,
+              { color: currentTheme.textPrimary },
+            ]}
+          >
+            Sign out
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -430,7 +437,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   logoutButtonText: {
-    color: "white",
     textDecorationLine: "underline",
     fontSize: 16,
     fontWeight: "600",

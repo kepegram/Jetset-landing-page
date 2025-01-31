@@ -16,7 +16,7 @@
       "supportsTablet": true,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.kpegra1.jetset",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./ios/Jetset/GoogleService-Info.plist"
     },
     "android": {
       "package": "com.pegram.jetset",
