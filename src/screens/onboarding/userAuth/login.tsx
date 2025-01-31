@@ -15,11 +15,19 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
 import { Ionicons } from "@expo/vector-icons";
-import { FIREBASE_AUTH } from "../../../../firebase.config";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
+import * as AppleAuthentication from "expo-apple-authentication";
+import {
+  OAuthProvider,
+  signInWithCredential,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { useTheme } from "../../../context/themeContext";
 import { AuthRequestPromptOptions, AuthSessionResult } from "expo-auth-session";
 import { MainButton } from "../../../components/ui/button";
+import { setDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -41,7 +49,11 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const auth = FIREBASE_AUTH;
+  const db = FIREBASE_DB;
+
   const navigation = useNavigation<LoginScreenNavigationProp>();
+
+  const isFormValid = email !== "" && password !== "";
 
   const handleLogin = async () => {
     setErrorMessage(null);
@@ -62,6 +74,55 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    setErrorMessage(null);
+
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (credential) {
+        const { identityToken, fullName, email } = credential;
+
+        if (!identityToken) {
+          setErrorMessage("Authentication failed. Please try again.");
+          return;
+        }
+
+        const provider = new OAuthProvider("apple.com");
+        const appleCredential = provider.credential({
+          idToken: identityToken,
+        });
+
+        const authResult = await signInWithCredential(auth, appleCredential);
+
+        const userRef = doc(db, "users", authResult.user.uid);
+        await setDoc(
+          userRef,
+          {
+            name: fullName?.givenName || "User",
+            email: email || authResult.user.email,
+            createdAt: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+
+        await AsyncStorage.setItem("userName", fullName?.givenName || "User");
+      }
+    } catch (e: any) {
+      if (e.code === "ERR_REQUEST_CANCELED") {
+        setErrorMessage("Cancelled Apple sign-in flow");
+      } else {
+        setErrorMessage("Error authenticating with Apple, please try again.");
+      }
+      console.error("Apple Sign-In Error:", e);
     }
   };
 
@@ -168,14 +229,18 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           </Pressable>
 
           {loading ? (
-            <ActivityIndicator size="large" color={currentTheme.primary} style={styles.button} />
+            <ActivityIndicator
+              size="large"
+              color={currentTheme.primary}
+              style={styles.button}
+            />
           ) : (
             <MainButton
               buttonText="Sign In"
               onPress={handleLogin}
               width="100%"
-              disabled={loading}
-              style={styles.button}
+              disabled={loading || !isFormValid}
+              style={[styles.button, !isFormValid && { opacity: 0.5 }]}
             />
           )}
 
@@ -247,27 +312,20 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               </Text>
             </MainButton>
 
-            <MainButton
-              onPress={() => console.log("Apple Sign-In")}
-              backgroundColor={currentTheme.accentBackground}
-              textColor={currentTheme.textPrimary}
-              style={styles.socialButton}
-              disabled={loading}
-            >
-              <Ionicons
-                name="logo-apple"
-                size={24}
-                color={currentTheme.textPrimary}
+            {Platform.OS === "ios" && (
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={
+                  AppleAuthentication.AppleAuthenticationButtonType.CONTINUE
+                }
+                buttonStyle={
+                  AppleAuthentication.AppleAuthenticationButtonStyle
+                    .WHITE_OUTLINE
+                }
+                cornerRadius={5}
+                style={styles.socialButton}
+                onPress={() => handleAppleSignIn()}
               />
-              <Text
-                style={[
-                  styles.socialButtonText,
-                  { color: currentTheme.textPrimary },
-                ]}
-              >
-                Apple
-              </Text>
-            </MainButton>
+            )}
           </View>
         </View>
       </ScrollView>

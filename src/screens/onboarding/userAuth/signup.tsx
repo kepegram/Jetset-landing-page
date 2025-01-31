@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  ScrollView,
+  SafeAreaView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -187,15 +187,83 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
     }
   };
 
+  const InputField: React.FC<InputFieldProps> = ({
+    label,
+    theme,
+    ...props
+  }) => (
+    <View style={styles.inputWrapper}>
+      <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
+        {label}
+      </Text>
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: theme.accentBackground,
+            color: theme.textPrimary,
+            borderColor: theme.inactive,
+          },
+        ]}
+        placeholderTextColor={theme.textSecondary}
+        {...props}
+      />
+    </View>
+  );
+
+  const PasswordField: React.FC<PasswordFieldProps> = ({
+    label,
+    value,
+    onChangeText,
+    visible,
+    toggleVisible,
+    theme,
+    editable,
+  }) => (
+    <View style={styles.inputWrapper}>
+      <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
+        {label}
+      </Text>
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.accentBackground,
+              color: theme.textPrimary,
+              borderColor: theme.inactive,
+            },
+          ]}
+          placeholder="••••••••••"
+          placeholderTextColor={theme.textSecondary}
+          value={value}
+          onChangeText={onChangeText}
+          secureTextEntry={!visible}
+          autoCapitalize="none"
+          editable={editable}
+        />
+        <Pressable
+          style={styles.eyeIcon}
+          onPress={toggleVisible}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons
+            name={visible ? "eye-off" : "eye"}
+            size={24}
+            color={theme.textSecondary}
+          />
+        </Pressable>
+      </View>
+    </View>
+  );
+
   return (
-    <KeyboardAvoidingView
+    <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        style={styles.contentContainer}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.headerContainer}>
           <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
@@ -254,10 +322,8 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           <MainButton
             buttonText="Create Account"
             onPress={handleSignUp}
-            backgroundColor={isFormValid ? currentTheme.buttonBackground : currentTheme.inactive}
-            textColor={currentTheme.buttonText}
             disabled={loading || !isFormValid}
-            style={[styles.button]}
+            style={[styles.button, !isFormValid && { opacity: 0.5 }]}
           />
 
           {errorMessage && (
@@ -311,27 +377,19 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             </Text>
           </MainButton>
 
-          <MainButton
-            onPress={handleAppleSignIn}
-            backgroundColor={currentTheme.accentBackground}
-            textColor={currentTheme.textPrimary}
-            style={[styles.socialButton, { opacity: loading ? 0.7 : 1 }]}
-            disabled={loading}
-          >
-            <Ionicons
-              name="logo-apple"
-              size={24}
-              color={currentTheme.textPrimary}
+          {Platform.OS === "ios" && (
+            <AppleAuthentication.AppleAuthenticationButton
+              buttonType={
+                AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+              }
+              buttonStyle={
+                AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
+              }
+              cornerRadius={5}
+              style={styles.socialButton}
+              onPress={handleAppleSignIn}
             />
-            <Text
-              style={[
-                styles.socialButtonText,
-                { color: currentTheme.textPrimary },
-              ]}
-            >
-              Apple
-            </Text>
-          </MainButton>
+          )}
         </View>
 
         <Pressable
@@ -348,76 +406,10 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             </Text>
           </Text>
         </Pressable>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
-
-const InputField: React.FC<InputFieldProps> = ({ label, theme, ...props }) => (
-  <View style={styles.inputWrapper}>
-    <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
-      {label}
-    </Text>
-    <TextInput
-      style={[
-        styles.input,
-        {
-          backgroundColor: theme.accentBackground,
-          color: theme.textPrimary,
-          borderColor: theme.inactive,
-        },
-      ]}
-      placeholderTextColor={theme.textSecondary}
-      {...props}
-    />
-  </View>
-);
-
-const PasswordField: React.FC<PasswordFieldProps> = ({
-  label,
-  value,
-  onChangeText,
-  visible,
-  toggleVisible,
-  theme,
-  editable,
-}) => (
-  <View style={styles.inputWrapper}>
-    <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
-      {label}
-    </Text>
-    <View style={styles.passwordContainer}>
-      <TextInput
-        style={[
-          styles.input,
-          {
-            backgroundColor: theme.accentBackground,
-            color: theme.textPrimary,
-            borderColor: theme.inactive,
-          },
-        ]}
-        placeholder="••••••••••"
-        placeholderTextColor={theme.textSecondary}
-        value={value}
-        onChangeText={onChangeText}
-        secureTextEntry={!visible}
-        autoCapitalize="none"
-        editable={editable}
-      />
-      <Pressable
-        style={styles.eyeIcon}
-        onPress={toggleVisible}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      >
-        <Ionicons
-          name={visible ? "eye-off" : "eye"}
-          size={24}
-          color={theme.textSecondary}
-        />
-      </Pressable>
-    </View>
-  </View>
-);
 
 export default SignUp;
 
@@ -425,34 +417,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollView: {
-    flex: 1,
-  },
   contentContainer: {
-    flexGrow: 1,
+    flex: 1,
     padding: 24,
+    justifyContent: "flex-start",
+    paddingTop: 10,
   },
   headerContainer: {
-    marginBottom: 36,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 12,
+    marginBottom: 8,
     letterSpacing: 0.5,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     opacity: 0.8,
   },
   signUpContainer: {
-    marginBottom: 32,
+    marginBottom: 24,
     width: "100%",
     maxWidth: 400,
     alignSelf: "center",
   },
   inputWrapper: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   inputLabel: {
     fontSize: 16,
@@ -461,7 +452,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    height: 56,
+    height: 50,
     borderRadius: 12,
     paddingHorizontal: 16,
     borderWidth: 1,
@@ -474,14 +465,12 @@ const styles = StyleSheet.create({
   eyeIcon: {
     position: "absolute",
     right: 16,
-    top: 16,
+    top: 10,
     padding: 4,
   },
   button: {
     width: "100%",
     marginTop: 16,
-    height: 52,
-    borderRadius: 16,
   },
   errorText: {
     textAlign: "center",
@@ -492,7 +481,7 @@ const styles = StyleSheet.create({
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 32,
+    marginBottom: 22,
   },
   divider: {
     flex: 1,
@@ -506,7 +495,7 @@ const styles = StyleSheet.create({
   socialButtonsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 32,
+    marginBottom: 22,
     width: "100%",
     maxWidth: 400,
     alignSelf: "center",
