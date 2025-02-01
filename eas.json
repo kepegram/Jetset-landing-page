@@ -14,10 +14,8 @@
       },
       "channel": "development",
       "env": {
-        "EXPO_PUBLIC_IOS_CLIENT_ID": "500450400417-gg1pf3lqt2k98ov98u85aem2ekc2rsd8.apps.googleusercontent.com",
-        "GOOGLE_SERVICES_BASE64": "${GOOGLE_SERVICES_BASE64}"
-      },
-      "prebuildCommand": "./prebuild.sh"
+        "EXPO_PUBLIC_IOS_CLIENT_ID": "500450400417-gg1pf3lqt2k98ov98u85aem2ekc2rsd8.apps.googleusercontent.com"
+      }
     },
     "preview": {
       "distribution": "internal"
