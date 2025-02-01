@@ -3,11 +3,18 @@
 # Create necessary directories
 mkdir -p ios/Jetset
 
-# Check if the file exists in the source location
-if [ -f "ios/Jetset/GoogleService-Info.plist" ]; then
-    echo "Found GoogleService-Info.plist"
+# Check if we have the base64 encoded secret
+if [ -n "$GOOGLE_SERVICES_BASE64" ]; then
+    echo "Using GOOGLE_SERVICES_BASE64 secret"
+    echo "$GOOGLE_SERVICES_BASE64" | base64 -d > ios/Jetset/GoogleService-Info.plist
+    if [ $? -eq 0 ]; then
+        echo "Successfully decoded and saved GoogleService-Info.plist"
+    else
+        echo "Error: Failed to decode GOOGLE_SERVICES_BASE64"
+        exit 1
+    fi
 else
-    echo "Error: GoogleService-Info.plist not found in ios/Jetset/"
+    echo "Error: GOOGLE_SERVICES_BASE64 environment variable not found"
     exit 1
 fi
 
