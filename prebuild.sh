@@ -1,15 +1,14 @@
 #!/bin/bash
 
 # Create necessary directories
-mkdir -p build/ios/Jetset
+mkdir -p ios/Jetset
 
-# Copy GoogleService-Info.plist to the required location
-cp ios/Jetset/GoogleService-Info.plist build/ios/Jetset/
-
-# Make sure the file exists in the target location
-if [ ! -f "build/ios/Jetset/GoogleService-Info.plist" ]; then
-    echo "Error: GoogleService-Info.plist not copied successfully"
+# Check if the file exists in the source location
+if [ -f "ios/Jetset/GoogleService-Info.plist" ]; then
+    echo "Found GoogleService-Info.plist"
+else
+    echo "Error: GoogleService-Info.plist not found in ios/Jetset/"
     exit 1
 fi
 
-echo "GoogleService-Info.plist copied successfully" 
+echo "GoogleService-Info.plist setup completed successfully" 

@@ -10,6 +10,7 @@ web-build/
 
 # Native
 ios/
+!ios/Jetset/GoogleService-Info.plist
 android/
 *.orig.*
 *.jks
@@ -41,4 +42,3 @@ yarn-error.*
 firebase.config.ts
 AI-Model.tsx
 google-services.json
-GoogleService-Info.plist

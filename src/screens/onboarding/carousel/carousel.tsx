@@ -1,18 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  Pressable,
   ImageBackground,
   Dimensions,
   Platform,
+  SafeAreaView,
 } from "react-native";
-import Swiper from "react-native-swiper";
+import Carousel from "react-native-reanimated-carousel";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
-import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "../../../components/ui/button";
 import { LinearGradient } from "expo-linear-gradient";
@@ -24,155 +23,176 @@ type CarouselScreenNavigationProp = NativeStackNavigationProp<
 
 const { width, height } = Dimensions.get("window");
 
-const Carousel: React.FC = () => {
+const CarouselScreen: React.FC = () => {
   const navigation = useNavigation<CarouselScreenNavigationProp>();
-  const { currentTheme } = useTheme();
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  let swiperRef: Swiper | null = null;
+  const slides = [
+    {
+      image: require("../../../assets/onboarding-imgs/city.jpeg"),
+      title: "Create your dream travel list",
+      subtitle: "Curate your own personalized travel bucket list",
+    },
+    {
+      image: require("../../../assets/onboarding-imgs/igloo.jpg"),
+      title: "Plan trips and explore destinations",
+      subtitle: "Simple AI tools to help you plan your dream trip.",
+    },
+    {
+      image: require("../../../assets/onboarding-imgs/beautiful.jpeg"),
+      title: "Become\nJetset\nToday",
+      subtitle:
+        "Join our community to start planning your travel list and explore the world",
+    },
+  ];
 
-  const renderSlide = (
-    image: any,
-    title: string,
-    subtitle: string,
-    isLastSlide: boolean = false
-  ) => (
-    <ImageBackground source={image} style={styles.backgroundImage}>
-      <LinearGradient
-        colors={["transparent", "rgba(0,0,0,0.9)"]}
-        style={styles.gradient}
+  const renderSlide = ({ item, index }: { item: any; index: number }) => (
+    <View style={styles.slide}>
+      <ImageBackground
+        source={item.image}
+        style={styles.backgroundImage}
+        resizeMode="cover"
       >
-        <View style={styles.slideContent}>
-          <View style={styles.textContainer}>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.subtitle}>{subtitle}</Text>
-          </View>
-
-          {isLastSlide ? (
-            <View style={styles.buttonContainer}>
-              <MainButton
-                onPress={() => navigation.navigate("SignUp")}
-                buttonText="Get Started"
-                width="100%"
-              />
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.7)", "rgba(0,0,0,0.95)"]}
+          style={styles.gradient}
+        >
+          <SafeAreaView style={styles.contentContainer}>
+            <View style={styles.dotsContainer}>
+              {slides.map((_, i) => (
+                <View
+                  key={i}
+                  style={[styles.dot, i === activeIndex && styles.activeDot]}
+                />
+              ))}
             </View>
-          ) : (
-            <Pressable
-              style={styles.arrowButton}
-              onPress={() => swiperRef?.scrollBy(1)}
-            >
-              <Ionicons name="chevron-forward" size={32} color="white" />
-            </Pressable>
-          )}
-        </View>
-      </LinearGradient>
-    </ImageBackground>
+
+            <View style={styles.bottomContent}>
+              <View style={styles.textContainer}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.subtitle}>{item.subtitle}</Text>
+              </View>
+
+              {index === slides.length - 1 ? (
+                <View style={styles.buttonContainer}>
+                  <MainButton
+                    onPress={() => navigation.navigate("SignUp")}
+                    buttonText="Get Started"
+                    width="100%"
+                  />
+                </View>
+              ) : (
+                <View style={styles.swipeIndicatorContainer}>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={28}
+                    color="rgba(255,255,255,0.6)"
+                  />
+                  <Ionicons
+                    name="chevron-forward"
+                    size={28}
+                    color="rgba(255,255,255,0.3)"
+                    style={styles.secondArrow}
+                  />
+                </View>
+              )}
+            </View>
+          </SafeAreaView>
+        </LinearGradient>
+      </ImageBackground>
+    </View>
   );
 
   return (
-    <Swiper
-      ref={(ref) => (swiperRef = ref)}
-      style={styles.wrapper}
-      showsButtons={false}
-      loop={false}
-      activeDotColor={currentTheme.alternate}
-      dotColor={currentTheme.inactive}
-      dotStyle={styles.dotStyle}
-      activeDotStyle={styles.activeDotStyle}
-      paginationStyle={styles.paginationStyle}
-    >
-      {renderSlide(
-        require("../../../assets/onboarding-imgs/city.jpeg"),
-        "Create your dream travel list",
-        "Curate your own personalized travel bucket list"
-      )}
-
-      {renderSlide(
-        require("../../../assets/onboarding-imgs/igloo.jpg"),
-        "Plan trips and explore destinations",
-        "Simple AI tools to help you plan your dream trip."
-      )}
-
-      {renderSlide(
-        require("../../../assets/onboarding-imgs/beautiful.jpeg"),
-        "Become\nJetset\nToday",
-        "Join our community to start planning your travel list and explore the world",
-        true
-      )}
-    </Swiper>
+    <View style={styles.container}>
+      <Carousel
+        loop={false}
+        width={width}
+        height={height}
+        data={slides}
+        renderItem={renderSlide}
+        onSnapToItem={setActiveIndex}
+        defaultIndex={0}
+      />
+    </View>
   );
 };
 
-export default Carousel;
+export default CarouselScreen;
 
 const styles = StyleSheet.create({
-  wrapper: {},
-  backgroundImage: {
+  container: {
+    flex: 1,
+    backgroundColor: "#000",
+  },
+  slide: {
+    flex: 1,
     width,
     height,
-    resizeMode: "cover",
+  },
+  backgroundImage: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
   },
   gradient: {
     flex: 1,
-    justifyContent: "flex-end",
-    paddingBottom: Platform.OS === "ios" ? 60 : 40,
   },
-  slideContent: {
-    padding: 32,
+  contentContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+    paddingTop: Platform.OS === "ios" ? 60 : 40,
+  },
+  dotsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 20,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    width: 24,
+    backgroundColor: "#fff",
+  },
+  bottomContent: {
+    paddingBottom: Platform.OS === "ios" ? 50 : 40,
   },
   textContainer: {
-    marginBottom: 40,
+    padding: 32,
+    paddingBottom: 20,
   },
   title: {
-    fontSize: 48,
+    fontSize: 42,
     fontWeight: "800",
     color: "white",
-    marginBottom: 20,
-    lineHeight: 56,
+    marginBottom: 16,
+    lineHeight: 52,
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: 18,
     color: "#F5F5F5",
-    lineHeight: 28,
+    lineHeight: 26,
     letterSpacing: 0.2,
-  },
-  dotStyle: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginLeft: 6,
-    marginRight: 6,
-    opacity: 0.6,
-  },
-  activeDotStyle: {
-    width: 20,
-    height: 6,
-    borderRadius: 3,
-    marginLeft: 6,
-    marginRight: 6,
-  },
-  paginationStyle: {
-    position: "absolute",
-    bottom: Platform.OS === "ios" ? 40 : 50,
-    left: 32,
-    justifyContent: "flex-start",
-  },
-  arrowButton: {
-    position: "absolute",
-    alignSelf: "flex-end",
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    padding: 20,
-    borderRadius: 40,
-    bottom: Platform.OS === "ios" ? -30 : -20,
-    right: 32,
+    opacity: 0.9,
   },
   buttonContainer: {
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  authButton: {
+    paddingHorizontal: 32,
     width: "100%",
-    height: 56,
-    borderRadius: 16,
+  },
+  swipeIndicatorContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 10,
+  },
+  secondArrow: {
+    marginLeft: -15,
   },
 });

@@ -9,12 +9,14 @@
       "distribution": "internal",
       "ios": {
         "simulator": true,
-        "buildConfiguration": "Debug"
+        "buildConfiguration": "Debug",
+        "resourceClass": "m-medium"
       },
       "channel": "development",
       "env": {
         "EXPO_PUBLIC_IOS_CLIENT_ID": "500450400417-gg1pf3lqt2k98ov98u85aem2ekc2rsd8.apps.googleusercontent.com"
-      }
+      },
+      "prebuildCommand": "./prebuild.sh"
     },
     "preview": {
       "distribution": "internal"
