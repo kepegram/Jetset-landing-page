@@ -29,12 +29,27 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-apple-authentication"],
+    "plugins": [
+      "expo-apple-authentication",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "deploymentTarget": "15.1"
+          }
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "cf7b3e9e-07c0-457e-b3b0-d4179b54b637"
       }
     },
-    "scheme": "jetset"
+    "scheme": "jetset",
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/cf7b3e9e-07c0-457e-b3b0-d4179b54b637"
+    }
   }
 }
