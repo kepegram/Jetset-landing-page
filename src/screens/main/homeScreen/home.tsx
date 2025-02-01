@@ -626,8 +626,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
     marginTop: 12,
-    fontSize: 12,
+    fontSize: 11,
     textAlign: "center",
+    width: "100%",
+    flexShrink: 1,
+    flexWrap: "nowrap",
   },
   scrollViewContent: {
     paddingBottom: 40,

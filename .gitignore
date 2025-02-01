@@ -18,6 +18,7 @@ android/
 *.p12
 *.key
 *.mobileprovision
+GoogleService-Info.plist
 
 # Metro
 .metro-health-check*
