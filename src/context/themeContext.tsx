@@ -11,7 +11,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { lightTheme, darkTheme } from "../theme/theme";
 
-type Theme = "light" | "dark"; // Define a union type for themes
+type Theme = "light" | "dark";
 
 type ThemeContextType = {
   theme: Theme;
@@ -36,10 +36,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const auth = getAuth();
   const user = auth.currentUser;
 
-  // Determine the current theme object
   const currentTheme = theme === "dark" ? darkTheme : lightTheme;
 
-  // Function to fetch theme from Firestore
   const fetchUserTheme = async () => {
     if (user) {
       const userDocRef = doc(FIREBASE_DB, "users", user.uid);
@@ -52,7 +50,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return null;
   };
 
-  // Function to update theme in Firestore
   const saveThemeToFirestore = async (newTheme: Theme) => {
     if (user) {
       const userDocRef = doc(FIREBASE_DB, "users", user.uid);
@@ -60,7 +57,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
   };
 
-  // Listen for system theme changes and load stored user theme on start
   useEffect(() => {
     const loadTheme = async () => {
       const storedTheme = await fetchUserTheme();
@@ -80,7 +76,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return () => listener.remove();
   }, []);
 
-  // Wrap setTheme to also save to Firestore
   const handleSetTheme = (newTheme: Theme) => {
     setTheme(newTheme);
     saveThemeToFirestore(newTheme);
@@ -88,12 +83,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   return (
     <ThemeContext.Provider
-      value={{ theme, currentTheme, setTheme: handleSetTheme }}
+      value={{
+        theme,
+        currentTheme,
+        setTheme: handleSetTheme,
+      }}
     >
       {children}
     </ThemeContext.Provider>
   );
 };
 
-// Custom hook to use the theme
 export const useTheme = () => useContext(ThemeContext);

@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Linking } from "react-native";
+import { View, Text, Pressable, Linking, StyleSheet } from "react-native";
 import React from "react";
 import { useTheme } from "../../context/themeContext";
 
@@ -27,69 +27,64 @@ const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
   };
 
   return (
-    <View
-      style={{
-        marginTop: 10,
-        marginBottom: 10,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "outfit-bold",
-            fontSize: 20,
-            color: currentTheme.textPrimary,
-          }}
-        >
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
           ✈️ Flights
         </Text>
         <Pressable
           onPress={handleBookClick}
-          style={{
-            backgroundColor: currentTheme.alternate,
-            padding: 5,
-            width: 100,
-            borderRadius: 25,
-          }}
+          style={[
+            styles.bookButton,
+            { backgroundColor: currentTheme.alternate },
+          ]}
         >
           <Text
-            style={{
-              textAlign: "center",
-              color: currentTheme.buttonText,
-              fontFamily: "outfit",
-            }}
+            style={[styles.bookButtonText, { color: currentTheme.buttonText }]}
           >
             Book Here
           </Text>
         </Pressable>
       </View>
 
-      <Text
-        style={{
-          fontFamily: "outfit",
-          fontSize: 17,
-          color: currentTheme.textSecondary,
-        }}
-      >
+      <Text style={[styles.infoText, { color: currentTheme.textSecondary }]}>
         Airline: {flightData.airlineName}
       </Text>
-      <Text
-        style={{
-          fontFamily: "outfit",
-          fontSize: 17,
-          color: currentTheme.textSecondary,
-        }}
-      >
+      <Text style={[styles.infoText, { color: currentTheme.textSecondary }]}>
         Price: ${flightData.flightPrice} (approx.)
       </Text>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    marginVertical: 10,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  title: {
+    fontFamily: "outfit-bold",
+    fontSize: 20,
+  },
+  bookButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    width: 100,
+    borderRadius: 25,
+  },
+  bookButtonText: {
+    textAlign: "center",
+    fontFamily: "outfit",
+  },
+  infoText: {
+    fontFamily: "outfit",
+    fontSize: 17,
+    marginTop: 4,
+  },
+});
 
 export default FlightInfo;

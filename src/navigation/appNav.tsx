@@ -35,7 +35,7 @@ import ChoosePlaces from "../screens/main/tripScreens/buildTrip/choosePlaces";
 import ChooseDate from "../screens/main/tripScreens/buildTrip/chooseDate";
 import WhosGoing from "../screens/main/tripScreens/buildTrip/whosGoing";
 import MoreInfo from "../screens/main/tripScreens/buildTrip/moreInfo";
-import PopularDestinations from "../screens/main/homeScreen/popularDestinations";
+import PopularDestinations from "../screens/main/homeScreen/popularDestinationsDetail";
 
 export type RootStackParamList = {
   Welcome: undefined;

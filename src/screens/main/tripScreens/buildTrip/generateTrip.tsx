@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { CreateTripContext } from "../../../../context/createTripContext";
 import { AI_PROMPT, PLACE_AI_PROMPT } from "../../../../api/ai-prompt";
-import { chatSession } from "../../../../../AI-Model";
+import { chatSession } from "../../../../api/AI-Model";
 import { doc, setDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../../firebase.config";
 import { useTheme } from "../../../../context/themeContext";

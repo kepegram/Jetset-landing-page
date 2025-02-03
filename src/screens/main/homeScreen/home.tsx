@@ -29,9 +29,9 @@ import { Fontisto } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
-import { popularDestinations } from "../../../constants/constants";
+import { popularDestinations } from "../../../constants/popularDestinations";
 import { RECOMMEND_TRIP_AI_PROMPT } from "../../../api/ai-prompt";
-import { chatSession } from "../../../../AI-Model";
+import { chatSession } from "../../../api/AI-Model";
 import {
   GooglePlacesAutocomplete,
   GooglePlaceDetail,

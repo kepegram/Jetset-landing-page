@@ -279,7 +279,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 25,
     backgroundColor: "rgba(0,0,0,0.3)",
-   
   },
   scrollContent: {
     paddingBottom: 100,
