@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import React from "react";
 import moment from "moment";
-import { useTheme } from "../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
@@ -29,7 +28,6 @@ interface UpcomingTripsCardProps {
 }
 
 const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
-  const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const scaleAnim = new Animated.Value(1);
 
@@ -98,7 +96,6 @@ const UpcomingTripsCard: React.FC<UpcomingTripsCardProps> = ({ userTrips }) => {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         onPress={() => {
-          console.log(UpcomingPlan?.travelPlan?.photoRef);
           navigation.navigate("TripDetails", {
             trip: JSON.stringify({
               ...UpcomingTrip,

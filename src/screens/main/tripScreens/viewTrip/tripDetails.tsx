@@ -2,71 +2,56 @@ import {
   View,
   Text,
   Image,
+  ScrollView,
   Alert,
+  Linking,
   StyleSheet,
   Dimensions,
   Pressable,
   StatusBar,
-  Animated,
 } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
-import { useTheme } from "../../../context/themeContext";
+import React, { useEffect, useState } from "react";
+import { useTheme } from "../../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../navigation/appNav";
+import { RootStackParamList } from "../../../../navigation/appNav";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import HotelList from "../../../components/tripDetails/hotelList";
-import PlannedTrip from "../../../components/tripDetails/plannedTrip";
-import { MainButton } from "../../../components/ui/button";
-import { FIREBASE_DB, FIREBASE_AUTH } from "../../../../firebase.config";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, deleteDoc } from "firebase/firestore";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../../firebase.config";
+import { Ionicons } from "@expo/vector-icons";
+import moment from "moment";
+import HotelList from "../../../../components/tripDetails/hotelList";
+import PlannedTrip from "../../../../components/tripDetails/plannedTrip";
+import { MainButton } from "../../../../components/ui/button";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 
 const { width, height } = Dimensions.get("window");
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "RecommendedTripDetails"
+  "TripDetails"
 >;
 
 interface RouteParams {
   trip: string;
   photoRef: string;
+  docId: string;
 }
 
-const RecommendedTripDetails: React.FC = () => {
+const TripDetails: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
-  const { trip, photoRef } = route.params as RouteParams;
-  const scrollY = useRef(new Animated.Value(0)).current;
+  const { trip, photoRef, docId } = route.params as RouteParams;
 
   const [tripDetails, setTripDetails] = useState<any>(null);
-  const [isHearted, setIsHearted] = useState(false);
-
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, height * 0.2],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
-  });
+  const user = FIREBASE_AUTH.currentUser;
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
       headerTitle: "",
-      headerBackground: () => (
-        <Animated.View
-          style={[
-            styles.headerBackground,
-            {
-              opacity: headerOpacity,
-              backgroundColor: currentTheme.background,
-            },
-          ]}
-        />
-      ),
       headerLeft: () => (
         <Pressable
           onPress={() => navigation.goBack()}
@@ -76,37 +61,36 @@ const RecommendedTripDetails: React.FC = () => {
         </Pressable>
       ),
     });
-  }, [navigation, currentTheme.background]);
 
-  useEffect(() => {
     try {
       const parsedTrip = JSON.parse(trip);
       setTripDetails(parsedTrip);
     } catch (error) {
       console.error("Error parsing trip details:", error);
     }
-  }, [trip]);
+  }, [trip, navigation]);
 
-  const handleHeartPress = async () => {
-    setIsHearted(!isHearted);
-    if (!isHearted) {
-      const user = FIREBASE_AUTH.currentUser;
-      if (user) {
-        try {
-          const tripDocRef = doc(
-            FIREBASE_DB,
-            `users/${user.uid}/userTrips`,
-            tripDetails.travelPlan.destination
-          );
-          await setDoc(tripDocRef, tripDetails);
-          Alert.alert("Success", "Trip saved successfully!");
-          navigation.navigate("MyTripsMain");
-        } catch (error) {
-          Alert.alert("Error", "Failed to save trip. Please try again.");
-        }
-      } else {
-        Alert.alert("Sign In Required", "Please sign in to save trips.");
-      }
+  const deleteTrip = async (tripId: string) => {
+    try {
+      Alert.alert("Delete Trip", "Are you sure you want to delete this trip?", [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            if (!user) return;
+            const tripDocRef = doc(
+              FIREBASE_DB,
+              `users/${user.uid}/userTrips/${tripId}`
+            );
+            await deleteDoc(tripDocRef);
+            console.log(`Trip with ID ${tripId} deleted successfully.`);
+            navigation.navigate("MyTripsMain");
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error("Failed to delete trip:", error);
     }
   };
 
@@ -118,11 +102,7 @@ const RecommendedTripDetails: React.FC = () => {
           { backgroundColor: currentTheme.background },
         ]}
       >
-        <MaterialCommunityIcons
-          name="airplane-clock"
-          size={50}
-          color={currentTheme.alternate}
-        />
+        <Ionicons name="airplane" size={50} color={currentTheme.alternate} />
         <Text style={[styles.loadingText, { color: currentTheme.textPrimary }]}>
           Loading trip details...
         </Text>
@@ -150,13 +130,9 @@ const RecommendedTripDetails: React.FC = () => {
         />
       </View>
 
-      <Animated.ScrollView
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
       >
         <BlurView
           intensity={90}
@@ -166,14 +142,23 @@ const RecommendedTripDetails: React.FC = () => {
           ]}
         >
           <View style={styles.headerContainer}>
-            <Text
-              style={[
-                styles.destinationTitle,
-                { color: currentTheme.textPrimary },
-              ]}
-            >
-              {tripDetails?.travelPlan?.destination || "Unknown Location"}
-            </Text>
+            <View style={styles.titleContainer}>
+              <Text
+                style={[
+                  styles.destinationTitle,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                {tripDetails?.travelPlan?.destination || "Unknown Location"}
+              </Text>
+              <Pressable onPress={() => deleteTrip(docId)}>
+                <Ionicons
+                  name="trash-bin-outline"
+                  size={24}
+                  color={currentTheme.textSecondary}
+                />
+              </Pressable>
+            </View>
           </View>
 
           <View style={styles.tripMetaContainer}>
@@ -194,7 +179,7 @@ const RecommendedTripDetails: React.FC = () => {
                   { color: currentTheme.textPrimary },
                 ]}
               >
-                {tripDetails?.travelPlan?.numberOfDays} days
+                {moment(tripDetails?.startDate).format("MMM DD")}
               </Text>
             </View>
             <View
@@ -204,7 +189,7 @@ const RecommendedTripDetails: React.FC = () => {
               ]}
             >
               <Ionicons
-                name="moon-outline"
+                name="people-outline"
                 size={22}
                 color={currentTheme.alternate}
               />
@@ -214,7 +199,7 @@ const RecommendedTripDetails: React.FC = () => {
                   { color: currentTheme.textPrimary },
                 ]}
               >
-                {tripDetails?.travelPlan?.numberOfNights} nights
+                {tripDetails?.whoIsGoing || "Unknown"}
               </Text>
             </View>
           </View>
@@ -222,7 +207,7 @@ const RecommendedTripDetails: React.FC = () => {
           <HotelList hotelList={tripDetails?.travelPlan?.hotels} />
           <PlannedTrip details={tripDetails?.travelPlan} />
         </BlurView>
-      </Animated.ScrollView>
+      </ScrollView>
 
       <BlurView intensity={90} style={styles.bottomBar}>
         <View style={styles.priceContainer}>
@@ -237,16 +222,19 @@ const RecommendedTripDetails: React.FC = () => {
           </Text>
         </View>
         <MainButton
-          onPress={handleHeartPress}
-          buttonText={isHearted ? "Saved! ♥" : "Save Trip"}
+          onPress={() => {
+            const url = tripDetails?.travelPlan?.flights?.airlineUrl;
+            if (url) {
+              Linking.openURL(url);
+            } else {
+              Alert.alert("Booking URL not available");
+            }
+          }}
+          buttonText="Book Now"
           width={width * 0.45}
           style={[
-            styles.saveButton,
-            {
-              backgroundColor: isHearted
-                ? currentTheme.alternate
-                : currentTheme.alternate,
-            },
+            styles.bookButton,
+            { backgroundColor: currentTheme.alternate },
           ]}
         />
       </BlurView>
@@ -254,16 +242,9 @@ const RecommendedTripDetails: React.FC = () => {
   );
 };
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  headerBackground: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "100%",
   },
   loadingContainer: {
     flex: 1,
@@ -295,9 +276,13 @@ export const styles = StyleSheet.create({
   },
   backButton: {
     marginLeft: 16,
-    padding: 12,
+    padding: 8,
     borderRadius: 25,
     backgroundColor: "rgba(0,0,0,0.3)",
+    height: 44,
+    width: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   scrollContent: {
     paddingBottom: 100,
@@ -311,6 +296,11 @@ export const styles = StyleSheet.create({
   },
   headerContainer: {
     marginBottom: 20,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   destinationTitle: {
     fontSize: 32,
@@ -358,7 +348,7 @@ export const styles = StyleSheet.create({
     fontFamily: "outfit-bold",
     fontSize: 24,
   },
-  saveButton: {
+  bookButton: {
     elevation: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -368,4 +358,4 @@ export const styles = StyleSheet.create({
   },
 });
 
-export default RecommendedTripDetails;
+export default TripDetails;

@@ -2,21 +2,33 @@ import { View, Text, Image, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { GetPhotoRef } from "../../api/googlePlaceApi";
 import { useTheme } from "../../context/themeContext";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/appNav";
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 interface Place {
   placeName: string;
   placeDetails: string;
   placeExtendedDetails: string;
   placeUrl: string;
+  timeToTravel: string;
+  geoCoordinates?: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 interface PlaceCardProps {
   place: Place;
+  onPhotoRefReady?: (photoRef: string) => void;
 }
 
-const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
+const PlaceCard: React.FC<PlaceCardProps> = ({ place, onPhotoRefReady }) => {
   const { currentTheme } = useTheme();
   const [photoRef, setPhotoRef] = useState<string | undefined>();
+  const navigation = useNavigation<NavigationProp>();
 
   useEffect(() => {
     GetGooglePhotoRef();
@@ -25,12 +37,18 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
   const GetGooglePhotoRef = async () => {
     const result = await GetPhotoRef(place.placeName);
     setPhotoRef(result);
+    if (result && onPhotoRefReady) {
+      onPhotoRefReady(result);
+    }
   };
 
   const handlePress = () => {
-    console.log("Place URL:", place.placeUrl);
-    console.log("Place Details:", place.placeDetails);
-    console.log("Place Extended Details:", place.placeExtendedDetails);
+    navigation.navigate("IteneraryDetail", {
+      place: {
+        ...place,
+        photoRef,
+      },
+    });
   };
 
   return (

@@ -3,6 +3,11 @@ import { useTheme } from "../../context/themeContext";
 import React, { useState } from "react";
 import PlaceCard from "./placeCard";
 import MapView, { Marker } from "react-native-maps";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/appNav";
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 interface PlannedTripProps {
   details: {
@@ -28,6 +33,17 @@ interface PlannedTripProps {
 const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
   const { currentTheme } = useTheme();
   const [isMapVisible, setMapVisible] = useState(false);
+  const navigation = useNavigation<NavigationProp>();
+  const [placePhotoRefs, setPlacePhotoRefs] = useState<{
+    [key: string]: string;
+  }>({});
+
+  const handlePhotoRefReady = (placeName: string, photoRef: string) => {
+    setPlacePhotoRefs((prev) => ({
+      ...prev,
+      [placeName]: photoRef,
+    }));
+  };
 
   if (!details || typeof details !== "object") {
     return (
@@ -42,7 +58,7 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
   const toggleMapModal = () => {
     setMapVisible(!isMapVisible);
   };
-    
+
   const defaultLocation = {
     latitude: 37.7749,
     longitude: -122.4194,
@@ -75,14 +91,22 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
           </Text>
           {Array.isArray(places) && places.length > 0 ? (
             places.map((place, index) => (
-              <Pressable key={index} onPress={() => console.log(place)}>
+              <Pressable
+                key={index}
+                onPress={() =>
+                  navigation.navigate("IteneraryDetail", {
+                    place: {
+                      ...place,
+                      photoRef: placePhotoRefs[place.placeName],
+                    },
+                  })
+                }
+              >
                 <PlaceCard
-                  place={{
-                    ...place,
-                    placeDetails: place.placeDetails,
-                    placeExtendedDetails: place.placeExtendedDetails,
-                    placeUrl: place.placeUrl,
-                  }}
+                  place={place}
+                  onPhotoRefReady={(photoRef) =>
+                    handlePhotoRefReady(place.placeName, photoRef)
+                  }
                 />
               </Pressable>
             ))

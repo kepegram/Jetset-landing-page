@@ -380,7 +380,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           {Platform.OS === "ios" && (
             <AppleAuthentication.AppleAuthenticationButton
               buttonType={
-                AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+                AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
               }
               buttonStyle={
                 AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE

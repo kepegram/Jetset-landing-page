@@ -32,7 +32,8 @@ Return ONLY a valid JSON object with this exact structure:
           "longitude": "Decimal coordinates to 6 decimal places"
         },
         "rating": "Rating out of 5 to one decimal place",
-        "description": "Factual description including room types, amenities and recent renovations"
+        "description": "Factual description including room types, amenities and recent renovations",
+        "bookingUrl": "Direct URL to hotel's booking page"
       },
       {
         "hotelName": "Full official hotel name",
@@ -43,7 +44,8 @@ Return ONLY a valid JSON object with this exact structure:
           "longitude": "Decimal coordinates to 6 decimal places"
         },
         "rating": "Rating out of 5 to one decimal place",
-        "description": "Factual description including room types, amenities and recent renovations"
+        "description": "Factual description including room types, amenities and recent renovations",
+        "bookingUrl": "Direct URL to hotel's booking page"
       },
       {
         "hotelName": "Full official hotel name",
@@ -54,7 +56,8 @@ Return ONLY a valid JSON object with this exact structure:
           "longitude": "Decimal coordinates to 6 decimal places"
         },
         "rating": "Rating out of 5 to one decimal place",
-        "description": "Factual description including room types, amenities and recent renovations"
+        "description": "Factual description including room types, amenities and recent renovations",
+        "bookingUrl": "Direct URL to hotel's booking page"
       }
     ],
     "itinerary": [
@@ -112,7 +115,8 @@ Return ONLY a valid JSON object with this exact structure:
           "longitude": "Decimal coordinates to 6 decimal places"
         },
         "rating": "Rating out of 5 to one decimal place",
-        "description": "Factual description including room types, amenities and recent renovations"
+        "description": "Factual description including room types, amenities and recent renovations",
+        "bookingUrl": "Direct URL to hotel's booking page"
       },
       {
         "hotelName": "Full official hotel name",
@@ -123,7 +127,8 @@ Return ONLY a valid JSON object with this exact structure:
           "longitude": "Decimal coordinates to 6 decimal places"
         },
         "rating": "Rating out of 5 to one decimal place",
-        "description": "Factual description including room types, amenities and recent renovations"
+        "description": "Factual description including room types, amenities and recent renovations",
+        "bookingUrl": "Direct URL to hotel's booking page"
       },
       {
         "hotelName": "Full official hotel name",
@@ -134,7 +139,8 @@ Return ONLY a valid JSON object with this exact structure:
           "longitude": "Decimal coordinates to 6 decimal places"
         },
         "rating": "Rating out of 5 to one decimal place",
-        "description": "Factual description including room types, amenities and recent renovations"
+        "description": "Factual description including room types, amenities and recent renovations",
+        "bookingUrl": "Direct URL to hotel's booking page"
       }
     ],
     "itinerary": [
@@ -199,7 +205,8 @@ Return ONLY a valid JSON object with this exact structure:
           "longitude": "Decimal coordinates to 6 decimal places"
         },
         "rating": "Exactly 4.0",
-        "description": "Factual description including room types, amenities and recent renovations"
+        "description": "Factual description including room types, amenities and recent renovations",
+        "bookingUrl": "Direct URL to hotel's booking page"
       },
       {
         "hotelName": "Full official hotel name",
@@ -210,7 +217,8 @@ Return ONLY a valid JSON object with this exact structure:
           "longitude": "Decimal coordinates to 6 decimal places"
         },
         "rating": "Exactly 4.0",
-        "description": "Factual description including room types, amenities and recent renovations"
+        "description": "Factual description including room types, amenities and recent renovations",
+        "bookingUrl": "Direct URL to hotel's booking page"
       },
       {
         "hotelName": "Full official hotel name",
@@ -221,7 +229,8 @@ Return ONLY a valid JSON object with this exact structure:
           "longitude": "Decimal coordinates to 6 decimal places"
         },
         "rating": "Exactly 4.0",
-        "description": "Factual description including room types, amenities and recent renovations"
+        "description": "Factual description including room types, amenities and recent renovations",
+        "bookingUrl": "Direct URL to hotel's booking page"
       }
     ],
     "itinerary": [

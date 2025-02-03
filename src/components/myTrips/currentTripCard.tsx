@@ -137,10 +137,12 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
             <View style={styles.daysContainer}>
               <MaterialIcons name="timer" size={20} color="#fff" />
               <Text style={styles.daysText}>
-                {daysRemaining >= 0
+                {daysRemaining > 0
                   ? `${daysRemaining} day${
                       daysRemaining !== 1 ? "s" : ""
                     } remaining`
+                  : daysRemaining === 0
+                  ? "Last day!"
                   : "Trip has ended"}
               </Text>
             </View>

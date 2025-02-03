@@ -5,20 +5,17 @@ import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
-import {
-  getFocusedRouteNameFromRoute,
-  useNavigation,
-} from "@react-navigation/native";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import {
   BottomTabNavigationOptions,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import { ProfileProvider, useProfile } from "../context/profileContext";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { CreateTripContext } from "../context/createTripContext";
 import Home from "../screens/main/homeScreen/home";
-import RecommendedTripDetails from "../screens/main/tripScreens/recommendedTripDetails";
+import RecommendedTripDetails from "../screens/main/tripScreens/viewTrip/recommendedTripDetails";
 import Profile from "../screens/main/userScreens/profile";
 import Edit from "../screens/main/userScreens/edit";
 import ChangeUsername from "../screens/main/userScreens/changeUsername";
@@ -27,9 +24,11 @@ import AppTheme from "../screens/main/userScreens/appTheme";
 import DeleteAccount from "../screens/main/userScreens/deleteAccount";
 import ReviewTrip from "../screens/main/tripScreens/buildTrip/reviewTrip";
 import GenerateTrip from "../screens/main/tripScreens/buildTrip/generateTrip";
-import TripDetails from "../screens/main/tripScreens/tripDetails";
+import TripDetails from "../screens/main/tripScreens/viewTrip/tripDetails";
 import MyTrips from "../screens/main/tripScreens/myTrips";
-import CurrentTripDetails from "../screens/main/tripScreens/currentTripDetails";
+import CurrentTripDetails from "../screens/main/tripScreens/viewTrip/currentTripDetails";
+import IteneraryDetail from "../screens/main/tripScreens/viewTrip/iteneraryDetail";
+import HotelDetail from "../screens/main/tripScreens/viewTrip/hotelDetail";
 import WhereTo from "../screens/main/tripScreens/buildTrip/whereTo";
 import ChoosePlaces from "../screens/main/tripScreens/buildTrip/choosePlaces";
 import ChooseDate from "../screens/main/tripScreens/buildTrip/chooseDate";
@@ -58,6 +57,38 @@ export type RootStackParamList = {
   GenerateTrip: undefined;
   TripDetails: { trip: string; photoRef: string; docId: string };
   CurrentTripDetails: { trip: string; photoRef: string };
+  IteneraryDetail: {
+    place: {
+      placeName: string;
+      placeDetails: string;
+      timeToTravel?: string;
+      geoCoordinates?: {
+        latitude: number;
+        longitude: number;
+      };
+      placeExtendedDetails?: string;
+      placeUrl?: string;
+      photoRef?: string;
+      rating?: number;
+      price?: number;
+      isHotel?: boolean;
+    };
+  };
+  HotelDetail: {
+    hotel: {
+      hotelName: string;
+      rating: number;
+      price: number;
+      photoRef?: string;
+      description?: string;
+      amenities?: string[];
+      bookingUrl?: string;
+      geoCoordinates: {
+        latitude: number;
+        longitude: number;
+      };
+    };
+  };
   Profile: undefined;
   Edit: undefined;
   ChangeUsername: undefined;
@@ -252,52 +283,22 @@ const MyTripsStack: React.FC = () => {
       <RootStack.Screen
         name="TripDetails"
         component={TripDetails}
-        options={{
-          headerLeft: () => {
-            const navigation = useNavigation();
-            return (
-              <Pressable
-                onPress={() => navigation.goBack()}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <MaterialIcons name="arrow-back" size={24} color="white" />
-              </Pressable>
-            );
-          },
-          headerShown: false,
-        }}
+        options={{ headerShown: false }}
       />
       <RootStack.Screen
         name="CurrentTripDetails"
         component={CurrentTripDetails}
-        options={{
-          headerLeft: () => {
-            const navigation = useNavigation();
-            return (
-              <Pressable
-                onPress={() => navigation.goBack()}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <MaterialIcons name="arrow-back" size={24} color="white" />
-              </Pressable>
-            );
-          },
-          headerShown: false,
-        }}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="IteneraryDetail"
+        component={IteneraryDetail}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="HotelDetail"
+        component={HotelDetail}
+        options={{ headerShown: false }}
       />
     </RootStack.Navigator>
   );

@@ -9,12 +9,12 @@ import {
   StatusBar,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useTheme } from "../../../context/themeContext";
+import { useTheme } from "../../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../navigation/appNav";
+import { RootStackParamList } from "../../../../navigation/appNav";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import PlannedTrip from "../../../components/tripDetails/plannedTrip";
+import PlannedTrip from "../../../../components/tripDetails/plannedTrip";
 import moment from "moment";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
@@ -126,7 +126,12 @@ const CurrentTripDetails: React.FC = () => {
               >
                 {tripDetails?.travelPlan?.destination || "Unknown Location"}
               </Text>
-              <Pressable onPress={() => setIsHearted(!isHearted)}>
+              <Pressable
+                onPress={() => {
+                  setIsHearted(!isHearted);
+                  console.log("Hearted", !isHearted);
+                }}
+              >
                 <Ionicons
                   name={isHearted ? "heart" : "heart-outline"}
                   size={30}
@@ -155,7 +160,9 @@ const CurrentTripDetails: React.FC = () => {
                 ]}
               >
                 {daysLeft !== null
-                  ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left`
+                  ? daysLeft === 0
+                    ? "Last day!"
+                    : `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left`
                   : "End date not available"}
               </Text>
             </View>
@@ -222,9 +229,13 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginLeft: 16,
-    padding: 12,
+    padding: 8,
     borderRadius: 25,
     backgroundColor: "rgba(0,0,0,0.3)",
+    height: 44,
+    width: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   scrollContent: {
     paddingBottom: 100,

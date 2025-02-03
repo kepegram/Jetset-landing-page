@@ -222,6 +222,40 @@ const Profile: React.FC = () => {
                     : "transparent",
                 },
               ]}
+              onPress={() => console.log("Saved Trips pressed")}
+            >
+              <View style={styles.optionContent}>
+                <Ionicons
+                  name="bookmark-outline"
+                  size={24}
+                  color={currentTheme.icon}
+                />
+                <Text
+                  style={[
+                    styles.optionText,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
+                  Saved Trips
+                </Text>
+              </View>
+              <MaterialIcons
+                name="chevron-right"
+                size={24}
+                color={currentTheme.icon}
+              />
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.settingOption,
+                pressed && styles.optionPressed,
+                {
+                  backgroundColor: pressed
+                    ? currentTheme.inactive + "20"
+                    : "transparent",
+                },
+              ]}
               onPress={() => navigation.navigate("AppTheme")}
             >
               <View style={styles.optionContent}>

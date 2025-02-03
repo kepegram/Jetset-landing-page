@@ -1,8 +1,8 @@
 import { View, Text, FlatList } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import HotelCard from "./hotelCard";
 import { useTheme } from "../../context/themeContext";
-  
+
 interface HotelListProps {
   hotelList: Array<{
     hotelName: string;
@@ -17,6 +17,16 @@ interface HotelListProps {
 
 const HotelList: React.FC<HotelListProps> = ({ hotelList }) => {
   const { currentTheme } = useTheme();
+  const [hotelPhotoRefs, setHotelPhotoRefs] = useState<{
+    [key: string]: string;
+  }>({});
+
+  const handlePhotoRefReady = (hotelName: string, photoRef: string) => {
+    setHotelPhotoRefs((prev) => ({
+      ...prev,
+      [hotelName]: photoRef,
+    }));
+  };
 
   return (
     <View
@@ -41,7 +51,14 @@ const HotelList: React.FC<HotelListProps> = ({ hotelList }) => {
         }}
         showsHorizontalScrollIndicator={false}
         horizontal={true}
-        renderItem={({ item }) => <HotelCard item={item} />}
+        renderItem={({ item }) => (
+          <HotelCard
+            item={item}
+            onPhotoRefReady={(photoRef) =>
+              handlePhotoRefReady(item.hotelName, photoRef)
+            }
+          />
+        )}
       />
     </View>
   );
