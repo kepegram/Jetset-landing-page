@@ -19,9 +19,7 @@ import PlannedTrip from "../../../../components/tripDetails/plannedTrip";
 import { MainButton } from "../../../../components/ui/button";
 import { FIREBASE_DB, FIREBASE_AUTH } from "../../../../../firebase.config";
 import { doc, setDoc } from "firebase/firestore";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 
 const { width, height } = Dimensions.get("window");
 
@@ -144,10 +142,6 @@ const RecommendedTripDetails: React.FC = () => {
           }}
           style={styles.image}
         />
-        <LinearGradient
-          colors={["transparent", "rgba(0,0,0,0.7)"]}
-          style={styles.gradient}
-        />
       </View>
 
       <Animated.ScrollView
@@ -158,11 +152,10 @@ const RecommendedTripDetails: React.FC = () => {
           { useNativeDriver: true }
         )}
       >
-        <BlurView
-          intensity={90}
+        <View
           style={[
             styles.contentContainer,
-            { backgroundColor: `${currentTheme.background}CC` },
+            { backgroundColor: currentTheme.background },
           ]}
         >
           <View style={styles.headerContainer}>
@@ -221,10 +214,12 @@ const RecommendedTripDetails: React.FC = () => {
 
           <HotelList hotelList={tripDetails?.travelPlan?.hotels} />
           <PlannedTrip details={tripDetails?.travelPlan} />
-        </BlurView>
+        </View>
       </Animated.ScrollView>
 
-      <BlurView intensity={90} style={styles.bottomBar}>
+      <View
+        style={[styles.bottomBar, { backgroundColor: currentTheme.background }]}
+      >
         <View style={styles.priceContainer}>
           <Text
             style={[styles.airlineName, { color: currentTheme.textPrimary }]}
@@ -249,7 +244,7 @@ const RecommendedTripDetails: React.FC = () => {
             },
           ]}
         />
-      </BlurView>
+      </View>
     </View>
   );
 };
@@ -285,23 +280,6 @@ export const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-  },
-  gradient: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 200,
-  },
-  backButton: {
-    marginLeft: 16,
-    padding: 8,
-    borderRadius: 25,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    height: 44,
-    width: 44,
-    alignItems: "center",
-    justifyContent: "center",
   },
   scrollContent: {
     paddingBottom: 100,
@@ -369,6 +347,16 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4.5,
     borderRadius: 15,
+  },
+  backButton: {
+    marginLeft: 16,
+    padding: 8,
+    borderRadius: 25,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    height: 44,
+    width: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

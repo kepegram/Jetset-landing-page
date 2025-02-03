@@ -12,8 +12,6 @@ import React, { useContext, useEffect } from "react";
 import { useTheme } from "../../../context/themeContext";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
@@ -69,21 +67,16 @@ const PopularDestinations: React.FC = () => {
           style={styles.image}
           resizeMode="cover"
         />
-        <LinearGradient
-          colors={["transparent", "rgba(0,0,0,0.7)"]}
-          style={styles.gradient}
-        />
       </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <BlurView
-          intensity={90}
+        <View
           style={[
             styles.contentContainer,
-            { backgroundColor: `${currentTheme.background}CC` },
+            { backgroundColor: currentTheme.background },
           ]}
         >
           <View style={styles.headerContainer}>
@@ -166,7 +159,7 @@ const PopularDestinations: React.FC = () => {
           >
             <Text style={styles.exploreButtonText}>Start Planning!</Text>
           </Pressable>
-        </BlurView>
+        </View>
       </ScrollView>
     </View>
   );
@@ -187,18 +180,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  gradient: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 200,
-  },
   backButton: {
     marginLeft: 16,
-    padding: 12,
+    padding: 8,
     borderRadius: 25,
     backgroundColor: "rgba(0,0,0,0.3)",
+    height: 44,
+    width: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   scrollContent: {
     paddingBottom: 100,

@@ -22,8 +22,6 @@ import moment from "moment";
 import HotelList from "../../../../components/tripDetails/hotelList";
 import PlannedTrip from "../../../../components/tripDetails/plannedTrip";
 import { MainButton } from "../../../../components/ui/button";
-import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
 
 const { width, height } = Dimensions.get("window");
 
@@ -124,21 +122,16 @@ const TripDetails: React.FC = () => {
           }}
           style={styles.image}
         />
-        <LinearGradient
-          colors={["transparent", "rgba(0,0,0,0.7)"]}
-          style={styles.gradient}
-        />
       </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <BlurView
-          intensity={90}
+        <View
           style={[
             styles.contentContainer,
-            { backgroundColor: `${currentTheme.background}CC` },
+            { backgroundColor: currentTheme.background },
           ]}
         >
           <View style={styles.headerContainer}>
@@ -206,10 +199,12 @@ const TripDetails: React.FC = () => {
 
           <HotelList hotelList={tripDetails?.travelPlan?.hotels} />
           <PlannedTrip details={tripDetails?.travelPlan} />
-        </BlurView>
+        </View>
       </ScrollView>
 
-      <BlurView intensity={90} style={styles.bottomBar}>
+      <View
+        style={[styles.bottomBar, { backgroundColor: currentTheme.background }]}
+      >
         <View style={styles.priceContainer}>
           <Text
             style={[styles.airlineName, { color: currentTheme.textPrimary }]}
@@ -237,7 +232,7 @@ const TripDetails: React.FC = () => {
             { backgroundColor: currentTheme.alternate },
           ]}
         />
-      </BlurView>
+      </View>
     </View>
   );
 };
@@ -266,23 +261,6 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-  },
-  gradient: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 200,
-  },
-  backButton: {
-    marginLeft: 16,
-    padding: 8,
-    borderRadius: 25,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    height: 44,
-    width: 44,
-    alignItems: "center",
-    justifyContent: "center",
   },
   scrollContent: {
     paddingBottom: 100,
@@ -355,6 +333,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4.5,
     borderRadius: 15,
+  },
+  backButton: {
+    marginLeft: 16,
+    padding: 8,
+    borderRadius: 25,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    height: 44,
+    width: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

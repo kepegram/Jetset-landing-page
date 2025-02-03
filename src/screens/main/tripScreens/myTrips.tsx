@@ -14,7 +14,7 @@ import {
   View,
   FlatList,
   StyleSheet,
-  Animated,
+  ScrollView,
 } from "react-native";
 import { Fontisto } from "@expo/vector-icons";
 import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
@@ -34,7 +34,6 @@ const MyTrips: React.FC = () => {
   const [userTrips, setUserTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<MyTripsScreenNavigationProp>();
-  const scrollY = new Animated.Value(0);
 
   const user = FIREBASE_AUTH.currentUser;
 
@@ -108,27 +107,13 @@ const MyTrips: React.FC = () => {
     return startDate.isSameOrBefore(today) && endDate.isSameOrAfter(today);
   });
 
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, 50],
-    outputRange: [1, 0.9],
-    extrapolate: "clamp",
-  });
-
-  const headerTranslateY = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [0, -20],
-    extrapolate: "clamp",
-  });
-
   return (
     <View style={styles.container}>
-      <Animated.View
+      <View
         style={[
           styles.header,
           {
             backgroundColor: currentTheme.background,
-            opacity: headerOpacity,
-            transform: [{ translateY: headerTranslateY }],
           },
         ]}
       >
@@ -145,19 +130,14 @@ const MyTrips: React.FC = () => {
             <Fontisto name="plus-a" size={24} color={currentTheme.icon} />
           </Pressable>
         </View>
-      </Animated.View>
+      </View>
 
-      <Animated.ScrollView
+      <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
           { backgroundColor: currentTheme.background },
         ]}
         showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
-        scrollEventThrottle={16}
       >
         {loading ? (
           <View style={styles.loadingContainer}>
@@ -240,7 +220,7 @@ const MyTrips: React.FC = () => {
             )}
           </View>
         )}
-      </Animated.ScrollView>
+      </ScrollView>
     </View>
   );
 };
@@ -250,11 +230,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1,
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 15,
@@ -276,7 +251,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.05)",
   },
   scrollContent: {
-    paddingTop: 100,
     paddingHorizontal: 20,
     flexGrow: 1,
   },

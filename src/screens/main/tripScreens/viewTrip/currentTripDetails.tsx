@@ -16,8 +16,6 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import PlannedTrip from "../../../../components/tripDetails/plannedTrip";
 import moment from "moment";
-import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
 
 const { height } = Dimensions.get("window");
 
@@ -99,21 +97,16 @@ const CurrentTripDetails: React.FC = () => {
           }}
           style={styles.image}
         />
-        <LinearGradient
-          colors={["transparent", "rgba(0,0,0,0.7)"]}
-          style={styles.gradient}
-        />
       </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <BlurView
-          intensity={90}
+        <View
           style={[
             styles.contentContainer,
-            { backgroundColor: `${currentTheme.background}CC` },
+            { backgroundColor: currentTheme.background },
           ]}
         >
           <View style={styles.headerContainer}>
@@ -189,7 +182,7 @@ const CurrentTripDetails: React.FC = () => {
           </View>
 
           <PlannedTrip details={tripDetails?.travelPlan} />
-        </BlurView>
+        </View>
       </ScrollView>
     </View>
   );
@@ -219,13 +212,6 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-  },
-  gradient: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 200,
   },
   backButton: {
     marginLeft: 16,
