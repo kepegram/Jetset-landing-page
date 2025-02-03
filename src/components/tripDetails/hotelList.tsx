@@ -2,8 +2,7 @@ import { View, Text, FlatList } from "react-native";
 import React from "react";
 import HotelCard from "./hotelCard";
 import { useTheme } from "../../context/themeContext";
-
-// Define the interface for the 'hotelList' prop
+  
 interface HotelListProps {
   hotelList: Array<{
     hotelName: string;

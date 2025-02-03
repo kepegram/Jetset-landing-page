@@ -1,8 +1,15 @@
 {
   "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "strict": true,
+    "jsx": "react",
+    "esModuleInterop": true,
     "paths": {
-      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
+      "@firebase/auth": [
+        "./node_modules/@firebase/auth/dist/index.rn.d.ts"
+      ]
     }
   },
-  "extends": "./tsconfig.base.json"
+  "extends": "expo/tsconfig.base"
 }

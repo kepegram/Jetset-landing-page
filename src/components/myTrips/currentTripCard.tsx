@@ -122,7 +122,7 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
               ? {
                   uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${parsedCurrentTrip.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
                 }
-              : require("../../assets/placeholder.jpeg")
+              : require("../../assets/app-imgs/placeholder.jpeg")
           }
           style={styles.image}
         />

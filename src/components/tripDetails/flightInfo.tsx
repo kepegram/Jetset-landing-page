@@ -2,7 +2,6 @@ import { View, Text, Pressable, Linking, StyleSheet } from "react-native";
 import React from "react";
 import { useTheme } from "../../context/themeContext";
 
-// Define an interface for flightData
 interface FlightData {
   airlineName: string;
   airlineUrl: string;
@@ -10,13 +9,12 @@ interface FlightData {
 }
 
 interface FlightInfoProps {
-  flightData: FlightData; // Type the prop correctly
+  flightData: FlightData;
 }
 
 const FlightInfo: React.FC<FlightInfoProps> = ({ flightData }) => {
   const { currentTheme } = useTheme();
 
-  // Handle "Book Here" button click
   const handleBookClick = () => {
     if (flightData.airlineUrl) {
       Linking.openURL(flightData.airlineUrl);

@@ -5,7 +5,6 @@ import { useTheme } from "../../context/themeContext";
 import MapView, { Marker } from "react-native-maps";
 import { MainButton } from "../ui/button";
 
-// Define the interface for the 'item' prop
 interface HotelCardProps {
   item: {
     hotelName: string;
@@ -55,7 +54,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ item }) => {
                   photoRef +
                   "&key=" +
                   process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY
-                : require("../../assets/place-placeholder.jpg"),
+                : require("../../assets/app-imgs/place-placeholder.jpg"),
             }}
             style={{
               width: 180,

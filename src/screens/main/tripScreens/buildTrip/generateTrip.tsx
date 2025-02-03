@@ -198,7 +198,7 @@ const GenerateTrip: React.FC = () => {
           Our AI is crafting a personalized itinerary just for you...
         </Text>
         <Image
-          source={require("../../../../assets/plane.gif")}
+          source={require("../../../../assets/app-imgs/plane.gif")}
           style={styles.animation}
         />
         <Text style={[styles.warning, { color: currentTheme.textSecondary }]}>

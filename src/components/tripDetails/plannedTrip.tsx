@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import PlaceCard from "./placeCard";
 import MapView, { Marker } from "react-native-maps";
 
-// Define an interface for the details prop
 interface PlannedTripProps {
   details: {
     itinerary: {
@@ -43,10 +42,9 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
   const toggleMapModal = () => {
     setMapVisible(!isMapVisible);
   };
-
-  // Calculate the initial region for the map with fallback coordinates
+    
   const defaultLocation = {
-    latitude: 37.7749, // San Francisco as default
+    latitude: 37.7749,
     longitude: -122.4194,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,

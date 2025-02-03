@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { GetPhotoRef } from "../../api/googlePlaceApi";
 import { useTheme } from "../../context/themeContext";
 
-// Define an interface for the place prop
 interface Place {
   placeName: string;
   placeDetails: string;
@@ -55,7 +54,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place }) => {
                   "&key=" +
                   process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
               }
-            : require("../../assets/place-placeholder.jpg")
+            : require("../../assets/app-imgs/place-placeholder.jpg")
         }
         style={{
           width: "100%",

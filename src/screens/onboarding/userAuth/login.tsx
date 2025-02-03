@@ -299,7 +299,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               disabled={loading}
             >
               <Image
-                source={require("../../../assets/google.png")}
+                source={require("../../../assets/app-imgs/google.png")}
                 style={styles.socialIcon}
               />
               <Text

@@ -235,7 +235,7 @@ const Home: React.FC = () => {
         <View style={styles.header}>
           <View style={styles.imageContainer}>
             <Image
-              source={require("../../../assets/travel.jpg")}
+              source={require("../../../assets/app-imgs/travel.jpg")}
               style={styles.image}
             />
             <LinearGradient

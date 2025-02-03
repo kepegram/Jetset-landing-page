@@ -364,7 +364,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             disabled={loading}
           >
             <Image
-              source={require("../../../assets/google.png")}
+              source={require("../../../assets/app-imgs/google.png")}
               style={styles.socialIcon}
             />
             <Text
