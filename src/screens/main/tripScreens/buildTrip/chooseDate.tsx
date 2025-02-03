@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Dimensions, SafeAreaView } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useCallback, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
@@ -24,26 +24,39 @@ const ChooseDate: React.FC = () => {
   const [startDate, setStartDate] = useState<Moment | null>(null);
   const [endDate, setEndDate] = useState<Moment | null>(null);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      headerTransparent: true,
-      headerTitle: "",
-    });
-  }, [navigation]);
+  const onDateChange = useCallback(
+    (date: Date, type: string) => {
+      if (!date) return;
 
-  const onDateChange = (date: Date, type: string) => {
-    const momentDate = moment(date);
-    if (type === "START_DATE") {
-      setStartDate(momentDate);
-      AsyncStorage.setItem("startDate", momentDate.toISOString());
-    } else {
-      setEndDate(momentDate);
-      AsyncStorage.setItem("endDate", momentDate.toISOString());
-    }
-  };
+      const momentDate = moment(date);
 
-  const OnDateSelectionContinue = () => {
+      // Prevent invalid date selections
+      if (type === "END_DATE" && startDate && momentDate.isBefore(startDate)) {
+        return;
+      }
+
+      if (type === "START_DATE") {
+        setStartDate(momentDate);
+        // If end date exists and is before new start date, reset it
+        if (endDate && endDate.isBefore(momentDate)) {
+          setEndDate(null);
+        }
+        // Store in AsyncStorage after state is updated
+        Promise.resolve().then(() => {
+          AsyncStorage.setItem("startDate", momentDate.toISOString());
+        });
+      } else {
+        setEndDate(momentDate);
+        // Store in AsyncStorage after state is updated
+        Promise.resolve().then(() => {
+          AsyncStorage.setItem("endDate", momentDate.toISOString());
+        });
+      }
+    },
+    [startDate, endDate]
+  );
+
+  const OnDateSelectionContinue = useCallback(() => {
     if (!startDate || !endDate) {
       alert("Please select Start and End Date");
       return;
@@ -64,9 +77,9 @@ const ChooseDate: React.FC = () => {
     setTripData(updatedTripData);
     console.log("Updated Trip Data:", updatedTripData);
     navigation.navigate("WhosGoing");
-  };
+  }, [startDate, endDate, tripData, setTripData, navigation]);
 
-  const getDateRangeText = () => {
+  const getDateRangeText = useCallback(() => {
     if (startDate && endDate) {
       const nights = endDate.diff(startDate, "days");
       return `${startDate.format("MMM D")} - ${endDate.format(
@@ -74,116 +87,121 @@ const ChooseDate: React.FC = () => {
       )} • ${nights} ${nights === 1 ? "night" : "nights"}`;
     }
     return "Select your travel dates";
-  };
+  }, [startDate, endDate]);
 
   return (
-    <SafeAreaView
+    <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <View style={styles.contentContainer}>
-        <View style={styles.headerContainer}>
-          <Text
-            style={[styles.subheading, { color: currentTheme.textSecondary }]}
-          >
-            When?
-          </Text>
-          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-            Choose your dates
-          </Text>
-          <View
-            style={[
-              styles.dateRangeContainer,
-              { backgroundColor: currentTheme.alternate + "20" },
-            ]}
-          >
-            <Ionicons
-              name="calendar-outline"
-              size={24}
-              color={currentTheme.textSecondary}
-            />
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.contentContainer}>
+          <View style={styles.headerContainer}>
             <Text
+              style={[styles.subheading, { color: currentTheme.textSecondary }]}
+            >
+              When?
+            </Text>
+            <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+              Choose your dates
+            </Text>
+            <View
               style={[
-                styles.dateRangeText,
-                { color: currentTheme.textSecondary },
+                styles.dateRangeContainer,
+                { backgroundColor: currentTheme.alternate + "20" },
               ]}
             >
-              {getDateRangeText()}
-            </Text>
+              <Ionicons
+                name="calendar-outline"
+                size={24}
+                color={currentTheme.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.dateRangeText,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                {getDateRangeText()}
+              </Text>
+            </View>
+          </View>
+
+          <View
+            style={[
+              styles.calendarWrapper,
+              { backgroundColor: currentTheme.alternate + "10" },
+            ]}
+          >
+            <CalendarPicker
+              onDateChange={onDateChange}
+              allowRangeSelection={true}
+              minDate={new Date()}
+              todayBackgroundColor={currentTheme.alternate}
+              selectedStartDate={startDate?.toDate()}
+              selectedEndDate={endDate?.toDate()}
+              previousComponent={
+                <Ionicons
+                  name="chevron-back"
+                  size={34}
+                  color={currentTheme.textPrimary}
+                />
+              }
+              nextComponent={
+                <Ionicons
+                  name="chevron-forward"
+                  size={34}
+                  color={currentTheme.textPrimary}
+                />
+              }
+              selectedRangeStyle={{
+                backgroundColor: `${currentTheme.alternate}50`,
+              }}
+              selectedDayStyle={{
+                backgroundColor: currentTheme.alternate,
+              }}
+              selectedDayTextStyle={{
+                color: "#FFFFFF",
+                fontWeight: "600",
+              }}
+              textStyle={{ color: currentTheme.textPrimary }}
+              dayTextStyle={{ color: currentTheme.textPrimary }}
+              monthTitleStyle={{
+                color: currentTheme.textPrimary,
+                fontSize: 20,
+                fontWeight: "700",
+              }}
+              yearTitleStyle={{
+                color: currentTheme.textPrimary,
+                fontSize: 20,
+                fontWeight: "700",
+              }}
+              disabledDatesTextStyle={{ color: "rgba(128,128,128,0.5)" }}
+              width={Dimensions.get("window").width - 40}
+              height={420}
+              scaleFactor={375}
+            />
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <MainButton
+              buttonText={startDate && endDate ? "Continue" : "Select Dates"}
+              onPress={OnDateSelectionContinue}
+              width="85%"
+              backgroundColor={currentTheme.alternate}
+              disabled={!startDate || !endDate}
+            />
           </View>
         </View>
-
-        <View
-          style={[
-            styles.calendarWrapper,
-            { backgroundColor: currentTheme.alternate + "10" },
-          ]}
-        >
-          <CalendarPicker
-            onDateChange={onDateChange}
-            allowRangeSelection={true}
-            minDate={new Date()}
-            todayBackgroundColor={currentTheme.alternate}
-            selectedStartDate={startDate?.toDate()}
-            selectedEndDate={endDate?.toDate()}
-            previousComponent={
-              <Ionicons
-                name="chevron-back"
-                size={34}
-                color={currentTheme.textPrimary}
-              />
-            }
-            nextComponent={
-              <Ionicons
-                name="chevron-forward"
-                size={34}
-                color={currentTheme.textPrimary}
-              />
-            }
-            selectedRangeStyle={{
-              backgroundColor: `${currentTheme.alternate}50`,
-            }}
-            selectedDayStyle={{
-              backgroundColor: currentTheme.alternate,
-            }}
-            selectedDayTextStyle={{
-              color: "#FFFFFF",
-              fontWeight: "600",
-            }}
-            textStyle={{ color: currentTheme.textPrimary }}
-            dayTextStyle={{ color: currentTheme.textPrimary }}
-            monthTitleStyle={{
-              color: currentTheme.textPrimary,
-              fontSize: 20,
-              fontWeight: "700",
-            }}
-            yearTitleStyle={{
-              color: currentTheme.textPrimary,
-              fontSize: 20,
-              fontWeight: "700",
-            }}
-            disabledDatesTextStyle={{ color: "rgba(128,128,128,0.5)" }}
-            width={Dimensions.get("window").width - 40}
-            height={420}
-            scaleFactor={375}
-          />
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <MainButton
-            buttonText={startDate && endDate ? "Continue" : "Select Dates"}
-            onPress={OnDateSelectionContinue}
-            width="85%"
-            backgroundColor={currentTheme.alternate}
-            disabled={!startDate || !endDate}
-          />
-        </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  safeArea: {
     flex: 1,
   },
   contentContainer: {

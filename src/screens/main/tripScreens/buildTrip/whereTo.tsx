@@ -1,6 +1,6 @@
 import { View, Text, Pressable, StyleSheet, SafeAreaView } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { useContext, useCallback, useState } from "react";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { useTheme } from "../../../../context/themeContext";
@@ -30,13 +30,18 @@ const WhereTo: React.FC = () => {
     useContext(CreateTripContext) || {};
   const [photoRef, setPhotoRef] = useState<string | null>(null);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      headerTransparent: true,
-      headerTitle: "",
-    });
-  }, [navigation]);
+  useFocusEffect(
+    useCallback(() => {
+      navigation.setOptions({
+        headerShown: true,
+        headerTransparent: true,
+        headerTitle: "",
+        headerStyle: {
+          backgroundColor: "transparent",
+        },
+      });
+    }, [navigation])
+  );
 
   const handlePlaceSelect = async (
     data: any,
@@ -60,154 +65,161 @@ const WhereTo: React.FC = () => {
   };
 
   return (
-    <SafeAreaView
+    <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <View style={styles.contentContainer}>
-        <View style={styles.headerContainer}>
-          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-            Where would you like to go? ✈️
-          </Text>
-          <Text
-            style={[styles.subheading, { color: currentTheme.textSecondary }]}
-          >
-            Search for a city, region, or country
-          </Text>
-        </View>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.contentContainer}>
+          <View style={styles.headerContainer}>
+            <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+              Where would you like to go? ✈️
+            </Text>
+            <Text
+              style={[styles.subheading, { color: currentTheme.textSecondary }]}
+            >
+              Search for a city, region, or country
+            </Text>
+          </View>
 
-        <View style={styles.searchContainer}>
-          <GooglePlacesAutocomplete
-            placeholder="Search destinations..."
-            textInputProps={{
-              placeholderTextColor: currentTheme.textSecondary,
-              returnKeyType: "search",
-            }}
-            fetchDetails={true}
-            onPress={handlePlaceSelect}
-            query={{
-              key: process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
-              language: "en",
-            }}
-            styles={{
-              container: {
-                flex: 0,
-                width: "100%",
-                zIndex: 1,
-              },
-              textInputContainer: {
-                backgroundColor: "transparent",
-                borderTopWidth: 0,
-                borderBottomWidth: 0,
-                marginHorizontal: 0,
-                paddingHorizontal: 0,
-              },
-              textInput: {
-                backgroundColor: currentTheme.background,
-                color: currentTheme.textPrimary,
-                fontSize: 18,
-                fontFamily: "outfit",
-                height: 55,
-                borderRadius: 12,
-                paddingHorizontal: 20,
-                paddingVertical: 10,
-                marginTop: 0,
-                marginBottom: 0,
-                marginLeft: 0,
-                marginRight: 0,
-                borderWidth: 1,
-                borderColor: "grey",
-              },
-              listView: {
-                backgroundColor: currentTheme.background,
-                borderRadius: 12,
-                marginTop: 10,
-                marginHorizontal: 0,
-                elevation: 3,
-                shadowColor: "#000",
-                shadowOpacity: 0.1,
-                shadowOffset: { width: 0, height: 2 },
-                shadowRadius: 4,
-              },
-              row: {
-                backgroundColor: currentTheme.background,
-                padding: 15,
-                height: "auto",
-                minHeight: 50,
-              },
-              separator: {
-                height: 1,
-                backgroundColor: `${currentTheme.textSecondary}20`,
-                marginLeft: 15,
-                marginRight: 15,
-              },
-              description: {
-                color: currentTheme.textPrimary,
-                fontSize: 16,
-                fontFamily: "outfit",
-              },
-              powered: {
-                display: "none",
-              },
-              poweredContainer: {
-                display: "none",
-              },
-            }}
-          />
-        </View>
+          <View style={styles.searchContainer}>
+            <GooglePlacesAutocomplete
+              placeholder="Search destinations..."
+              textInputProps={{
+                placeholderTextColor: currentTheme.textSecondary,
+                returnKeyType: "search",
+              }}
+              fetchDetails={true}
+              onPress={handlePlaceSelect}
+              query={{
+                key: process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
+                language: "en",
+              }}
+              styles={{
+                container: {
+                  flex: 0,
+                  width: "100%",
+                  zIndex: 1,
+                },
+                textInputContainer: {
+                  backgroundColor: "transparent",
+                  borderTopWidth: 0,
+                  borderBottomWidth: 0,
+                  marginHorizontal: 0,
+                  paddingHorizontal: 0,
+                },
+                textInput: {
+                  backgroundColor: currentTheme.background,
+                  color: currentTheme.textPrimary,
+                  fontSize: 18,
+                  fontFamily: "outfit",
+                  height: 55,
+                  borderRadius: 12,
+                  paddingHorizontal: 20,
+                  paddingVertical: 10,
+                  marginTop: 0,
+                  marginBottom: 0,
+                  marginLeft: 0,
+                  marginRight: 0,
+                  borderWidth: 1,
+                  borderColor: "grey",
+                },
+                listView: {
+                  backgroundColor: currentTheme.background,
+                  borderRadius: 12,
+                  marginTop: 10,
+                  marginHorizontal: 0,
+                  elevation: 3,
+                  shadowColor: "#000",
+                  shadowOpacity: 0.1,
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowRadius: 4,
+                },
+                row: {
+                  backgroundColor: currentTheme.background,
+                  padding: 15,
+                  height: "auto",
+                  minHeight: 50,
+                },
+                separator: {
+                  height: 1,
+                  backgroundColor: `${currentTheme.textSecondary}20`,
+                  marginLeft: 15,
+                  marginRight: 15,
+                },
+                description: {
+                  color: currentTheme.textPrimary,
+                  fontSize: 16,
+                  fontFamily: "outfit",
+                },
+                powered: {
+                  display: "none",
+                },
+                poweredContainer: {
+                  display: "none",
+                },
+              }}
+            />
+          </View>
 
-        <View style={styles.dividerContainer}>
-          <View
-            style={[
-              styles.dividerLine,
-              { backgroundColor: currentTheme.textSecondary },
+          <View style={styles.dividerContainer}>
+            <View
+              style={[
+                styles.dividerLine,
+                { backgroundColor: currentTheme.textSecondary },
+              ]}
+            />
+            <Text
+              style={[
+                styles.dividerText,
+                { color: currentTheme.textSecondary },
+              ]}
+            >
+              Don't know?
+            </Text>
+            <View
+              style={[
+                styles.dividerLine,
+                { backgroundColor: currentTheme.textSecondary },
+              ]}
+            />
+          </View>
+
+          <Pressable
+            onPress={() => navigation.navigate("ChoosePlaces")}
+            style={({ pressed }) => [
+              styles.helpButton,
+              {
+                backgroundColor: pressed
+                  ? currentTheme.alternate
+                  : currentTheme.background,
+                borderColor: currentTheme.alternate,
+              },
             ]}
-          />
-          <Text
-            style={[styles.dividerText, { color: currentTheme.textSecondary }]}
           >
-            Don't know?
-          </Text>
-          <View
-            style={[
-              styles.dividerLine,
-              { backgroundColor: currentTheme.textSecondary },
-            ]}
-          />
+            <Ionicons
+              name="compass-outline"
+              size={24}
+              color={currentTheme.textPrimary}
+              style={styles.buttonIcon}
+            />
+            <Text
+              style={[styles.buttonText, { color: currentTheme.textPrimary }]}
+            >
+              Help me choose
+            </Text>
+          </Pressable>
         </View>
-
-        <Pressable
-          onPress={() => navigation.navigate("ChoosePlaces")}
-          style={({ pressed }) => [
-            styles.helpButton,
-            {
-              backgroundColor: pressed
-                ? currentTheme.alternate
-                : currentTheme.background,
-              borderColor: currentTheme.alternate,
-            },
-          ]}
-        >
-          <Ionicons
-            name="compass-outline"
-            size={24}
-            color={currentTheme.textPrimary}
-            style={styles.buttonIcon}
-          />
-          <Text
-            style={[styles.buttonText, { color: currentTheme.textPrimary }]}
-          >
-            Help me choose
-          </Text>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+  },
+  safeArea: {
+    flex: 1,
   },
   contentContainer: {
     flex: 1,

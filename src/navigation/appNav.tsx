@@ -147,12 +147,24 @@ const MyTripsStack: React.FC = () => {
     const previousScreen = screens[screens.indexOf(currentScreen) - 1];
 
     return {
+      headerTransparent: true,
       headerStyle: {
+        backgroundColor: "transparent",
+      },
+      contentStyle: {
         backgroundColor: currentTheme.background,
       },
       headerShadowVisible: false,
+      animation: "slide_from_right",
       headerLeft: () => (
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 5,
+            marginLeft: 8,
+          }}
+        >
           <Pressable
             onPress={() => {
               if (isFirstScreen) {
@@ -161,12 +173,12 @@ const MyTripsStack: React.FC = () => {
                 navigation.navigate(previousScreen);
               }
             }}
+            style={{ padding: 4 }}
           >
             <Ionicons
               name="arrow-back"
-              size={28}
+              size={26}
               color={currentTheme.textPrimary}
-              style={{ marginLeft: 10 }}
             />
           </Pressable>
           {!isFirstScreen && (
@@ -190,12 +202,12 @@ const MyTripsStack: React.FC = () => {
                   ]
                 );
               }}
+              style={{ padding: 0 }}
             >
               <Ionicons
                 name="refresh"
-                size={25}
+                size={24}
                 color={currentTheme.textPrimary}
-                style={{ marginLeft: 5 }}
               />
             </Pressable>
           )}
@@ -417,7 +429,7 @@ const TabNavigator: React.FC = () => {
     height: Platform.OS === "ios" ? 85 : 65,
     paddingBottom: Platform.OS === "ios" ? 25 : 10,
     paddingTop: 10,
-    borderTopWidth: 0.5,
+    borderTopWidth: 0,
   };
 
   const TabIcon = ({

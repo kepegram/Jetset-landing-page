@@ -296,78 +296,103 @@ const Home: React.FC = () => {
             { backgroundColor: currentTheme.background },
           ]}
         >
-          <GooglePlacesAutocomplete
-            ref={googlePlacesRef}
-            placeholder="Where would you like to go?"
-            textInputProps={{
-              placeholderTextColor: currentTheme.textPrimary,
-            }}
-            fetchDetails={true}
-            onPress={(
-              data,
-              details: ExtendedGooglePlaceDetail | null = null
-            ) => {
-              if (details) {
-                const photoReference =
-                  details.photos?.[0]?.photo_reference || null;
-                setTripData({
-                  locationInfo: {
-                    name: data.description,
-                    coordinates: details.geometry.location,
-                    photoRef: photoReference,
-                    url: details.url,
-                  },
-                });
-                // Clear input
-                if (googlePlacesRef.current) {
-                  googlePlacesRef.current.clear();
+          <View style={styles.searchContainer}>
+            <GooglePlacesAutocomplete
+              ref={googlePlacesRef}
+              placeholder="Where would you like to go?"
+              textInputProps={{
+                placeholderTextColor: currentTheme.textSecondary,
+                selectionColor: currentTheme.alternate,
+              }}
+              fetchDetails={true}
+              onPress={(
+                data,
+                details: ExtendedGooglePlaceDetail | null = null
+              ) => {
+                if (details) {
+                  const photoReference =
+                    details.photos?.[0]?.photo_reference || null;
+                  setTripData({
+                    locationInfo: {
+                      name: data.description,
+                      coordinates: details.geometry.location,
+                      photoRef: photoReference,
+                      url: details.url,
+                    },
+                  });
+                  // Clear input
+                  if (googlePlacesRef.current) {
+                    googlePlacesRef.current.clear();
+                  }
+                  // @ts-ignore - Nested navigation type issue
+                  navigation.navigate("MyTrips", {
+                    screen: "ChooseDate",
+                  });
                 }
-                // @ts-ignore - Nested navigation type issue
-                navigation.navigate("MyTrips", {
-                  screen: "ChooseDate",
-                });
-              }
-            }}
-            query={{
-              key: process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
-              language: "en",
-            }}
-            styles={{
-              textInput: [
-                styles.searchInput,
-                { color: currentTheme.textPrimary },
-                { backgroundColor: currentTheme.background },
-              ],
-              listView: {
-                backgroundColor: currentTheme.background,
-                borderRadius: 12,
-                marginTop: 10,
-                marginHorizontal: 0,
-                elevation: 3,
-                shadowColor: "#000",
-                shadowOpacity: 0.1,
-                shadowOffset: { width: 0, height: 2 },
-                shadowRadius: 4,
-              },
-              row: {
-                backgroundColor: currentTheme.background,
-                padding: 15,
-                height: "auto",
-                minHeight: 50,
-              },
-              separator: {
-                backgroundColor: `${currentTheme.textSecondary}20`,
-                height: 0.5,
-              },
-              description: {
-                color: currentTheme.textPrimary,
-                fontSize: 16,
-              },
-              poweredContainer: {
-                backgroundColor: currentTheme.background,
-              },
-            }}
-          />
+              }}
+              query={{
+                key: process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
+                language: "en",
+              }}
+              styles={{
+                container: {
+                  flex: 0,
+                },
+                textInputContainer: {
+                  backgroundColor: 'transparent',
+                },
+                textInput: [
+                  styles.searchInput,
+                  {
+                    color: currentTheme.textPrimary,
+                    backgroundColor: currentTheme.accentBackground,
+                  },
+                ],
+                listView: {
+                  backgroundColor: currentTheme.accentBackground,
+                  borderRadius: 12,
+                  marginTop: 10,
+                  marginHorizontal: 0,
+                  elevation: 3,
+                  shadowColor: "#000",
+                  shadowOpacity: 0.1,
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowRadius: 4,
+                },
+                row: {
+                  backgroundColor: currentTheme.accentBackground,
+                  padding: 15,
+                  height: "auto",
+                  minHeight: 50,
+                },
+                separator: {
+                  backgroundColor: `${currentTheme.textSecondary}20`,
+                  height: 1,
+                },
+                description: {
+                  color: currentTheme.textPrimary,
+                  fontSize: 16,
+                },
+                poweredContainer: {
+                  backgroundColor: currentTheme.accentBackground,
+                  borderTopWidth: 1,
+                  borderColor: `${currentTheme.textSecondary}20`,
+                },
+                powered: {
+                  tintColor: currentTheme.textSecondary,
+                },
+              }}
+              renderLeftButton={() => (
+                <View style={styles.searchIcon}>
+                  <Ionicons 
+                    name="search" 
+                    size={24} 
+                    color={currentTheme.textSecondary}
+                  />
+                </View>
+              )}
+            />
+          </View>
           <View style={styles.recommendedTripsHeader}>
             <Text
               style={[
@@ -642,15 +667,32 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     marginTop: -50,
   },
-  searchInput: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "grey",
-    padding: 15,
-    height: 60,
-    borderRadius: 15,
+  searchContainer: {
     marginBottom: 20,
+  },
+  searchInput: {
+    height: 55,
+    borderRadius: 15,
+    paddingHorizontal: 45,
     fontSize: 16,
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 15,
+    top: 15,
+    zIndex: 1,
   },
   popularDestinationContainer: {
     marginRight: 15,

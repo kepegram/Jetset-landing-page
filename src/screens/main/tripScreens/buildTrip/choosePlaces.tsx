@@ -1,5 +1,12 @@
-import { View, Text, Pressable, Image, StyleSheet } from "react-native";
-import React, { useEffect, useState, useContext } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
+import React, { useState, useContext } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { useNavigation } from "@react-navigation/native";
@@ -12,6 +19,8 @@ type ChoosePlacesNavigationProp = StackNavigationProp<
   RootStackParamList,
   "ChoosePlaces"
 >;
+
+const { width, height } = Dimensions.get("window");
 
 const ChoosePlaces: React.FC = () => {
   const navigation = useNavigation<ChoosePlacesNavigationProp>();
@@ -51,37 +60,11 @@ const ChoosePlaces: React.FC = () => {
         (dest) => dest.id === selectedDestination
       );
 
-      // Define default coordinates based on destination type
-      let defaultCoordinates = { lat: 0, lng: 0 };
-      let defaultUrl = "";
-
-      switch (selectedDestination) {
-        case "beach":
-          defaultCoordinates = { lat: 8.7832, lng: 83.7115 }; // Costa Rica beaches
-          defaultUrl = "https://maps.google.com/?q=Costa+Rica+Beaches";
-          break;
-        case "mountain":
-          defaultCoordinates = { lat: 45.8326, lng: 6.8652 }; // Mont Blanc
-          defaultUrl = "https://maps.google.com/?q=Mont+Blanc";
-          break;
-        case "islands":
-          defaultCoordinates = { lat: -17.6797, lng: -149.4068 }; // Bora Bora
-          defaultUrl = "https://maps.google.com/?q=Bora+Bora";
-          break;
-        case "landmarks":
-          defaultCoordinates = { lat: 48.8584, lng: 2.2945 }; // Eiffel Tower
-          defaultUrl = "https://maps.google.com/?q=Eiffel+Tower";
-          break;
-      }
-
       const updatedTripData = {
         ...tripData,
         destinationType: selectedPlace?.label,
         locationInfo: {
           name: `${selectedPlace?.label} Destination`,
-          coordinates: defaultCoordinates,
-          photoRef: null,
-          url: defaultUrl,
         },
       };
       setTripData(updatedTripData);
@@ -147,47 +130,49 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    padding: 20,
+    flex: 1,
+    padding: width * 0.05,
+    justifyContent: "space-between",
   },
   headerContainer: {
     alignItems: "flex-start",
+    marginTop: height * 0.04,
   },
   subheading: {
-    fontSize: 16,
-    marginBottom: 8,
+    fontSize: width * 0.04,
+    marginBottom: height * 0.01,
   },
   heading: {
-    fontSize: 32,
+    fontSize: width * 0.08,
     fontWeight: "bold",
   },
   destinationsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-around",
-    marginTop: 30,
-    gap: 20,
+    justifyContent: "space-between",
+    paddingHorizontal: width * 0.02,
   },
   destinationButton: {
     alignItems: "center",
-    width: 150,
+    width: width * 0.42,
+    marginBottom: height * 0.03,
   },
   destinationImage: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    width: width * 0.4,
+    height: width * 0.4,
+    borderRadius: width * 0.2,
   },
   selectedDestination: {
     opacity: 0.7,
   },
   destinationLabel: {
-    marginTop: 8,
-    fontSize: 16,
+    marginTop: height * 0.01,
+    fontSize: width * 0.04,
     fontWeight: "bold",
   },
   buttonContainer: {
-    justifyContent: "center",
+    width: "100%",
     alignItems: "center",
-    marginTop: 50,
   },
 });
 
