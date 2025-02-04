@@ -55,6 +55,7 @@ interface InputFieldProps {
   keyboardType?: "default" | "email-address";
   autoCapitalize?: "none" | "sentences";
   editable?: boolean;
+  testID?: string;
 }
 
 interface PasswordFieldProps {
@@ -72,6 +73,7 @@ interface PasswordFieldProps {
     inactive: string;
   };
   editable: boolean;
+  testID?: string;
 }
 
 const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
@@ -219,6 +221,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
     toggleVisible,
     theme,
     editable,
+    testID,
   }) => (
     <View style={styles.inputWrapper}>
       <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
@@ -241,6 +244,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           secureTextEntry={!visible}
           autoCapitalize="none"
           editable={editable}
+          testID={testID}
         />
         <Pressable
           style={styles.eyeIcon}
@@ -259,25 +263,32 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
   return (
     <SafeAreaView
+      testID="signup-screen"
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <KeyboardAvoidingView
+        testID="signup-content"
         style={styles.contentContainer}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.headerContainer}>
-          <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+        <View testID="signup-header" style={styles.headerContainer}>
+          <Text
+            testID="signup-title"
+            style={[styles.title, { color: currentTheme.textPrimary }]}
+          >
             Create Account
           </Text>
           <Text
+            testID="signup-subtitle"
             style={[styles.subtitle, { color: currentTheme.textSecondary }]}
           >
             Sign up to get started
           </Text>
         </View>
 
-        <View style={styles.signUpContainer}>
+        <View testID="signup-form" style={styles.signUpContainer}>
           <InputField
+            testID="signup-name-input"
             label="Name"
             placeholder="Jane Doe"
             value={name}
@@ -287,6 +298,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           />
 
           <InputField
+            testID="signup-email-input"
             label="Email"
             placeholder="example@mail.com"
             value={email}
@@ -298,6 +310,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           />
 
           <PasswordField
+            testID="signup-password-input"
             label="Password"
             value={password}
             onChangeText={setPassword}
@@ -308,6 +321,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           />
 
           <PasswordField
+            testID="signup-confirm-password-input"
             label="Confirm Password"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
@@ -320,6 +334,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           />
 
           <MainButton
+            testID="signup-submit-button"
             buttonText="Create Account"
             onPress={handleSignUp}
             disabled={loading || !isFormValid}
@@ -328,6 +343,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
           {errorMessage && (
             <Text
+              testID="signup-error-message"
               style={[styles.errorText, { color: currentTheme.error || "red" }]}
             >
               {errorMessage}
@@ -357,6 +373,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
         <View style={styles.socialButtonsContainer}>
           <MainButton
+            testID="google-signup-button"
             onPress={() => promptAsync()}
             backgroundColor={currentTheme.accentBackground}
             textColor={currentTheme.textPrimary}
@@ -379,6 +396,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
           {Platform.OS === "ios" && (
             <AppleAuthentication.AppleAuthenticationButton
+              testID="apple-signup-button"
               buttonType={
                 AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
               }
@@ -393,11 +411,13 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
         </View>
 
         <Pressable
+          testID="login-link-button"
           onPress={() => navigation.navigate("Login")}
           disabled={loading}
           style={[styles.loginLink, { opacity: loading ? 0.7 : 1 }]}
         >
           <Text
+            testID="login-link-text"
             style={[styles.loginText, { color: currentTheme.textSecondary }]}
           >
             Already have an account?{" "}

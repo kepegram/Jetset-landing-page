@@ -11,6 +11,7 @@ import {
 import { useTheme } from "../../context/themeContext";
 
 type ButtonProps = {
+  testID?: string;
   buttonText?: string;
   onPress: (event: GestureResponderEvent) => void;
   width?: number | string;
@@ -68,6 +69,7 @@ const AltButton: React.FC<ButtonProps> = ({ buttonText, onPress }) => {
 };
 
 const MainButton: React.FC<ButtonProps> = ({
+  testID,
   buttonText,
   onPress,
   width,
@@ -81,6 +83,7 @@ const MainButton: React.FC<ButtonProps> = ({
 
   return (
     <Pressable
+      testID={testID}
       style={[
         styles.mainButton,
         {

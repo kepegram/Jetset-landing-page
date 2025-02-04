@@ -226,15 +226,17 @@ const Home: React.FC = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View testID="home-screen" style={{ flex: 1 }}>
       <ScrollView
+        testID="home-scroll-view"
         style={[{ backgroundColor: currentTheme.background }]}
         contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <View style={styles.imageContainer}>
+        <View testID="home-header" style={styles.header}>
+          <View testID="home-image-container" style={styles.imageContainer}>
             <Image
+              testID="home-header-image"
               source={require("../../../assets/app-imgs/travel.jpg")}
               style={styles.image}
             />
@@ -243,9 +245,11 @@ const Home: React.FC = () => {
               style={styles.overlay}
             />
           </View>
-          <View style={styles.headerContent}>
-            <Text style={styles.greetingText}>{getGreeting()}</Text>
-            <Text style={styles.subGreetingText}>
+          <View testID="home-header-content" style={styles.headerContent}>
+            <Text testID="home-greeting" style={styles.greetingText}>
+              {getGreeting()}
+            </Text>
+            <Text testID="home-subgreeting" style={styles.subGreetingText}>
               Let's plan your next adventure
             </Text>
             <View style={styles.terrainContainer}>
@@ -296,7 +300,7 @@ const Home: React.FC = () => {
             { backgroundColor: currentTheme.background },
           ]}
         >
-          <View style={styles.searchContainer}>
+          <View testID="home-search-container" style={styles.searchContainer}>
             <GooglePlacesAutocomplete
               ref={googlePlacesRef}
               placeholder="Where would you like to go?"
@@ -404,11 +408,13 @@ const Home: React.FC = () => {
             </Text>
           </View>
           <FlatList
+            testID="popular-destinations-list"
             horizontal
             data={popularDestinations}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <Pressable
+                testID={`destination-item-${item.id}`}
                 onPress={() => {
                   navigation.navigate("PopularDestinations", {
                     destination: item,
@@ -420,6 +426,7 @@ const Home: React.FC = () => {
                 ]}
               >
                 <Image
+                  testID={`destination-image-${item.id}`}
                   source={item.image}
                   style={styles.popularDestinationImage}
                 />
@@ -427,7 +434,10 @@ const Home: React.FC = () => {
                   colors={["transparent", "rgba(0,0,0,0.7)"]}
                   style={styles.popularDestinationGradient}
                 />
-                <Text style={styles.popularDestinationText}>
+                <Text
+                  testID={`destination-name-${item.id}`}
+                  style={styles.popularDestinationText}
+                >
                   {item.name.split(",")[0]}
                 </Text>
               </Pressable>
@@ -471,6 +481,7 @@ const Home: React.FC = () => {
             </View>
           ) : (
             <FlatList
+              testID="recommended-trips-list"
               horizontal
               data={[...recommendedTrips, { id: "dont-like-button" }]}
               keyExtractor={(trip) => trip.id}
@@ -496,6 +507,7 @@ const Home: React.FC = () => {
                   const tripInfo = JSON.parse(trip.fullResponse);
                   return (
                     <Pressable
+                      testID={`trip-card-${trip.id}`}
                       onPress={() => {
                         console.log(
                           "Navigating to TripDetails with tripInfo:",
@@ -517,6 +529,7 @@ const Home: React.FC = () => {
                       {trip.photoRef && (
                         <View style={styles.tripImageContainer}>
                           <Image
+                            testID={`trip-image-${trip.id}`}
                             source={{
                               uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${trip.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
                             }}
@@ -537,6 +550,7 @@ const Home: React.FC = () => {
                         />
                         <View style={styles.tripTextContainer}>
                           <Text
+                            testID={`trip-name-${trip.id}`}
                             style={[
                               styles.tripName,
                               { color: currentTheme.textPrimary },
@@ -547,6 +561,7 @@ const Home: React.FC = () => {
                             {trip.name}
                           </Text>
                           <Text
+                            testID={`trip-description-${trip.id}`}
                             style={[
                               styles.tripDescription,
                               { color: currentTheme.textSecondary },

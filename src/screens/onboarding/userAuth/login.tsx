@@ -128,6 +128,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
 
   return (
     <KeyboardAvoidingView
+      testID="login-screen"
       style={[styles.container, { backgroundColor: currentTheme.background }]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
@@ -136,18 +137,22 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerContainer}>
-          <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+        <View testID="login-header" style={styles.headerContainer}>
+          <Text
+            testID="login-title"
+            style={[styles.title, { color: currentTheme.textPrimary }]}
+          >
             Welcome Back
           </Text>
           <Text
+            testID="login-subtitle"
             style={[styles.subTitle, { color: currentTheme.textSecondary }]}
           >
             Sign in to continue your journey
           </Text>
         </View>
 
-        <View style={styles.loginContainer}>
+        <View testID="login-form" style={styles.loginContainer}>
           <View style={styles.inputWrapper}>
             <Text
               style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
@@ -155,6 +160,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               Email
             </Text>
             <TextInput
+              testID="login-email-input"
               style={[
                 styles.input,
                 {
@@ -182,6 +188,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
             </Text>
             <View style={styles.passwordContainer}>
               <TextInput
+                testID="login-password-input"
                 style={[
                   styles.input,
                   {
@@ -214,11 +221,13 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           </View>
 
           <Pressable
+            testID="forgot-password-button"
             onPress={() => navigation.navigate("ForgotPassword")}
             style={styles.forgotPasswordContainer}
             disabled={loading}
           >
             <Text
+              testID="forgot-password-text"
               style={[
                 styles.forgotPasswordText,
                 { color: currentTheme.alternate },
@@ -236,6 +245,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
             />
           ) : (
             <MainButton
+              testID="login-submit-button"
               buttonText="Sign In"
               onPress={handleLogin}
               width="100%"
@@ -245,7 +255,10 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           )}
 
           {errorMessage && (
-            <Text style={[styles.errorText, { color: currentTheme.error }]}>
+            <Text
+              testID="login-error-message"
+              style={[styles.errorText, { color: currentTheme.error }]}
+            >
               {errorMessage}
             </Text>
           )}
@@ -260,6 +273,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               New to Jetset?{" "}
               <Text
                 style={[styles.signUpLink, { color: currentTheme.alternate }]}
+                testID="signup-link-text"
                 onPress={() => navigation.navigate("SignUp")}
               >
                 Sign up here
@@ -292,6 +306,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
 
           <View style={styles.socialIconsContainer}>
             <MainButton
+              testID="google-signin-button"
               onPress={() => promptAsync()}
               backgroundColor={currentTheme.accentBackground}
               textColor={currentTheme.textPrimary}
@@ -314,6 +329,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
 
             {Platform.OS === "ios" && (
               <AppleAuthentication.AppleAuthenticationButton
+                testID="apple-signin-button"
                 buttonType={
                   AppleAuthentication.AppleAuthenticationButtonType.CONTINUE
                 }
