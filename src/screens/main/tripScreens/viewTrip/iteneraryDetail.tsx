@@ -3,14 +3,13 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  Animated,
   Dimensions,
   Image,
   ScrollView,
   Linking,
   StatusBar,
 } from "react-native";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { useTheme } from "../../../../context/themeContext";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -18,7 +17,6 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
-import { BlurView } from "expo-blur";
 
 const { width, height } = Dimensions.get("window");
 
@@ -33,54 +31,27 @@ const IteneraryDetail: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProps>();
-  const scrollY = useRef(new Animated.Value(0)).current;
   const { place } = route.params;
-
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, height * 0.2],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
-  });
-
-  const imageScale = scrollY.interpolate({
-    inputRange: [-100, 0],
-    outputRange: [1.5, 1],
-    extrapolateLeft: "extend",
-    extrapolateRight: "clamp",
-  });
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
       headerTitle: "",
-      headerBackground: () => (
-        <Animated.View
-          style={[
-            styles.headerBackground,
-            {
-              opacity: headerOpacity,
-              backgroundColor: currentTheme.background,
-            },
-          ]}
-        />
-      ),
       headerLeft: () => (
         <Pressable
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <BlurView intensity={80} style={styles.blurButton}>
-            <Ionicons
-              name="chevron-back"
-              size={24}
-              color={currentTheme.textPrimary}
-            />
-          </BlurView>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={currentTheme.textPrimary}
+          />
         </Pressable>
       ),
     });
-  }, [navigation, currentTheme.background]);
+  }, [navigation, currentTheme]);
 
   const handleOpenUrl = async () => {
     if (place.placeUrl) {
@@ -93,20 +64,8 @@ const IteneraryDetail: React.FC = () => {
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <StatusBar barStyle="light-content" />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        scrollEventThrottle={16}
-      >
-        <Animated.View
-          style={[
-            styles.imageContainer,
-            { transform: [{ scale: imageScale }] },
-          ]}
-        >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.imageContainer}>
           <Image
             source={
               place.photoRef
@@ -121,10 +80,15 @@ const IteneraryDetail: React.FC = () => {
             }
             style={styles.image}
           />
-          <BlurView intensity={60} style={styles.imageOverlay}>
+          <View
+            style={[
+              styles.imageOverlay,
+              { backgroundColor: "rgba(0, 0, 0, 0.4)" },
+            ]}
+          >
             <Text style={styles.overlayTitle}>{place.placeName}</Text>
-          </BlurView>
-        </Animated.View>
+          </View>
+        </View>
 
         <View
           style={[
@@ -133,27 +97,6 @@ const IteneraryDetail: React.FC = () => {
           ]}
         >
           <View style={styles.detailsContainer}>
-            <View
-              style={[
-                styles.infoBox,
-                { backgroundColor: `${currentTheme.alternate}15` },
-              ]}
-            >
-              <Ionicons
-                name="time-outline"
-                size={24}
-                color={currentTheme.alternate}
-              />
-              <Text
-                style={[
-                  styles.infoText,
-                  { color: currentTheme.textPrimary },
-                ]}
-              >
-                {place.timeToTravel}
-              </Text>
-            </View>
-
             <View style={styles.section}>
               <Text
                 style={[
@@ -250,20 +193,15 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
-  headerBackground: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "100%",
-  },
   backButton: {
     marginLeft: 16,
-  },
-  blurButton: {
-    padding: 12,
+    padding: 8,
     borderRadius: 25,
-    overflow: "hidden",
+    backgroundColor: "rgba(0,0,0,0.3)",
+    height: 44,
+    width: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   imageContainer: {
     height: height * 0.5,
@@ -294,23 +232,12 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     marginTop: -30,
-    paddingTop: 30,
+    paddingTop: 10,
     minHeight: height * 0.6,
   },
   detailsContainer: {
     padding: 20,
     gap: 24,
-  },
-  infoBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    padding: 16,
-    borderRadius: 12,
-  },
-  infoText: {
-    fontSize: 16,
-    fontFamily: "outfit-medium",
   },
   section: {
     gap: 12,

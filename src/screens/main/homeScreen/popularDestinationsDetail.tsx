@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
+import MapView, { Marker } from "react-native-maps";
 
 const { height } = Dimensions.get("window");
 
@@ -24,6 +25,10 @@ type RouteParams = {
     description: string;
     image: number;
     bestTimeToVisit: string;
+    geoCoordinates?: {
+      latitude: number;
+      longitude: number;
+    };
   };
 };
 
@@ -148,6 +153,38 @@ const PopularDestinations: React.FC = () => {
             </Text>
           </View>
 
+          {destination.geoCoordinates && (
+            <View style={styles.mapSection}>
+              <Text
+                style={[
+                  styles.descriptionTitle,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                Location
+              </Text>
+              <View style={styles.mapContainer}>
+                <MapView
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: destination.geoCoordinates.latitude,
+                    longitude: destination.geoCoordinates.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: destination.geoCoordinates.latitude,
+                      longitude: destination.geoCoordinates.longitude,
+                    }}
+                    title={destination.name}
+                  />
+                </MapView>
+              </View>
+            </View>
+          )}
+
           <Pressable
             style={[
               styles.exploreButton,
@@ -263,6 +300,18 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontFamily: "outfit-bold",
+  },
+  mapSection: {
+    marginBottom: 24,
+  },
+  mapContainer: {
+    height: 200,
+    borderRadius: 20,
+    overflow: "hidden",
+    marginTop: 12,
+  },
+  map: {
+    flex: 1,
   },
 });
 

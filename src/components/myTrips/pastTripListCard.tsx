@@ -73,7 +73,7 @@ const PastTripListCard: React.FC<PastTripListCardProps> = ({ trip }) => {
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           onPress={() => {
-            navigation.navigate("TripDetails", {
+            navigation.navigate("PastTripDetails", {
               trip: JSON.stringify({
                 ...tripData,
                 travelPlan: tripPlan?.travelPlan || {},
@@ -89,8 +89,8 @@ const PastTripListCard: React.FC<PastTripListCardProps> = ({ trip }) => {
         >
           <Image
             source={{
-              uri: tripPlan.travelPlan?.photoRef
-                ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripPlan.travelPlan.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+              uri: tripData.locationInfo?.photoRef
+                ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripData.locationInfo?.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
                 : "https://via.placeholder.com/100",
             }}
             style={styles.image}

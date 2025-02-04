@@ -339,7 +339,7 @@ const Home: React.FC = () => {
                   flex: 0,
                 },
                 textInputContainer: {
-                  backgroundColor: 'transparent',
+                  backgroundColor: "transparent",
                 },
                 textInput: [
                   styles.searchInput,
@@ -384,9 +384,9 @@ const Home: React.FC = () => {
               }}
               renderLeftButton={() => (
                 <View style={styles.searchIcon}>
-                  <Ionicons 
-                    name="search" 
-                    size={24} 
+                  <Ionicons
+                    name="search"
+                    size={24}
                     color={currentTheme.textSecondary}
                   />
                 </View>
@@ -410,7 +410,6 @@ const Home: React.FC = () => {
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => {
-                  console.log("Selected destination:", item);
                   navigation.navigate("PopularDestinations", {
                     destination: item,
                   });
@@ -689,7 +688,7 @@ const styles = StyleSheet.create({
     }),
   },
   searchIcon: {
-    position: 'absolute',
+    position: "absolute",
     left: 15,
     top: 15,
     zIndex: 1,

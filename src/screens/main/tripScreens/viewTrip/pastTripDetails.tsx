@@ -4,7 +4,6 @@ import {
   Image,
   ScrollView,
   Alert,
-  Linking,
   StyleSheet,
   Dimensions,
   Pressable,
@@ -19,15 +18,13 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
-import HotelList from "../../../../components/tripDetails/hotelList";
 import PlannedTrip from "../../../../components/tripDetails/plannedTrip";
-import { MainButton } from "../../../../components/ui/button";
 
-const { width, height } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "TripDetails"
+  "PastTripDetails"
 >;
 
 interface RouteParams {
@@ -36,7 +33,7 @@ interface RouteParams {
   docId: string;
 }
 
-const TripDetails: React.FC = () => {
+const PastTripDetails: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
@@ -172,7 +169,8 @@ const TripDetails: React.FC = () => {
                   { color: currentTheme.textPrimary },
                 ]}
               >
-                {moment(tripDetails?.startDate).format("MMM DD")} - {moment(tripDetails?.endDate).format("MMM DD")}
+                {moment(tripDetails?.startDate).format("MMM DD")} -{" "}
+                {moment(tripDetails?.endDate).format("MMM DD")}
               </Text>
             </View>
             <View
@@ -197,42 +195,9 @@ const TripDetails: React.FC = () => {
             </View>
           </View>
 
-          <HotelList hotelList={tripDetails?.travelPlan?.hotels} />
           <PlannedTrip details={tripDetails?.travelPlan} />
         </View>
       </ScrollView>
-
-      <View
-        style={[styles.bottomBar, { backgroundColor: currentTheme.background }]}
-      >
-        <View style={styles.priceContainer}>
-          <Text
-            style={[styles.airlineName, { color: currentTheme.textPrimary }]}
-          >
-            {tripDetails?.travelPlan?.flights?.airlineName || "Unknown Airline"}{" "}
-            ✈️
-          </Text>
-          <Text style={[styles.price, { color: currentTheme.alternate }]}>
-            ${tripDetails?.travelPlan?.flights?.flightPrice || "N/A"}
-          </Text>
-        </View>
-        <MainButton
-          onPress={() => {
-            const url = tripDetails?.travelPlan?.flights?.airlineUrl;
-            if (url) {
-              Linking.openURL(url);
-            } else {
-              Alert.alert("Booking URL not available");
-            }
-          }}
-          buttonText="Book Now"
-          width={width * 0.45}
-          style={[
-            styles.bookButton,
-            { backgroundColor: currentTheme.alternate },
-          ]}
-        />
-      </View>
     </View>
   );
 };
@@ -302,38 +267,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 8,
   },
-  bottomBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 24,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.1)",
-  },
-  priceContainer: {
-    flex: 1,
-  },
-  airlineName: {
-    fontFamily: "outfit-bold",
-    fontSize: 20,
-    marginBottom: 4,
-  },
-  price: {
-    fontFamily: "outfit-bold",
-    fontSize: 24,
-  },
-  bookButton: {
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.5,
-    borderRadius: 15,
-  },
   backButton: {
     marginLeft: 16,
     padding: 8,
@@ -346,4 +279,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TripDetails;
+export default PastTripDetails;

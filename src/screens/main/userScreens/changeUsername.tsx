@@ -63,32 +63,33 @@ const ChangeUsername: React.FC = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <View style={styles.formContainer}>
-        <Text 
-          style={[
-            styles.inputLabel, 
-            { color: currentTheme.textPrimary }
-          ]}
-        >
-          Username
-        </Text>
-        <View style={styles.inputContainer}>
-          <TextInput
+      <View style={styles.contentContainer}>
+        <View style={styles.formContainer}>
+          <Text
+            style={[styles.inputLabel, { color: currentTheme.textPrimary }]}
+          >
+            Username
+          </Text>
+          <View
             style={[
-              styles.input,
+              styles.inputWrapper,
               {
-                color: currentTheme.textPrimary,
-                backgroundColor: currentTheme.background,
                 borderColor: currentTheme.inactive,
+                backgroundColor:
+                  currentTheme.background === "#FFFFFF" ? "#F5F5F5" : "#2A2A2A",
               },
             ]}
-            placeholder="Enter your username"
-            placeholderTextColor={currentTheme.inactive}
-            value={userName || ""}
-            onChangeText={setUserName}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
+          >
+            <TextInput
+              style={[styles.input, { color: currentTheme.textPrimary }]}
+              placeholder="Enter your username"
+              placeholderTextColor={currentTheme.secondary}
+              value={userName || ""}
+              onChangeText={setUserName}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
         </View>
 
         <View style={styles.buttonContainer}>
@@ -106,35 +107,39 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  formContainer: {
+  contentContainer: {
     flex: 1,
-    marginTop: 40,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-  },
-  inputContainer: {
+    padding: 24,
+    maxWidth: 600,
     width: "100%",
-    marginBottom: 32,
+    alignSelf: "center",
+  },
+  formContainer: {
+    width: "100%",
+    marginTop: 20,
   },
   inputLabel: {
-    fontSize: 18,
+    fontSize: 16,
     marginBottom: 12,
-    fontFamily: 'outfit-bold',
-    alignSelf: 'flex-start',
+    fontFamily: "outfit-medium",
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 12,
+    marginBottom: 24,
+    paddingHorizontal: 16,
+    height: 56,
   },
   input: {
-    width: "100%",
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1.5,
+    flex: 1,
     fontSize: 16,
-    fontFamily: 'outfit',
+    fontFamily: "outfit",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "100%",
-    marginTop: 24,
-    gap: 16,
+    marginTop: "auto",
+    gap: 12,
   },
 });

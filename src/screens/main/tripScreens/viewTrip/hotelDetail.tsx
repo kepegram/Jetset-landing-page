@@ -3,21 +3,19 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  Animated,
   Dimensions,
   Image,
   ScrollView,
   StatusBar,
   Linking,
 } from "react-native";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { useTheme } from "../../../../context/themeContext";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker } from "react-native-maps";
-import { BlurView } from "expo-blur";
 import { MainButton } from "../../../../components/ui/button";
 
 const { width, height } = Dimensions.get("window");
@@ -32,54 +30,27 @@ const HotelDetail: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProps>();
-  const scrollY = useRef(new Animated.Value(0)).current;
   const { hotel } = route.params;
-
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, height * 0.2],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
-  });
-
-  const imageScale = scrollY.interpolate({
-    inputRange: [-100, 0],
-    outputRange: [1.5, 1],
-    extrapolateLeft: "extend",
-    extrapolateRight: "clamp",
-  });
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
       headerTitle: "",
-      headerBackground: () => (
-        <Animated.View
-          style={[
-            styles.headerBackground,
-            {
-              opacity: headerOpacity,
-              backgroundColor: currentTheme.background,
-            },
-          ]}
-        />
-      ),
       headerLeft: () => (
         <Pressable
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <BlurView intensity={80} style={styles.blurButton}>
-            <Ionicons
-              name="chevron-back"
-              size={24}
-              color={currentTheme.textPrimary}
-            />
-          </BlurView>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={currentTheme.textPrimary}
+          />
         </Pressable>
       ),
     });
-  }, [navigation, currentTheme.background]);
+  }, [navigation, currentTheme]);
 
   const handleBooking = async () => {
     if (hotel.bookingUrl) {
@@ -97,18 +68,8 @@ const HotelDetail: React.FC = () => {
       <StatusBar barStyle="light-content" />
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        scrollEventThrottle={16}
       >
-        <Animated.View
-          style={[
-            styles.imageContainer,
-            { transform: [{ scale: imageScale }] },
-          ]}
-        >
+        <View style={styles.imageContainer}>
           <Image
             source={{
               uri: hotel.photoRef
@@ -120,10 +81,15 @@ const HotelDetail: React.FC = () => {
             }}
             style={styles.image}
           />
-          <BlurView intensity={60} style={styles.imageOverlay}>
+          <View
+            style={[
+              styles.imageOverlay,
+              { backgroundColor: "rgba(0, 0, 0, 0.4)" },
+            ]}
+          >
             <Text style={styles.overlayTitle}>{hotel.hotelName}</Text>
-          </BlurView>
-        </Animated.View>
+          </View>
+        </View>
 
         <View
           style={[
@@ -133,31 +99,39 @@ const HotelDetail: React.FC = () => {
         >
           <View style={styles.detailsContainer}>
             <View style={styles.hotelContainer}>
-              <View
-                style={[
-                  styles.ratingBox,
-                  { backgroundColor: `${currentTheme.alternate}20` },
-                ]}
-              >
-                <Text
-                  style={[styles.ratingText, { color: currentTheme.alternate }]}
-                >
-                  {hotel.rating} ⭐
-                </Text>
-              </View>
-              <Text
-                style={[styles.priceText, { color: currentTheme.textPrimary }]}
-              >
-                ${hotel.price}
-                <Text
+              <View style={styles.ratingPriceContainer}>
+                <View
                   style={[
-                    styles.perNight,
-                    { color: currentTheme.textSecondary },
+                    styles.ratingBox,
+                    { backgroundColor: `${currentTheme.alternate}20` },
                   ]}
                 >
-                  /night
+                  <Text
+                    style={[
+                      styles.ratingText,
+                      { color: currentTheme.alternate },
+                    ]}
+                  >
+                    {hotel.rating} ⭐
+                  </Text>
+                </View>
+                <Text
+                  style={[
+                    styles.priceText,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
+                  ${hotel.price}
+                  <Text
+                    style={[
+                      styles.perNight,
+                      { color: currentTheme.textSecondary },
+                    ]}
+                  >
+                    /night
+                  </Text>
                 </Text>
-              </Text>
+              </View>
             </View>
 
             <View style={styles.section}>
@@ -212,7 +186,9 @@ const HotelDetail: React.FC = () => {
         </View>
       </ScrollView>
 
-      <BlurView intensity={90} style={styles.bottomBar}>
+      <View
+        style={[styles.bottomBar, { backgroundColor: currentTheme.background }]}
+      >
         <View style={styles.priceContainer}>
           <Text style={[styles.hotelName, { color: currentTheme.textPrimary }]}>
             {hotel.hotelName} 🏨
@@ -237,7 +213,7 @@ const HotelDetail: React.FC = () => {
           ]}
           disabled={!hotel.bookingUrl}
         />
-      </BlurView>
+      </View>
     </View>
   );
 };
@@ -249,20 +225,15 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
-  headerBackground: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "100%",
-  },
   backButton: {
     marginLeft: 16,
-  },
-  blurButton: {
-    padding: 12,
+    padding: 8,
     borderRadius: 25,
-    overflow: "hidden",
+    backgroundColor: "rgba(0,0,0,0.3)",
+    height: 44,
+    width: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   imageContainer: {
     height: height * 0.5,
@@ -301,12 +272,13 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   hotelContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     marginBottom: 20,
   },
+  ratingPriceContainer: {
+    gap: 12,
+  },
   ratingBox: {
+    alignSelf: "flex-start",
     padding: 10,
     borderRadius: 12,
   },
@@ -352,7 +324,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.1)",
+    borderTopColor: "rgba(128,128,128,0.2)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
   },
   priceContainer: {
     flex: 1,

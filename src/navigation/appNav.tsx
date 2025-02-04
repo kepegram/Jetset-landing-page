@@ -27,6 +27,7 @@ import GenerateTrip from "../screens/main/tripScreens/buildTrip/generateTrip";
 import TripDetails from "../screens/main/tripScreens/viewTrip/tripDetails";
 import MyTrips from "../screens/main/tripScreens/myTrips";
 import CurrentTripDetails from "../screens/main/tripScreens/viewTrip/currentTripDetails";
+import PastTripDetails from "../screens/main/tripScreens/viewTrip/pastTripDetails";
 import IteneraryDetail from "../screens/main/tripScreens/viewTrip/iteneraryDetail";
 import HotelDetail from "../screens/main/tripScreens/viewTrip/hotelDetail";
 import WhereTo from "../screens/main/tripScreens/buildTrip/whereTo";
@@ -57,6 +58,7 @@ export type RootStackParamList = {
   GenerateTrip: undefined;
   TripDetails: { trip: string; photoRef: string; docId: string };
   CurrentTripDetails: { trip: string; photoRef: string };
+  PastTripDetails: { trip: string; photoRef: string; docId: string };
   IteneraryDetail: {
     place: {
       placeName: string;
@@ -303,6 +305,11 @@ const MyTripsStack: React.FC = () => {
         options={{ headerShown: false }}
       />
       <RootStack.Screen
+        name="PastTripDetails"
+        component={PastTripDetails}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
         name="IteneraryDetail"
         component={IteneraryDetail}
         options={{ headerShown: false }}
@@ -372,6 +379,15 @@ const ProfileStack: React.FC = () => {
         component={Edit}
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
+          title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="ChangeUsername"
+        component={ChangeUsername}
+        options={({ navigation }) => ({
+          ...screenOptions({ navigation }),
+          title: "Change Username",
         })}
       />
       <RootStack.Screen
@@ -396,14 +412,6 @@ const ProfileStack: React.FC = () => {
         options={({ navigation }) => ({
           ...screenOptions({ navigation }),
           title: "Delete Account",
-        })}
-      />
-      <RootStack.Screen
-        name="ChangeUsername"
-        component={ChangeUsername}
-        options={({ navigation }) => ({
-          ...screenOptions({ navigation }),
-          title: "Change Username",
         })}
       />
     </RootStack.Navigator>
