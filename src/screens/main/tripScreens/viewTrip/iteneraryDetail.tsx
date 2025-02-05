@@ -43,11 +43,7 @@ const IteneraryDetail: React.FC = () => {
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Ionicons
-            name="chevron-back"
-            size={24}
-            color={currentTheme.textPrimary}
-          />
+          <Ionicons name="chevron-back" size={24} color={"white"} />
         </Pressable>
       ),
     });

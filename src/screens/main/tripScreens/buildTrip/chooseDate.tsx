@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Dimensions, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  SafeAreaView,
+  Alert,
+} from "react-native";
 import React, { useContext, useCallback, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../../navigation/appNav";
@@ -25,57 +32,52 @@ const ChooseDate: React.FC = () => {
   const [endDate, setEndDate] = useState<Moment | null>(null);
 
   const onDateChange = useCallback(
-    (date: Date, type: string) => {
+    async (date: Date, type: string) => {
       if (!date) return;
 
       const momentDate = moment(date);
 
-      // Prevent invalid date selections
-      if (type === "END_DATE" && startDate && momentDate.isBefore(startDate)) {
-        return;
-      }
-
-      if (type === "START_DATE") {
-        setStartDate(momentDate);
-        // If end date exists and is before new start date, reset it
-        if (endDate && endDate.isBefore(momentDate)) {
-          setEndDate(null);
+      try {
+        if (type === "START_DATE") {
+          setStartDate(momentDate);
+          if (endDate && endDate.isBefore(momentDate)) {
+            setEndDate(null);
+          }
+          await AsyncStorage.setItem("startDate", momentDate.toISOString());
+        } else {
+          if (startDate && momentDate.isBefore(startDate)) {
+            return;
+          }
+          setEndDate(momentDate);
+          await AsyncStorage.setItem("endDate", momentDate.toISOString());
         }
-        // Store in AsyncStorage after state is updated
-        Promise.resolve().then(() => {
-          AsyncStorage.setItem("startDate", momentDate.toISOString());
-        });
-      } else {
-        setEndDate(momentDate);
-        // Store in AsyncStorage after state is updated
-        Promise.resolve().then(() => {
-          AsyncStorage.setItem("endDate", momentDate.toISOString());
-        });
+      } catch (error) {
+        console.error("Error saving date to AsyncStorage:", error);
       }
     },
     [startDate, endDate]
   );
 
-  const OnDateSelectionContinue = useCallback(() => {
+  const handleDateSelectionContinue = useCallback(() => {
     if (!startDate || !endDate) {
-      alert("Please select Start and End Date");
+      Alert.alert("Missing Dates", "Please select both start and end dates");
       return;
     }
 
     if (endDate.isBefore(startDate)) {
-      alert("End date cannot be before start date");
+      Alert.alert("Invalid Dates", "End date cannot be before start date");
       return;
     }
 
-    const totalNoOfDays = endDate.diff(startDate, "days");
-    const updatedTripData = {
+    const totalNoOfDays = endDate.diff(startDate, "days") + 1;
+
+    setTripData({
       ...tripData,
-      startDate: startDate,
-      endDate: endDate,
-      totalNoOfDays: totalNoOfDays + 1,
-    };
-    setTripData(updatedTripData);
-    console.log("Updated Trip Data:", updatedTripData);
+      startDate,
+      endDate,
+      totalNoOfDays,
+    });
+
     navigation.navigate("WhosGoing");
   }, [startDate, endDate, tripData, setTripData, navigation]);
 
@@ -185,7 +187,7 @@ const ChooseDate: React.FC = () => {
           <View style={styles.buttonContainer}>
             <MainButton
               buttonText={startDate && endDate ? "Continue" : "Select Dates"}
-              onPress={OnDateSelectionContinue}
+              onPress={handleDateSelectionContinue}
               width="85%"
               backgroundColor={currentTheme.alternate}
               disabled={!startDate || !endDate}

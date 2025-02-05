@@ -182,14 +182,7 @@ const MyTrips: React.FC = () => {
                   ]}
                   onPress={() => navigation.navigate("WhereTo")}
                 >
-                  <Text
-                    style={[
-                      styles.emptyStateButtonText,
-                      { color: currentTheme.textPrimary },
-                    ]}
-                  >
-                    Plan a Trip
-                  </Text>
+                  <Text style={[styles.emptyStateButtonText]}>Plan a Trip</Text>
                 </Pressable>
               </View>
             )}
@@ -396,6 +389,7 @@ const styles = StyleSheet.create({
   emptyStateButtonText: {
     fontSize: 16,
     fontWeight: "600",
+    color: "white",
   },
 });
 

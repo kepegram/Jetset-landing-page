@@ -23,6 +23,21 @@ interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
   }>;
 }
 
+interface LocationInfo {
+  name: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  photoRef?: string | null;
+  url?: string;
+}
+
+interface PlaceData {
+  description: string;
+  [key: string]: any;
+}
+
 const WhereTo: React.FC = () => {
   const navigation = useNavigation<WhereToNavigationProp>();
   const { currentTheme } = useTheme();
@@ -44,23 +59,33 @@ const WhereTo: React.FC = () => {
   );
 
   const handlePlaceSelect = async (
-    data: any,
+    data: PlaceData,
     details: ExtendedGooglePlaceDetail | null
   ) => {
-    const photoReference = details?.photos?.[0]?.photo_reference || null;
+    if (!details) return;
+
+    const photoReference = details.photos?.[0]?.photo_reference || null;
+    const locationInfo: LocationInfo = {
+      name: data.description,
+      coordinates: details.geometry.location,
+      photoRef: photoReference,
+      url: details.url,
+    };
+
     setTripData({
       ...tripData,
-      locationInfo: {
-        name: data.description,
-        coordinates: details?.geometry.location,
-        photoRef: photoReference,
-        url: details?.url,
-      },
+      locationInfo,
     });
+
     if (photoReference) {
-      await AsyncStorage.setItem("photoRef", photoReference);
-      setPhotoRef(photoReference);
+      try {
+        await AsyncStorage.setItem("photoRef", photoReference);
+        setPhotoRef(photoReference);
+      } catch (error) {
+        console.error("Error saving photo reference:", error);
+      }
     }
+
     navigation.navigate("ChooseDate");
   };
 

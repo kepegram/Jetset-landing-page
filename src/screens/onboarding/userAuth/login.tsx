@@ -58,11 +58,6 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
   const handleLogin = async () => {
     setErrorMessage(null);
 
-    if (email === "" || password === "") {
-      setErrorMessage("Please enter both email and password");
-      return;
-    }
-
     setLoading(true);
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);

@@ -97,11 +97,6 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
   const handleSignUp = async () => {
     setErrorMessage(null);
 
-    if (!name || !email || !password || !confirmPassword) {
-      setErrorMessage("All fields are required");
-      return;
-    }
-
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match");
       return;

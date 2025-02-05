@@ -12,7 +12,6 @@ import {
   Alert,
   StyleSheet,
   SafeAreaView,
-  Pressable,
 } from "react-native";
 import { CreateTripContext } from "../../../../context/createTripContext";
 import { AI_PROMPT, PLACE_AI_PROMPT } from "../../../../api/ai-prompt";
@@ -24,12 +23,17 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
 
 type GenerateTripScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "GenerateTrip"
 >;
+
+interface TripResponse {
+  travelPlan: {
+    [key: string]: any;
+  };
+}
 
 const GenerateTrip: React.FC = () => {
   const { currentTheme } = useTheme();
@@ -68,101 +72,112 @@ const GenerateTrip: React.FC = () => {
     return FINAL_PROMPT;
   };
 
-  const GenerateAiTrip = async (retryCount = 0) => {
+  const generateAiTrip = async (retryCount = 0): Promise<void> => {
+    if (!user?.uid) {
+      Alert.alert("Error", "You must be logged in to generate a trip");
+      return;
+    }
+
     setLoading(true);
-    const FINAL_PROMPT = getFinalPrompt();
-    console.log("Generated Prompt:", FINAL_PROMPT);
+    const finalPrompt = getFinalPrompt();
 
     try {
-      console.log(`Attempt ${retryCount + 1} to generate AI trip...`);
-      const result = await chatSession.sendMessage(FINAL_PROMPT);
+      const result = await chatSession.sendMessage(finalPrompt);
       const responseText = await result.response.text();
-      console.log("AI Response:", responseText);
 
-      let tripResp;
-      try {
-        // Clean the response by removing any extra closing braces and whitespace
-        let cleanedResponse = responseText.trim();
-        // Find the last valid JSON object by matching braces
-        let braceCount = 0;
-        let lastValidIndex = 0;
-
-        for (let i = 0; i < cleanedResponse.length; i++) {
-          if (cleanedResponse[i] === "{") braceCount++;
-          if (cleanedResponse[i] === "}") {
-            braceCount--;
-            if (braceCount === 0) lastValidIndex = i;
-          }
-        }
-
-        cleanedResponse = cleanedResponse.substring(0, lastValidIndex + 1);
-        tripResp = JSON.parse(cleanedResponse);
-      } catch (parseError) {
-        console.error("JSON parsing error:", parseError);
-        throw new Error("Failed to parse AI response");
-      }
-
-      if (!tripResp?.travelPlan) {
-        throw new Error("Invalid AI response format");
-      }
-
-      const docId = Date.now().toString();
-      const userTripRef = doc(
-        FIREBASE_DB,
-        "users",
-        user?.uid || "unknown",
-        "userTrips",
-        docId
-      );
-
-      const sanitizedTripData = {
-        ...tripData,
-        startDate: tripData.startDate?.format("YYYY-MM-DD") || null,
-        endDate: tripData.endDate?.format("YYYY-MM-DD") || null,
-      };
-
-      await setDoc(userTripRef, {
-        userEmail: user?.email || "unknown",
-        tripPlan: tripResp,
-        tripData: sanitizedTripData,
-        docId: docId,
-      });
-
-      console.log("Firestore Document Updated Successfully with ID:", docId);
+      const tripResp = parseAIResponse(responseText);
+      await saveTripToFirestore(tripResp);
 
       await AsyncStorage.clear();
-      console.log("AsyncStorage cleared successfully.");
-
       navigation.navigate("MyTripsMain");
-    } catch (error: any) {
-      console.error("AI generation failed:", error.message);
-      if (retryCount < 3 && isMounted.current) {
-        const waitTime = Math.pow(2, retryCount) * 1000;
-        console.log(`Retrying in ${waitTime / 1000} seconds...`);
-        setTimeout(() => {
-          if (isMounted.current) {
-            GenerateAiTrip(retryCount + 1);
-          }
-        }, waitTime);
-      } else {
-        Alert.alert(
-          "Error",
-          "An error occurred while generating your trip. Please try again later.",
-          [
-            {
-              text: "OK",
-              onPress: () => {
-                setTripData({});
-                navigation.navigate("MyTripsMain");
-              },
-            },
-          ]
-        );
-      }
+    } catch (error) {
+      handleGenerationError(error, retryCount);
     } finally {
       if (isMounted.current) {
         setLoading(false);
       }
+    }
+  };
+
+  const parseAIResponse = (responseText: string): TripResponse => {
+    const cleanedResponse = cleanJsonResponse(responseText);
+    try {
+      const parsed = JSON.parse(cleanedResponse);
+      if (!parsed?.travelPlan) {
+        throw new Error("Invalid AI response format");
+      }
+      return parsed;
+    } catch (error) {
+      console.error("JSON parsing error:", error);
+      throw new Error("Failed to parse AI response");
+    }
+  };
+
+  const cleanJsonResponse = (response: string): string => {
+    let cleanedResponse = response.trim();
+    let braceCount = 0;
+    let lastValidIndex = 0;
+
+    for (let i = 0; i < cleanedResponse.length; i++) {
+      if (cleanedResponse[i] === "{") braceCount++;
+      if (cleanedResponse[i] === "}") {
+        braceCount--;
+        if (braceCount === 0) lastValidIndex = i;
+      }
+    }
+
+    return cleanedResponse.substring(0, lastValidIndex + 1);
+  };
+
+  const saveTripToFirestore = async (tripResp: TripResponse) => {
+    const docId = Date.now().toString();
+    const userTripRef = doc(
+      FIREBASE_DB,
+      "users",
+      user?.uid || "unknown",
+      "userTrips",
+      docId
+    );
+
+    const sanitizedTripData = {
+      ...tripData,
+      startDate: tripData.startDate?.format("YYYY-MM-DD") || null,
+      endDate: tripData.endDate?.format("YYYY-MM-DD") || null,
+    };
+
+    await setDoc(userTripRef, {
+      userEmail: user?.email || "unknown",
+      tripPlan: tripResp,
+      tripData: sanitizedTripData,
+      docId,
+      createdAt: new Date().toISOString(),
+    });
+  };
+
+  const handleGenerationError = (error: any, retryCount: number) => {
+    console.error("AI generation failed:", error.message);
+    if (retryCount < 3 && isMounted.current) {
+      const waitTime = Math.pow(2, retryCount) * 1000;
+      console.log(`Retrying in ${waitTime / 1000} seconds...`);
+      setTimeout(() => {
+        if (isMounted.current) {
+          generateAiTrip(retryCount + 1);
+        }
+      }, waitTime);
+    } else {
+      Alert.alert(
+        "Error",
+        "An error occurred while generating your trip. Please try again later.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              setTripData({});
+              navigation.navigate("MyTripsMain");
+            },
+          },
+        ]
+      );
     }
   };
 
@@ -175,21 +190,17 @@ const GenerateTrip: React.FC = () => {
     }, [])
   );
 
-  const logTripData = () => {
-    console.log("Current Trip Data:", JSON.stringify(tripData, null, 2));
-  };
+  // Start generating trip when screen loads
+  useEffect(() => {
+    if (!loading) {
+      generateAiTrip();
+    }
+  }, []);
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons
-          name="chevron-back"
-          size={28}
-          color={currentTheme.textPrimary}
-        />
-      </Pressable>
       <View style={styles.contentContainer}>
         <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
           Creating Your Perfect Trip
@@ -202,23 +213,8 @@ const GenerateTrip: React.FC = () => {
           style={styles.animation}
         />
         <Text style={[styles.warning, { color: currentTheme.textSecondary }]}>
-          Click the button below to generate your trip
+          Please wait while we generate your trip...
         </Text>
-        <Pressable
-          style={[styles.button, { backgroundColor: currentTheme.alternate }]}
-          onPress={() => GenerateAiTrip()}
-        >
-          <Text style={styles.buttonText}>Generate Trip</Text>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.button,
-            { backgroundColor: currentTheme.alternate, marginTop: 10 },
-          ]}
-          onPress={logTripData}
-        >
-          <Text style={styles.buttonText}>Log Trip Data</Text>
-        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -227,13 +223,6 @@ const GenerateTrip: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  backButton: {
-    position: "absolute",
-    top: 50,
-    left: 20,
-    zIndex: 1,
-    padding: 8,
   },
   contentContainer: {
     flex: 1,
@@ -266,7 +255,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     opacity: 0.8,
     paddingHorizontal: 30,
-    marginBottom: 20,
+    marginTop: 20,
   },
   button: {
     paddingHorizontal: 30,
