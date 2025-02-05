@@ -43,7 +43,7 @@ const Profile: React.FC = () => {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: "images" as ImagePicker.MediaType,
       aspect: [4, 3],
       quality: 1,
     });
@@ -436,7 +436,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   logoutButtonText: {
-    textDecorationLine: "underline",
     fontSize: 16,
     fontWeight: "600",
   },
