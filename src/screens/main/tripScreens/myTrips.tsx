@@ -121,11 +121,22 @@ const MyTrips: React.FC = () => {
         ]}
       >
         <View style={styles.headerContent}>
-          <Text
-            style={[styles.headerTitle, { color: currentTheme.textPrimary }]}
-          >
-            {userName || displayName}'s Trips ✈️
-          </Text>
+          {userName ? (
+            <Text
+              style={[styles.headerTitle, { color: currentTheme.textPrimary }]}
+            >
+              {userName}'s Trips ✈️
+            </Text>
+          ) : (
+            <Text
+              style={[
+                styles.smheaderTitle,
+                { color: currentTheme.textPrimary },
+              ]}
+            >
+              {displayName}'s Trips ✈️
+            </Text>
+          )}
           <Pressable
             style={styles.addButton}
             onPress={() => navigation.navigate("WhereTo")}
@@ -336,6 +347,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 32,
+    fontWeight: "800",
+  },
+  smheaderTitle: {
+    fontSize: 23,
     fontWeight: "800",
   },
   addButton: {

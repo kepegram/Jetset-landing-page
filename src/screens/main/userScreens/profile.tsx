@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   profilePicture: {
     width: "100%",
     height: "100%",
-    borderRadius: 50,
+    borderRadius: 65,
   },
   editIconContainer: {
     position: "absolute",

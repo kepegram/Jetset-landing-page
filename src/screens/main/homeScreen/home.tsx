@@ -508,7 +508,7 @@ const Home: React.FC = () => {
                 Generating recommendations...
               </Text>
             </View>
-          ) : (
+          ) : recommendedTrips.length > 0 ? (
             <FlatList
               testID="recommended-trips-list"
               horizontal
@@ -609,6 +609,12 @@ const Home: React.FC = () => {
               }}
               showsHorizontalScrollIndicator={false}
             />
+          ) : (
+            <View style={styles.noTripsContainer}>
+              <Text style={[styles.noTripsText, { color: currentTheme.textPrimary }]}>
+                No trips found. Create your own adventure!
+              </Text>
+            </View>
           )}
         </View>
       </ScrollView>
@@ -881,6 +887,15 @@ const styles = StyleSheet.create({
   tripDescription: {
     fontSize: 14,
     lineHeight: 18,
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
+  },
+  noTripsContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  noTripsText: {
+    fontSize: 16,
     fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
   },
 });
