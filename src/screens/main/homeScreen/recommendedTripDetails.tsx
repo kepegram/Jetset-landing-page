@@ -7,17 +7,17 @@ import {
   Dimensions,
   Pressable,
   StatusBar,
-  Animated,
+  ScrollView,
 } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
-import { useTheme } from "../../../../context/themeContext";
+import React, { useEffect, useState } from "react";
+import { useTheme } from "../../../context/themeContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../../navigation/appNav";
+import { RootStackParamList } from "../../../navigation/appNav";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import HotelList from "../../../../components/tripDetails/hotelList";
-import PlannedTrip from "../../../../components/tripDetails/plannedTrip";
-import { MainButton } from "../../../../components/ui/button";
-import { FIREBASE_DB, FIREBASE_AUTH } from "../../../../../firebase.config";
+import HotelList from "../../../components/tripDetails/hotelList";
+import PlannedTrip from "../../../components/tripDetails/plannedTrip";
+import { MainButton } from "../../../components/ui/button";
+import { FIREBASE_DB, FIREBASE_AUTH } from "../../../../firebase.config";
 import { doc, setDoc } from "firebase/firestore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -38,33 +38,15 @@ const RecommendedTripDetails: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
   const { trip, photoRef } = route.params as RouteParams;
-  const scrollY = useRef(new Animated.Value(0)).current;
 
   const [tripDetails, setTripDetails] = useState<any>(null);
   const [isHearted, setIsHearted] = useState(false);
-
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, height * 0.2],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
-  });
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
       headerTitle: "",
-      headerBackground: () => (
-        <Animated.View
-          style={[
-            styles.headerBackground,
-            {
-              opacity: headerOpacity,
-              backgroundColor: currentTheme.background,
-            },
-          ]}
-        />
-      ),
       headerLeft: () => (
         <Pressable
           onPress={() => navigation.goBack()}
@@ -144,13 +126,9 @@ const RecommendedTripDetails: React.FC = () => {
         />
       </View>
 
-      <Animated.ScrollView
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
       >
         <View
           style={[
@@ -215,7 +193,7 @@ const RecommendedTripDetails: React.FC = () => {
           <HotelList hotelList={tripDetails?.travelPlan?.hotels} />
           <PlannedTrip details={tripDetails?.travelPlan} />
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
 
       <View
         style={[styles.bottomBar, { backgroundColor: currentTheme.background }]}
@@ -252,13 +230,6 @@ const RecommendedTripDetails: React.FC = () => {
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  headerBackground: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "100%",
   },
   loadingContainer: {
     flex: 1,

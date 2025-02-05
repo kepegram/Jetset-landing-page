@@ -39,6 +39,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 
+// Interface for extended Google Place Details including photo information
 interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
   photos?: Array<{
     photo_reference: string;
@@ -48,8 +49,7 @@ interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
   }>;
 }
 
-const { width } = Dimensions.get("window");
-
+// Interface for recommended trip data structure
 interface RecommendedTrip {
   id: string;
   name: string;
@@ -57,6 +57,8 @@ interface RecommendedTrip {
   photoRef: string | null;
   fullResponse: string;
 }
+
+const { width } = Dimensions.get("window");
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "HomeMain">;
 
@@ -72,6 +74,7 @@ const Home: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const googlePlacesRef = useRef<any>(null);
 
+  // Generate appropriate greeting based on time of day
   const getGreeting = () => {
     const currentHour = new Date().getHours();
     if (currentHour < 12) {
@@ -83,6 +86,7 @@ const Home: React.FC = () => {
     }
   };
 
+  // Fetch user's name from Firestore
   const getUserName = async () => {
     try {
       const user = getAuth().currentUser;
@@ -100,6 +104,7 @@ const Home: React.FC = () => {
     }
   };
 
+  // Set trip type and navigate to date selection
   const setTerrainTrip = async (terrainType: string) => {
     setTripData({
       ...tripData,
@@ -111,14 +116,38 @@ const Home: React.FC = () => {
     });
   };
 
+  const fetchPhotoReference = async (
+    placeName: string
+  ): Promise<string | null> => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
+          placeName
+        )}&inputtype=textquery&fields=photos&key=${
+          process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY
+        }`
+      );
+      const data = await response.json();
+      return data.candidates[0]?.photos[0]?.photo_reference || null;
+    } catch (error) {
+      console.error("Error fetching photo reference:", error);
+      return null;
+    }
+  };
+
+  // Generate AI recommended trips
   const generateRecommendedTrips = async () => {
     try {
       setIsLoading(true);
       const trips: RecommendedTrip[] = [];
       const user = getAuth().currentUser;
+
+      // Validate user authentication
       if (!user) {
         throw new Error("User not authenticated");
       }
+
+      // Check for existing recommended trips
       const userTripsCollection = collection(
         FIREBASE_DB,
         `users/${user.uid}/suggestedTrips`
@@ -126,6 +155,7 @@ const Home: React.FC = () => {
 
       const userTripsSnapshot = await getDocs(userTripsCollection);
       if (!userTripsSnapshot.empty) {
+        // Use existing recommendations if available
         userTripsSnapshot.forEach((doc) => {
           const tripData = doc.data();
           trips.push(tripData as RecommendedTrip);
@@ -135,6 +165,7 @@ const Home: React.FC = () => {
         return;
       }
 
+      // Generate new recommendations using AI
       for (let i = 0; i < 3; i++) {
         console.log(
           "Generated AI Prompt for Recommended Trip:",
@@ -150,21 +181,12 @@ const Home: React.FC = () => {
           continue;
         }
 
+        // Parse AI response and fetch photo reference
         const tripResp = JSON.parse(responseText);
         const placeName = tripResp.travelPlan.destination;
+        const photoRef = await fetchPhotoReference(placeName);
 
-        // Fetch photo reference using Google Places API
-        const photoResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
-            placeName
-          )}&inputtype=textquery&fields=photos&key=${
-            process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY
-          }`
-        );
-        const photoData = await photoResponse.json();
-        const photoRef =
-          photoData.candidates[0]?.photos[0]?.photo_reference || null;
-
+        // Create trip object and save to Firestore
         const trip: RecommendedTrip = {
           id: `trip-${i}-${new Date().getTime()}`,
           name: placeName,
@@ -178,9 +200,9 @@ const Home: React.FC = () => {
         trips.push(trip);
         await addDoc(userTripsCollection, trip);
       }
+
       setRecommendedTrips(trips);
       await AsyncStorage.setItem("lastFetchTime", new Date().toISOString());
-      console.log("Stored current time as last fetch time.");
     } catch (error) {
       console.error("Error generating recommended trips:", error);
     } finally {
@@ -188,12 +210,15 @@ const Home: React.FC = () => {
     }
   };
 
+  // Clear existing recommendations and generate new ones
   const clearStorageAndFetchNewTrips = async () => {
     try {
       const user = getAuth().currentUser;
       if (!user) {
         throw new Error("User not authenticated");
       }
+
+      // Delete existing recommendations
       const userTripsCollection = collection(
         FIREBASE_DB,
         `users/${user.uid}/suggestedTrips`
@@ -206,10 +231,18 @@ const Home: React.FC = () => {
       });
       await batch.commit();
 
+      // Generate new recommendations
       await generateRecommendedTrips();
     } catch (error) {
       console.error("Error clearing storage and fetching new trips:", error);
     }
+  };
+
+  // Type guard to check if a trip is a RecommendedTrip
+  const isRecommendedTrip = (
+    trip: RecommendedTrip | { id: string }
+  ): trip is RecommendedTrip => {
+    return (trip as RecommendedTrip).fullResponse !== undefined;
   };
 
   useFocusEffect(
@@ -218,12 +251,6 @@ const Home: React.FC = () => {
       getUserName();
     }, [])
   );
-
-  const isRecommendedTrip = (
-    trip: RecommendedTrip | { id: string }
-  ): trip is RecommendedTrip => {
-    return (trip as RecommendedTrip).fullResponse !== undefined;
-  };
 
   return (
     <View testID="home-screen" style={{ flex: 1 }}>
@@ -422,7 +449,9 @@ const Home: React.FC = () => {
                 }}
                 style={({ pressed }) => [
                   styles.popularDestinationContainer,
-                  { opacity: pressed ? 0.8 : 1 },
+                  {
+                    transform: [{ scale: pressed ? 0.95 : 1 }],
+                  },
                 ]}
               >
                 <Image

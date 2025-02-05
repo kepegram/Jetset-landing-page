@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { CreateTripContext } from "../context/createTripContext";
 import Home from "../screens/main/homeScreen/home";
-import RecommendedTripDetails from "../screens/main/tripScreens/viewTrip/recommendedTripDetails";
+import RecommendedTripDetails from "../screens/main/homeScreen/recommendedTripDetails";
 import Profile from "../screens/main/userScreens/profile";
 import Edit from "../screens/main/userScreens/edit";
 import ChangeUsername from "../screens/main/userScreens/changeUsername";
@@ -116,6 +116,16 @@ const HomeStack: React.FC = () => {
       <RootStack.Screen
         name="RecommendedTripDetails"
         component={RecommendedTripDetails}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="HotelDetail"
+        component={HotelDetail}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="IteneraryDetail"
+        component={IteneraryDetail}
         options={{ headerShown: false }}
       />
     </RootStack.Navigator>

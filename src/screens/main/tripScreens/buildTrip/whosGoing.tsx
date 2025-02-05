@@ -22,6 +22,7 @@ const WhosGoing: React.FC = () => {
   const [whoIsGoing, setWhoIsGoing] = useState<number>(1);
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
+  // Initialize trip data with default solo traveler setting
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
@@ -29,7 +30,6 @@ const WhosGoing: React.FC = () => {
       headerTitle: "",
     });
 
-    // Set default trip data for solo traveler
     const updatedTripData = {
       ...tripData,
       whoIsGoing: "Solo",
@@ -37,14 +37,19 @@ const WhosGoing: React.FC = () => {
     setTripData(updatedTripData);
   }, [navigation]);
 
+  // Handle selection of number of travelers
   const handleWhoIsGoingChange = (value: number) => {
     setWhoIsGoing(value);
+
+    // Determine text description based on number selected
     let whoIsGoingText = "Group";
     if (value === 1) {
       whoIsGoingText = "Solo";
     } else if (value === 2) {
       whoIsGoingText = "Couple";
     }
+
+    // Update trip data with selection
     const updatedTripData = {
       ...tripData,
       whoIsGoing: whoIsGoingText,

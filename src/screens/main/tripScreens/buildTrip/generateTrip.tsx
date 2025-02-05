@@ -45,9 +45,11 @@ const GenerateTrip: React.FC = () => {
 
   const user = FIREBASE_AUTH.currentUser;
 
+  // Construct the final AI prompt based on trip data
   const getFinalPrompt = () => {
     let FINAL_PROMPT;
 
+    // Choose prompt template based on destination type
     if (tripData?.destinationType) {
       FINAL_PROMPT = AI_PROMPT.replace(
         "{destinationType}",
@@ -60,6 +62,7 @@ const GenerateTrip: React.FC = () => {
       );
     }
 
+    // Replace placeholders with actual trip data
     FINAL_PROMPT = FINAL_PROMPT.replace(
       "{totalDays}",
       tripData.totalNoOfDays?.toString() || "0"
@@ -72,6 +75,7 @@ const GenerateTrip: React.FC = () => {
     return FINAL_PROMPT;
   };
 
+  // Generate AI trip plan with retry logic
   const generateAiTrip = async (retryCount = 0): Promise<void> => {
     if (!user?.uid) {
       Alert.alert("Error", "You must be logged in to generate a trip");
@@ -82,12 +86,15 @@ const GenerateTrip: React.FC = () => {
     const finalPrompt = getFinalPrompt();
 
     try {
+      // Get AI response and parse it
       const result = await chatSession.sendMessage(finalPrompt);
       const responseText = await result.response.text();
-
       const tripResp = parseAIResponse(responseText);
+
+      // Save generated trip to Firestore
       await saveTripToFirestore(tripResp);
 
+      // Clear AsyncStorage and navigate to trips screen
       await AsyncStorage.clear();
       navigation.navigate("MyTripsMain");
     } catch (error) {

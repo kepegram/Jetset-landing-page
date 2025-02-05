@@ -4,24 +4,31 @@ import { doc, getDoc } from "firebase/firestore";
 import { getAuth, User } from "firebase/auth";
 import { FIREBASE_DB } from "../../firebase.config";
 
+// Define the shape of our profile context
 interface ProfileContextType {
-  profilePicture: string;
-  setProfilePicture: (uri: string) => void;
-  displayName: string;
-  setDisplayName: (name: string) => void;
+  profilePicture: string; // URL of user's profile picture
+  setProfilePicture: (uri: string) => void; // Function to update profile picture
+  displayName: string; // User's display name
+  setDisplayName: (name: string) => void; // Function to update display name
 }
 
-export const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
+// Create the context with undefined default value
+export const ProfileContext = createContext<ProfileContextType | undefined>(
+  undefined
+);
 
+// ProfileProvider component that manages profile state and provides it to children
 export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  // Initialize state with default profile picture and empty display name
   const [profilePicture, setProfilePictureState] = useState<string>(
     "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
   );
   const [displayName, setDisplayNameState] = useState<string>("");
 
   useEffect(() => {
+    // Load profile data from multiple sources (Firebase Auth, Firestore)
     const loadProfileData = async () => {
       try {
         const user = getAuth().currentUser;
@@ -29,7 +36,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
           const userDocRef = doc(FIREBASE_DB, "users", user.uid);
           const userDoc = await getDoc(userDocRef);
 
-          // Use Google profile details if available
+          // First priority: Use Google profile details if available
           if (user.photoURL) {
             setProfilePictureState(user.photoURL);
             await AsyncStorage.setItem("profilePicture", user.photoURL);
@@ -39,7 +46,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
             await AsyncStorage.setItem("displayName", user.displayName);
           }
 
-          // Otherwise, load from Firestore if available
+          // Second priority: Load from Firestore if available
           if (userDoc.exists()) {
             const data = userDoc.data();
             if (data?.profilePicture) {
@@ -62,6 +69,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
     loadProfileData();
   }, []);
 
+  // Handler to update profile picture - saves to AsyncStorage and updates state
   const setProfilePicture = async (uri: string) => {
     try {
       await AsyncStorage.setItem("profilePicture", uri);
@@ -71,6 +79,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Handler to update display name - saves to AsyncStorage and updates state
   const setDisplayName = async (name: string) => {
     try {
       await AsyncStorage.setItem("displayName", name);
@@ -94,6 +103,8 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
+// Custom hook for accessing profile context
+// Throws error if used outside of ProfileProvider
 export const useProfile = () => {
   const context = useContext(ProfileContext);
   if (!context) {

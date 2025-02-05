@@ -17,8 +17,10 @@ const ReviewTrip: React.FC = () => {
   const { currentTheme } = useTheme();
   const navigation = useNavigation<ReviewTripScreenNavigationProp>();
   const { tripData } = useContext(CreateTripContext) || {};
+  // Local state to track trip data changes
   const [localTripData, setLocalTripData] = useState(tripData);
 
+  // Update local state when trip data changes
   useEffect(() => {
     setLocalTripData(tripData);
   }, [tripData]);
@@ -28,18 +30,13 @@ const ReviewTrip: React.FC = () => {
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <View style={styles.contentContainer}>
+        {/* Header Section */}
         <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
           Final step!
         </Text>
 
         <View style={styles.reviewContainer}>
-          <Text
-            style={[styles.subtitle, { color: currentTheme.textPrimary }]}
-          >
-            Please review your selections
-          </Text>
-
-          {/* Destination Info  */}
+          {/* Destination Information Card */}
           <View
             style={[
               styles.infoContainer,
@@ -53,9 +50,7 @@ const ReviewTrip: React.FC = () => {
               >
                 Destination
               </Text>
-              <Text
-                style={[styles.value, { color: currentTheme.textPrimary }]}
-              >
+              <Text style={[styles.value, { color: currentTheme.textPrimary }]}>
                 {localTripData?.destinationType ||
                   localTripData?.locationInfo?.name ||
                   localTripData?.name}
@@ -63,7 +58,7 @@ const ReviewTrip: React.FC = () => {
             </View>
           </View>
 
-          {/* Date Selected Info  */}
+          {/* Travel Dates Card */}
           <View
             style={[
               styles.infoContainer,
@@ -77,9 +72,7 @@ const ReviewTrip: React.FC = () => {
               >
                 Travel Date
               </Text>
-              <Text
-                style={[styles.value, { color: currentTheme.textPrimary }]}
-              >
+              <Text style={[styles.value, { color: currentTheme.textPrimary }]}>
                 {moment(localTripData?.startDate).format("MMM DD") +
                   " - " +
                   moment(localTripData?.endDate).format("MMM DD") +
@@ -89,7 +82,7 @@ const ReviewTrip: React.FC = () => {
             </View>
           </View>
 
-          {/* Travelers Info  */}
+          {/* Travelers Information Card */}
           <View
             style={[
               styles.infoContainer,
@@ -103,15 +96,13 @@ const ReviewTrip: React.FC = () => {
               >
                 Who is Traveling
               </Text>
-              <Text
-                style={[styles.value, { color: currentTheme.textPrimary }]}
-              >
+              <Text style={[styles.value, { color: currentTheme.textPrimary }]}>
                 {localTripData?.whoIsGoing}
               </Text>
             </View>
           </View>
 
-          {/* Budget Info  */}
+          {/* Budget Information Card */}
           <View
             style={[
               styles.infoContainer,
@@ -125,15 +116,13 @@ const ReviewTrip: React.FC = () => {
               >
                 Budget
               </Text>
-              <Text
-                style={[styles.value, { color: currentTheme.textPrimary }]}
-              >
+              <Text style={[styles.value, { color: currentTheme.textPrimary }]}>
                 {localTripData?.budget}
               </Text>
             </View>
           </View>
 
-          {/* Activity Level Info  */}
+          {/* Activity Level Card */}
           <View
             style={[
               styles.infoContainer,
@@ -147,15 +136,14 @@ const ReviewTrip: React.FC = () => {
               >
                 Activity Level
               </Text>
-              <Text
-                style={[styles.value, { color: currentTheme.textPrimary }]}
-              >
+              <Text style={[styles.value, { color: currentTheme.textPrimary }]}>
                 {localTripData?.activityLevel}
               </Text>
             </View>
           </View>
         </View>
 
+        {/* Generate Trip Button */}
         <View style={styles.buttonContainer}>
           <MainButton
             onPress={() => navigation.navigate("GenerateTrip")}

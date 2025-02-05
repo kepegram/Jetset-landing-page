@@ -1,39 +1,20 @@
-import { StyleSheet, View, Animated, Pressable } from "react-native";
-import React, { useEffect, useRef } from "react";
+import { StyleSheet, View, Pressable, Text } from "react-native";
+import React from "react";
 import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 
 const AppTheme: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const isDarkTheme = theme === "dark";
-  const animation = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(animation, {
-      toValue: isDarkTheme ? 1 : 0,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
-  }, [isDarkTheme]);
-
-  const animatedBackgroundColor = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["#fff", "#121212"],
-  });
-
-  const animatedTextColor = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["#000", "#fff"],
-  });
 
   return (
-    <Animated.View
-      style={[styles.container, { backgroundColor: animatedBackgroundColor }]}
+    <View
+      style={[styles.container, { backgroundColor: isDarkTheme ? "#121212" : "#fff" }]}
     >
       <View style={styles.themeContainer}>
-        <Animated.Text style={[styles.title, { color: animatedTextColor }]}>
+        <Text style={[styles.title, { color: isDarkTheme ? "#fff" : "#000" }]}>
           Choose Your Theme
-        </Animated.Text>
+        </Text>
 
         <View style={styles.optionsContainer}>
           <Pressable
@@ -49,11 +30,11 @@ const AppTheme: React.FC = () => {
               size={32}
               color={isDarkTheme ? "#666" : "#387694"}
             />
-            <Animated.Text
-              style={[styles.optionText, { color: animatedTextColor }]}
+            <Text
+              style={[styles.optionText, { color: isDarkTheme ? "#fff" : "#000" }]}
             >
               Light Mode
-            </Animated.Text>
+            </Text>
             <View
               style={[styles.checkmark, !isDarkTheme && styles.activeCheckmark]}
             >
@@ -76,11 +57,11 @@ const AppTheme: React.FC = () => {
               size={32}
               color={isDarkTheme ? "#387694" : "#666"}
             />
-            <Animated.Text
-              style={[styles.optionText, { color: animatedTextColor }]}
+            <Text
+              style={[styles.optionText, { color: isDarkTheme ? "#fff" : "#000" }]}
             >
               Dark Mode
-            </Animated.Text>
+            </Text>
             <View
               style={[styles.checkmark, isDarkTheme && styles.activeCheckmark]}
             >
@@ -91,7 +72,7 @@ const AppTheme: React.FC = () => {
           </Pressable>
         </View>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
@@ -139,7 +120,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: "#666",
+    borderColor: "#555",
     alignItems: "center",
     justifyContent: "center",
   },

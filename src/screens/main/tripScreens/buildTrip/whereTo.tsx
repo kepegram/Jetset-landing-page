@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 type WhereToNavigationProp = StackNavigationProp<RootStackParamList, "WhereTo">;
 
+// Interface for extended Google Place Details including photo information
 interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
   photos?: Array<{
     photo_reference: string;
@@ -23,6 +24,7 @@ interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
   }>;
 }
 
+// Interface for storing location information
 interface LocationInfo {
   name: string;
   coordinates?: {
@@ -33,6 +35,7 @@ interface LocationInfo {
   url?: string;
 }
 
+// Interface for Google Places Autocomplete data
 interface PlaceData {
   description: string;
   [key: string]: any;
@@ -58,13 +61,17 @@ const WhereTo: React.FC = () => {
     }, [navigation])
   );
 
+  // Handle selection of a place from Google Places Autocomplete
   const handlePlaceSelect = async (
     data: PlaceData,
     details: ExtendedGooglePlaceDetail | null
   ) => {
     if (!details) return;
 
+    // Extract photo reference from the place details
     const photoReference = details.photos?.[0]?.photo_reference || null;
+
+    // Create location info object with place details
     const locationInfo: LocationInfo = {
       name: data.description,
       coordinates: details.geometry.location,
@@ -72,11 +79,13 @@ const WhereTo: React.FC = () => {
       url: details.url,
     };
 
+    // Update trip data with new location info
     setTripData({
       ...tripData,
       locationInfo,
     });
 
+    // Store photo reference in AsyncStorage if available
     if (photoReference) {
       try {
         await AsyncStorage.setItem("photoRef", photoReference);
@@ -86,6 +95,7 @@ const WhereTo: React.FC = () => {
       }
     }
 
+    // Navigate to date selection screen
     navigation.navigate("ChooseDate");
   };
 

@@ -31,6 +31,7 @@ const ChooseDate: React.FC = () => {
   const [startDate, setStartDate] = useState<Moment | null>(null);
   const [endDate, setEndDate] = useState<Moment | null>(null);
 
+  // Handle date selection from calendar
   const onDateChange = useCallback(
     async (date: Date, type: string) => {
       if (!date) return;
@@ -39,12 +40,14 @@ const ChooseDate: React.FC = () => {
 
       try {
         if (type === "START_DATE") {
+          // Set start date and clear end date if it's before new start date
           setStartDate(momentDate);
           if (endDate && endDate.isBefore(momentDate)) {
             setEndDate(null);
           }
           await AsyncStorage.setItem("startDate", momentDate.toISOString());
         } else {
+          // Validate and set end date
           if (startDate && momentDate.isBefore(startDate)) {
             return;
           }
@@ -58,7 +61,9 @@ const ChooseDate: React.FC = () => {
     [startDate, endDate]
   );
 
+  // Handle continue button press after date selection
   const handleDateSelectionContinue = useCallback(() => {
+    // Validate date selection
     if (!startDate || !endDate) {
       Alert.alert("Missing Dates", "Please select both start and end dates");
       return;
@@ -69,8 +74,10 @@ const ChooseDate: React.FC = () => {
       return;
     }
 
+    // Calculate total number of days
     const totalNoOfDays = endDate.diff(startDate, "days") + 1;
 
+    // Update trip data with selected dates
     setTripData({
       ...tripData,
       startDate,

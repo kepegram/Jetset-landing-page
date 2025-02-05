@@ -171,8 +171,10 @@ const IteneraryDetail: React.FC = () => {
                 ]}
                 onPress={handleOpenUrl}
               >
-                <Ionicons name="map-outline" size={24} color="white" />
-                <Text style={styles.linkButtonText}>View on Google Maps</Text>
+                <Ionicons name="globe-outline" size={24} color="white" />
+                <Text style={styles.linkButtonText}>
+                  Visit Official Website
+                </Text>
               </Pressable>
             )}
           </View>

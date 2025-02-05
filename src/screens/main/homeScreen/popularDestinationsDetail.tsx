@@ -19,6 +19,7 @@ import MapView, { Marker } from "react-native-maps";
 
 const { height } = Dimensions.get("window");
 
+// Interface for route parameters
 type RouteParams = {
   destination: {
     name: string;
@@ -45,11 +46,13 @@ const PopularDestinations: React.FC = () => {
   const { destination } = route.params as RouteParams;
   const navigation = useNavigation<PopularDestinationsScreenNavigationProp>();
 
+  // Configure navigation header
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
       headerTitle: "",
+      // Custom back button with white background
       headerLeft: () => (
         <Pressable
           onPress={() => navigation.goBack()}
@@ -66,6 +69,8 @@ const PopularDestinations: React.FC = () => {
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <StatusBar barStyle="light-content" />
+
+      {/* Hero Image Section */}
       <View style={styles.imageContainer}>
         <Image
           source={destination.image}
@@ -84,6 +89,7 @@ const PopularDestinations: React.FC = () => {
             { backgroundColor: currentTheme.background },
           ]}
         >
+          {/* Destination Title */}
           <View style={styles.headerContainer}>
             <View style={styles.titleContainer}>
               <Text
@@ -97,6 +103,7 @@ const PopularDestinations: React.FC = () => {
             </View>
           </View>
 
+          {/* Best Time to Visit Card */}
           <View style={styles.tripMetaContainer}>
             <View
               style={[
@@ -132,6 +139,7 @@ const PopularDestinations: React.FC = () => {
             </View>
           </View>
 
+          {/* Description Section */}
           <View
             style={[
               styles.descriptionContainer,
@@ -153,6 +161,7 @@ const PopularDestinations: React.FC = () => {
             </Text>
           </View>
 
+          {/* Map Section (if coordinates available) */}
           {destination.geoCoordinates && (
             <View style={styles.mapSection}>
               <Text
@@ -185,6 +194,7 @@ const PopularDestinations: React.FC = () => {
             </View>
           )}
 
+          {/* Start Planning Button */}
           <Pressable
             style={[
               styles.exploreButton,

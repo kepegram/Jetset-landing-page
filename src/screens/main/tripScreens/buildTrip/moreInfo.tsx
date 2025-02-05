@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, SafeAreaView, Pressable } from "react-native";
 import React, { useContext, useState } from "react";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -27,6 +21,7 @@ const MoreInfo: React.FC = () => {
   const [activityLevel, setActivityLevel] = useState<string>("Normal");
   const [budget, setBudget] = useState<string>("Average");
 
+  // Reusable button component for selection options
   const SelectionButton = ({
     selected,
     onPress,
@@ -41,6 +36,7 @@ const MoreInfo: React.FC = () => {
       style={[
         styles.selectionButton,
         {
+          // Change background color based on selection state
           backgroundColor: selected
             ? currentTheme.alternate
             : currentTheme.accentBackground,
@@ -51,6 +47,7 @@ const MoreInfo: React.FC = () => {
       <Text
         style={[
           styles.selectionText,
+          // Change text color based on selection state
           { color: selected ? "#FFFFFF" : currentTheme.textPrimary },
         ]}
       >
@@ -76,7 +73,7 @@ const MoreInfo: React.FC = () => {
         </View>
 
         <View style={styles.selectionsContainer}>
-          {/* Activity Level */}
+          {/* Activity Level Selection Section */}
           <View style={styles.inputContainer}>
             <View style={styles.labelContainer}>
               <Ionicons
@@ -90,6 +87,7 @@ const MoreInfo: React.FC = () => {
                 How active do you want to be?
               </Text>
             </View>
+            {/* Activity level options */}
             <View style={styles.optionsContainer}>
               <SelectionButton
                 selected={activityLevel === "Low"}
@@ -109,7 +107,7 @@ const MoreInfo: React.FC = () => {
             </View>
           </View>
 
-          {/* Budget */}
+          {/* Budget Selection Section */}
           <View style={styles.inputContainer}>
             <View style={styles.labelContainer}>
               <Ionicons
@@ -142,8 +140,10 @@ const MoreInfo: React.FC = () => {
             </View>
           </View>
 
+          {/* Continue Button */}
           <MainButton
             onPress={() => {
+              // Update trip data with selected preferences
               setTripData({
                 ...tripData,
                 activityLevel,

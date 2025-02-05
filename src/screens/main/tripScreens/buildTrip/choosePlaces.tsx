@@ -27,10 +27,12 @@ const ChoosePlaces: React.FC = () => {
   const { currentTheme } = useTheme();
   const { tripData = {}, setTripData = () => {} } =
     useContext(CreateTripContext) || {};
+  // Track selected destination type
   const [selectedDestination, setSelectedDestination] = useState<string | null>(
     null
   );
 
+  // Predefined destination options with images and labels
   const destinations = [
     {
       id: "beach",
@@ -54,12 +56,15 @@ const ChoosePlaces: React.FC = () => {
     },
   ];
 
+  // Handle continue button press
   const handleContinue = () => {
     if (selectedDestination) {
+      // Find selected destination details
       const selectedPlace = destinations.find(
         (dest) => dest.id === selectedDestination
       );
 
+      // Update trip data with selected destination type
       const updatedTripData = {
         ...tripData,
         destinationType: selectedPlace?.label,
@@ -78,6 +83,7 @@ const ChoosePlaces: React.FC = () => {
       style={[styles.safeArea, { backgroundColor: currentTheme.background }]}
     >
       <View style={styles.container}>
+        {/* Header Section */}
         <View style={styles.headerContainer}>
           <Text
             style={[styles.subheading, { color: currentTheme.textSecondary }]}
@@ -89,6 +95,7 @@ const ChoosePlaces: React.FC = () => {
           </Text>
         </View>
 
+        {/* Destination Options Grid */}
         <View style={styles.destinationsContainer}>
           {destinations.map((dest) => (
             <Pressable
@@ -112,6 +119,7 @@ const ChoosePlaces: React.FC = () => {
           ))}
         </View>
 
+        {/* Continue Button */}
         <View style={styles.buttonContainer}>
           <MainButton
             onPress={handleContinue}
