@@ -4,12 +4,16 @@ import { useTheme } from "../../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 
 const AppTheme: React.FC = () => {
+  // Get theme context values
   const { theme, setTheme } = useTheme();
   const isDarkTheme = theme === "dark";
 
   return (
     <View
-      style={[styles.container, { backgroundColor: isDarkTheme ? "#121212" : "#fff" }]}
+      style={[
+        styles.container,
+        { backgroundColor: isDarkTheme ? "#121212" : "#fff" },
+      ]}
     >
       <View style={styles.themeContainer}>
         <Text style={[styles.title, { color: isDarkTheme ? "#fff" : "#000" }]}>
@@ -31,7 +35,10 @@ const AppTheme: React.FC = () => {
               color={isDarkTheme ? "#666" : "#387694"}
             />
             <Text
-              style={[styles.optionText, { color: isDarkTheme ? "#fff" : "#000" }]}
+              style={[
+                styles.optionText,
+                { color: isDarkTheme ? "#fff" : "#000" },
+              ]}
             >
               Light Mode
             </Text>
@@ -58,7 +65,10 @@ const AppTheme: React.FC = () => {
               color={isDarkTheme ? "#387694" : "#666"}
             />
             <Text
-              style={[styles.optionText, { color: isDarkTheme ? "#fff" : "#000" }]}
+              style={[
+                styles.optionText,
+                { color: isDarkTheme ? "#fff" : "#000" },
+              ]}
             >
               Dark Mode
             </Text>

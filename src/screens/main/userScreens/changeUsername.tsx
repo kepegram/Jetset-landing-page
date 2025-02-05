@@ -9,6 +9,7 @@ import { FIREBASE_DB } from "../../../../firebase.config";
 import { CustomButton, AltButton } from "../../../components/ui/button";
 import { useTheme } from "../../../context/themeContext";
 
+// Navigation prop type for the ChangeUsername screen
 type ChangeUsernameScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "ChangeUsername"
@@ -19,6 +20,7 @@ const ChangeUsername: React.FC = () => {
   const navigation = useNavigation<ChangeUsernameScreenNavigationProp>();
   const [userName, setUserName] = useState<string | null>("");
 
+  // Fetch current username on component mount
   useEffect(() => {
     const fetchUserData = async () => {
       const user = getAuth().currentUser;
@@ -38,10 +40,12 @@ const ChangeUsername: React.FC = () => {
     fetchUserData();
   }, []);
 
+  // Handle saving the new username
   const handleSave = async () => {
     const user = getAuth().currentUser;
     if (user) {
       try {
+        // Update username in Firestore
         await setDoc(
           doc(FIREBASE_DB, "users", user.uid),
           { name: userName },
@@ -55,6 +59,7 @@ const ChangeUsername: React.FC = () => {
     }
   };
 
+  // Handle canceling the username change
   const handleCancel = () => {
     navigation.navigate("Edit");
   };
@@ -64,6 +69,7 @@ const ChangeUsername: React.FC = () => {
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <View style={styles.contentContainer}>
+        {/* Username input form */}
         <View style={styles.formContainer}>
           <Text
             style={[styles.inputLabel, { color: currentTheme.textPrimary }]}
@@ -92,6 +98,7 @@ const ChangeUsername: React.FC = () => {
           </View>
         </View>
 
+        {/* Action buttons */}
         <View style={styles.buttonContainer}>
           <CustomButton onPress={handleCancel} buttonText="Cancel" />
           <AltButton onPress={handleSave} buttonText="Save" />

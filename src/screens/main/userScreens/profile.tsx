@@ -1,12 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  Pressable,
-  View,
-  Image,
-  ScrollView,
-  Alert,
-} from "react-native";
+import { StyleSheet, Text, Pressable, View, Image, Alert } from "react-native";
 import React, { useCallback, useState } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -20,12 +12,14 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// Navigation prop type for type safety when navigating
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Profile"
 >;
 
 const Profile: React.FC = () => {
+  // Context hooks for profile and theme data
   const { profilePicture, displayName, setProfilePicture } = useProfile();
   const { currentTheme, setTheme } = useTheme();
   const [userName, setUserName] = useState<string | null>(null);
@@ -33,7 +27,9 @@ const Profile: React.FC = () => {
   const user = getAuth().currentUser;
   const navigation = useNavigation<ProfileScreenNavigationProp>();
 
+  // Handle profile picture selection and upload
   const handlePickImage = async () => {
+    // Request permission to access media library
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -42,6 +38,7 @@ const Profile: React.FC = () => {
       return;
     }
 
+    // Launch image picker
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: "images" as ImagePicker.MediaType,
       aspect: [4, 3],
@@ -52,6 +49,7 @@ const Profile: React.FC = () => {
       const uri = result.assets[0].uri;
       setProfilePicture(uri);
 
+      // Save profile picture URI to Firestore
       if (user) {
         try {
           await setDoc(
@@ -65,10 +63,12 @@ const Profile: React.FC = () => {
         }
       }
 
+      // Cache profile picture locally
       await AsyncStorage.setItem("profilePicture", uri);
     }
   };
 
+  // Handle user logout with confirmation
   const handleLogout = () => {
     Alert.alert(
       "Confirm Logout",
@@ -81,7 +81,7 @@ const Profile: React.FC = () => {
         {
           text: "OK",
           onPress: () => {
-            setTheme("light");
+            setTheme("light"); // Reset theme to light
             FIREBASE_AUTH.signOut();
           },
         },
@@ -90,6 +90,7 @@ const Profile: React.FC = () => {
     );
   };
 
+  // Fetch user data when screen comes into focus
   useFocusEffect(
     useCallback(() => {
       const fetchUserData = async () => {
@@ -114,208 +115,204 @@ const Profile: React.FC = () => {
     <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.profileContainer}>
-          <View style={styles.userInfoContainer}>
-            <Text
-              style={[styles.userName, { color: currentTheme.textPrimary }]}
-            >
-              {displayName || userName}
-            </Text>
+      <View style={styles.profileContainer}>
+        <View style={styles.userInfoContainer}>
+          <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
+            {displayName || userName}
+          </Text>
+        </View>
+
+        <Pressable
+          onPress={handlePickImage}
+          style={styles.profileImageContainer}
+        >
+          <View style={styles.profilePictureBackground}>
+            <Image
+              source={{ uri: profilePicture }}
+              style={styles.profilePicture}
+            />
+
+            <View style={styles.editIconContainer}>
+              <MaterialIcons name="edit" size={20} color="white" />
+            </View>
           </View>
+        </Pressable>
+      </View>
+
+      {/* Settings Section */}
+      <View style={styles.settingsContainer}>
+        <View style={styles.optionsContainer}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.settingOption,
+              pressed && styles.optionPressed,
+              {
+                backgroundColor: pressed
+                  ? currentTheme.inactive + "20"
+                  : "transparent",
+              },
+            ]}
+            onPress={() => navigation.navigate("Edit")}
+          >
+            <View style={styles.optionContent}>
+              <Ionicons
+                name="person-circle-outline"
+                size={24}
+                color={currentTheme.icon}
+              />
+              <Text
+                style={[
+                  styles.optionText,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                Profile Management
+              </Text>
+            </View>
+            <MaterialIcons
+              name="chevron-right"
+              size={24}
+              color={currentTheme.icon}
+            />
+          </Pressable>
 
           <Pressable
-            onPress={handlePickImage}
-            style={styles.profileImageContainer}
+            style={({ pressed }) => [
+              styles.settingOption,
+              pressed && styles.optionPressed,
+              {
+                backgroundColor: pressed
+                  ? currentTheme.inactive + "20"
+                  : "transparent",
+              },
+            ]}
+            onPress={() => navigation.navigate("MyTripsMain")}
           >
-            <View style={styles.profilePictureBackground}>
-              <Image
-                source={{ uri: profilePicture }}
-                style={styles.profilePicture}
+            <View style={styles.optionContent}>
+              <Ionicons
+                name="airplane-outline"
+                size={24}
+                color={currentTheme.icon}
               />
-
-              <View style={styles.editIconContainer}>
-                <MaterialIcons name="edit" size={20} color="white" />
-              </View>
+              <Text
+                style={[
+                  styles.optionText,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                My Trips
+              </Text>
             </View>
+            <MaterialIcons
+              name="chevron-right"
+              size={24}
+              color={currentTheme.icon}
+            />
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.settingOption,
+              pressed && styles.optionPressed,
+              {
+                backgroundColor: pressed
+                  ? currentTheme.inactive + "20"
+                  : "transparent",
+              },
+            ]}
+            onPress={() => console.log("Saved Trips pressed")}
+          >
+            <View style={styles.optionContent}>
+              <Ionicons
+                name="bookmark-outline"
+                size={24}
+                color={currentTheme.icon}
+              />
+              <Text
+                style={[
+                  styles.optionText,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                Saved Trips
+              </Text>
+            </View>
+            <MaterialIcons
+              name="chevron-right"
+              size={24}
+              color={currentTheme.icon}
+            />
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.settingOption,
+              pressed && styles.optionPressed,
+              {
+                backgroundColor: pressed
+                  ? currentTheme.inactive + "20"
+                  : "transparent",
+              },
+            ]}
+            onPress={() => navigation.navigate("AppTheme")}
+          >
+            <View style={styles.optionContent}>
+              <Ionicons
+                name="color-palette-outline"
+                size={24}
+                color={currentTheme.icon}
+              />
+              <Text
+                style={[
+                  styles.optionText,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                App Theme
+              </Text>
+            </View>
+            <MaterialIcons
+              name="chevron-right"
+              size={24}
+              color={currentTheme.icon}
+            />
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.settingOption,
+              pressed && styles.optionPressed,
+              {
+                backgroundColor: pressed
+                  ? currentTheme.inactive + "20"
+                  : "transparent",
+              },
+            ]}
+            onPress={() => console.log("Security & Privacy pressed")}
+          >
+            <View style={styles.optionContent}>
+              <Ionicons
+                name="shield-outline"
+                size={24}
+                color={currentTheme.icon}
+              />
+              <Text
+                style={[
+                  styles.optionText,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                Security & Privacy
+              </Text>
+            </View>
+            <MaterialIcons
+              name="chevron-right"
+              size={24}
+              color={currentTheme.icon}
+            />
           </Pressable>
         </View>
-
-        {/* Settings Section */}
-        <View style={styles.settingsContainer}>
-          <View style={styles.optionsContainer}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.settingOption,
-                pressed && styles.optionPressed,
-                {
-                  backgroundColor: pressed
-                    ? currentTheme.inactive + "20"
-                    : "transparent",
-                },
-              ]}
-              onPress={() => navigation.navigate("Edit")}
-            >
-              <View style={styles.optionContent}>
-                <Ionicons
-                  name="person-circle-outline"
-                  size={24}
-                  color={currentTheme.icon}
-                />
-                <Text
-                  style={[
-                    styles.optionText,
-                    { color: currentTheme.textSecondary },
-                  ]}
-                >
-                  Profile Management
-                </Text>
-              </View>
-              <MaterialIcons
-                name="chevron-right"
-                size={24}
-                color={currentTheme.icon}
-              />
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.settingOption,
-                pressed && styles.optionPressed,
-                {
-                  backgroundColor: pressed
-                    ? currentTheme.inactive + "20"
-                    : "transparent",
-                },
-              ]}
-              onPress={() => navigation.navigate("MyTripsMain")}
-            >
-              <View style={styles.optionContent}>
-                <Ionicons
-                  name="airplane-outline"
-                  size={24}
-                  color={currentTheme.icon}
-                />
-                <Text
-                  style={[
-                    styles.optionText,
-                    { color: currentTheme.textSecondary },
-                  ]}
-                >
-                  My Trips
-                </Text>
-              </View>
-              <MaterialIcons
-                name="chevron-right"
-                size={24}
-                color={currentTheme.icon}
-              />
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.settingOption,
-                pressed && styles.optionPressed,
-                {
-                  backgroundColor: pressed
-                    ? currentTheme.inactive + "20"
-                    : "transparent",
-                },
-              ]}
-              onPress={() => console.log("Saved Trips pressed")}
-            >
-              <View style={styles.optionContent}>
-                <Ionicons
-                  name="bookmark-outline"
-                  size={24}
-                  color={currentTheme.icon}
-                />
-                <Text
-                  style={[
-                    styles.optionText,
-                    { color: currentTheme.textSecondary },
-                  ]}
-                >
-                  Saved Trips
-                </Text>
-              </View>
-              <MaterialIcons
-                name="chevron-right"
-                size={24}
-                color={currentTheme.icon}
-              />
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.settingOption,
-                pressed && styles.optionPressed,
-                {
-                  backgroundColor: pressed
-                    ? currentTheme.inactive + "20"
-                    : "transparent",
-                },
-              ]}
-              onPress={() => navigation.navigate("AppTheme")}
-            >
-              <View style={styles.optionContent}>
-                <Ionicons
-                  name="color-palette-outline"
-                  size={24}
-                  color={currentTheme.icon}
-                />
-                <Text
-                  style={[
-                    styles.optionText,
-                    { color: currentTheme.textSecondary },
-                  ]}
-                >
-                  App Theme
-                </Text>
-              </View>
-              <MaterialIcons
-                name="chevron-right"
-                size={24}
-                color={currentTheme.icon}
-              />
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.settingOption,
-                pressed && styles.optionPressed,
-                {
-                  backgroundColor: pressed
-                    ? currentTheme.inactive + "20"
-                    : "transparent",
-                },
-              ]}
-              onPress={() => console.log("Security & Privacy pressed")}
-            >
-              <View style={styles.optionContent}>
-                <Ionicons
-                  name="shield-outline"
-                  size={24}
-                  color={currentTheme.icon}
-                />
-                <Text
-                  style={[
-                    styles.optionText,
-                    { color: currentTheme.textSecondary },
-                  ]}
-                >
-                  Security & Privacy
-                </Text>
-              </View>
-              <MaterialIcons
-                name="chevron-right"
-                size={24}
-                color={currentTheme.icon}
-              />
-            </Pressable>
-          </View>
-        </View>
-      </ScrollView>
+      </View>
 
       {/* Logout Button */}
       <View style={styles.logoutContainer}>

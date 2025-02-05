@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: "700",
-    marginTop: 30,
+    marginTop: 10,
   },
   upcomingTripCard: {
     marginRight: 15,

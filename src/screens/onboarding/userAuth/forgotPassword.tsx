@@ -59,9 +59,9 @@ const ForgotPassword: React.FC = () => {
       >
         <View style={styles.headerContainer}>
           <View style={styles.iconContainer}>
-            <Ionicons 
-              name="lock-closed" 
-              size={40} 
+            <Ionicons
+              name="lock-closed"
+              size={40}
               color={currentTheme.alternate}
             />
           </View>
@@ -82,9 +82,9 @@ const ForgotPassword: React.FC = () => {
             Email Address
           </Text>
           <View style={styles.inputWrapper}>
-            <Ionicons 
-              name="mail-outline" 
-              size={20} 
+            <Ionicons
+              name="mail-outline"
+              size={20}
               color={currentTheme.textSecondary}
               style={styles.inputIcon}
             />
@@ -115,7 +115,7 @@ const ForgotPassword: React.FC = () => {
                   color: feedbackMessage.includes("Failed")
                     ? currentTheme.error
                     : currentTheme.alternate,
-                  backgroundColor: feedbackMessage.includes("Failed") 
+                  backgroundColor: feedbackMessage.includes("Failed")
                     ? `${currentTheme.error}15`
                     : `${currentTheme.alternate}15`,
                 },
@@ -154,27 +154,27 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     marginBottom: 40,
-    alignItems: 'center',
+    alignItems: "center",
   },
   iconContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(100, 100, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(100, 100, 255, 0.1)",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 24,
   },
   title: {
     fontSize: 32,
     fontWeight: "bold",
     marginBottom: 12,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
     lineHeight: 24,
-    textAlign: 'center',
+    textAlign: "center",
     maxWidth: width * 0.8,
   },
   formContainer: {
@@ -186,12 +186,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   inputWrapper: {
-    position: 'relative',
-    width: '100%',
+    position: "relative",
+    width: "100%",
     marginBottom: 20,
   },
   inputIcon: {
-    position: 'absolute',
+    position: "absolute",
     left: 16,
     top: 18,
     zIndex: 1,

@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View, SafeAreaView } from "react-native";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
@@ -15,6 +9,7 @@ import { getAuth } from "firebase/auth";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { useTheme } from "../../../context/themeContext";
 
+// Navigation prop type for the Edit screen
 type EditScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Edit"
@@ -25,6 +20,7 @@ const Edit: React.FC = () => {
   const navigation = useNavigation<EditScreenNavigationProp>();
   const [userName, setUserName] = useState<string | null>("");
 
+  // Fetch user data on component mount
   useEffect(() => {
     const fetchUserData = async () => {
       const user = getAuth().currentUser;
@@ -48,6 +44,7 @@ const Edit: React.FC = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
+      {/* Account Settings Section */}
       <View style={styles.formContainer}>
         <View style={styles.securitySection}>
           <Text
@@ -56,6 +53,7 @@ const Edit: React.FC = () => {
             Account Settings
           </Text>
 
+          {/* Username Option */}
           <Pressable
             style={({ pressed }) => [
               styles.securityOption,
@@ -74,10 +72,20 @@ const Edit: React.FC = () => {
                 color={currentTheme.icon}
               />
               <View style={styles.optionTextContainer}>
-                <Text style={[styles.optionLabel, { color: currentTheme.textPrimary }]}>
+                <Text
+                  style={[
+                    styles.optionLabel,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
                   Username
                 </Text>
-                <Text style={[styles.optionValue, { color: currentTheme.textSecondary }]}>
+                <Text
+                  style={[
+                    styles.optionValue,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
                   {userName || "Not set"}
                 </Text>
               </View>
@@ -89,6 +97,7 @@ const Edit: React.FC = () => {
             />
           </Pressable>
 
+          {/* Password Option */}
           <Pressable
             style={({ pressed }) => [
               styles.securityOption,
@@ -107,10 +116,20 @@ const Edit: React.FC = () => {
                 color={currentTheme.icon}
               />
               <View style={styles.optionTextContainer}>
-                <Text style={[styles.optionLabel, { color: currentTheme.textPrimary }]}>
+                <Text
+                  style={[
+                    styles.optionLabel,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
                   Password
                 </Text>
-                <Text style={[styles.optionValue, { color: currentTheme.textSecondary }]}>
+                <Text
+                  style={[
+                    styles.optionValue,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
                   ******
                 </Text>
               </View>
@@ -123,14 +142,17 @@ const Edit: React.FC = () => {
           </Pressable>
         </View>
 
+        {/* Delete Account Button */}
         <Pressable
           style={({ pressed }) => [
             styles.deleteButton,
-            pressed && { opacity: 0.8 }
+            pressed && { opacity: 0.8 },
           ]}
           onPress={() => navigation.navigate("DeleteAccount")}
         >
-          <Text style={[styles.deleteButtonText, { color: currentTheme.error }]}>
+          <Text
+            style={[styles.deleteButtonText, { color: currentTheme.error }]}
+          >
             Delete Account
           </Text>
         </Pressable>

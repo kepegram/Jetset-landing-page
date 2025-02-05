@@ -27,10 +27,12 @@ import { useTheme } from "../../../context/themeContext";
 
 const DeleteAccount: React.FC = () => {
   const { currentTheme } = useTheme();
+  // State for tracking user's deletion reason and credentials
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [otherReason, setOtherReason] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
+  // Predefined list of reasons for account deletion
   const reasons = [
     "Switching to another app",
     "Privacy concerns",
@@ -39,7 +41,9 @@ const DeleteAccount: React.FC = () => {
     "Other",
   ];
 
+  // Handle the account deletion process
   const handleDeleteAccount = async () => {
+    // Get the final reason (either selected or custom)
     const reasonToSubmit =
       selectedReason === "Other" ? otherReason : selectedReason;
 
@@ -52,7 +56,6 @@ const DeleteAccount: React.FC = () => {
     }
 
     const user = FIREBASE_AUTH.currentUser;
-
     if (!user) {
       Alert.alert("Error", "No user is logged in.");
       return;
@@ -61,6 +64,7 @@ const DeleteAccount: React.FC = () => {
     try {
       let credential;
 
+      // Handle different authentication methods (Google vs Email)
       if (
         user.providerData.some(
           (provider) => provider.providerId === "google.com"
@@ -79,8 +83,10 @@ const DeleteAccount: React.FC = () => {
         credential = EmailAuthProvider.credential(email!, password);
       }
 
+      // Re-authenticate user before deletion
       await reauthenticateWithCredential(user, credential);
 
+      // Show final confirmation dialog
       Alert.alert(
         "Confirm Deletion",
         "Are you sure you want to delete your account? This action cannot be undone.",
@@ -92,7 +98,7 @@ const DeleteAccount: React.FC = () => {
               try {
                 const userId = user?.uid;
 
-                // Function to delete all subcollections
+                // Helper function to recursively delete subcollections
                 const deleteSubcollections = async (docRef: any) => {
                   const subcollectionNames = [
                     "subcollection1",
@@ -108,10 +114,12 @@ const DeleteAccount: React.FC = () => {
                   }
                 };
 
+                // Delete user data from Firestore
                 const userDocRef = doc(FIREBASE_DB, "users", userId!);
                 await deleteSubcollections(userDocRef);
                 await deleteDoc(userDocRef);
 
+                // Log deletion reason
                 const deletionDocRef = doc(
                   FIREBASE_DB,
                   "accountDeletions",
@@ -122,6 +130,7 @@ const DeleteAccount: React.FC = () => {
                   deletedAt: new Date().toISOString(),
                 });
 
+                // Delete the user account
                 await user.delete();
                 Alert.alert(
                   "Account Deleted",
@@ -147,6 +156,7 @@ const DeleteAccount: React.FC = () => {
     }
   };
 
+  // Check if user is signed in with Google
   const isGoogleSignIn = FIREBASE_AUTH.currentUser?.providerData.some(
     (provider) => provider.providerId === "google.com"
   );
