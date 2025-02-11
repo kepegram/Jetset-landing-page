@@ -172,81 +172,57 @@ export const RECOMMEND_TRIP_AI_PROMPT = `Generate a detailed and realistic JSON 
 - Accommodation: 4-star hotels only
 - Activity level: Moderate (2-3 hours walking per day)
 
-Important requirements:
-- All prices must be current for 2024 including taxes and fees
-- Hotel ratings must be exactly 4 stars from major booking platforms
-- Include exactly 3 activities per day spaced throughout morning, afternoon and evening
-- All coordinates must be accurate to within 100 meters
-- All URLs must link to official websites or Google Maps listings
-- Descriptions must include specific facts, dates, and historical context
-- Avoid generic descriptions and marketing language
+Important formatting requirements:
+- Response must be ONLY valid JSON - no additional text before or after
+- All JSON properties must be wrapped in double quotes
+- No trailing commas in arrays or objects
+- No comments in the JSON
+- No line breaks within string values
+- All numbers must be unquoted
+- Boolean values must be unquoted (true/false)
 
-Return ONLY a valid JSON object with this exact structure:
+Return this exact JSON structure:
 {
   "travelPlan": {
-    "budget": "Total estimated cost in USD (sum of all components)",
+    "budget": "5000",
     "numberOfDays": 5,
     "numberOfNights": 4,
-    "destination": "Full destination name including city, region and country",
-    "destinationDescription": "Brief overview of the destination's history, culture, and main attractions",
-    "photoRef": "Google Places photo reference for destination",
+    "destination": "City, Region, Country",
+    "destinationDescription": "Single line description",
+    "photoRef": "photo_reference_string",
     "flights": {
-      "airlineName": "Major international airline name",
-      "flightPrice": "Average round-trip price in USD",
-      "airlineUrl": "Direct URL to airline's booking page"
+      "airlineName": "Airline Name",
+      "flightPrice": "1200",
+      "airlineUrl": "https://example.com"
     },
     "hotels": [
       {
-        "hotelName": "Full official hotel name",
-        "hotelAddress": "Complete street address with postal code",
-        "price": "Price per night in USD (integer)",
+        "hotelName": "Hotel Name",
+        "hotelAddress": "Full Address",
+        "price": 200,
         "geoCoordinates": {
-          "latitude": "Decimal coordinates to 6 decimal places",
-          "longitude": "Decimal coordinates to 6 decimal places"
+          "latitude": 12.345678,
+          "longitude": -12.345678
         },
-        "rating": "Exactly 4.0",
-        "description": "Factual description including room types, amenities and recent renovations",
-        "bookingUrl": "Direct URL to hotel's booking page"
-      },
-      {
-        "hotelName": "Full official hotel name",
-        "hotelAddress": "Complete street address with postal code",
-        "price": "Price per night in USD (integer)",
-        "geoCoordinates": {
-          "latitude": "Decimal coordinates to 6 decimal places",
-          "longitude": "Decimal coordinates to 6 decimal places"
-        },
-        "rating": "Exactly 4.0",
-        "description": "Factual description including room types, amenities and recent renovations",
-        "bookingUrl": "Direct URL to hotel's booking page"
-      },
-      {
-        "hotelName": "Full official hotel name",
-        "hotelAddress": "Complete street address with postal code",
-        "price": "Price per night in USD (integer)",
-        "geoCoordinates": {
-          "latitude": "Decimal coordinates to 6 decimal places",
-          "longitude": "Decimal coordinates to 6 decimal places"
-        },
-        "rating": "Exactly 4.0",
-        "description": "Factual description including room types, amenities and recent renovations",
-        "bookingUrl": "Direct URL to hotel's booking page"
+        "rating": 4.0,
+        "description": "Single line description",
+        "bookingUrl": "https://example.com"
       }
     ],
     "itinerary": [
       {
-        "day": "Day X: Theme for the day",
+        "day": "Day 1: Theme",
         "places": [
           {
-            "placeName": "Official attraction name",
-            "placeDetails": "Key highlights and practical visitor information",
-            "placeExtendedDetails": "Historical background, architectural details, cultural significance and insider tips",
+            "placeName": "Place Name",
+            "placeDetails": "Single line details",
+            "placeExtendedDetails": "Single line extended details",
             "geoCoordinates": {
-              "latitude": "Decimal coordinates to 6 decimal places",
-              "longitude": "Decimal coordinates to 6 decimal places"
+              "latitude": 12.345678,
+              "longitude": -12.345678
             },
-            "ticketPrice": "Price in USD or 'Free' (include student/senior discounts if available)",
-            "placeUrl": "Direct URL to official website or Google Maps"
+            "ticketPrice": "Free",
+            "placeUrl": "https://example.com"
           }
         ]
       }

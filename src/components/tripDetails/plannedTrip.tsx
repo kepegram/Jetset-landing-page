@@ -118,15 +118,6 @@ const PlannedTrip: React.FC<PlannedTripProps> = ({ details }) => {
         </View>
       ))}
 
-      <View style={styles.infoContainer}>
-        <Text style={{ color: currentTheme.textPrimary }}>
-          Budget: {details.budget}
-        </Text>
-        <Text style={{ color: currentTheme.textPrimary }}>
-          Destination: {details.destination}
-        </Text>
-      </View>
-
       <View style={styles.mapButtonContainer}>
         <Button
           title="Show Itinerary on Map"
@@ -193,10 +184,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "outfit",
     marginBottom: 10,
-  },
-  infoContainer: {
-    marginTop: 15,
-    gap: 5,
   },
   mapButtonContainer: {
     marginTop: 10,

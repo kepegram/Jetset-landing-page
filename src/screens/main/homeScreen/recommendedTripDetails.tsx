@@ -40,7 +40,6 @@ const RecommendedTripDetails: React.FC = () => {
   const { trip, photoRef } = route.params as RouteParams;
 
   const [tripDetails, setTripDetails] = useState<any>(null);
-  const [isHearted, setIsHearted] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
@@ -66,29 +65,6 @@ const RecommendedTripDetails: React.FC = () => {
       console.error("Error parsing trip details:", error);
     }
   }, [trip]);
-
-  const handleHeartPress = async () => {
-    setIsHearted(!isHearted);
-    if (!isHearted) {
-      const user = FIREBASE_AUTH.currentUser;
-      if (user) {
-        try {
-          const tripDocRef = doc(
-            FIREBASE_DB,
-            `users/${user.uid}/userTrips`,
-            tripDetails.travelPlan.destination
-          );
-          await setDoc(tripDocRef, tripDetails);
-          Alert.alert("Success", "Trip saved successfully!");
-          navigation.navigate("MyTripsMain");
-        } catch (error) {
-          Alert.alert("Error", "Failed to save trip. Please try again.");
-        }
-      } else {
-        Alert.alert("Sign In Required", "Please sign in to save trips.");
-      }
-    }
-  };
 
   if (!tripDetails) {
     return (
@@ -210,17 +186,12 @@ const RecommendedTripDetails: React.FC = () => {
           </Text>
         </View>
         <MainButton
-          onPress={handleHeartPress}
-          buttonText={isHearted ? "Saved! ♥" : "Save Trip"}
+          onPress={() => {
+            console.log("Book Trip", tripDetails);
+          }}
+          buttonText={"Book Trip"}
           width={width * 0.45}
-          style={[
-            styles.saveButton,
-            {
-              backgroundColor: isHearted
-                ? currentTheme.alternate
-                : currentTheme.alternate,
-            },
-          ]}
+          style={[styles.saveButton]}
         />
       </View>
     </View>

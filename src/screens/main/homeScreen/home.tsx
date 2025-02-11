@@ -5,7 +5,6 @@ import {
   ScrollView,
   Image,
   FlatList,
-  ActivityIndicator,
   StyleSheet,
   Dimensions,
   Platform,
@@ -38,6 +37,7 @@ import {
 } from "react-native-google-places-autocomplete";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
+import RecommendedTripSkeleton from "../../../components/common/RecommendedTripSkeleton";
 
 // Interface for extended Google Place Details including photo information
 interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
@@ -71,6 +71,7 @@ const Home: React.FC = () => {
     []
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const navigation = useNavigation<NavigationProp>();
   const googlePlacesRef = useRef<any>(null);
 
@@ -78,11 +79,11 @@ const Home: React.FC = () => {
   const getGreeting = () => {
     const currentHour = new Date().getHours();
     if (currentHour < 12) {
-      return `Good Morning, ${userName} 🌅`;
+      return `Good Morning,`;
     } else if (currentHour < 18) {
-      return `Good Afternoon, ${userName} ☀️`;
+      return `Good Afternoon,`;
     } else {
-      return `Good Evening, ${userName} 🌙`;
+      return `Good Evening,`;
     }
   };
 
@@ -135,19 +136,87 @@ const Home: React.FC = () => {
     }
   };
 
+  const isValidTripResponse = (response: any): boolean => {
+    return (
+      response &&
+      response.travelPlan &&
+      response.travelPlan.destination &&
+      response.travelPlan.itinerary &&
+      Array.isArray(response.travelPlan.itinerary)
+    );
+  };
+
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 1000; // 1 second
+
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  const generateSingleTrip = async (
+    retryCount = 0
+  ): Promise<RecommendedTrip | null> => {
+    try {
+      const result = await chatSession.sendMessage(RECOMMEND_TRIP_AI_PROMPT);
+      const responseText = await result.response.text();
+
+      console.log("Raw AI Response:", responseText); // Log the raw response
+
+      if (!responseText) {
+        throw new Error("Empty response");
+      }
+
+      // Clean the response
+      const cleanedResponse = responseText.trim();
+      console.log("Cleaned Response:", cleanedResponse); // Log the cleaned response
+
+      let tripResp;
+      try {
+        tripResp = JSON.parse(cleanedResponse);
+      } catch (parseError) {
+        console.error("JSON Parse error:", parseError);
+        console.error("Failed to parse response:", cleanedResponse);
+        throw parseError;
+      }
+
+      if (!isValidTripResponse(tripResp)) {
+        console.error("Invalid response structure:", tripResp);
+        throw new Error("Invalid response structure");
+      }
+
+      const placeName = tripResp.travelPlan.destination;
+      const photoRef = await fetchPhotoReference(placeName);
+
+      return {
+        id: `trip-${new Date().getTime()}`,
+        name: placeName,
+        description:
+          tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
+          "No description available",
+        photoRef,
+        fullResponse: responseText,
+      };
+    } catch (error) {
+      if (retryCount < MAX_RETRIES) {
+        console.log(`Retry attempt ${retryCount + 1} for generating trip`);
+        await delay(RETRY_DELAY);
+        return generateSingleTrip(retryCount + 1);
+      }
+      throw error;
+    }
+  };
+
   // Generate AI recommended trips
   const generateRecommendedTrips = async () => {
     try {
       setIsLoading(true);
+      setLoadingProgress(0);
       const trips: RecommendedTrip[] = [];
       const user = getAuth().currentUser;
 
-      // Validate user authentication
       if (!user) {
         throw new Error("User not authenticated");
       }
 
-      // Check for existing recommended trips
       const userTripsCollection = collection(
         FIREBASE_DB,
         `users/${user.uid}/suggestedTrips`
@@ -155,7 +224,6 @@ const Home: React.FC = () => {
 
       const userTripsSnapshot = await getDocs(userTripsCollection);
       if (!userTripsSnapshot.empty) {
-        // Use existing recommendations if available
         userTripsSnapshot.forEach((doc) => {
           const tripData = doc.data();
           trips.push(tripData as RecommendedTrip);
@@ -165,40 +233,18 @@ const Home: React.FC = () => {
         return;
       }
 
-      // Generate new recommendations using AI
       for (let i = 0; i < 3; i++) {
-        console.log(
-          "Generated AI Prompt for Recommended Trip:",
-          RECOMMEND_TRIP_AI_PROMPT
-        );
-
-        const result = await chatSession.sendMessage(RECOMMEND_TRIP_AI_PROMPT);
-        const responseText = await result.response.text();
-        console.log("AI Response for Recommended Trip:", responseText);
-
-        if (!responseText) {
-          console.error("AI response is empty or undefined");
+        try {
+          const trip = await generateSingleTrip();
+          if (trip) {
+            trips.push(trip);
+            await addDoc(userTripsCollection, trip);
+            setLoadingProgress(i + 1);
+          }
+        } catch (tripError) {
+          console.error("Error generating single trip:", tripError);
           continue;
         }
-
-        // Parse AI response and fetch photo reference
-        const tripResp = JSON.parse(responseText);
-        const placeName = tripResp.travelPlan.destination;
-        const photoRef = await fetchPhotoReference(placeName);
-
-        // Create trip object and save to Firestore
-        const trip: RecommendedTrip = {
-          id: `trip-${i}-${new Date().getTime()}`,
-          name: placeName,
-          description:
-            tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
-            "No description available",
-          photoRef,
-          fullResponse: responseText,
-        };
-
-        trips.push(trip);
-        await addDoc(userTripsCollection, trip);
       }
 
       setRecommendedTrips(trips);
@@ -247,7 +293,7 @@ const Home: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      generateRecommendedTrips();
+      //generateRecommendedTrips();
       getUserName();
     }, [])
   );
@@ -275,6 +321,9 @@ const Home: React.FC = () => {
           <View testID="home-header-content" style={styles.headerContent}>
             <Text testID="home-greeting" style={styles.greetingText}>
               {getGreeting()}
+            </Text>
+            <Text testID="home-name" style={styles.greetingText}>
+              {userName} 🌅
             </Text>
             <Text testID="home-subgreeting" style={styles.subGreetingText}>
               Let's plan your next adventure
@@ -497,16 +546,14 @@ const Home: React.FC = () => {
             </Pressable>
           </View>
           {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={currentTheme.alternate} />
-              <Text
-                style={[
-                  styles.loadingText,
-                  { color: currentTheme.textPrimary },
-                ]}
-              >
-                Generating recommendations...
-              </Text>
+            <View style={{ flexDirection: "row" }}>
+              {[1, 2, 3].map((_, index) => (
+                <RecommendedTripSkeleton
+                  key={index}
+                  loadingProgress={loadingProgress}
+                  isFirstCard={index === 0}
+                />
+              ))}
             </View>
           ) : recommendedTrips.length > 0 ? (
             <FlatList
@@ -538,10 +585,6 @@ const Home: React.FC = () => {
                     <Pressable
                       testID={`trip-card-${trip.id}`}
                       onPress={() => {
-                        console.log(
-                          "Navigating to TripDetails with tripInfo:",
-                          tripInfo
-                        );
                         navigation.navigate("RecommendedTripDetails", {
                           trip: trip.fullResponse,
                           photoRef: trip.photoRef ?? "",
@@ -611,8 +654,10 @@ const Home: React.FC = () => {
             />
           ) : (
             <View style={styles.noTripsContainer}>
-              <Text style={[styles.noTripsText, { color: currentTheme.textPrimary }]}>
-                No trips found. Create your own adventure!
+              <Text style={[styles.noTripsText]}>
+                Cannot generate trips right now.
+                {"\n"}
+                Create your own adventure or please try again later!
               </Text>
             </View>
           )}
@@ -714,7 +759,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop: -50,
+    marginTop: -20,
   },
   searchContainer: {
     marginBottom: 20,
@@ -897,6 +942,8 @@ const styles = StyleSheet.create({
   noTripsText: {
     fontSize: 16,
     fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
+    textAlign: "center",
+    color: "grey",
   },
 });
 

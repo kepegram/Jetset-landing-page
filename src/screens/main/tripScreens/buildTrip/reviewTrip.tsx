@@ -34,6 +34,11 @@ const ReviewTrip: React.FC = () => {
         <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
           Final step!
         </Text>
+        <Text
+          style={[styles.subtitle, { color: currentTheme.textPrimary }]}
+        >
+          Review your trip details!
+        </Text>
 
         <View style={styles.reviewContainer}>
           {/* Destination Information Card */}

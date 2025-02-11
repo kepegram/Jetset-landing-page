@@ -23,6 +23,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getPhotoReference } from "../../../../api/places-api";
 
 type GenerateTripScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -91,8 +92,19 @@ const GenerateTrip: React.FC = () => {
       const responseText = await result.response.text();
       const tripResp = parseAIResponse(responseText);
 
-      // Save generated trip to Firestore
-      await saveTripToFirestore(tripResp);
+      // Fetch photo reference if using place AI prompt
+      let photoRef = null;
+      if (!tripData?.destinationType && tripData?.locationInfo?.placeId) {
+        try {
+          photoRef = await getPhotoReference(tripData.locationInfo.placeId);
+        } catch (error) {
+          console.error("Error fetching photo reference:", error);
+          // Continue without photo reference if fetch fails
+        }
+      }
+
+      // Save generated trip to Firestore with photo reference
+      await saveTripToFirestore(tripResp, photoRef);
 
       // Clear AsyncStorage and navigate to trips screen
       await AsyncStorage.clear();
@@ -136,7 +148,10 @@ const GenerateTrip: React.FC = () => {
     return cleanedResponse.substring(0, lastValidIndex + 1);
   };
 
-  const saveTripToFirestore = async (tripResp: TripResponse) => {
+  const saveTripToFirestore = async (
+    tripResp: TripResponse,
+    photoRef: string | null
+  ) => {
     const docId = Date.now().toString();
     const userTripRef = doc(
       FIREBASE_DB,
@@ -156,6 +171,7 @@ const GenerateTrip: React.FC = () => {
       userEmail: user?.email || "unknown",
       tripPlan: tripResp,
       tripData: sanitizedTripData,
+      photoRef: photoRef,
       docId,
       createdAt: new Date().toISOString(),
     });

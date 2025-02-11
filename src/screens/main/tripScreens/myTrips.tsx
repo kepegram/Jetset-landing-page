@@ -8,7 +8,6 @@ import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../firebase.config";
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import {
-  ActivityIndicator,
   Pressable,
   Text,
   View,
@@ -24,6 +23,7 @@ import PastTripListCard from "../../../components/myTrips/pastTripListCard";
 import { useProfile } from "../../../context/profileContext";
 import moment from "moment";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import SkeletonCard from "../../../components/common/SkeletonCard";
 
 type MyTripsScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -35,6 +35,7 @@ const MyTrips: React.FC = () => {
   const [userTrips, setUserTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<MyTripsScreenNavigationProp>();
+  const ITEMS_TO_SHOW = 6;
 
   const user = FIREBASE_AUTH.currentUser;
 
@@ -90,6 +91,17 @@ const MyTrips: React.FC = () => {
     }
   };
 
+  const getPastTrips = () => {
+    return userTrips
+      .filter((trip) => moment(trip.tripData.endDate).isBefore(moment(), "day"))
+      .sort((a, b) => {
+        const dateA = moment(a.tripData.endDate);
+        const dateB = moment(b.tripData.endDate);
+        return dateB.diff(dateA); // Most recent first
+      })
+      .slice(0, ITEMS_TO_SHOW);
+  };
+
   const sortedUpcomingTrips = userTrips
     .filter((trip) => {
       const startDate = moment(trip.tripData.startDate).startOf("day");
@@ -99,7 +111,17 @@ const MyTrips: React.FC = () => {
       const dateA = moment(a.tripData.startDate);
       const dateB = moment(b.tripData.startDate);
       return dateA.diff(dateB);
-    });
+    })
+    .slice(0, ITEMS_TO_SHOW);
+
+  const totalUpcomingTrips = userTrips.filter((trip) => {
+    const startDate = moment(trip.tripData.startDate).startOf("day");
+    return startDate.isAfter(moment().startOf("day"));
+  }).length;
+
+  const totalPastTrips = userTrips.filter((trip) =>
+    moment(trip.tripData.endDate).isBefore(moment(), "day")
+  ).length;
 
   const hasCurrentTrip = userTrips.some((trip) => {
     const startDate = moment(trip.tripData.startDate).startOf("day");
@@ -152,177 +174,239 @@ const MyTrips: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={currentTheme.alternate} />
-          </View>
-        ) : userTrips.length === 0 ? (
-          <StartNewTripCard navigation={navigation} />
-        ) : (
           <View style={styles.tripsContainer}>
-            <Text
-              style={[styles.sectionTitle, { color: currentTheme.textPrimary }]}
-            >
-              Current Trip
-            </Text>
-            {hasCurrentTrip ? (
-              <CurrentTripsCard userTrips={userTrips} />
-            ) : (
-              <View
+            <View style={styles.sectionHeaderContainer}>
+              <Text
                 style={[
-                  styles.emptyStateContainer,
-                  { backgroundColor: currentTheme.background },
+                  styles.sectionTitle,
+                  { color: currentTheme.textPrimary },
                 ]}
               >
-                <MaterialCommunityIcons
-                  name="calendar-today"
-                  size={32}
-                  color={currentTheme.textSecondary}
-                />
-                <Text
-                  style={[
-                    styles.emptyStateText,
-                    { color: currentTheme.textSecondary },
-                  ]}
-                >
-                  Nothing booked for today
-                </Text>
-                <Pressable
-                  style={[
-                    styles.emptyStateButton,
-                    { backgroundColor: currentTheme.alternate },
-                  ]}
-                  onPress={() => navigation.navigate("WhereTo")}
-                >
-                  <Text style={[styles.emptyStateButtonText]}>Plan a Trip</Text>
-                </Pressable>
-              </View>
-            )}
+                Current Trip
+              </Text>
+            </View>
+            <SkeletonCard variant="current" />
 
-            <Text
-              style={[styles.sectionTitle, { color: currentTheme.textPrimary }]}
-            >
-              Upcoming Trips
-            </Text>
-            {sortedUpcomingTrips.length > 0 ? (
-              <FlatList
-                data={sortedUpcomingTrips}
-                horizontal
-                renderItem={({ item }) => (
-                  <View style={styles.upcomingTripCard}>
-                    <UpcomingTripsCard userTrips={[item]} />
+            <View style={styles.sectionHeaderContainer}>
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                Upcoming Trips
+              </Text>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {[1, 2, 3].map((_, index) => (
+                <SkeletonCard key={index} variant="upcoming" />
+              ))}
+            </ScrollView>
+
+            <View style={styles.sectionHeaderContainer}>
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                Past Trips
+              </Text>
+            </View>
+            {[1, 2, 3].map((_, index) => (
+              <SkeletonCard key={index} variant="past" />
+            ))}
+          </View>
+        ) : (
+          <>
+            {userTrips.length === 0 ? (
+              <StartNewTripCard navigation={navigation} />
+            ) : (
+              <View style={styles.tripsContainer}>
+                <View style={styles.sectionHeaderContainer}>
+                  <Text
+                    style={[
+                      styles.sectionTitle,
+                      { color: currentTheme.textPrimary },
+                    ]}
+                  >
+                    Current Trip
+                  </Text>
+                  <Pressable
+                    style={styles.seeAllButton}
+                    onPress={() => console.log("See all current trips")}
+                  >
+                    <Text
+                      style={[
+                        styles.seeAllText,
+                        { color: currentTheme.alternate },
+                      ]}
+                    >
+                      See All
+                    </Text>
+                  </Pressable>
+                </View>
+                {hasCurrentTrip ? (
+                  <CurrentTripsCard userTrips={userTrips} />
+                ) : (
+                  <View
+                    style={[
+                      styles.emptyStateContainer,
+                      { backgroundColor: currentTheme.background },
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name="calendar-today"
+                      size={32}
+                      color={currentTheme.textSecondary}
+                    />
+                    <Text
+                      style={[
+                        styles.emptyStateText,
+                        { color: currentTheme.textSecondary },
+                      ]}
+                    >
+                      Nothing booked for today
+                    </Text>
+                    <Pressable
+                      style={[
+                        styles.emptyStateButton,
+                        { backgroundColor: currentTheme.alternate },
+                      ]}
+                      onPress={() => navigation.navigate("WhereTo")}
+                    >
+                      <Text style={[styles.emptyStateButtonText]}>
+                        Plan a Trip
+                      </Text>
+                    </Pressable>
                   </View>
                 )}
-                keyExtractor={(item) => item.id}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.upcomingTripsContainer}
-              />
-            ) : (
-              <View
-                style={[
-                  styles.emptyStateContainer,
-                  { backgroundColor: currentTheme.background },
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name="calendar-clock"
-                  size={32}
-                  color={currentTheme.textSecondary}
-                />
-                <Text
-                  style={[
-                    styles.emptyStateText,
-                    { color: currentTheme.textSecondary },
-                  ]}
-                >
-                  No upcoming trips planned
-                </Text>
-                <Pressable
-                  style={[
-                    styles.emptyStateButton,
-                    { backgroundColor: currentTheme.alternate },
-                  ]}
-                  onPress={() => navigation.navigate("WhereTo")}
-                >
-                  <Text
-                    style={[
-                      styles.emptyStateButtonText,
-                      { color: currentTheme.textPrimary },
-                    ]}
-                  >
-                    Schedule One Now
-                  </Text>
-                </Pressable>
-              </View>
-            )}
 
-            <Text
-              style={[styles.sectionTitle, { color: currentTheme.textPrimary }]}
-            >
-              Past Trips
-            </Text>
-            {userTrips.some((trip) =>
-              moment(trip.tripData.endDate).isBefore(moment(), "day")
-            ) ? (
-              <View style={styles.pastTripsContainer}>
-                {userTrips.map((trip, index) => {
-                  if (!trip || !trip.tripData || !trip.tripPlan) {
-                    console.warn(
-                      `Skipping invalid trip at index ${index}:`,
-                      trip
-                    );
-                    return null;
-                  }
-                  return (
-                    <PastTripListCard
-                      trip={{
-                        tripData: trip.tripData,
-                        tripPlan: trip.tripPlan,
-                        id: trip.id,
-                      }}
-                      key={index}
-                    />
-                  );
-                })}
-              </View>
-            ) : (
-              <View
-                style={[
-                  styles.emptyStateContainer,
-                  { backgroundColor: currentTheme.background },
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name="history"
-                  size={32}
-                  color={currentTheme.textSecondary}
-                />
-                <Text
-                  style={[
-                    styles.emptyStateText,
-                    { color: currentTheme.textSecondary },
-                  ]}
-                >
-                  No past trips yet
-                </Text>
-                <Pressable
-                  style={[
-                    styles.emptyStateButton,
-                    { backgroundColor: currentTheme.alternate },
-                  ]}
-                  onPress={() => navigation.navigate("WhereTo")}
-                >
+                <View style={styles.sectionHeaderContainer}>
                   <Text
                     style={[
-                      styles.emptyStateButtonText,
+                      styles.sectionTitle,
                       { color: currentTheme.textPrimary },
                     ]}
                   >
-                    Create Your First Memory
+                    Upcoming Trips
                   </Text>
-                </Pressable>
+                  <Pressable
+                    style={styles.seeAllButton}
+                    onPress={() => console.log("See all upcoming trips")}
+                  >
+                    <Text
+                      style={[
+                        styles.seeAllText,
+                        { color: currentTheme.alternate },
+                      ]}
+                    >
+                      See All
+                    </Text>
+                  </Pressable>
+                </View>
+                {sortedUpcomingTrips.length > 0 && (
+                  <View>
+                    <FlatList
+                      data={sortedUpcomingTrips}
+                      horizontal
+                      renderItem={({ item }) => (
+                        <View style={styles.upcomingTripCard}>
+                          <UpcomingTripsCard userTrips={[item]} />
+                        </View>
+                      )}
+                      keyExtractor={(item) => item.id}
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.upcomingTripsContainer}
+                      ListFooterComponent={() =>
+                        totalUpcomingTrips > ITEMS_TO_SHOW ? (
+                          <Pressable
+                            style={styles.seeMoreButton}
+                            onPress={() =>
+                              console.log("See all upcoming trips")
+                            }
+                          >
+                            <Text
+                              style={[
+                                styles.seeMoreText,
+                                { color: currentTheme.alternate },
+                              ]}
+                            >
+                              See All ({totalUpcomingTrips})
+                            </Text>
+                          </Pressable>
+                        ) : null
+                      }
+                    />
+                  </View>
+                )}
+
+                <View style={styles.sectionHeaderContainer}>
+                  <Text
+                    style={[
+                      styles.sectionTitle,
+                      { color: currentTheme.textPrimary },
+                    ]}
+                  >
+                    Past Trips
+                  </Text>
+                  <Pressable
+                    style={styles.seeAllButton}
+                    onPress={() => console.log("See all past trips")}
+                  >
+                    <Text
+                      style={[
+                        styles.seeAllText,
+                        { color: currentTheme.alternate },
+                      ]}
+                    >
+                      See All
+                    </Text>
+                  </Pressable>
+                </View>
+                {userTrips.some((trip) =>
+                  moment(trip.tripData.endDate).isBefore(moment(), "day")
+                ) && (
+                  <View style={styles.pastTripsContainer}>
+                    {getPastTrips().map((trip, index) => {
+                      if (!trip || !trip.tripData || !trip.tripPlan) {
+                        console.warn(
+                          `Skipping invalid trip at index ${index}:`,
+                          trip
+                        );
+                        return null;
+                      }
+                      return (
+                        <PastTripListCard
+                          trip={{
+                            tripData: trip.tripData,
+                            tripPlan: trip.tripPlan,
+                            id: trip.id,
+                          }}
+                          key={index}
+                        />
+                      );
+                    })}
+                    {totalPastTrips > ITEMS_TO_SHOW && (
+                      <Pressable
+                        style={styles.seeMoreButton}
+                        onPress={() => console.log("See all past trips")}
+                      >
+                        <Text
+                          style={[
+                            styles.seeMoreText,
+                            { color: currentTheme.alternate },
+                          ]}
+                        >
+                          See All ({totalPastTrips})
+                        </Text>
+                      </Pressable>
+                    )}
+                  </View>
+                )}
               </View>
             )}
-          </View>
+          </>
         )}
       </ScrollView>
     </View>
@@ -362,19 +446,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexGrow: 1,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   tripsContainer: {
     flex: 1,
     gap: 20,
   },
+  sectionHeaderContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+  },
   sectionTitle: {
     fontSize: 24,
     fontWeight: "700",
-    marginTop: 10,
+  },
+  seeAllButton: {
+    padding: 8,
+  },
+  seeAllText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
   upcomingTripCard: {
     marginRight: 15,
@@ -405,6 +496,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "white",
+  },
+  seeMoreButton: {
+    padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  seeMoreText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 
