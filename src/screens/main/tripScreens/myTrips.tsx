@@ -130,6 +130,15 @@ const MyTrips: React.FC = () => {
     return startDate.isSameOrBefore(today) && endDate.isSameOrAfter(today);
   });
 
+  const getCurrentTrips = () => {
+    return userTrips.filter((trip) => {
+      const startDate = moment(trip.tripData.startDate).startOf("day");
+      const endDate = moment(trip.tripData.endDate).endOf("day");
+      const today = moment().startOf("day");
+      return startDate.isSameOrBefore(today) && endDate.isSameOrAfter(today);
+    });
+  };
+
   return (
     <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
@@ -232,19 +241,6 @@ const MyTrips: React.FC = () => {
                   >
                     Current Trip
                   </Text>
-                  <Pressable
-                    style={styles.seeAllButton}
-                    onPress={() => console.log("See all current trips")}
-                  >
-                    <Text
-                      style={[
-                        styles.seeAllText,
-                        { color: currentTheme.alternate },
-                      ]}
-                    >
-                      See All
-                    </Text>
-                  </Pressable>
                 </View>
                 {hasCurrentTrip ? (
                   <CurrentTripsCard userTrips={userTrips} />
@@ -293,7 +289,20 @@ const MyTrips: React.FC = () => {
                   </Text>
                   <Pressable
                     style={styles.seeAllButton}
-                    onPress={() => console.log("See all upcoming trips")}
+                    onPress={() => {
+                      const upcomingTrips = userTrips.filter((trip) => {
+                        const startDate = moment(
+                          trip.tripData.startDate
+                        ).startOf("day");
+                        return startDate.isAfter(moment().startOf("day"));
+                      });
+                      if (upcomingTrips.length > 0) {
+                        navigation.navigate("AllTripsView", {
+                          trips: JSON.stringify(upcomingTrips),
+                          type: "upcoming",
+                        });
+                      }
+                    }}
                   >
                     <Text
                       style={[
@@ -352,7 +361,17 @@ const MyTrips: React.FC = () => {
                   </Text>
                   <Pressable
                     style={styles.seeAllButton}
-                    onPress={() => console.log("See all past trips")}
+                    onPress={() => {
+                      const pastTrips = userTrips.filter((trip) =>
+                        moment(trip.tripData.endDate).isBefore(moment(), "day")
+                      );
+                      if (pastTrips.length > 0) {
+                        navigation.navigate("AllTripsView", {
+                          trips: JSON.stringify(pastTrips),
+                          type: "past",
+                        });
+                      }
+                    }}
                   >
                     <Text
                       style={[

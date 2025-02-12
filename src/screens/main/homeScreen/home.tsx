@@ -38,6 +38,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import RecommendedTripSkeleton from "../../../components/common/RecommendedTripSkeleton";
+import { defaultTrips } from "../../../constants/defaultTrips";
 
 // Interface for extended Google Place Details including photo information
 interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
@@ -54,7 +55,8 @@ interface RecommendedTrip {
   id: string;
   name: string;
   description: string;
-  photoRef: string | null;
+  imageUrl?: string;
+  photoRef?: string | null;
   fullResponse: string;
 }
 
@@ -146,67 +148,53 @@ const Home: React.FC = () => {
     );
   };
 
-  const MAX_RETRIES = 3;
-  const RETRY_DELAY = 1000; // 1 second
-
-  const delay = (ms: number) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
-
-  const generateSingleTrip = async (
-    retryCount = 0
-  ): Promise<RecommendedTrip | null> => {
+  const generateSingleTrip = async (): Promise<RecommendedTrip | null> => {
     try {
       const result = await chatSession.sendMessage(RECOMMEND_TRIP_AI_PROMPT);
       const responseText = await result.response.text();
 
-      console.log("Raw AI Response:", responseText); // Log the raw response
-
       if (!responseText) {
-        throw new Error("Empty response");
+        throw new Error("Empty response from AI");
       }
-
-      // Clean the response
-      const cleanedResponse = responseText.trim();
-      console.log("Cleaned Response:", cleanedResponse); // Log the cleaned response
 
       let tripResp;
       try {
+        // Add input validation and cleaning
+        const cleanedResponse = responseText
+          .trim()
+          .replace(/[\u0000-\u001F\u007F-\u009F]/g, ""); // Remove control characters
         tripResp = JSON.parse(cleanedResponse);
       } catch (parseError) {
-        console.error("JSON Parse error:", parseError);
-        console.error("Failed to parse response:", cleanedResponse);
-        throw parseError;
+        console.error("Failed to parse AI response:", parseError);
+        return null;
       }
 
+      // Validate response structure
       if (!isValidTripResponse(tripResp)) {
-        console.error("Invalid response structure:", tripResp);
-        throw new Error("Invalid response structure");
+        console.error("Invalid trip response structure");
+        return null;
       }
 
       const placeName = tripResp.travelPlan.destination;
       const photoRef = await fetchPhotoReference(placeName);
 
       return {
-        id: `trip-${new Date().getTime()}`,
+        id: `trip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name: placeName,
         description:
           tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
+          tripResp.travelPlan.destinationDescription ||
           "No description available",
         photoRef,
-        fullResponse: responseText,
+        fullResponse: JSON.stringify(tripResp), // Store cleaned and validated response
       };
     } catch (error) {
-      if (retryCount < MAX_RETRIES) {
-        console.log(`Retry attempt ${retryCount + 1} for generating trip`);
-        await delay(RETRY_DELAY);
-        return generateSingleTrip(retryCount + 1);
-      }
-      throw error;
+      console.error("Error generating trip:", error);
+      return null;
     }
   };
 
-  // Generate AI recommended trips
-  const generateRecommendedTrips = async () => {
+  const generateRecommendedTrips = async (isRefresh = false) => {
     try {
       setIsLoading(true);
       setLoadingProgress(0);
@@ -222,66 +210,65 @@ const Home: React.FC = () => {
         `users/${user.uid}/suggestedTrips`
       );
 
-      const userTripsSnapshot = await getDocs(userTripsCollection);
-      if (!userTripsSnapshot.empty) {
-        userTripsSnapshot.forEach((doc) => {
-          const tripData = doc.data();
-          trips.push(tripData as RecommendedTrip);
-        });
-        setRecommendedTrips(trips);
-        setIsLoading(false);
-        return;
-      }
-
-      for (let i = 0; i < 3; i++) {
-        try {
-          const trip = await generateSingleTrip();
-          if (trip) {
-            trips.push(trip);
-            await addDoc(userTripsCollection, trip);
-            setLoadingProgress(i + 1);
-          }
-        } catch (tripError) {
-          console.error("Error generating single trip:", tripError);
-          continue;
+      // If not refreshing, first try to load existing trips from Firebase
+      if (!isRefresh) {
+        const userTripsSnapshot = await getDocs(userTripsCollection);
+        if (!userTripsSnapshot.empty) {
+          userTripsSnapshot.forEach((doc) => {
+            const tripData = doc.data();
+            trips.push(tripData as RecommendedTrip);
+          });
+          setRecommendedTrips(trips);
+          setIsLoading(false);
+          return;
         }
       }
 
-      setRecommendedTrips(trips);
-      await AsyncStorage.setItem("lastFetchTime", new Date().toISOString());
+      // If refreshing or no existing trips, generate new ones
+      const batch = writeBatch(FIREBASE_DB);
+
+      // Try to generate AI trips
+      for (let i = 0; i < 3; i++) {
+        const trip = await generateSingleTrip();
+        if (trip) {
+          trips.push(trip);
+          const newTripRef = doc(userTripsCollection);
+          batch.set(newTripRef, trip);
+          setLoadingProgress(i + 1);
+        }
+      }
+
+      // Only use default trips if AI generation failed AND it's not a refresh
+      if (trips.length === 0 && !isRefresh) {
+        defaultTrips.forEach((trip) => {
+          const newTripRef = doc(userTripsCollection);
+          const formattedTrip: RecommendedTrip = {
+            id: `trip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            name: trip.travelPlan.destination,
+            description: trip.travelPlan.destinationDescription,
+            imageUrl: trip.travelPlan.imageUrl,
+            fullResponse: JSON.stringify(trip),
+          };
+          batch.set(newTripRef, formattedTrip);
+          trips.push(formattedTrip);
+        });
+      }
+
+      if (trips.length > 0) {
+        await batch.commit();
+        setRecommendedTrips(trips);
+        await AsyncStorage.setItem("lastFetchTime", new Date().toISOString());
+      }
     } catch (error) {
-      console.error("Error generating recommended trips:", error);
+      console.error("Error in generateRecommendedTrips:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Clear existing recommendations and generate new ones
-  const clearStorageAndFetchNewTrips = async () => {
-    try {
-      const user = getAuth().currentUser;
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-
-      // Delete existing recommendations
-      const userTripsCollection = collection(
-        FIREBASE_DB,
-        `users/${user.uid}/suggestedTrips`
-      );
-      const userTripsSnapshot = await getDocs(userTripsCollection);
-
-      const batch = writeBatch(FIREBASE_DB);
-      userTripsSnapshot.forEach((doc) => {
-        batch.delete(doc.ref);
-      });
-      await batch.commit();
-
-      // Generate new recommendations
-      await generateRecommendedTrips();
-    } catch (error) {
-      console.error("Error clearing storage and fetching new trips:", error);
-    }
+  // Modify the refresh button press handler
+  const handleRefresh = () => {
+    generateRecommendedTrips(true); // Pass true to indicate this is a refresh
   };
 
   // Type guard to check if a trip is a RecommendedTrip
@@ -293,7 +280,7 @@ const Home: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      //generateRecommendedTrips();
+      generateRecommendedTrips(false); // Pass false to indicate this is initial load
       getUserName();
     }, [])
   );
@@ -532,7 +519,7 @@ const Home: React.FC = () => {
               Recommended Trips
             </Text>
             <Pressable
-              onPress={clearStorageAndFetchNewTrips}
+              onPress={handleRefresh}
               style={({ pressed }) => ({
                 opacity: pressed ? 0.7 : 1,
                 transform: [{ scale: pressed ? 0.95 : 1 }],

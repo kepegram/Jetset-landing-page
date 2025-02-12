@@ -60,7 +60,6 @@ const App: React.FC = () => {
         signInWithCredential(FIREBASE_AUTH, credential)
           .then((userCredential) => {
             const user = userCredential.user;
-            console.log("User signed in: ", user);
           })
           .catch((error) => {
             console.error("Error signing in with Google: ", error);
@@ -74,7 +73,6 @@ const App: React.FC = () => {
   useEffect(() => {
     const unsub = onAuthStateChanged(FIREBASE_AUTH, (user) => {
       if (user) {
-        console.log(JSON.stringify(user, null, 2));
         setUser(user);
       } else {
         setUser(null);

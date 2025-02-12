@@ -116,8 +116,8 @@ const TripDetails: React.FC = () => {
       <View style={styles.imageContainer}>
         <Image
           source={{
-            uri: photoRef
-              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+            uri: photoRef || tripDetails?.photoRef
+              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef || tripDetails?.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
               : "https://via.placeholder.com/800",
           }}
           style={styles.image}

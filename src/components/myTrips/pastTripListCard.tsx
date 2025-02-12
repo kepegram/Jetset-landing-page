@@ -78,7 +78,8 @@ const PastTripListCard: React.FC<PastTripListCardProps> = ({ trip }) => {
                 ...tripData,
                 travelPlan: tripPlan?.travelPlan || {},
               }),
-              photoRef: tripPlan?.travelPlan?.photoRef || "",
+              photoRef:
+                tripData?.locationInfo?.photoRef || tripData.photoRef || "",
               docId: trip.id,
             });
           }}
@@ -89,9 +90,12 @@ const PastTripListCard: React.FC<PastTripListCardProps> = ({ trip }) => {
         >
           <Image
             source={{
-              uri: tripData.locationInfo?.photoRef
-                ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${tripData.locationInfo?.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
-                : "https://via.placeholder.com/100",
+              uri:
+                tripData.photoRef || tripData.locationInfo?.photoRef
+                  ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${
+                      tripData.photoRef || tripData.locationInfo?.photoRef
+                    }&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+                  : "https://via.placeholder.com/100",
             }}
             style={styles.image}
           />

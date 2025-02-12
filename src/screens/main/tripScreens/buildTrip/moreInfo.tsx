@@ -18,8 +18,8 @@ const MoreInfo: React.FC = () => {
   const { currentTheme } = useTheme();
   const { tripData = {}, setTripData = () => {} } =
     useContext(CreateTripContext) || {};
-  const [activityLevel, setActivityLevel] = useState<string>("Normal");
-  const [budget, setBudget] = useState<string>("Average");
+  const [activityLevel, setActivityLevel] = useState<string>("");
+  const [budget, setBudget] = useState<string>("");
 
   // Reusable button component for selection options
   const SelectionButton = ({

@@ -36,7 +36,6 @@ const CurrentTripDetails: React.FC = () => {
   const { trip, photoRef } = route.params as RouteParams;
 
   const [tripDetails, setTripDetails] = useState<any>(null);
-  const [isHearted, setIsHearted] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
 
   useEffect(() => {
@@ -91,8 +90,8 @@ const CurrentTripDetails: React.FC = () => {
       <View style={styles.imageContainer}>
         <Image
           source={{
-            uri: photoRef
-              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+            uri: photoRef || tripDetails?.photoRef
+              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef || tripDetails?.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
               : "https://via.placeholder.com/800",
           }}
           style={styles.image}
@@ -119,18 +118,6 @@ const CurrentTripDetails: React.FC = () => {
               >
                 {tripDetails?.travelPlan?.destination || "Unknown Location"}
               </Text>
-              <Pressable
-                onPress={() => {
-                  setIsHearted(!isHearted);
-                  console.log("Hearted", !isHearted);
-                }}
-              >
-                <Ionicons
-                  name={isHearted ? "heart" : "heart-outline"}
-                  size={30}
-                  color={isHearted ? "red" : currentTheme.textPrimary}
-                />
-              </Pressable>
             </View>
           </View>
 

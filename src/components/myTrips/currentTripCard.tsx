@@ -105,22 +105,21 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         onPress={() => {
-          console.log(parsedCurrentPlan.photoRef);
           navigation.navigate("CurrentTripDetails", {
             trip: JSON.stringify({
               ...parsedCurrentTrip,
               travelPlan: parsedCurrentPlan?.travelPlan || {},
             }),
-            photoRef: parsedCurrentTrip?.locationInfo?.photoRef || "",
+            photoRef: parsedCurrentTrip?.photoRef || parsedCurrentTrip?.locationInfo?.photoRef || "",
           });
         }}
         style={styles.cardContainer}
       >
         <Image
           source={
-            parsedCurrentTrip?.locationInfo?.photoRef
+            parsedCurrentTrip?.photoRef || parsedCurrentTrip?.locationInfo?.photoRef
               ? {
-                  uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${parsedCurrentTrip.locationInfo.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
+                  uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${parsedCurrentTrip?.photoRef || parsedCurrentTrip?.locationInfo?.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`,
                 }
               : require("../../assets/app-imgs/placeholder.jpeg")
           }

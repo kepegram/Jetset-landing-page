@@ -76,6 +76,74 @@ interface PasswordFieldProps {
   testID?: string;
 }
 
+const InputField: React.FC<InputFieldProps> = ({ label, theme, ...props }) => (
+  <View style={styles.inputWrapper}>
+    <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
+      {label}
+    </Text>
+    <TextInput
+      style={[
+        styles.input,
+        {
+          backgroundColor: theme.accentBackground,
+          color: theme.textPrimary,
+          borderColor: theme.inactive,
+        },
+      ]}
+      placeholderTextColor={theme.textSecondary}
+      {...props}
+    />
+  </View>
+);
+
+const PasswordField: React.FC<PasswordFieldProps> = ({
+  label,
+  value,
+  onChangeText,
+  visible,
+  toggleVisible,
+  theme,
+  editable,
+  testID,
+}) => (
+  <View style={styles.inputWrapper}>
+    <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
+      {label}
+    </Text>
+    <View style={styles.passwordContainer}>
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: theme.accentBackground,
+            color: theme.textPrimary,
+            borderColor: theme.inactive,
+          },
+        ]}
+        placeholder="••••••••••"
+        placeholderTextColor={theme.textSecondary}
+        value={value}
+        onChangeText={onChangeText}
+        secureTextEntry={!visible}
+        autoCapitalize="none"
+        editable={editable}
+        testID={testID}
+      />
+      <Pressable
+        style={styles.eyeIcon}
+        onPress={toggleVisible}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Ionicons
+          name={visible ? "eye-off" : "eye"}
+          size={24}
+          color={theme.textSecondary}
+        />
+      </Pressable>
+    </View>
+  </View>
+);
+
 const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
   const { currentTheme } = useTheme();
   const [name, setName] = useState("");
@@ -183,78 +251,6 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
       console.error("Apple Sign-In Error:", e);
     }
   };
-
-  const InputField: React.FC<InputFieldProps> = ({
-    label,
-    theme,
-    ...props
-  }) => (
-    <View style={styles.inputWrapper}>
-      <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
-        {label}
-      </Text>
-      <TextInput
-        style={[
-          styles.input,
-          {
-            backgroundColor: theme.accentBackground,
-            color: theme.textPrimary,
-            borderColor: theme.inactive,
-          },
-        ]}
-        placeholderTextColor={theme.textSecondary}
-        {...props}
-      />
-    </View>
-  );
-
-  const PasswordField: React.FC<PasswordFieldProps> = ({
-    label,
-    value,
-    onChangeText,
-    visible,
-    toggleVisible,
-    theme,
-    editable,
-    testID,
-  }) => (
-    <View style={styles.inputWrapper}>
-      <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
-        {label}
-      </Text>
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              backgroundColor: theme.accentBackground,
-              color: theme.textPrimary,
-              borderColor: theme.inactive,
-            },
-          ]}
-          placeholder="••••••••••"
-          placeholderTextColor={theme.textSecondary}
-          value={value}
-          onChangeText={onChangeText}
-          secureTextEntry={!visible}
-          autoCapitalize="none"
-          editable={editable}
-          testID={testID}
-        />
-        <Pressable
-          style={styles.eyeIcon}
-          onPress={toggleVisible}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons
-            name={visible ? "eye-off" : "eye"}
-            size={24}
-            color={theme.textSecondary}
-          />
-        </Pressable>
-      </View>
-    </View>
-  );
 
   return (
     <SafeAreaView

@@ -1,4 +1,4 @@
-import { View, Text, Image, Pressable } from "react-native";
+import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { GetPhotoRef } from "../../api/googlePlaceApi";
 import { useTheme } from "../../context/themeContext";
@@ -51,40 +51,47 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, onPhotoRefReady }) => {
     });
   };
 
+  const styles = StyleSheet.create({
+    card: {
+      marginVertical: 10,
+      borderRadius: 15,
+      overflow: 'hidden',
+    },
+    imageContainer: {
+      height: 200, // Adjust height as needed
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+    },
+    contentContainer: {
+      padding: 15,
+    },
+    // ... rest of the styles
+  });
+
   return (
     <Pressable
       onPress={handlePress}
-      style={{
-        backgroundColor: currentTheme.accentBackground,
-        padding: 10,
-        borderRadius: 15,
-        borderColor: "gray",
-        marginBottom: 20,
-      }}
+      style={styles.card}
     >
-      <Image
-        source={
-          photoRef
-            ? {
-                uri:
-                  "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" +
-                  photoRef +
-                  "&key=" +
-                  process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
-              }
-            : require("../../assets/app-imgs/place-placeholder.jpg")
-        }
-        style={{
-          width: "100%",
-          height: 140,
-          borderRadius: 15,
-        }}
-      />
-      <View
-        style={{
-          marginTop: 5,
-        }}
-      >
+      <View style={styles.imageContainer}>
+        <Image
+          source={
+            photoRef
+              ? {
+                  uri:
+                    "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" +
+                    photoRef +
+                    "&key=" +
+                    process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
+                }
+              : require("../../assets/app-imgs/place-placeholder.jpg")
+          }
+          style={styles.image}
+        />
+      </View>
+      <View style={styles.contentContainer}>
         <Text
           style={{
             fontFamily: "outfit-bold",

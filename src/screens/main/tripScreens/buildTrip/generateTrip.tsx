@@ -12,6 +12,7 @@ import {
   Alert,
   StyleSheet,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import { CreateTripContext } from "../../../../context/createTripContext";
 import { AI_PROMPT, PLACE_AI_PROMPT } from "../../../../api/ai-prompt";
@@ -24,6 +25,8 @@ import { RootStackParamList } from "../../../../navigation/appNav";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getPhotoReference } from "../../../../api/places-api";
+import * as Progress from "react-native-progress";
+import { LinearGradient } from "expo-linear-gradient";
 
 type GenerateTripScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -32,6 +35,7 @@ type GenerateTripScreenNavigationProp = NativeStackNavigationProp<
 
 interface TripResponse {
   travelPlan: {
+    destination?: string;
     [key: string]: any;
   };
 }
@@ -43,6 +47,8 @@ const GenerateTrip: React.FC = () => {
     useContext(CreateTripContext) || {};
   const [loading, setLoading] = useState(false);
   const isMounted = useRef(true);
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState("Initializing your trip...");
 
   const user = FIREBASE_AUTH.currentUser;
 
@@ -76,7 +82,13 @@ const GenerateTrip: React.FC = () => {
     return FINAL_PROMPT;
   };
 
-  // Generate AI trip plan with retry logic
+  // Add this function to update progress and status
+  const updateProgress = (newProgress: number, status: string) => {
+    setProgress(newProgress);
+    setStatusText(status);
+  };
+
+  // Modify generateAiTrip to include progress updates
   const generateAiTrip = async (retryCount = 0): Promise<void> => {
     if (!user?.uid) {
       Alert.alert("Error", "You must be logged in to generate a trip");
@@ -84,37 +96,59 @@ const GenerateTrip: React.FC = () => {
     }
 
     setLoading(true);
+    updateProgress(0.1, "Preparing your travel preferences...");
     const finalPrompt = getFinalPrompt();
 
     try {
-      // Get AI response and parse it
+      updateProgress(0.3, "Consulting our AI travel expert...");
       const result = await chatSession.sendMessage(finalPrompt);
+      updateProgress(0.5, "Creating your personalized itinerary...");
       const responseText = await result.response.text();
       const tripResp = parseAIResponse(responseText);
 
-      // Fetch photo reference if using place AI prompt
+      updateProgress(0.7, "Finding the perfect photos for your destination...");
       let photoRef = null;
-      if (!tripData?.destinationType && tripData?.locationInfo?.placeId) {
+      if (!tripData?.destinationType) {
+        if (tripData?.locationInfo?.placeId) {
+          try {
+            photoRef = await getPhotoReference(tripData.locationInfo.placeId);
+          } catch (error) {
+            console.error("Error fetching photo reference:", error);
+          }
+        }
+      } else {
+        // For AI-generated destination trips, get photo reference for the generated destination
         try {
-          photoRef = await getPhotoReference(tripData.locationInfo.placeId);
+          const destination = tripResp.travelPlan.destination;
+          if (destination) {
+            // First, get the placeId for the destination
+            const response = await fetch(
+              `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
+                destination
+              )}&inputtype=textquery&key=${process.env.GOOGLE_PLACES_API_KEY}`
+            );
+            const data = await response.json();
+
+            if (data.candidates && data.candidates[0]?.place_id) {
+              photoRef = await getPhotoReference(data.candidates[0].place_id);
+            }
+          }
         } catch (error) {
-          console.error("Error fetching photo reference:", error);
-          // Continue without photo reference if fetch fails
+          console.error(
+            "Error fetching photo reference for AI destination:",
+            error
+          );
         }
       }
 
-      // Save generated trip to Firestore with photo reference
+      updateProgress(0.9, "Saving your trip details...");
       await saveTripToFirestore(tripResp, photoRef);
 
-      // Clear AsyncStorage and navigate to trips screen
+      updateProgress(1, "Trip successfully generated!");
       await AsyncStorage.clear();
       navigation.navigate("MyTripsMain");
     } catch (error) {
       handleGenerationError(error, retryCount);
-    } finally {
-      if (isMounted.current) {
-        setLoading(false);
-      }
     }
   };
 
@@ -222,29 +256,72 @@ const GenerateTrip: React.FC = () => {
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: currentTheme.background }]}
+      style={[styles.container, { backgroundColor: currentTheme.secondary }]}
     >
-      <View style={styles.contentContainer}>
-        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
-          Creating Your Perfect Trip
-        </Text>
-        <Text style={[styles.subtitle, { color: currentTheme.textSecondary }]}>
-          Our AI is crafting a personalized itinerary just for you...
-        </Text>
-        <Image
-          source={require("../../../../assets/app-imgs/plane.gif")}
-          style={styles.animation}
-        />
-        <Text style={[styles.warning, { color: currentTheme.textSecondary }]}>
-          Please wait while we generate your trip...
-        </Text>
-      </View>
+      <LinearGradient
+        colors={[currentTheme.background, currentTheme.alternate]}
+        style={styles.gradient}
+      >
+        <View style={styles.contentContainer}>
+          <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+            Creating Your Perfect Trip
+          </Text>
+
+          <Text
+            style={[styles.subtitle, { color: currentTheme.textSecondary }]}
+          >
+            Our AI is crafting a personalized itinerary just for you...
+          </Text>
+
+          <Image
+            source={require("../../../../assets/app-imgs/plane.gif")}
+            style={styles.animation}
+          />
+
+          <View style={styles.progressContainer}>
+            <Progress.Bar
+              progress={progress}
+              width={300}
+              height={8}
+              color={currentTheme.primary}
+              unfilledColor={currentTheme.secondary}
+              borderWidth={0}
+              animated={true}
+            />
+
+            <Text
+              style={[styles.statusText, { color: currentTheme.textSecondary }]}
+            >
+              {statusText}
+            </Text>
+
+            <View style={styles.loadingIndicator}>
+              <ActivityIndicator color={currentTheme.primary} />
+              <Text
+                style={[
+                  styles.loadingText,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                {Math.round(progress * 100)}% Complete
+              </Text>
+            </View>
+          </View>
+
+          <Text style={[styles.warning, { color: currentTheme.textSecondary }]}>
+            This may take a few moments. Please don't close the app.
+          </Text>
+        </View>
+      </LinearGradient>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  gradient: {
     flex: 1,
   },
   contentContainer: {
@@ -270,7 +347,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 220,
     resizeMode: "contain",
-    marginBottom: 40,
+    marginBottom: 20,
   },
   warning: {
     fontSize: 14,
@@ -280,17 +357,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     marginTop: 20,
   },
-  button: {
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 25,
-    width: "80%",
+  progressContainer: {
+    alignItems: "center",
+    marginVertical: 20,
+    width: "100%",
   },
-  buttonText: {
-    color: "white",
+  statusText: {
+    marginTop: 15,
     fontSize: 16,
     fontFamily: "outfit-medium",
     textAlign: "center",
+  },
+  loadingIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 15,
+    gap: 10,
+  },
+  loadingText: {
+    fontSize: 14,
+    fontFamily: "outfit",
   },
 });
 
