@@ -185,7 +185,6 @@ const Home: React.FC = () => {
     try {
       setIsLoading(true);
       setLoadingProgress(0);
-      const trips: RecommendedTrip[] = [];
       const user = getAuth().currentUser;
 
       if (!user) {
@@ -201,6 +200,7 @@ const Home: React.FC = () => {
       if (!isRefresh) {
         const userTripsSnapshot = await getDocs(userTripsCollection);
         if (!userTripsSnapshot.empty) {
+          const trips: RecommendedTrip[] = [];
           userTripsSnapshot.forEach((doc) => {
             const tripData = doc.data();
             trips.push(tripData as RecommendedTrip);
@@ -211,23 +211,25 @@ const Home: React.FC = () => {
         }
       }
 
-      // If refreshing or no existing trips, generate new ones
-      const batch = writeBatch(FIREBASE_DB);
+      // Generate all trips in parallel
+      const tripPromises = Array(3).fill(null).map(generateSingleTrip);
+      const generatedTrips = await Promise.all(tripPromises);
 
-      // Try to generate AI trips
-      for (let i = 0; i < 3; i++) {
-        const trip = await generateSingleTrip();
-        if (trip) {
-          trips.push(trip);
+      // Filter out any null results and store valid trips
+      const validTrips = generatedTrips.filter(
+        (trip): trip is RecommendedTrip => trip !== null
+      );
+
+      if (validTrips.length > 0) {
+        // Batch write all trips to Firebase
+        const batch = writeBatch(FIREBASE_DB);
+        validTrips.forEach((trip) => {
           const newTripRef = doc(userTripsCollection);
           batch.set(newTripRef, trip);
-          setLoadingProgress(i + 1);
-        }
-      }
+        });
 
-      if (trips.length > 0) {
         await batch.commit();
-        setRecommendedTrips(trips);
+        setRecommendedTrips(validTrips);
         await AsyncStorage.setItem("lastFetchTime", new Date().toISOString());
       }
     } catch (error) {
@@ -284,7 +286,7 @@ const Home: React.FC = () => {
               {userName} 🌅
             </Text>
             <Text testID="home-subgreeting" style={styles.subGreetingText}>
-              Let's plan your next adventure
+              Let's plan your next adventure!
             </Text>
           </View>
         </View>

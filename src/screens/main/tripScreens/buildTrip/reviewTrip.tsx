@@ -31,15 +31,12 @@ const ReviewTrip: React.FC = () => {
     >
       <View style={styles.contentContainer}>
         {/* Header Section */}
-        <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
+        <Text style={[styles.subtitle, { color: currentTheme.textPrimary }]}>
+          Review your trip details 🔍
+        </Text>
+        <Text style={[styles.title, { color: currentTheme.textSecondary }]}>
           Final step!
         </Text>
-        <Text
-          style={[styles.subtitle, { color: currentTheme.textPrimary }]}
-        >
-          Review your trip details!
-        </Text>
-
         <View style={styles.reviewContainer}>
           {/* Destination Information Card */}
           <View
@@ -176,13 +173,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
+    fontFamily: "outfit",
+    opacity: 0.8,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 15,
+    fontFamily: "outfit-bold",
+    marginBottom: 8,
     lineHeight: 38,
   },
   infoContainer: {
@@ -209,11 +208,13 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
+    fontFamily: "outfit",
+    opacity: 0.8,
     marginBottom: 4,
   },
   value: {
     fontSize: 18,
-    fontWeight: "600",
+    fontFamily: "outfit-medium",
   },
   buttonContainer: {
     position: "absolute",

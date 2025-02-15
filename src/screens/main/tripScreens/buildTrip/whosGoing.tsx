@@ -88,12 +88,10 @@ const WhosGoing: React.FC = () => {
       style={({ pressed }) => [
         styles.optionCard,
         {
-          backgroundColor: whoIsGoing === option.value 
-            ? `${currentTheme.alternate}15`
-            : `${currentTheme.secondary}10`,
+          backgroundColor: currentTheme.background,
           borderColor: whoIsGoing === option.value 
             ? currentTheme.alternate
-            : 'transparent',
+            : currentTheme.secondary,
           transform: [{
             scale: pressed ? 0.98 : 1
           }]
@@ -107,18 +105,26 @@ const WhosGoing: React.FC = () => {
             {
               backgroundColor: whoIsGoing === option.value
                 ? currentTheme.alternate
-                : `${currentTheme.secondary}20`,
+                : currentTheme.background,
             },
           ]}
         >
           <Ionicons
             name={option.icon as any}
-            size={28}
-            color={whoIsGoing === option.value ? "white" : currentTheme.textPrimary}
+            size={24}
+            color={whoIsGoing === option.value ? "white" : currentTheme.textSecondary}
           />
         </View>
         <View style={styles.optionTextContainer}>
-          <Text style={[styles.optionTitle, { color: currentTheme.textPrimary }]}>
+          <Text 
+            style={[
+              styles.optionTitle, 
+              { 
+                color: currentTheme.textPrimary,
+                fontWeight: whoIsGoing === option.value ? "600" : "400",
+              }
+            ]}
+          >
             {option.label}
           </Text>
           <Text style={[styles.optionDescription, { color: currentTheme.textSecondary }]}>
@@ -203,16 +209,24 @@ const styles = StyleSheet.create({
   optionCard: {
     borderRadius: 16,
     padding: 16,
-    borderWidth: 2,
+    borderWidth: 1,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   optionContent: {
     flexDirection: "row",
     alignItems: "center",
   },
   iconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,

@@ -26,7 +26,6 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getPhotoReference } from "../../../../api/places-api";
 import * as Progress from "react-native-progress";
-import { LinearGradient } from "expo-linear-gradient";
 
 type GenerateTripScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -258,10 +257,7 @@ const GenerateTrip: React.FC = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.secondary }]}
     >
-      <LinearGradient
-        colors={[currentTheme.background, currentTheme.alternate]}
-        style={styles.gradient}
-      >
+      <View style={styles.gradient}>
         <View style={styles.contentContainer}>
           <Text style={[styles.title, { color: currentTheme.textPrimary }]}>
             Creating Your Perfect Trip
@@ -312,7 +308,7 @@ const GenerateTrip: React.FC = () => {
             This may take a few moments. Please don't close the app.
           </Text>
         </View>
-      </LinearGradient>
+      </View>
     </SafeAreaView>
   );
 };

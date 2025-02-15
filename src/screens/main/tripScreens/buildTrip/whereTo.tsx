@@ -117,10 +117,12 @@ const WhereTo: React.FC = () => {
     icon: JSX.Element,
     title: string,
     description: string,
-    onPress: () => void
+    onPress: () => void,
+    isComingSoon: boolean = false
   ) => (
     <Pressable
       onPress={onPress}
+      disabled={isComingSoon}
       style={({ pressed }) => [
         styles.optionCard,
         {
@@ -128,6 +130,7 @@ const WhereTo: React.FC = () => {
             ? `${currentTheme.alternate}15`
             : `${currentTheme.secondary}10`,
           borderColor: currentTheme.alternate,
+          opacity: isComingSoon ? 0.6 : 1,
         },
       ]}
     >
@@ -223,23 +226,24 @@ const WhereTo: React.FC = () => {
           />
         </View>
 
-        <View style={styles.optionsContainer}>
-          <Text
-            style={[styles.optionsTitle, { color: currentTheme.textPrimary }]}
-          >
-            Other Ways to Plan
-          </Text>
+        <View style={styles.spacer} />
 
-          {renderOptionCard(
-            <MaterialIcons
-              name="edit-calendar"
-              size={24}
-              color={currentTheme.alternate}
-            />,
-            "Build Manually",
-            "Create your own custom itinerary",
-            () => navigation.navigate("ManualTripBuilder")
-          )}
+        <View style={styles.optionsContainer}>
+          <View style={styles.optionsTitleContainer}>
+            <Text
+              style={[styles.optionsTitle, { color: currentTheme.textPrimary }]}
+            >
+              Other Ways to Plan
+            </Text>
+            <View
+              style={[
+                styles.comingSoonBadge,
+                { backgroundColor: currentTheme.alternate },
+              ]}
+            >
+              <Text style={styles.comingSoonText}>Coming Soon</Text>
+            </View>
+          </View>
 
           {renderOptionCard(
             <Ionicons
@@ -249,7 +253,20 @@ const WhereTo: React.FC = () => {
             />,
             "Get Recommendations",
             "Discover perfect destinations for you",
-            () => navigation.navigate("ChoosePlaces")
+            () => {},
+            true
+          )}
+
+          {renderOptionCard(
+            <MaterialIcons
+              name="edit-calendar"
+              size={24}
+              color={currentTheme.alternate}
+            />,
+            "Build Manually",
+            "Create your own custom itinerary",
+            () => {},
+            true
           )}
         </View>
       </Animated.View>
@@ -264,9 +281,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+    justifyContent: "space-between",
   },
   headerContainer: {
-    marginTop: 60,
+    marginTop: 20,
     marginBottom: 32,
   },
   heading: {
@@ -330,13 +348,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "outfit",
   },
-  optionsContainer: {
-    marginTop: 20,
+  spacer: {
+    flex: 1,
+  },
+  optionsContainer: {},
+  optionsTitleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 16,
   },
   optionsTitle: {
     fontSize: 20,
     fontFamily: "outfit-medium",
-    marginBottom: 16,
+    marginBottom: 0,
   },
   optionCard: {
     flexDirection: "row",
@@ -368,6 +393,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "outfit",
     opacity: 0.8,
+  },
+  comingSoonBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  comingSoonText: {
+    color: "white",
+    fontSize: 12,
+    fontFamily: "outfit",
   },
 });
 

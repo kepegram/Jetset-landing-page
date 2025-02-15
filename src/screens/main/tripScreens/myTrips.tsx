@@ -287,32 +287,32 @@ const MyTrips: React.FC = () => {
                   >
                     Upcoming Trips
                   </Text>
-                  <Pressable
-                    style={styles.seeAllButton}
-                    onPress={() => {
-                      const upcomingTrips = userTrips.filter((trip) => {
-                        const startDate = moment(
-                          trip.tripData.startDate
-                        ).startOf("day");
-                        return startDate.isAfter(moment().startOf("day"));
-                      });
-                      if (upcomingTrips.length > 0) {
-                        navigation.navigate("AllTripsView", {
-                          trips: JSON.stringify(upcomingTrips),
-                          type: "upcoming",
+                  {totalUpcomingTrips >= 3 && (
+                    <Pressable
+                      style={styles.seeAllButton}
+                      onPress={() => {
+                        const upcomingTrips = userTrips.filter((trip) => {
+                          const startDate = moment(trip.tripData.startDate).startOf("day");
+                          return startDate.isAfter(moment().startOf("day"));
                         });
-                      }
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.seeAllText,
-                        { color: currentTheme.alternate },
-                      ]}
+                        if (upcomingTrips.length > 0) {
+                          navigation.navigate("AllTripsView", {
+                            trips: JSON.stringify(upcomingTrips),
+                            type: "upcoming",
+                          });
+                        }
+                      }}
                     >
-                      See All
-                    </Text>
-                  </Pressable>
+                      <Text
+                        style={[
+                          styles.seeAllText,
+                          { color: currentTheme.alternate },
+                        ]}
+                      >
+                        See All
+                      </Text>
+                    </Pressable>
+                  )}
                 </View>
                 {sortedUpcomingTrips.length > 0 && (
                   <View>
@@ -350,78 +350,80 @@ const MyTrips: React.FC = () => {
                   </View>
                 )}
 
-                <View style={styles.sectionHeaderContainer}>
-                  <Text
-                    style={[
-                      styles.sectionTitle,
-                      { color: currentTheme.textPrimary },
-                    ]}
-                  >
-                    Past Trips
-                  </Text>
-                  <Pressable
-                    style={styles.seeAllButton}
-                    onPress={() => {
-                      const pastTrips = userTrips.filter((trip) =>
-                        moment(trip.tripData.endDate).isBefore(moment(), "day")
-                      );
-                      if (pastTrips.length > 0) {
-                        navigation.navigate("AllTripsView", {
-                          trips: JSON.stringify(pastTrips),
-                          type: "past",
-                        });
-                      }
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.seeAllText,
-                        { color: currentTheme.alternate },
-                      ]}
-                    >
-                      See All
-                    </Text>
-                  </Pressable>
-                </View>
-                {userTrips.some((trip) =>
-                  moment(trip.tripData.endDate).isBefore(moment(), "day")
-                ) && (
-                  <View style={styles.pastTripsContainer}>
-                    {getPastTrips().map((trip, index) => {
-                      if (!trip || !trip.tripData || !trip.tripPlan) {
-                        console.warn(
-                          `Skipping invalid trip at index ${index}:`,
-                          trip
-                        );
-                        return null;
-                      }
-                      return (
-                        <PastTripListCard
-                          trip={{
-                            tripData: trip.tripData,
-                            tripPlan: trip.tripPlan,
-                            id: trip.id,
-                          }}
-                          key={index}
-                        />
-                      );
-                    })}
-                    {totalPastTrips > ITEMS_TO_SHOW && (
-                      <Pressable
-                        style={styles.seeMoreButton}
-                        onPress={() => console.log("See all past trips")}
+                {totalPastTrips > 0 && (
+                  <>
+                    <View style={styles.sectionHeaderContainer}>
+                      <Text
+                        style={[
+                          styles.sectionTitle,
+                          { color: currentTheme.textPrimary },
+                        ]}
                       >
-                        <Text
-                          style={[
-                            styles.seeMoreText,
-                            { color: currentTheme.alternate },
-                          ]}
+                        Past Trips
+                      </Text>
+                      {totalPastTrips >= 3 && (
+                        <Pressable
+                          style={styles.seeAllButton}
+                          onPress={() => {
+                            const pastTrips = userTrips.filter((trip) =>
+                              moment(trip.tripData.endDate).isBefore(moment(), "day")
+                            );
+                            if (pastTrips.length > 0) {
+                              navigation.navigate("AllTripsView", {
+                                trips: JSON.stringify(pastTrips),
+                                type: "past",
+                              });
+                            }
+                          }}
                         >
-                          See All ({totalPastTrips})
-                        </Text>
-                      </Pressable>
-                    )}
-                  </View>
+                          <Text
+                            style={[
+                              styles.seeAllText,
+                              { color: currentTheme.alternate },
+                            ]}
+                          >
+                            See All
+                          </Text>
+                        </Pressable>
+                      )}
+                    </View>
+                    <View style={styles.pastTripsContainer}>
+                      {getPastTrips().map((trip, index) => {
+                        if (!trip || !trip.tripData || !trip.tripPlan) {
+                          console.warn(
+                            `Skipping invalid trip at index ${index}:`,
+                            trip
+                          );
+                          return null;
+                        }
+                        return (
+                          <PastTripListCard
+                            trip={{
+                              tripData: trip.tripData,
+                              tripPlan: trip.tripPlan,
+                              id: trip.id,
+                            }}
+                            key={index}
+                          />
+                        );
+                      })}
+                      {totalPastTrips > ITEMS_TO_SHOW && (
+                        <Pressable
+                          style={styles.seeMoreButton}
+                          onPress={() => console.log("See all past trips")}
+                        >
+                          <Text
+                            style={[
+                              styles.seeMoreText,
+                              { color: currentTheme.alternate },
+                            ]}
+                          >
+                            See All ({totalPastTrips})
+                          </Text>
+                        </Pressable>
+                      )}
+                    </View>
+                  </>
                 )}
               </View>
             )}

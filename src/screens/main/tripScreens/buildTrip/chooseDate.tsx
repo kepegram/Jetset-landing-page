@@ -105,13 +105,8 @@ const ChooseDate: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.contentContainer}>
           <View style={styles.headerContainer}>
-            <Text
-              style={[styles.subheading, { color: currentTheme.textSecondary }]}
-            >
-              When?
-            </Text>
             <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-              Choose your dates
+              Choose your dates 📅
             </Text>
             <View
               style={[
@@ -218,16 +213,19 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   headerContainer: {
-    marginBottom: 2,
+    marginTop: 20,
+    marginBottom: 32,
   },
   subheading: {
-    fontSize: 18,
+    fontSize: 16,
+    fontFamily: "outfit",
+    opacity: 0.8,
     marginBottom: 8,
   },
   heading: {
     fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 16,
+    fontFamily: "outfit-bold",
+    marginBottom: 8,
   },
   dateRangeContainer: {
     flexDirection: "row",

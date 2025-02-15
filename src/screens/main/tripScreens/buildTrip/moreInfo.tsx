@@ -1,11 +1,18 @@
-import { View, Text, StyleSheet, SafeAreaView, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  Pressable,
+  ScrollView,
+} from "react-native";
 import React, { useContext, useState } from "react";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../../../context/themeContext";
 import { MainButton } from "../../../../components/ui/button";
-import Ionicons from "@expo/vector-icons/build/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 import { CreateTripContext } from "../../../../context/createTripContext";
 
 type MoreInfoNavigationProp = StackNavigationProp<
@@ -26,33 +33,67 @@ const MoreInfo: React.FC = () => {
     selected,
     onPress,
     label,
+    icon,
+    description,
   }: {
     selected: boolean;
     onPress: () => void;
     label: string;
+    icon: keyof typeof Ionicons.glyphMap;
+    description: string;
   }) => (
     <Pressable
       onPress={onPress}
-      style={[
+      style={({ pressed }) => [
         styles.selectionButton,
         {
-          // Change background color based on selection state
-          backgroundColor: selected
+          backgroundColor: currentTheme.background,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
+          borderColor: selected
             ? currentTheme.alternate
-            : currentTheme.accentBackground,
-          borderColor: currentTheme.alternate,
+            : currentTheme.secondary,
         },
       ]}
     >
-      <Text
-        style={[
-          styles.selectionText,
-          // Change text color based on selection state
-          { color: selected ? "#FFFFFF" : currentTheme.textPrimary },
-        ]}
-      >
-        {label}
-      </Text>
+      <View style={styles.selectionContent}>
+        <View
+          style={[
+            styles.iconContainer,
+            {
+              backgroundColor: selected
+                ? currentTheme.alternate
+                : currentTheme.background,
+            },
+          ]}
+        >
+          <Ionicons
+            name={icon}
+            size={24}
+            color={selected ? "white" : currentTheme.textSecondary}
+          />
+        </View>
+        <View style={styles.selectionTextContainer}>
+          <Text
+            style={[
+              styles.selectionTitle,
+              {
+                color: currentTheme.textPrimary,
+                fontWeight: selected ? "600" : "400",
+              },
+            ]}
+          >
+            {label}
+          </Text>
+          <Text
+            style={[
+              styles.selectionDescription,
+              { color: currentTheme.textSecondary },
+            ]}
+          >
+            {description}
+          </Text>
+        </View>
+      </View>
     </Pressable>
   );
 
@@ -60,65 +101,78 @@ const MoreInfo: React.FC = () => {
     <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <View style={styles.contentContainer}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.headerContainer}>
+          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+            Trip Preferences ⚙️
+          </Text>
           <Text
             style={[styles.subheading, { color: currentTheme.textSecondary }]}
           >
-            Almost there!
-          </Text>
-          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-            Let's customize your perfect trip
+            Help us further customize your perfect itinerary!
           </Text>
         </View>
 
         <View style={styles.selectionsContainer}>
-          {/* Activity Level Selection Section */}
-          <View style={styles.inputContainer}>
-            <View style={styles.labelContainer}>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
               <Ionicons
                 name="walk-outline"
                 size={24}
                 color={currentTheme.alternate}
               />
               <Text
-                style={[styles.labelText, { color: currentTheme.textPrimary }]}
+                style={[
+                  styles.sectionTitle,
+                  { color: currentTheme.textPrimary },
+                ]}
               >
-                How active do you want to be?
+                Activity Level
               </Text>
             </View>
-            {/* Activity level options */}
             <View style={styles.optionsContainer}>
               <SelectionButton
                 selected={activityLevel === "Low"}
                 onPress={() => setActivityLevel("Low")}
                 label="Take it easy"
+                description="Relaxed pace with plenty of downtime"
+                icon="leaf-outline"
               />
               <SelectionButton
                 selected={activityLevel === "Normal"}
                 onPress={() => setActivityLevel("Normal")}
                 label="Balanced mix"
+                description="Good blend of activities and rest"
+                icon="walk-outline"
               />
               <SelectionButton
                 selected={activityLevel === "High"}
                 onPress={() => setActivityLevel("High")}
                 label="Adventure packed"
+                description="Full days with lots of activities"
+                icon="bicycle-outline"
               />
             </View>
           </View>
 
-          {/* Budget Selection Section */}
-          <View style={styles.inputContainer}>
-            <View style={styles.labelContainer}>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
               <Ionicons
                 name="wallet-outline"
                 size={24}
                 color={currentTheme.alternate}
               />
               <Text
-                style={[styles.labelText, { color: currentTheme.textPrimary }]}
+                style={[
+                  styles.sectionTitle,
+                  { color: currentTheme.textPrimary },
+                ]}
               >
-                What's your budget like?
+                Budget Range
               </Text>
             </View>
             <View style={styles.optionsContainer}>
@@ -126,42 +180,44 @@ const MoreInfo: React.FC = () => {
                 selected={budget === "Frugal"}
                 onPress={() => setBudget("Frugal")}
                 label="Budget friendly"
+                description="Economic options and good deals"
+                icon="wallet-outline"
               />
               <SelectionButton
                 selected={budget === "Average"}
                 onPress={() => setBudget("Average")}
                 label="Mid-range"
+                description="Mix of comfort and value"
+                icon="card-outline"
               />
               <SelectionButton
                 selected={budget === "Luxury"}
                 onPress={() => setBudget("Luxury")}
                 label="High-end"
+                description="Premium experiences and luxury stays"
+                icon="diamond-outline"
               />
             </View>
           </View>
+        </View>
 
-          {/* Continue Button */}
+        <View style={styles.footer}>
           <MainButton
             onPress={() => {
-              // Update trip data with selected preferences
               setTripData({
-                ...tripData,
-                activityLevel,
-                budget,
-              });
-              console.log("Trip Data:", {
                 ...tripData,
                 activityLevel,
                 budget,
               });
               navigation.navigate("ReviewTrip");
             }}
-            buttonText="Review Your Trip"
+            buttonText="Continue"
             width="85%"
             backgroundColor={currentTheme.alternate}
+            disabled={!activityLevel || !budget}
           />
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -170,54 +226,86 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  contentContainer: {
+  scrollView: {
     flex: 1,
+  },
+  contentContainer: {
     padding: 20,
+    paddingBottom: 40,
   },
   headerContainer: {
-    marginBottom: 10,
-  },
-  subheading: {
-    fontSize: 18,
-    marginBottom: 8,
+    marginBottom: 32,
   },
   heading: {
     fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 12,
+    fontFamily: "outfit-bold",
+    marginBottom: 8,
+  },
+  subheading: {
+    fontSize: 16,
+    fontFamily: "outfit",
+    opacity: 0.8,
   },
   selectionsContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    gap: 32,
+    marginBottom: 20,
   },
-  inputContainer: {
-    width: "100%",
-    marginBottom: 35,
+  section: {
+    gap: 16,
   },
-  labelContainer: {
+  sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    gap: 12,
   },
-  labelText: {
-    paddingLeft: 12,
-    fontSize: 18,
-    fontWeight: "500",
+  sectionTitle: {
+    fontSize: 20,
+    fontFamily: "outfit-medium",
   },
   optionsContainer: {
-    flexDirection: "column",
     gap: 12,
   },
   selectionButton: {
-    padding: 12,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  selectionContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
     borderRadius: 12,
-    borderWidth: 1.5,
+    justifyContent: "center",
     alignItems: "center",
   },
-  selectionText: {
+  selectionTextContainer: {
+    flex: 1,
+  },
+  selectionTitle: {
     fontSize: 16,
-    fontWeight: "500",
+    fontFamily: "outfit-medium",
+    marginBottom: 4,
+  },
+  selectionDescription: {
+    fontSize: 14,
+    fontFamily: "outfit",
+    opacity: 0.7,
+  },
+  footer: {
+    alignItems: "center",
+    marginTop: 20,
   },
 });
 

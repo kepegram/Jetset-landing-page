@@ -144,7 +144,7 @@ const MyTripsStack: React.FC = () => {
   const { setTripData } = useContext(CreateTripContext) || {};
   const screens = [
     "WhereTo",
-    "ChoosePlaces",
+    //"ChoosePlaces",
     "ChooseDate",
     "WhosGoing",
     "MoreInfo",
@@ -281,7 +281,7 @@ const MyTripsStack: React.FC = () => {
           title: "",
         })}
       />
-      <RootStack.Screen
+      {/* <RootStack.Screen
         name="ManualTripBuilder"
         component={ManualTripBuilder}
         options={({ navigation }) => ({
@@ -316,15 +316,15 @@ const MyTripsStack: React.FC = () => {
             </View>
           ),
         })}
-      />
-      <RootStack.Screen
+      /> */}
+      {/* <RootStack.Screen
         name="ChoosePlaces"
         component={ChoosePlaces}
         options={({ navigation, route }) => ({
           ...tripBuilderScreenOptions({ navigation, route }),
           title: "",
         })}
-      />
+      /> */}
       <RootStack.Screen
         name="ChooseDate"
         component={ChooseDate}
