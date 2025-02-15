@@ -110,17 +110,6 @@ const IteneraryDetail: React.FC = () => {
               >
                 {place.placeDetails}
               </Text>
-            </View>
-
-            <View style={styles.section}>
-              <Text
-                style={[
-                  styles.sectionTitle,
-                  { color: currentTheme.textPrimary },
-                ]}
-              >
-                More Information
-              </Text>
               <Text
                 style={[
                   styles.detailText,

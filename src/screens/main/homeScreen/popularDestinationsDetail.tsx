@@ -65,8 +65,10 @@ const PopularDestinations: React.FC = () => {
   }, [navigation]);
 
   return (
-    <View
+    <ScrollView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
     >
       <StatusBar barStyle="light-content" />
 
@@ -79,136 +81,131 @@ const PopularDestinations: React.FC = () => {
         />
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <View
+        style={[
+          styles.contentContainer,
+          { backgroundColor: currentTheme.background },
+        ]}
       >
-        <View
-          style={[
-            styles.contentContainer,
-            { backgroundColor: currentTheme.background },
-          ]}
-        >
-          {/* Destination Title */}
-          <View style={styles.headerContainer}>
-            <View style={styles.titleContainer}>
+        {/* Destination Title */}
+        <View style={styles.headerContainer}>
+          <View style={styles.titleContainer}>
+            <Text
+              style={[
+                styles.destinationTitle,
+                { color: currentTheme.textPrimary },
+              ]}
+            >
+              {destination.name}
+            </Text>
+          </View>
+        </View>
+
+        {/* Best Time to Visit Card */}
+        <View style={styles.tripMetaContainer}>
+          <View
+            style={[
+              styles.tripMetaItem,
+              { backgroundColor: `${currentTheme.alternate}10` },
+            ]}
+          >
+            <View style={styles.tripMetaIconContainer}>
+              <Ionicons
+                name="calendar-outline"
+                size={24}
+                color={currentTheme.alternate}
+              />
+            </View>
+            <View style={styles.tripMetaTextContainer}>
               <Text
                 style={[
-                  styles.destinationTitle,
+                  styles.tripMetaLabel,
+                  { color: currentTheme.textSecondary },
+                ]}
+              >
+                Best Time to Visit
+              </Text>
+              <Text
+                style={[
+                  styles.tripMetaText,
                   { color: currentTheme.textPrimary },
                 ]}
               >
-                {destination.name}
+                {destination.bestTimeToVisit}
               </Text>
             </View>
           </View>
+        </View>
 
-          {/* Best Time to Visit Card */}
-          <View style={styles.tripMetaContainer}>
-            <View
-              style={[
-                styles.tripMetaItem,
-                { backgroundColor: `${currentTheme.alternate}10` },
-              ]}
-            >
-              <View style={styles.tripMetaIconContainer}>
-                <Ionicons
-                  name="calendar-outline"
-                  size={24}
-                  color={currentTheme.alternate}
-                />
-              </View>
-              <View style={styles.tripMetaTextContainer}>
-                <Text
-                  style={[
-                    styles.tripMetaLabel,
-                    { color: currentTheme.textSecondary },
-                  ]}
-                >
-                  Best Time to Visit
-                </Text>
-                <Text
-                  style={[
-                    styles.tripMetaText,
-                    { color: currentTheme.textPrimary },
-                  ]}
-                >
-                  {destination.bestTimeToVisit}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Description Section */}
-          <View
+        {/* Description Section */}
+        <View
+          style={[
+            styles.descriptionContainer,
+            { backgroundColor: `${currentTheme.accentBackground}80` },
+          ]}
+        >
+          <Text
             style={[
-              styles.descriptionContainer,
-              { backgroundColor: `${currentTheme.accentBackground}80` },
+              styles.descriptionTitle,
+              { color: currentTheme.textPrimary },
             ]}
           >
+            About
+          </Text>
+          <Text
+            style={[styles.description, { color: currentTheme.textPrimary }]}
+          >
+            {destination.description}
+          </Text>
+        </View>
+
+        {/* Map Section (if coordinates available) */}
+        {destination.geoCoordinates && (
+          <View style={styles.mapSection}>
             <Text
               style={[
                 styles.descriptionTitle,
                 { color: currentTheme.textPrimary },
               ]}
             >
-              About
+              Location
             </Text>
-            <Text
-              style={[styles.description, { color: currentTheme.textPrimary }]}
-            >
-              {destination.description}
-            </Text>
-          </View>
-
-          {/* Map Section (if coordinates available) */}
-          {destination.geoCoordinates && (
-            <View style={styles.mapSection}>
-              <Text
-                style={[
-                  styles.descriptionTitle,
-                  { color: currentTheme.textPrimary },
-                ]}
+            <View style={styles.mapContainer}>
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: destination.geoCoordinates.latitude,
+                  longitude: destination.geoCoordinates.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
               >
-                Location
-              </Text>
-              <View style={styles.mapContainer}>
-                <MapView
-                  style={styles.map}
-                  initialRegion={{
+                <Marker
+                  coordinate={{
                     latitude: destination.geoCoordinates.latitude,
                     longitude: destination.geoCoordinates.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
                   }}
-                >
-                  <Marker
-                    coordinate={{
-                      latitude: destination.geoCoordinates.latitude,
-                      longitude: destination.geoCoordinates.longitude,
-                    }}
-                    title={destination.name}
-                  />
-                </MapView>
-              </View>
+                  title={destination.name}
+                />
+              </MapView>
             </View>
-          )}
+          </View>
+        )}
 
-          {/* Start Planning Button */}
-          <Pressable
-            style={[
-              styles.exploreButton,
-              { backgroundColor: currentTheme.alternate },
-            ]}
-            onPress={() => {
-              /* Handle explore press */
-            }}
-          >
-            <Text style={styles.exploreButtonText}>Start Planning!</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-    </View>
+        {/* Start Planning Button */}
+        <Pressable
+          style={[
+            styles.exploreButton,
+            { backgroundColor: currentTheme.alternate },
+          ]}
+          onPress={() => {
+            /* Handle explore press */
+          }}
+        >
+          <Text style={styles.exploreButtonText}>Start Planning!</Text>
+        </Pressable>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -216,11 +213,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   imageContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
     height: height * 0.5,
   },
   image: {
@@ -236,10 +232,6 @@ const styles = StyleSheet.create({
     width: 44,
     alignItems: "center",
     justifyContent: "center",
-  },
-  scrollContent: {
-    paddingBottom: 100,
-    marginTop: height * 0.45,
   },
   contentContainer: {
     padding: 24,
@@ -305,6 +297,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: "center",
+    marginBottom: 20,
   },
   exploreButtonText: {
     color: "#fff",

@@ -30,6 +30,7 @@ import CurrentTripDetails from "../screens/main/tripScreens/viewTrip/currentTrip
 import PastTripDetails from "../screens/main/tripScreens/viewTrip/pastTripDetails";
 import IteneraryDetail from "../screens/main/tripScreens/viewTrip/iteneraryDetail";
 import HotelDetail from "../screens/main/tripScreens/viewTrip/hotelDetail";
+import ManualTripBuilder from "../screens/main/tripScreens/buildTrip/manual/manualTripBuilder";
 import WhereTo from "../screens/main/tripScreens/buildTrip/whereTo";
 import ChoosePlaces from "../screens/main/tripScreens/buildTrip/choosePlaces";
 import ChooseDate from "../screens/main/tripScreens/buildTrip/chooseDate";
@@ -51,6 +52,7 @@ export type RootStackParamList = {
   RecommendedTripDetails: { trip: string; photoRef: string };
   MyTripsMain: undefined;
   WhereTo: undefined;
+  ManualTripBuilder: undefined;
   ChoosePlaces: undefined;
   ChooseDate: undefined;
   WhosGoing: undefined;
@@ -277,6 +279,42 @@ const MyTripsStack: React.FC = () => {
         options={({ navigation, route }) => ({
           ...tripBuilderScreenOptions({ navigation, route }),
           title: "",
+        })}
+      />
+      <RootStack.Screen
+        name="ManualTripBuilder"
+        component={ManualTripBuilder}
+        options={({ navigation }) => ({
+          headerTransparent: true,
+          headerStyle: {
+            backgroundColor: "transparent",
+          },
+          contentStyle: {
+            backgroundColor: currentTheme.background,
+          },
+          headerShadowVisible: false,
+          animation: "slide_from_right",
+          headerLeft: () => (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+                marginLeft: 8,
+              }}
+            >
+              <Pressable
+                onPress={() => navigation.goBack()}
+                style={{ padding: 4 }}
+              >
+                <Ionicons
+                  name="arrow-back"
+                  size={26}
+                  color={currentTheme.textPrimary}
+                />
+              </Pressable>
+            </View>
+          ),
         })}
       />
       <RootStack.Screen

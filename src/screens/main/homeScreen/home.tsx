@@ -106,18 +106,6 @@ const Home: React.FC = () => {
     }
   };
 
-  // Set trip type and navigate to date selection
-  const setTerrainTrip = async (terrainType: string) => {
-    setTripData({
-      ...tripData,
-      destinationType: terrainType,
-    });
-    // @ts-ignore - Nested navigation type issue
-    navigation.navigate("MyTrips", {
-      screen: "ChooseDate",
-    });
-  };
-
   const fetchPhotoReference = async (
     placeName: string
   ): Promise<string | null> => {
@@ -298,45 +286,6 @@ const Home: React.FC = () => {
             <Text testID="home-subgreeting" style={styles.subGreetingText}>
               Let's plan your next adventure
             </Text>
-            <View style={styles.terrainContainer}>
-              {[
-                { label: "Beach", icon: "umbrella-beach", type: "fa" },
-                { label: "Mountain", icon: "mountain", type: "fa" },
-                {
-                  label: "Island",
-                  icon: "island",
-                  type: "fo",
-                },
-                {
-                  label: "Landmark",
-                  icon: "globe-americas",
-                  type: "fa",
-                },
-              ].map(({ label, icon, type }) => (
-                <Pressable
-                  key={label}
-                  onPress={() => setTerrainTrip(label)}
-                  style={({ pressed }) => [
-                    styles.button,
-                    {
-                      transform: [{ scale: pressed ? 0.95 : 1 }],
-                      backgroundColor: pressed
-                        ? "rgba(255,255,255,0.2)"
-                        : "rgba(5, 5, 5, 0.6)",
-                      borderColor: currentTheme.alternate,
-                      width: width * 0.22,
-                    },
-                  ]}
-                >
-                  {type === "fa" ? (
-                    <FontAwesome5 name={icon} size={28} color="white" />
-                  ) : (
-                    <Fontisto name={icon as any} size={28} color="white" />
-                  )}
-                  <Text style={styles.buttonText}>{label}</Text>
-                </Pressable>
-              ))}
-            </View>
           </View>
         </View>
 
@@ -643,18 +592,18 @@ const styles = StyleSheet.create({
   },
   header: {
     width: "100%",
-    height: 380,
+    height: 280,
     zIndex: -1,
   },
   imageContainer: {
     position: "absolute",
-    top: 0,
+    top: -30,
     left: 0,
     right: 0,
   },
   image: {
     width: "100%",
-    height: 380,
+    height: 280,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -686,41 +635,6 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
   },
-  terrainContainer: {
-    flexDirection: "row",
-    marginTop: 30,
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  button: {
-    padding: 15,
-    borderRadius: 20,
-    borderWidth: 1,
-    height: width * 0.3,
-    alignItems: "center",
-    justifyContent: "center",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "600",
-    marginTop: 12,
-    fontSize: 11,
-    textAlign: "center",
-    width: "100%",
-    flexShrink: 1,
-    flexWrap: "nowrap",
-  },
   scrollViewContent: {
     paddingBottom: 40,
   },
@@ -729,7 +643,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop: -20,
+    marginTop: -70,
   },
   searchContainer: {
     marginBottom: 20,

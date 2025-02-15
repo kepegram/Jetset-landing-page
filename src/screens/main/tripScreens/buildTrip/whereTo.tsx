@@ -1,5 +1,12 @@
-import { View, Text, Pressable, StyleSheet, SafeAreaView } from "react-native";
-import React, { useContext, useCallback, useState } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  SafeAreaView,
+  Animated,
+} from "react-native";
+import React, { useContext, useCallback, useState, useRef } from "react";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../../navigation/appNav";
@@ -10,7 +17,7 @@ import {
   GooglePlacesAutocomplete,
 } from "react-native-google-places-autocomplete";
 import { CreateTripContext } from "../../../../context/createTripContext";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 type WhereToNavigationProp = StackNavigationProp<RootStackParamList, "WhereTo">;
 
@@ -47,6 +54,7 @@ const WhereTo: React.FC = () => {
   const { tripData = {}, setTripData = () => {} } =
     useContext(CreateTripContext) || {};
   const [photoRef, setPhotoRef] = useState<string | null>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useFocusEffect(
     useCallback(() => {
@@ -58,6 +66,12 @@ const WhereTo: React.FC = () => {
           backgroundColor: "transparent",
         },
       });
+
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
     }, [navigation])
   );
 
@@ -99,153 +113,147 @@ const WhereTo: React.FC = () => {
     navigation.navigate("ChooseDate");
   };
 
+  const renderOptionCard = (
+    icon: JSX.Element,
+    title: string,
+    description: string,
+    onPress: () => void
+  ) => (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.optionCard,
+        {
+          backgroundColor: pressed
+            ? `${currentTheme.alternate}15`
+            : `${currentTheme.secondary}10`,
+          borderColor: currentTheme.alternate,
+        },
+      ]}
+    >
+      <View style={styles.optionIconContainer}>{icon}</View>
+      <View style={styles.optionContent}>
+        <Text style={[styles.optionTitle, { color: currentTheme.textPrimary }]}>
+          {title}
+        </Text>
+        <Text
+          style={[
+            styles.optionDescription,
+            { color: currentTheme.textSecondary },
+          ]}
+        >
+          {description}
+        </Text>
+      </View>
+      <MaterialIcons
+        name="arrow-forward-ios"
+        size={20}
+        color={currentTheme.textSecondary}
+      />
+    </Pressable>
+  );
+
   return (
-    <View
+    <SafeAreaView
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.contentContainer}>
-          <View style={styles.headerContainer}>
-            <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-              Where would you like to go? ✈️
-            </Text>
-            <Text
-              style={[styles.subheading, { color: currentTheme.textSecondary }]}
-            >
-              Search for a city, region, or country
-            </Text>
-          </View>
-
-          <View style={styles.searchContainer}>
-            <GooglePlacesAutocomplete
-              placeholder="Search destinations..."
-              textInputProps={{
-                placeholderTextColor: currentTheme.textSecondary,
-                returnKeyType: "search",
-              }}
-              fetchDetails={true}
-              onPress={handlePlaceSelect}
-              query={{
-                key: process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
-                language: "en",
-              }}
-              styles={{
-                container: {
-                  flex: 0,
-                  width: "100%",
-                  zIndex: 1,
-                },
-                textInputContainer: {
-                  backgroundColor: "transparent",
-                  borderTopWidth: 0,
-                  borderBottomWidth: 0,
-                  marginHorizontal: 0,
-                  paddingHorizontal: 0,
-                },
-                textInput: {
-                  backgroundColor: currentTheme.background,
-                  color: currentTheme.textPrimary,
-                  fontSize: 18,
-                  fontFamily: "outfit",
-                  height: 55,
-                  borderRadius: 12,
-                  paddingHorizontal: 20,
-                  paddingVertical: 10,
-                  marginTop: 0,
-                  marginBottom: 0,
-                  marginLeft: 0,
-                  marginRight: 0,
-                  borderWidth: 1,
-                  borderColor: "grey",
-                },
-                listView: {
-                  backgroundColor: currentTheme.background,
-                  borderRadius: 12,
-                  marginTop: 10,
-                  marginHorizontal: 0,
-                  elevation: 3,
-                  shadowColor: "#000",
-                  shadowOpacity: 0.1,
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowRadius: 4,
-                },
-                row: {
-                  backgroundColor: currentTheme.background,
-                  padding: 15,
-                  height: "auto",
-                  minHeight: 50,
-                },
-                separator: {
-                  height: 1,
-                  backgroundColor: `${currentTheme.textSecondary}20`,
-                  marginLeft: 15,
-                  marginRight: 15,
-                },
-                description: {
-                  color: currentTheme.textPrimary,
-                  fontSize: 16,
-                  fontFamily: "outfit",
-                },
-                powered: {
-                  display: "none",
-                },
-                poweredContainer: {
-                  display: "none",
-                },
-              }}
-            />
-          </View>
-
-          <View style={styles.dividerContainer}>
-            <View
-              style={[
-                styles.dividerLine,
-                { backgroundColor: currentTheme.textSecondary },
-              ]}
-            />
-            <Text
-              style={[
-                styles.dividerText,
-                { color: currentTheme.textSecondary },
-              ]}
-            >
-              Don't know?
-            </Text>
-            <View
-              style={[
-                styles.dividerLine,
-                { backgroundColor: currentTheme.textSecondary },
-              ]}
-            />
-          </View>
-
-          <Pressable
-            onPress={() => navigation.navigate("ChoosePlaces")}
-            style={({ pressed }) => [
-              styles.helpButton,
-              {
-                backgroundColor: pressed
-                  ? currentTheme.alternate
-                  : currentTheme.background,
-                borderColor: currentTheme.alternate,
-              },
-            ]}
+      <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+        <View style={styles.headerContainer}>
+          <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
+            Start Your Journey ✈️
+          </Text>
+          <Text
+            style={[styles.subheading, { color: currentTheme.textSecondary }]}
           >
+            Where would you like to explore?
+          </Text>
+        </View>
+
+        <View style={styles.searchContainer}>
+          <GooglePlacesAutocomplete
+            placeholder="Search destinations..."
+            textInputProps={{
+              placeholderTextColor: currentTheme.textSecondary,
+              returnKeyType: "search",
+            }}
+            fetchDetails={true}
+            onPress={handlePlaceSelect}
+            query={{
+              key: process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY,
+              language: "en",
+            }}
+            styles={{
+              container: styles.autocompleteContainer,
+              textInputContainer: styles.textInputContainer,
+              textInput: [
+                styles.textInput,
+                {
+                  backgroundColor: `${currentTheme.secondary}15`,
+                  color: currentTheme.textPrimary,
+                  borderColor: `${currentTheme.alternate}30`,
+                },
+              ],
+              listView: [
+                styles.listView,
+                {
+                  backgroundColor: currentTheme.background,
+                },
+              ],
+              row: [
+                styles.row,
+                {
+                  backgroundColor: currentTheme.background,
+                },
+              ],
+              separator: [
+                styles.separator,
+                {
+                  backgroundColor: `${currentTheme.textSecondary}20`,
+                },
+              ],
+              description: [
+                styles.description,
+                {
+                  color: currentTheme.textPrimary,
+                },
+              ],
+              powered: { display: "none" },
+              poweredContainer: { display: "none" },
+            }}
+          />
+        </View>
+
+        <View style={styles.optionsContainer}>
+          <Text
+            style={[styles.optionsTitle, { color: currentTheme.textPrimary }]}
+          >
+            Other Ways to Plan
+          </Text>
+
+          {renderOptionCard(
+            <MaterialIcons
+              name="edit-calendar"
+              size={24}
+              color={currentTheme.alternate}
+            />,
+            "Build Manually",
+            "Create your own custom itinerary",
+            () => navigation.navigate("ManualTripBuilder")
+          )}
+
+          {renderOptionCard(
             <Ionicons
               name="compass-outline"
               size={24}
-              color={currentTheme.textPrimary}
-              style={styles.buttonIcon}
-            />
-            <Text
-              style={[styles.buttonText, { color: currentTheme.textPrimary }]}
-            >
-              Help me choose
-            </Text>
-          </Pressable>
+              color={currentTheme.alternate}
+            />,
+            "Get Recommendations",
+            "Discover perfect destinations for you",
+            () => navigation.navigate("ChoosePlaces")
+          )}
         </View>
-      </SafeAreaView>
-    </View>
+      </Animated.View>
+    </SafeAreaView>
   );
 };
 
@@ -253,68 +261,113 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  safeArea: {
-    flex: 1,
-  },
-  contentContainer: {
+  content: {
     flex: 1,
     padding: 20,
   },
   headerContainer: {
-    marginTop: 100,
+    marginTop: 60,
     marginBottom: 32,
   },
   heading: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontFamily: "outfit-bold",
     marginBottom: 8,
   },
   subheading: {
     fontSize: 16,
+    fontFamily: "outfit",
     opacity: 0.8,
   },
   searchContainer: {
     marginBottom: 32,
   },
-  dividerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 32,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    opacity: 0.2,
-  },
-  dividerText: {
-    paddingHorizontal: 16,
-    fontSize: 15,
-    fontFamily: "outfit-medium",
-  },
-  helpButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderRadius: 15,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+  autocompleteContainer: {
+    flex: 0,
     width: "100%",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    zIndex: 1,
+  },
+  textInputContainer: {
+    backgroundColor: "transparent",
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+    marginHorizontal: 0,
+    paddingHorizontal: 0,
+  },
+  textInput: {
+    height: 55,
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    fontSize: 16,
+    fontFamily: "outfit",
+    borderWidth: 1,
+    marginTop: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+  },
+  listView: {
+    borderRadius: 12,
+    marginTop: 10,
+    marginHorizontal: 0,
     elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
-  buttonIcon: {
-    marginRight: 8,
+  row: {
+    padding: 15,
+    height: "auto",
+    minHeight: 50,
   },
-  buttonText: {
+  separator: {
+    height: 1,
+    marginLeft: 15,
+    marginRight: 15,
+  },
+  description: {
+    fontSize: 16,
+    fontFamily: "outfit",
+  },
+  optionsContainer: {
+    marginTop: 20,
+  },
+  optionsTitle: {
+    fontSize: 20,
+    fontFamily: "outfit-medium",
+    marginBottom: 16,
+  },
+  optionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "transparent",
+  },
+  optionIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  optionContent: {
+    flex: 1,
+  },
+  optionTitle: {
     fontSize: 16,
     fontFamily: "outfit-medium",
+    marginBottom: 4,
+  },
+  optionDescription: {
+    fontSize: 14,
+    fontFamily: "outfit",
+    opacity: 0.8,
   },
 });
 

@@ -87,7 +87,9 @@ const RecommendedTripDetails: React.FC = () => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: currentTheme.background }]}>
+    <View
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
       <StatusBar barStyle="light-content" />
       <View style={styles.imageContainer}>
         <Image
@@ -140,26 +142,6 @@ const RecommendedTripDetails: React.FC = () => {
                 ]}
               >
                 {tripDetails?.travelPlan?.numberOfDays} days
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.tripMetaItem,
-                { backgroundColor: `${currentTheme.alternate}20` },
-              ]}
-            >
-              <Ionicons
-                name="moon-outline"
-                size={22}
-                color={currentTheme.alternate}
-              />
-              <Text
-                style={[
-                  styles.tripMetaText,
-                  { color: currentTheme.textPrimary },
-                ]}
-              >
-                {tripDetails?.travelPlan?.numberOfNights} nights
               </Text>
             </View>
           </View>

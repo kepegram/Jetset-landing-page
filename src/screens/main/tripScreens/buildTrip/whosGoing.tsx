@@ -1,28 +1,50 @@
-import { View, Text, StyleSheet, Animated, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, Animated, SafeAreaView, Pressable } from "react-native";
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { CreateTripContext } from "../../../../context/createTripContext";
 import { useTheme } from "../../../../context/themeContext";
-import Slider from "@react-native-community/slider";
 import { MainButton } from "../../../../components/ui/button";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
-type WhosGoingNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "WhosGoing"
->;
+type WhosGoingNavigationProp = StackNavigationProp<RootStackParamList, "WhosGoing">;
+
+const travelOptions = [
+  {
+    value: 1,
+    label: "Solo",
+    description: "Adventure at your own pace",
+    icon: "person-outline",
+  },
+  {
+    value: 2,
+    label: "Couple",
+    description: "Perfect for two",
+    icon: "people-outline",
+  },
+  {
+    value: 3,
+    label: "Small Group",
+    description: "3-4 travelers",
+    icon: "people",
+  },
+  {
+    value: 4,
+    label: "Large Group",
+    description: "5+ travelers",
+    icon: "people-circle-outline",
+  },
+];
 
 const WhosGoing: React.FC = () => {
   const navigation = useNavigation<WhosGoingNavigationProp>();
   const { currentTheme } = useTheme();
-  const { tripData = {}, setTripData = () => {} } =
-    useContext(CreateTripContext) || {};
+  const { tripData = {}, setTripData = () => {} } = useContext(CreateTripContext) || {};
   const [whoIsGoing, setWhoIsGoing] = useState<number>(1);
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
 
-  // Initialize trip data with default solo traveler setting
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
@@ -30,134 +52,124 @@ const WhosGoing: React.FC = () => {
       headerTitle: "",
     });
 
-    const updatedTripData = {
-      ...tripData,
-      whoIsGoing: "Solo",
-    };
-    setTripData(updatedTripData);
-  }, [navigation]);
-
-  // Handle selection of number of travelers
-  const handleWhoIsGoingChange = (value: number) => {
-    setWhoIsGoing(value);
-
-    // Determine text description based on number selected
-    let whoIsGoingText = "Group";
-    if (value === 1) {
-      whoIsGoingText = "Solo";
-    } else if (value === 2) {
-      whoIsGoingText = "Couple";
-    }
-
-    // Update trip data with selection
-    const updatedTripData = {
-      ...tripData,
-      whoIsGoing: whoIsGoingText,
-    };
-    setTripData(updatedTripData);
-
-    // Animate the selection text
-    Animated.sequence([
-      Animated.timing(scaleAnim, {
-        toValue: 1.2,
-        duration: 100,
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
         useNativeDriver: true,
       }),
-      Animated.timing(scaleAnim, {
+      Animated.spring(scaleAnim, {
         toValue: 1,
-        duration: 100,
+        tension: 20,
+        friction: 7,
         useNativeDriver: true,
       }),
     ]).start();
+
+    setTripData({
+      ...tripData,
+      whoIsGoing: "Solo",
+    });
+  }, [navigation]);
+
+  const handleOptionSelect = (value: number) => {
+    setWhoIsGoing(value);
+    const option = travelOptions.find(opt => opt.value === value);
+    setTripData({
+      ...tripData,
+      whoIsGoing: option?.label,
+    });
   };
 
-  const getIconForSelection = () => {
-    if (whoIsGoing === 1) return "person-outline";
-    if (whoIsGoing === 2) return "people-outline";
-    return "people-circle-outline";
-  };
+  const renderOption = (option: typeof travelOptions[0]) => (
+    <Pressable
+      key={option.value}
+      onPress={() => handleOptionSelect(option.value)}
+      style={({ pressed }) => [
+        styles.optionCard,
+        {
+          backgroundColor: whoIsGoing === option.value 
+            ? `${currentTheme.alternate}15`
+            : `${currentTheme.secondary}10`,
+          borderColor: whoIsGoing === option.value 
+            ? currentTheme.alternate
+            : 'transparent',
+          transform: [{
+            scale: pressed ? 0.98 : 1
+          }]
+        },
+      ]}
+    >
+      <View style={styles.optionContent}>
+        <View
+          style={[
+            styles.iconContainer,
+            {
+              backgroundColor: whoIsGoing === option.value
+                ? currentTheme.alternate
+                : `${currentTheme.secondary}20`,
+            },
+          ]}
+        >
+          <Ionicons
+            name={option.icon as any}
+            size={28}
+            color={whoIsGoing === option.value ? "white" : currentTheme.textPrimary}
+          />
+        </View>
+        <View style={styles.optionTextContainer}>
+          <Text style={[styles.optionTitle, { color: currentTheme.textPrimary }]}>
+            {option.label}
+          </Text>
+          <Text style={[styles.optionDescription, { color: currentTheme.textSecondary }]}>
+            {option.description}
+          </Text>
+        </View>
+        {whoIsGoing === option.value && (
+          <MaterialIcons
+            name="check-circle"
+            size={24}
+            color={currentTheme.alternate}
+            style={styles.checkIcon}
+          />
+        )}
+      </View>
+    </Pressable>
+  );
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: currentTheme.background }]}
-    >
-      <View style={styles.contentContainer}>
+    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
+      <Animated.View
+        style={[
+          styles.content,
+          {
+            opacity: fadeAnim,
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}
+      >
         <View style={styles.headerContainer}>
-          <Text
-            style={[styles.subheading, { color: currentTheme.textSecondary }]}
-          >
-            With who?
-          </Text>
           <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
-            Choose how many people you're traveling with
+            Travel Companions 👥
+          </Text>
+          <Text style={[styles.subheading, { color: currentTheme.textSecondary }]}>
+            Who's joining your adventure?
           </Text>
         </View>
 
-        <View style={styles.sliderContainer}>
-          <View style={styles.iconContainer}>
-            <Ionicons
-              name={getIconForSelection()}
-              size={60}
-              color={currentTheme.alternate}
-            />
-          </View>
-
-          <Animated.Text
-            style={[
-              styles.selectionText,
-              {
-                color: currentTheme.textPrimary,
-                transform: [{ scale: scaleAnim }],
-              },
-            ]}
-          >
-            {whoIsGoing === 1 ? "Solo" : whoIsGoing === 2 ? "Couple" : "Group"}
-          </Animated.Text>
-
-          <Slider
-            style={styles.slider}
-            minimumValue={1}
-            maximumValue={4}
-            step={1}
-            value={whoIsGoing}
-            onValueChange={handleWhoIsGoingChange}
-            minimumTrackTintColor={currentTheme.alternate}
-            maximumTrackTintColor={currentTheme.accentBackground}
-            thumbTintColor={currentTheme.alternate}
-          />
-
-          <View style={styles.markerContainer}>
-            {[...Array(4)].map((_, index) => (
-              <Text
-                key={index}
-                style={[
-                  styles.markerText,
-                  {
-                    color:
-                      whoIsGoing === index + 1
-                        ? currentTheme.alternate
-                        : currentTheme.textSecondary,
-                    fontWeight: whoIsGoing === index + 1 ? "bold" : "normal",
-                  },
-                ]}
-              >
-                {index < 3 ? index + 1 : "4+"}
-              </Text>
-            ))}
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <MainButton
-              onPress={() => {
-                console.log("Updated Trip Data:", tripData);
-                navigation.navigate("MoreInfo");
-              }}
-              buttonText="Continue"
-              width={"70%"}
-            />
-          </View>
+        <View style={styles.optionsContainer}>
+          {travelOptions.map(renderOption)}
         </View>
-      </View>
+
+        <View style={styles.footer}>
+          <MainButton
+            onPress={() => navigation.navigate("MoreInfo")}
+            buttonText="Continue"
+            width="85%"
+            backgroundColor={currentTheme.alternate}
+          />
+        </View>
+      </Animated.View>
     </SafeAreaView>
   );
 };
@@ -166,56 +178,64 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  contentContainer: {
+  content: {
     flex: 1,
     padding: 20,
   },
   headerContainer: {
+    marginTop: 20,
     marginBottom: 32,
-  },
-  subheading: {
-    fontSize: 18,
-    marginBottom: 8,
   },
   heading: {
     fontSize: 32,
-    fontWeight: "bold",
-    lineHeight: 40,
-    marginBottom: 16,
+    fontFamily: "outfit-bold",
+    marginBottom: 8,
   },
-  sliderContainer: {
+  subheading: {
+    fontSize: 16,
+    fontFamily: "outfit",
+    opacity: 0.8,
+  },
+  optionsContainer: {
     flex: 1,
-    width: "100%",
+    gap: 16,
+  },
+  optionCard: {
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 2,
+  },
+  optionContent: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
   },
   iconContainer: {
-    marginBottom: 20,
-  },
-  slider: {
-    width: "100%",
-    height: 40,
-    marginTop: 20,
-  },
-  markerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingHorizontal: 0,
-  },
-  markerText: {
-    fontSize: 16,
-    textAlign: "center",
-    width: `${100 / 4}%`,
-  },
-  selectionText: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  buttonContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 100,
-    width: "100%",
+    marginRight: 16,
+  },
+  optionTextContainer: {
+    flex: 1,
+  },
+  optionTitle: {
+    fontSize: 18,
+    fontFamily: "outfit-bold",
+    marginBottom: 4,
+  },
+  optionDescription: {
+    fontSize: 14,
+    fontFamily: "outfit",
+    opacity: 0.8,
+  },
+  checkIcon: {
+    marginLeft: 12,
+  },
+  footer: {
+    paddingVertical: 20,
+    alignItems: "center",
   },
 });
 
