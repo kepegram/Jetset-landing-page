@@ -14,6 +14,8 @@ import {
   FlatList,
   StyleSheet,
   ScrollView,
+  Image,
+  Animated,
 } from "react-native";
 import { Fontisto } from "@expo/vector-icons";
 import StartNewTripCard from "../../../components/myTrips/startNewTripCard";
@@ -24,6 +26,8 @@ import { useProfile } from "../../../context/profileContext";
 import moment from "moment";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import SkeletonCard from "../../../components/common/SkeletonCard";
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type MyTripsScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -139,6 +143,22 @@ const MyTrips: React.FC = () => {
     });
   };
 
+  const scaleAnim = new Animated.Value(1);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.98,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
     <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
@@ -245,37 +265,57 @@ const MyTrips: React.FC = () => {
                 {hasCurrentTrip ? (
                   <CurrentTripsCard userTrips={userTrips} />
                 ) : (
-                  <View
+                  <Animated.View
                     style={[
-                      styles.emptyStateContainer,
-                      { backgroundColor: currentTheme.background },
+                      styles.container,
+                      { transform: [{ scale: scaleAnim }] },
                     ]}
                   >
-                    <MaterialCommunityIcons
-                      name="calendar-today"
-                      size={32}
-                      color={currentTheme.textSecondary}
-                    />
-                    <Text
-                      style={[
-                        styles.emptyStateText,
-                        { color: currentTheme.textSecondary },
-                      ]}
-                    >
-                      Nothing booked for today
-                    </Text>
                     <Pressable
-                      style={[
-                        styles.emptyStateButton,
-                        { backgroundColor: currentTheme.alternate },
-                      ]}
+                      onPressIn={handlePressIn}
+                      onPressOut={handlePressOut}
                       onPress={() => navigation.navigate("WhereTo")}
+                      style={[styles.cardContainer]}
                     >
-                      <Text style={[styles.emptyStateButtonText]}>
-                        Plan a Trip
-                      </Text>
+                      <Image
+                        source={require("../../../assets/app-imgs/placeholder.jpeg")}
+                        style={styles.noTripImage}
+                      />
+                      <LinearGradient
+                        colors={["transparent", "rgba(0,0,0,0.9)"]}
+                        style={styles.gradient}
+                      >
+                        <View style={styles.contentContainer}>
+                          <View style={styles.noTripContent}>
+                            <MaterialIcons
+                              name="flight"
+                              size={32}
+                              color="#fff"
+                            />
+                            <Text style={styles.noTripText}>
+                              No current trips. Time to plan your next
+                              adventure!
+                            </Text>
+                            <View style={styles.createTripButtonContainer}>
+                              <View style={styles.createTripButton}>
+                                <MaterialIcons
+                                  name="add-circle"
+                                  size={24}
+                                  color="#000"
+                                />
+                                <Text style={styles.createTripText}>
+                                  Start New Trip
+                                </Text>
+                              </View>
+                              <Text style={styles.tapToStartText}>
+                                Tap to begin planning
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      </LinearGradient>
                     </Pressable>
-                  </View>
+                  </Animated.View>
                 )}
 
                 <View style={styles.sectionHeaderContainer}>
@@ -292,7 +332,9 @@ const MyTrips: React.FC = () => {
                       style={styles.seeAllButton}
                       onPress={() => {
                         const upcomingTrips = userTrips.filter((trip) => {
-                          const startDate = moment(trip.tripData.startDate).startOf("day");
+                          const startDate = moment(
+                            trip.tripData.startDate
+                          ).startOf("day");
                           return startDate.isAfter(moment().startOf("day"));
                         });
                         if (upcomingTrips.length > 0) {
@@ -366,7 +408,10 @@ const MyTrips: React.FC = () => {
                           style={styles.seeAllButton}
                           onPress={() => {
                             const pastTrips = userTrips.filter((trip) =>
-                              moment(trip.tripData.endDate).isBefore(moment(), "day")
+                              moment(trip.tripData.endDate).isBefore(
+                                moment(),
+                                "day"
+                              )
                             );
                             if (pastTrips.length > 0) {
                               navigation.navigate("AllTripsView", {
@@ -497,26 +542,72 @@ const styles = StyleSheet.create({
   pastTripsContainer: {
     gap: 15,
   },
-  emptyStateContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+  cardContainer: {
+    borderRadius: 20,
+    overflow: "hidden",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  noTripImage: {
+    width: "100%",
+    height: 240,
+  },
+  gradient: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "50%",
+    justifyContent: "flex-end",
     padding: 20,
   },
-  emptyStateText: {
+  contentContainer: {
+    flex: 1,
+  },
+  noTripContent: {
+    alignItems: "center",
+    gap: 12,
+  },
+  noTripText: {
     fontSize: 18,
-    fontWeight: "500",
-    marginBottom: 20,
-  },
-  emptyStateButton: {
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: "rgba(0,0,0,0.05)",
-  },
-  emptyStateButtonText: {
-    fontSize: 16,
+    color: "#fff",
     fontWeight: "600",
-    color: "white",
+    textAlign: "center",
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
+  },
+  createTripButtonContainer: {
+    alignItems: "center",
+    marginTop: 16,
+    gap: 8,
+  },
+  createTripButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 25,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  createTripText: {
+    color: "#000",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  tapToStartText: {
+    color: "rgba(255, 255, 255, 0.8)",
+    fontSize: 14,
+    fontStyle: "italic",
   },
   seeMoreButton: {
     padding: 12,

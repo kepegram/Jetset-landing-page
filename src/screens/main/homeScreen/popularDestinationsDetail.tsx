@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   tripMetaContainer: {
-    marginBottom: 25,
+    marginBottom: 5,
   },
   tripMetaItem: {
     flexDirection: "row",

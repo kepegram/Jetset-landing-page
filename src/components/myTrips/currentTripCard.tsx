@@ -75,18 +75,37 @@ const CurrentTripCard: React.FC<CurrentTripCardProps> = ({ userTrips }) => {
 
   if (!currentTrip) {
     return (
-      <View style={styles.noTripContainer}>
-        <MaterialIcons
-          name="flight"
-          size={40}
-          color={currentTheme.textSecondary}
-        />
-        <Text
-          style={[styles.noTripText, { color: currentTheme.textSecondary }]}
+      <Animated.View
+        style={[styles.container, { transform: [{ scale: scaleAnim }] }]}
+      >
+        <Pressable
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onPress={() => navigation.navigate("WhereTo")}
+          style={[styles.cardContainer, styles.noTripCard]}
         >
-          No current trips. Time to plan your next adventure!
-        </Text>
-      </View>
+          <Image
+            source={require("../../assets/app-imgs/placeholder.jpeg")}
+            style={styles.image}
+          />
+          <LinearGradient
+            colors={["transparent", "rgba(0,0,0,0.8)"]}
+            style={styles.gradient}
+          >
+            <View style={styles.contentContainer}>
+              <View style={styles.noTripContent}>
+                <MaterialIcons name="flight" size={32} color="#fff" />
+                <Text style={styles.noTripText}>
+                  No current trips. Time to plan your next adventure!
+                </Text>
+                <View style={styles.createTripButton}>
+                  <Text style={styles.createTripText}>Create Trip</Text>
+                </View>
+              </View>
+            </View>
+          </LinearGradient>
+        </Pressable>
+      </Animated.View>
     );
   }
 
@@ -200,19 +219,33 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "500",
   },
-  noTripContainer: {
-    marginVertical: 20,
-    width: "100%",
-    alignItems: "center",
-    padding: 30,
-    gap: 15,
-    backgroundColor: "rgba(0,0,0,0.05)",
-    borderRadius: 15,
+  noTripCard: {
+    height: 240,
+  },
+  noTripContent: {
+    alignItems: 'center',
+    gap: 12,
   },
   noTripText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: '600',
+    textAlign: 'center',
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
+  },
+  createTripButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginTop: 8,
+  },
+  createTripText: {
+    color: '#000',
     fontSize: 16,
-    textAlign: "center",
-    fontWeight: "500",
+    fontWeight: '600',
   },
 });
 
