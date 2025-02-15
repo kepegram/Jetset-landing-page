@@ -7,7 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "ios-sim-build": "eas build --profile development-simulator --platform ios"
+    "ios-sim-build": "eas build --profile development-simulator --platform ios --clear-cache"
   },
   "expo": {
     "doctor": {

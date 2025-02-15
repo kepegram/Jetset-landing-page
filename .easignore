@@ -1,0 +1,43 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Node
+node_modules/**/*
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+web-report/
+
+# macOS
+.DS_Store
+
+# Testing
+__tests__
+coverage
+jest.config.js
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Keep Firebase config files
+!GoogleService-Info.plist
+!google-services.json
+
+# Misc
+*.log
+.DS_Store 

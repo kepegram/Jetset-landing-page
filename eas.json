@@ -15,13 +15,29 @@
       "channel": "development",
       "env": {
         "EXPO_PUBLIC_IOS_CLIENT_ID": "500450400417-gg1pf3lqt2k98ov98u85aem2ekc2rsd8.apps.googleusercontent.com"
+      },
+      "cache": {
+        "disabled": true
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "preview"
+      },
+      "autoIncrement": true,
+      "channel": "preview",
+      "ios": {
+        "resourceClass": "m-medium"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "channel": "production",
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "distribution": "store"
     }
   },
   "submit": {

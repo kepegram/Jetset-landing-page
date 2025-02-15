@@ -166,7 +166,7 @@ const Profile: React.FC = () => {
                   { color: currentTheme.textSecondary },
                 ]}
               >
-                Profile Management
+                Manage Account
               </Text>
             </View>
             <MaterialIcons

@@ -38,7 +38,6 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import RecommendedTripSkeleton from "../../../components/common/RecommendedTripSkeleton";
-import { defaultTrips } from "../../../constants/defaultTrips";
 
 // Interface for extended Google Place Details including photo information
 interface ExtendedGooglePlaceDetail extends GooglePlaceDetail {
@@ -236,22 +235,6 @@ const Home: React.FC = () => {
           batch.set(newTripRef, trip);
           setLoadingProgress(i + 1);
         }
-      }
-
-      // Only use default trips if AI generation failed AND it's not a refresh
-      if (trips.length === 0 && !isRefresh) {
-        defaultTrips.forEach((trip) => {
-          const newTripRef = doc(userTripsCollection);
-          const formattedTrip: RecommendedTrip = {
-            id: `trip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            name: trip.travelPlan.destination,
-            description: trip.travelPlan.destinationDescription,
-            imageUrl: trip.travelPlan.imageUrl,
-            fullResponse: JSON.stringify(trip),
-          };
-          batch.set(newTripRef, formattedTrip);
-          trips.push(formattedTrip);
-        });
       }
 
       if (trips.length > 0) {

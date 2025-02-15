@@ -11,7 +11,7 @@ import {
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import { ProfileProvider, useProfile } from "../context/profileContext";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { CreateTripContext } from "../context/createTripContext";
 import Home from "../screens/main/homeScreen/home";
@@ -101,7 +101,7 @@ export type RootStackParamList = {
   Map: undefined;
   AllTripsView: {
     trips: string;
-    type: 'current' | 'upcoming' | 'past';
+    type: "current" | "upcoming" | "past";
   };
 };
 
@@ -464,32 +464,34 @@ const TabNavigator: React.FC = () => {
     focused,
     color,
     icon,
-    size = 28,
+    size = 32,
+    isMaterial = false,
   }: {
     focused: boolean;
     color: string;
-    icon: keyof typeof Ionicons.glyphMap;
+    icon: keyof typeof Ionicons.glyphMap | string;
     size?: number;
+    isMaterial?: boolean;
   }) => {
     return (
       <View
         style={{
-          padding: 5,
-          borderRadius: 10,
+          padding: 8,
+          borderRadius: 12,
           backgroundColor: focused
             ? `${currentTheme.alternate}20`
             : "transparent",
         }}
       >
-        <Ionicons
-          name={
-            focused
-              ? icon
-              : ((icon + "-outline") as keyof typeof Ionicons.glyphMap)
-          }
-          color={color}
-          size={size}
-        />
+        {isMaterial ? (
+          <MaterialIcons name={icon as any} color={color} size={size} />
+        ) : (
+          <Ionicons
+            name={icon as keyof typeof Ionicons.glyphMap}
+            color={color}
+            size={size}
+          />
+        )}
       </View>
     );
   };
@@ -498,14 +500,9 @@ const TabNavigator: React.FC = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: true,
+        tabBarShowLabel: false,
         tabBarActiveTintColor: currentTheme.alternate,
         tabBarInactiveTintColor: currentTheme.inactiveTabIcon,
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "500",
-          marginTop: -5,
-        },
       }}
     >
       <Tab.Screen
@@ -519,9 +516,14 @@ const TabNavigator: React.FC = () => {
           };
           return {
             tabBarStyle,
-            tabBarLabel: "Home",
             tabBarIcon: ({ color, focused }) => (
-              <TabIcon focused={focused} color={color} icon="home" />
+              <TabIcon
+                focused={focused}
+                color={color}
+                icon="home-filled"
+                size={34}
+                isMaterial={true}
+              />
             ),
           } as BottomTabNavigationOptions;
         }}
@@ -538,13 +540,13 @@ const TabNavigator: React.FC = () => {
           return {
             tabBarStyle,
             headerShown: false,
-            tabBarLabel: "My Trips",
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
                 focused={focused}
                 color={color}
-                icon="airplane"
-                size={30}
+                icon="space-dashboard"
+                size={32}
+                isMaterial={true}
               />
             ),
           } as BottomTabNavigationOptions;
@@ -561,29 +563,32 @@ const TabNavigator: React.FC = () => {
           };
           return {
             tabBarStyle,
-            tabBarLabel: "Profile",
-            tabBarIcon: ({ focused }) => (
+            tabBarIcon: ({ focused, color }) => (
               <View
                 style={{
-                  padding: 3,
-                  borderRadius: 20,
+                  padding: 4,
+                  borderRadius: 24,
                   backgroundColor: focused
                     ? `${currentTheme.alternate}20`
                     : "transparent",
                 }}
               >
-                <Image
-                  source={{ uri: profilePicture }}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 15,
-                    borderColor: focused
-                      ? currentTheme.alternate
-                      : "transparent",
-                    borderWidth: 2,
-                  }}
-                />
+                {profilePicture ? (
+                  <Image
+                    source={{ uri: profilePicture }}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 16,
+                      borderColor: focused
+                        ? currentTheme.alternate
+                        : "transparent",
+                      borderWidth: 2,
+                    }}
+                  />
+                ) : (
+                  <Ionicons name="person-circle" size={38} color={color} />
+                )}
               </View>
             ),
           } as BottomTabNavigationOptions;

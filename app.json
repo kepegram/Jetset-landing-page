@@ -5,27 +5,40 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "sdkVersion": "52.0.0",
-    "icon": "./src/assets/icon.png",
     "splash": {
-      "image": "./src/assets/splash.png",
+      "image": "./src/assets/icons/splash-icon-dark.png",
+      "imageWidth": 200,
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+      "dark": {
+        "image": "./src/assets/icons/splash-icon-light.png",
+        "imageWidth": 200,
+        "resizeMode": "contain",
+        "backgroundColor": "#000000"
+      }
     },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.kpegra1.jetset",
-      "googleServicesFile": "GoogleService-Info.plist",
+      "googleServicesFile": "./ios/Jetset/GoogleService-Info.plist",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "icon": "./src/assets/icons/Dark.png",
+      "alternateIcons": {
+        "dark": "./src/assets/icons/Dark.png",
+        "light": "./src/assets/icons/Light.png",
+        "tinted": "./src/assets/icons/Tinted.png"
       }
     },
     "android": {
       "package": "com.pegram.jetset",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "foregroundImage": "./src/assets/icons/adaptive-icon.png",
+        "monochromeImage": "./src/assets/icons/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
     },

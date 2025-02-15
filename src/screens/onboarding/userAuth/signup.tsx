@@ -146,7 +146,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
 
 const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
   const { currentTheme } = useTheme();
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -160,7 +160,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
   const navigation = useNavigation<SignUpScreenNavigationProp>();
 
-  const isFormValid = name && email && password && confirmPassword;
+  const isFormValid = username && email && password && confirmPassword;
 
   const handleSignUp = async () => {
     setErrorMessage(null);
@@ -181,12 +181,12 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
       const userRef = doc(db, "users", user.uid);
       await setDoc(userRef, {
-        name: name,
+        username: username,
         email: email,
         createdAt: new Date().toISOString(),
       });
 
-      await AsyncStorage.setItem("userName", name);
+      await AsyncStorage.setItem("userName", username);
     } catch (err: any) {
       console.error("Error signing up:", err);
       const user = auth.currentUser;
@@ -233,7 +233,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
         await setDoc(
           userRef,
           {
-            name: fullName?.givenName || "User",
+            username: fullName?.givenName || "User",
             email: email || authResult.user.email,
             createdAt: new Date().toISOString(),
           },
@@ -279,13 +279,14 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
         <View testID="signup-form" style={styles.signUpContainer}>
           <InputField
-            testID="signup-name-input"
-            label="Name"
-            placeholder="Jane Doe"
-            value={name}
-            onChangeText={setName}
+            testID="signup-username-input"
+            label="Username"
+            placeholder="johndoe123"
+            value={username}
+            onChangeText={setUsername}
             editable={!loading}
             theme={currentTheme}
+            autoCapitalize="none"
           />
 
           <InputField
