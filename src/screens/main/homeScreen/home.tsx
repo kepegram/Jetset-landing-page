@@ -18,13 +18,11 @@ import {
   doc,
   getDoc,
   collection,
-  addDoc,
   getDocs,
   writeBatch,
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { Fontisto } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../navigation/appNav";
@@ -57,6 +55,12 @@ interface RecommendedTrip {
   imageUrl?: string;
   photoRef?: string | null;
   fullResponse: string;
+}
+
+// Add this near the top of the file with other interfaces
+interface AIError extends Error {
+  message: string;
+  status?: number;
 }
 
 const { width } = Dimensions.get("window");
@@ -135,7 +139,17 @@ const Home: React.FC = () => {
     );
   };
 
-  const generateSingleTrip = async (): Promise<RecommendedTrip | null> => {
+  // Add this utility function
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  // Modify the generateSingleTrip function
+  const generateSingleTrip = async (
+    retryCount = 0
+  ): Promise<RecommendedTrip | null> => {
+    const MAX_RETRIES = 3;
+    const INITIAL_RETRY_DELAY = 1000; // 1 second
+
     try {
       const result = await chatSession.sendMessage(RECOMMEND_TRIP_AI_PROMPT);
       const responseText = await result.response.text();
@@ -146,17 +160,15 @@ const Home: React.FC = () => {
 
       let tripResp;
       try {
-        // Add input validation and cleaning
         const cleanedResponse = responseText
           .trim()
-          .replace(/[\u0000-\u001F\u007F-\u009F]/g, ""); // Remove control characters
+          .replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
         tripResp = JSON.parse(cleanedResponse);
       } catch (parseError) {
         console.error("Failed to parse AI response:", parseError);
         return null;
       }
 
-      // Validate response structure
       if (!isValidTripResponse(tripResp)) {
         console.error("Invalid trip response structure");
         return null;
@@ -173,14 +185,31 @@ const Home: React.FC = () => {
           tripResp.travelPlan.destinationDescription ||
           "No description available",
         photoRef,
-        fullResponse: JSON.stringify(tripResp), // Store cleaned and validated response
+        fullResponse: JSON.stringify(tripResp),
       };
     } catch (error) {
+      const aiError = error as AIError;
+
+      // Check if it's an overload error (503) and we haven't exceeded max retries
+      if (
+        retryCount < MAX_RETRIES &&
+        (aiError.message?.includes("503") ||
+          aiError.message?.includes("overloaded") ||
+          aiError.status === 503)
+      ) {
+        console.log(`Retry attempt ${retryCount + 1} for AI generation...`);
+        // Exponential backoff: wait longer between each retry
+        const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryCount);
+        await delay(retryDelay);
+        return generateSingleTrip(retryCount + 1);
+      }
+
       console.error("Error generating trip:", error);
       return null;
     }
   };
 
+  // Modify the generateRecommendedTrips function
   const generateRecommendedTrips = async (isRefresh = false) => {
     try {
       setIsLoading(true);
@@ -196,7 +225,7 @@ const Home: React.FC = () => {
         `users/${user.uid}/suggestedTrips`
       );
 
-      // If not refreshing, first try to load existing trips from Firebase
+      // If not refreshing, try to load existing trips
       if (!isRefresh) {
         const userTripsSnapshot = await getDocs(userTripsCollection);
         if (!userTripsSnapshot.empty) {
@@ -211,23 +240,33 @@ const Home: React.FC = () => {
         }
       }
 
-      // Generate all trips in parallel
-      const tripPromises = Array(3).fill(null).map(generateSingleTrip);
-      const generatedTrips = await Promise.all(tripPromises);
+      // Generate trips with some delay between each to avoid rate limiting
+      const tripPromises = Array(3)
+        .fill(null)
+        .map((_, index) => delay(index * 500).then(() => generateSingleTrip()));
 
-      // Filter out any null results and store valid trips
+      const generatedTrips = await Promise.all(tripPromises);
       const validTrips = generatedTrips.filter(
         (trip): trip is RecommendedTrip => trip !== null
       );
 
       if (validTrips.length > 0) {
-        // Batch write all trips to Firebase
+        // Delete all existing trips first
+        const existingTripsSnapshot = await getDocs(userTripsCollection);
         const batch = writeBatch(FIREBASE_DB);
+
+        // Delete existing trips
+        existingTripsSnapshot.forEach((document) => {
+          batch.delete(doc(userTripsCollection, document.id));
+        });
+
+        // Add new trips
         validTrips.forEach((trip) => {
           const newTripRef = doc(userTripsCollection);
           batch.set(newTripRef, trip);
         });
 
+        // Execute all operations in a single batch
         await batch.commit();
         setRecommendedTrips(validTrips);
         await AsyncStorage.setItem("lastFetchTime", new Date().toISOString());

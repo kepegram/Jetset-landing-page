@@ -77,14 +77,6 @@ const HotelDetail: React.FC = () => {
             }}
             style={styles.image}
           />
-          <View
-            style={[
-              styles.imageOverlay,
-              { backgroundColor: "rgba(0, 0, 0, 0.4)" },
-            ]}
-          >
-            <Text style={styles.overlayTitle}>{hotel.hotelName}</Text>
-          </View>
         </View>
 
         <View
@@ -94,6 +86,11 @@ const HotelDetail: React.FC = () => {
           ]}
         >
           <View style={styles.detailsContainer}>
+            <Text
+              style={[styles.hotelTitle, { color: currentTheme.textPrimary }]}
+            >
+              {hotel.hotelName}
+            </Text>
             <View style={styles.hotelContainer}>
               <View style={styles.ratingPriceContainer}>
                 <View
@@ -178,38 +175,21 @@ const HotelDetail: React.FC = () => {
                 </MapView>
               </View>
             </View>
+
+            <MainButton
+              onPress={handleBooking}
+              buttonText={hotel.bookingUrl ? "Book Now" : "Unavailable"}
+              width="100%"
+              style={[
+                styles.bookButton,
+                { backgroundColor: currentTheme.alternate },
+                !hotel.bookingUrl && { opacity: 0.5 },
+              ]}
+              disabled={!hotel.bookingUrl}
+            />
           </View>
         </View>
       </ScrollView>
-
-      <View
-        style={[styles.bottomBar, { backgroundColor: currentTheme.background }]}
-      >
-        <View style={styles.priceContainer}>
-          <Text style={[styles.hotelName, { color: currentTheme.textPrimary }]}>
-            {hotel.hotelName} 🏨
-          </Text>
-          <Text style={[styles.price, { color: currentTheme.alternate }]}>
-            ${hotel.price}
-            <Text
-              style={[styles.perNight, { color: currentTheme.textSecondary }]}
-            >
-              /night
-            </Text>
-          </Text>
-        </View>
-        <MainButton
-          onPress={handleBooking}
-          buttonText={hotel.bookingUrl ? "Book Now" : "Unavailable"}
-          width={width * 0.45}
-          style={[
-            styles.bookButton,
-            { backgroundColor: currentTheme.alternate },
-            !hotel.bookingUrl && { opacity: 0.5 },
-          ]}
-          disabled={!hotel.bookingUrl}
-        />
-      </View>
     </View>
   );
 };
@@ -232,7 +212,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   imageContainer: {
-    height: height * 0.5,
+    height: height * 0.4,
     width: width,
   },
   image: {
@@ -240,42 +220,26 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "cover",
   },
-  imageOverlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 20,
-    paddingBottom: 40,
-  },
-  overlayTitle: {
-    fontSize: 32,
-    fontFamily: "outfit-bold",
-    color: "white",
-    textShadowColor: "rgba(0,0,0,0.3)",
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-  },
   contentContainer: {
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     marginTop: -30,
-    paddingTop: 30,
     minHeight: height * 0.6,
   },
   detailsContainer: {
     padding: 20,
-    gap: 24,
+    gap: 16,
   },
   hotelContainer: {
-    marginBottom: 20,
+    marginBottom: 0,
   },
   ratingPriceContainer: {
-    gap: 12,
+    gap: 8,
+    flexDirection: "row",
+    alignItems: "center",
   },
   ratingBox: {
-    alignSelf: "flex-start",
-    padding: 10,
+    padding: 8,
     borderRadius: 12,
   },
   ratingText: {
@@ -291,7 +255,7 @@ const styles = StyleSheet.create({
     fontFamily: "outfit",
   },
   section: {
-    gap: 12,
+    gap: 8,
   },
   sectionTitle: {
     fontSize: 22,
@@ -310,42 +274,18 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  bottomBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 24,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "rgba(128,128,128,0.2)",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  priceContainer: {
-    flex: 1,
-  },
-  hotelName: {
-    fontFamily: "outfit-bold",
-    fontSize: 20,
-    marginBottom: 4,
-  },
-  price: {
-    fontFamily: "outfit-bold",
-    fontSize: 24,
-  },
   bookButton: {
+    marginTop: 24,
     elevation: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4.5,
     borderRadius: 15,
+  },
+  hotelTitle: {
+    fontSize: 32,
+    fontFamily: "outfit-bold",
   },
 });
 

@@ -76,14 +76,6 @@ const IteneraryDetail: React.FC = () => {
             }
             style={styles.image}
           />
-          <View
-            style={[
-              styles.imageOverlay,
-              { backgroundColor: "rgba(0, 0, 0, 0.4)" },
-            ]}
-          >
-            <Text style={styles.overlayTitle}>{place.placeName}</Text>
-          </View>
         </View>
 
         <View
@@ -93,6 +85,12 @@ const IteneraryDetail: React.FC = () => {
           ]}
         >
           <View style={styles.detailsContainer}>
+            <Text
+              style={[styles.placeTitle, { color: currentTheme.textPrimary }]}
+            >
+              {place.placeName}
+            </Text>
+
             <View style={styles.section}>
               <Text
                 style={[
@@ -199,27 +197,10 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "cover",
   },
-  imageOverlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 20,
-    paddingBottom: 40,
-  },
-  overlayTitle: {
-    fontSize: 32,
-    fontFamily: "outfit-bold",
-    color: "white",
-    textShadowColor: "rgba(0,0,0,0.3)",
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-  },
   contentContainer: {
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     marginTop: -30,
-    paddingTop: 10,
     minHeight: height * 0.6,
   },
   detailsContainer: {
@@ -259,6 +240,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "outfit-medium",
     color: "white",
+  },
+  placeTitle: {
+    fontSize: 32,
+    fontFamily: "outfit-bold",
   },
 });
 

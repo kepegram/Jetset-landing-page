@@ -116,9 +116,12 @@ const TripDetails: React.FC = () => {
       <View style={styles.imageContainer}>
         <Image
           source={{
-            uri: photoRef || tripDetails?.photoRef
-              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photoRef || tripDetails?.photoRef}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
-              : "https://via.placeholder.com/800",
+            uri:
+              photoRef || tripDetails?.photoRef
+                ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${
+                    photoRef || tripDetails?.photoRef
+                  }&key=${process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}`
+                : "https://via.placeholder.com/800",
           }}
           style={styles.image}
         />
@@ -172,7 +175,8 @@ const TripDetails: React.FC = () => {
                   { color: currentTheme.textPrimary },
                 ]}
               >
-                {moment(tripDetails?.startDate).format("MMM DD")} - {moment(tripDetails?.endDate).format("MMM DD")}
+                {moment(tripDetails?.startDate).format("MMM DD")} -{" "}
+                {moment(tripDetails?.endDate).format("MMM DD")}
               </Text>
             </View>
             <View
@@ -197,42 +201,60 @@ const TripDetails: React.FC = () => {
             </View>
           </View>
 
+          <View
+            style={[
+              styles.flightContainer,
+              { backgroundColor: currentTheme.background },
+            ]}
+          >
+            <View style={styles.flightInfo}>
+              <View style={styles.airlineWrapper}>
+                <Text
+                  style={[
+                    styles.airlineName,
+                    { color: currentTheme.textPrimary },
+                  ]}
+                >
+                  {tripDetails?.travelPlan?.flights?.airlineName ||
+                    "Unknown Airline"}
+                </Text>
+              </View>
+              <View style={styles.priceWrapper}>
+                <Text
+                  style={[
+                    styles.priceLabel,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
+                  Approximate Price
+                </Text>
+                <Text style={[styles.price, { color: currentTheme.alternate }]}>
+                  ~${tripDetails?.travelPlan?.flights?.flightPrice || "N/A"}
+                </Text>
+              </View>
+            </View>
+            <MainButton
+              onPress={() => {
+                const url = tripDetails?.travelPlan?.flights?.airlineUrl;
+                if (url) {
+                  Linking.openURL(url);
+                } else {
+                  Alert.alert("Booking URL not available");
+                }
+              }}
+              buttonText="Book Now"
+              width={width * 0.35}
+              style={[
+                styles.bookButton,
+                { backgroundColor: currentTheme.alternate },
+              ]}
+            />
+          </View>
+
           <HotelList hotelList={tripDetails?.travelPlan?.hotels} />
           <PlannedTrip details={tripDetails?.travelPlan} />
         </View>
       </ScrollView>
-
-      <View
-        style={[styles.bottomBar, { backgroundColor: currentTheme.background }]}
-      >
-        <View style={styles.priceContainer}>
-          <Text
-            style={[styles.airlineName, { color: currentTheme.textPrimary }]}
-          >
-            {tripDetails?.travelPlan?.flights?.airlineName || "Unknown Airline"}{" "}
-            ✈️
-          </Text>
-          <Text style={[styles.price, { color: currentTheme.alternate }]}>
-            ${tripDetails?.travelPlan?.flights?.flightPrice || "N/A"}
-          </Text>
-        </View>
-        <MainButton
-          onPress={() => {
-            const url = tripDetails?.travelPlan?.flights?.airlineUrl;
-            if (url) {
-              Linking.openURL(url);
-            } else {
-              Alert.alert("Booking URL not available");
-            }
-          }}
-          buttonText="Book Now"
-          width={width * 0.45}
-          style={[
-            styles.bookButton,
-            { backgroundColor: currentTheme.alternate },
-          ]}
-        />
-      </View>
     </View>
   );
 };
@@ -302,25 +324,40 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 8,
   },
-  bottomBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 24,
+  flightContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.1)",
+    marginBottom: 25,
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.1)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
   },
-  priceContainer: {
+  flightInfo: {
     flex: 1,
+    gap: 8,
+  },
+  airlineWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   airlineName: {
     fontFamily: "outfit-bold",
-    fontSize: 20,
-    marginBottom: 4,
+    fontSize: 18,
+  },
+  priceWrapper: {
+    gap: 2,
+  },
+  priceLabel: {
+    fontFamily: "outfit",
+    fontSize: 14,
   },
   price: {
     fontFamily: "outfit-bold",
