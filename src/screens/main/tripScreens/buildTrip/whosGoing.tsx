@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Animated, SafeAreaView, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  SafeAreaView,
+  Pressable,
+} from "react-native";
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { RootStackParamList } from "../../../../navigation/appNav";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -8,9 +15,19 @@ import { useTheme } from "../../../../context/themeContext";
 import { MainButton } from "../../../../components/ui/button";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
-type WhosGoingNavigationProp = StackNavigationProp<RootStackParamList, "WhosGoing">;
+type WhosGoingNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "WhosGoing"
+>;
 
-const travelOptions = [
+export interface TravelOption {
+  value: number;
+  label: string;
+  description: string;
+  icon: string;
+}
+
+export const travelOptions: TravelOption[] = [
   {
     value: 1,
     label: "Solo",
@@ -40,7 +57,8 @@ const travelOptions = [
 const WhosGoing: React.FC = () => {
   const navigation = useNavigation<WhosGoingNavigationProp>();
   const { currentTheme } = useTheme();
-  const { tripData = {}, setTripData = () => {} } = useContext(CreateTripContext) || {};
+  const { tripData = {}, setTripData = () => {} } =
+    useContext(CreateTripContext) || {};
   const [whoIsGoing, setWhoIsGoing] = useState<number>(1);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
@@ -74,14 +92,14 @@ const WhosGoing: React.FC = () => {
 
   const handleOptionSelect = (value: number) => {
     setWhoIsGoing(value);
-    const option = travelOptions.find(opt => opt.value === value);
+    const option = travelOptions.find((opt) => opt.value === value);
     setTripData({
       ...tripData,
       whoIsGoing: option?.label,
     });
   };
 
-  const renderOption = (option: typeof travelOptions[0]) => (
+  const renderOption = (option: (typeof travelOptions)[0]) => (
     <Pressable
       key={option.value}
       onPress={() => handleOptionSelect(option.value)}
@@ -89,12 +107,15 @@ const WhosGoing: React.FC = () => {
         styles.optionCard,
         {
           backgroundColor: currentTheme.background,
-          borderColor: whoIsGoing === option.value 
-            ? currentTheme.alternate
-            : currentTheme.secondary,
-          transform: [{
-            scale: pressed ? 0.98 : 1
-          }]
+          borderColor:
+            whoIsGoing === option.value
+              ? currentTheme.alternate
+              : currentTheme.secondary,
+          transform: [
+            {
+              scale: pressed ? 0.98 : 1,
+            },
+          ],
         },
       ]}
     >
@@ -103,31 +124,39 @@ const WhosGoing: React.FC = () => {
           style={[
             styles.iconContainer,
             {
-              backgroundColor: whoIsGoing === option.value
-                ? currentTheme.alternate
-                : currentTheme.background,
+              backgroundColor:
+                whoIsGoing === option.value
+                  ? currentTheme.alternate
+                  : currentTheme.background,
             },
           ]}
         >
           <Ionicons
             name={option.icon as any}
             size={24}
-            color={whoIsGoing === option.value ? "white" : currentTheme.textSecondary}
+            color={
+              whoIsGoing === option.value ? "white" : currentTheme.textSecondary
+            }
           />
         </View>
         <View style={styles.optionTextContainer}>
-          <Text 
+          <Text
             style={[
-              styles.optionTitle, 
-              { 
+              styles.optionTitle,
+              {
                 color: currentTheme.textPrimary,
                 fontWeight: whoIsGoing === option.value ? "600" : "400",
-              }
+              },
             ]}
           >
             {option.label}
           </Text>
-          <Text style={[styles.optionDescription, { color: currentTheme.textSecondary }]}>
+          <Text
+            style={[
+              styles.optionDescription,
+              { color: currentTheme.textSecondary },
+            ]}
+          >
             {option.description}
           </Text>
         </View>
@@ -144,7 +173,9 @@ const WhosGoing: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: currentTheme.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
+    >
       <Animated.View
         style={[
           styles.content,
@@ -158,7 +189,9 @@ const WhosGoing: React.FC = () => {
           <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
             Travel Companions 👥
           </Text>
-          <Text style={[styles.subheading, { color: currentTheme.textSecondary }]}>
+          <Text
+            style={[styles.subheading, { color: currentTheme.textSecondary }]}
+          >
             Who's joining your adventure?
           </Text>
         </View>

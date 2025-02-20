@@ -20,6 +20,55 @@ type MoreInfoNavigationProp = StackNavigationProp<
   "MoreInfo"
 >;
 
+export interface SelectionOption {
+  label: string;
+  description: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  value: string;
+}
+
+export const activityOptions: SelectionOption[] = [
+  {
+    label: "Take it easy",
+    description: "Relaxed pace with plenty of downtime",
+    icon: "leaf-outline",
+    value: "Low",
+  },
+  {
+    label: "Balanced mix",
+    description: "Good blend of activities and rest",
+    icon: "walk-outline",
+    value: "Normal",
+  },
+  {
+    label: "Adventure packed",
+    description: "Full days with lots of activities",
+    icon: "bicycle-outline",
+    value: "High",
+  },
+];
+
+export const budgetOptions: SelectionOption[] = [
+  {
+    label: "Budget friendly",
+    description: "Economic options and good deals",
+    icon: "wallet-outline",
+    value: "Frugal",
+  },
+  {
+    label: "Mid-range",
+    description: "Mix of comfort and value",
+    icon: "card-outline",
+    value: "Average",
+  },
+  {
+    label: "High-end",
+    description: "Premium experiences and luxury stays",
+    icon: "diamond-outline",
+    value: "Luxury",
+  },
+];
+
 const MoreInfo: React.FC = () => {
   const navigation = useNavigation<MoreInfoNavigationProp>();
   const { currentTheme } = useTheme();

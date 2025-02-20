@@ -88,6 +88,18 @@ const ChooseDate: React.FC = () => {
     navigation.navigate("WhosGoing");
   }, [startDate, endDate, tripData, setTripData, navigation]);
 
+  // Add this new handler function after the other handlers
+  const handleResetDates = useCallback(async () => {
+    setStartDate(null);
+    setEndDate(null);
+    try {
+      await AsyncStorage.removeItem("startDate");
+      await AsyncStorage.removeItem("endDate");
+    } catch (error) {
+      console.error("Error clearing dates from AsyncStorage:", error);
+    }
+  }, []);
+
   const getDateRangeText = useCallback(() => {
     if (startDate && endDate) {
       const nights = endDate.diff(startDate, "days");
@@ -108,25 +120,39 @@ const ChooseDate: React.FC = () => {
             <Text style={[styles.heading, { color: currentTheme.textPrimary }]}>
               Choose your dates 📅
             </Text>
-            <View
-              style={[
-                styles.dateRangeContainer,
-                { backgroundColor: currentTheme.alternate + "20" },
-              ]}
-            >
-              <Ionicons
-                name="calendar-outline"
-                size={24}
-                color={currentTheme.textSecondary}
-              />
-              <Text
+            <View style={styles.dateRangeWrapper}>
+              <View
                 style={[
-                  styles.dateRangeText,
-                  { color: currentTheme.textSecondary },
+                  styles.dateRangeContainer,
+                  { backgroundColor: currentTheme.alternate + "20" },
                 ]}
               >
-                {getDateRangeText()}
-              </Text>
+                <Ionicons
+                  name="calendar-outline"
+                  size={24}
+                  color={currentTheme.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.dateRangeText,
+                    { color: currentTheme.textSecondary },
+                  ]}
+                >
+                  {getDateRangeText()}
+                </Text>
+              </View>
+              {(startDate || endDate) && (
+                <Ionicons
+                  name="refresh-outline"
+                  size={24}
+                  color={currentTheme.textSecondary}
+                  onPress={handleResetDates}
+                  style={[
+                    styles.resetIcon,
+                    { backgroundColor: currentTheme.alternate + "20" },
+                  ]}
+                />
+              )}
             </View>
           </View>
 
@@ -227,12 +253,19 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-bold",
     marginBottom: 8,
   },
+  dateRangeWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 16,
+    gap: 12,
+  },
   dateRangeContainer: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
     borderRadius: 12,
-    marginTop: 16,
   },
   dateRangeText: {
     fontSize: 16,
@@ -278,6 +311,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: "center",
+  },
+  resetIcon: {
+    padding: 8,
+    borderRadius: 8,
   },
 });
 

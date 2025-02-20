@@ -192,7 +192,15 @@ const MyTrips: React.FC = () => {
             style={styles.addButton}
             onPress={() => navigation.navigate("WhereTo")}
           >
-            <Fontisto name="plus-a" size={24} color={currentTheme.icon} />
+            <Fontisto
+              name="plus-a"
+              size={24}
+              color={currentTheme.icon}
+              style={[
+                styles.addButton,
+                { backgroundColor: currentTheme.accentBackground },
+              ]}
+            />
           </Pressable>
         </View>
       </View>
@@ -533,7 +541,6 @@ const styles = StyleSheet.create({
   addButton: {
     padding: 8,
     borderRadius: 12,
-    backgroundColor: "rgba(0,0,0,0.05)",
   },
   scrollContent: {
     paddingHorizontal: 20,

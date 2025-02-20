@@ -10,6 +10,7 @@ interface ProfileContextType {
   setProfilePicture: (uri: string) => void; // Function to update profile picture
   displayName: string; // User's display name
   setDisplayName: (name: string) => void; // Function to update display name
+  isLoading: boolean; // Add loading state
 }
 
 // Create the context with undefined default value
@@ -26,17 +27,34 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
     "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png"
   );
   const [displayName, setDisplayNameState] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     // Load profile data from multiple sources (Firebase Auth, Firestore)
     const loadProfileData = async () => {
       try {
+        setIsLoading(true);
         const user = getAuth().currentUser;
+
+        // First try to load from AsyncStorage for immediate display
+        const cachedProfilePicture = await AsyncStorage.getItem(
+          "profilePicture"
+        );
+        const cachedDisplayName = await AsyncStorage.getItem("displayName");
+
+        if (cachedProfilePicture) {
+          setProfilePictureState(cachedProfilePicture);
+        }
+        if (cachedDisplayName) {
+          setDisplayNameState(cachedDisplayName);
+        }
+
         if (user) {
+          // Load from Firestore
           const userDocRef = doc(FIREBASE_DB, "users", user.uid);
           const userDoc = await getDoc(userDocRef);
 
-          // First priority: Use Google profile details if available
+          // Update from Google profile if available
           if (user.photoURL) {
             setProfilePictureState(user.photoURL);
             await AsyncStorage.setItem("profilePicture", user.photoURL);
@@ -46,7 +64,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
             await AsyncStorage.setItem("displayName", user.displayName);
           }
 
-          // Second priority: Load from Firestore if available
+          // Update from Firestore if available
           if (userDoc.exists()) {
             const data = userDoc.data();
             if (data?.profilePicture) {
@@ -57,12 +75,12 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
               setDisplayNameState(data.displayName);
               await AsyncStorage.setItem("displayName", data.displayName);
             }
-          } else {
-            console.log("No document found for user:", user.uid);
           }
         }
       } catch (error) {
-        console.error("Failed to load profile data from Firestore:", error);
+        console.error("Failed to load profile data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -96,6 +114,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
         setProfilePicture,
         displayName,
         setDisplayName,
+        isLoading,
       }}
     >
       {children}

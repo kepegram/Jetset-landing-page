@@ -1,4 +1,13 @@
-import { StyleSheet, Text, Pressable, View, Image, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  Pressable,
+  View,
+  Image,
+  Alert,
+  ActivityIndicator,
+  Modal,
+} from "react-native";
 import React, { useCallback, useState } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -20,9 +29,11 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 
 const Profile: React.FC = () => {
   // Context hooks for profile and theme data
-  const { profilePicture, displayName, setProfilePicture } = useProfile();
+  const { profilePicture, displayName, setProfilePicture, isLoading } =
+    useProfile();
   const { currentTheme, setTheme } = useTheme();
   const [userName, setUserName] = useState<string | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const user = getAuth().currentUser;
   const navigation = useNavigation<ProfileScreenNavigationProp>();
@@ -68,6 +79,50 @@ const Profile: React.FC = () => {
     }
   };
 
+  // Add this new function to handle profile picture removal
+  const handleRemoveProfilePicture = () => {
+    Alert.alert(
+      "Remove Profile Picture",
+      "Are you sure you want to remove your profile picture?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: async () => {
+            const defaultPfp =
+              "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png";
+
+            try {
+              // Update state and AsyncStorage
+              setProfilePicture(defaultPfp);
+              await AsyncStorage.removeItem("profilePicture");
+
+              // Remove from Firestore
+              if (user) {
+                await setDoc(
+                  doc(FIREBASE_DB, "users", user.uid),
+                  {
+                    profilePicture: defaultPfp,
+                  },
+                  { merge: true }
+                );
+              }
+
+              console.log("Profile picture removed successfully");
+            } catch (error) {
+              console.error("Failed to remove profile picture:", error);
+              Alert.alert("Error", "Failed to remove profile picture");
+            }
+          },
+        },
+      ]
+    );
+  };
+
   // Handle user logout with confirmation
   const handleLogout = () => {
     Alert.alert(
@@ -111,10 +166,101 @@ const Profile: React.FC = () => {
     }, [])
   );
 
+  // Add this function to handle profile picture press
+  const handleProfilePress = () => {
+    setIsModalVisible(true);
+  };
+
   return (
     <View
       style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
+      {/* Add Modal component */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setIsModalVisible(false)}
+        >
+          <View
+            style={[
+              styles.modalView,
+              { backgroundColor: currentTheme.background },
+            ]}
+          >
+            {/* Add the large profile picture */}
+            <View style={styles.modalImageContainer}>
+              <View
+                style={[
+                  styles.modalImageContainer,
+                  { backgroundColor: currentTheme.inactive + "20" },
+                ]}
+              >
+                <Image
+                  source={{
+                    uri:
+                      profilePicture ||
+                      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png",
+                    cache: "reload",
+                  }}
+                  style={styles.modalProfilePicture}
+                  onError={(e) =>
+                    console.log("Error loading image:", e.nativeEvent.error)
+                  }
+                />
+              </View>
+            </View>
+
+            <Pressable
+              style={[
+                styles.modalOption,
+                {
+                  borderBottomWidth: 1,
+                  borderBottomColor: currentTheme.secondary,
+                },
+              ]}
+              onPress={() => {
+                setIsModalVisible(false);
+                handlePickImage();
+              }}
+            >
+              <MaterialIcons name="edit" size={24} color={currentTheme.icon} />
+              <Text
+                style={[
+                  styles.modalOptionText,
+                  { color: currentTheme.textPrimary },
+                ]}
+              >
+                Change Profile Picture
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.modalOption}
+              onPress={() => {
+                setIsModalVisible(false);
+                handleRemoveProfilePicture();
+              }}
+            >
+              <MaterialIcons
+                name="delete-outline"
+                size={24}
+                color={currentTheme.error}
+              />
+              <Text
+                style={[styles.modalOptionText, { color: currentTheme.error }]}
+              >
+                Remove Profile Picture
+              </Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+
       <View style={styles.profileContainer}>
         <View style={styles.userInfoContainer}>
           <Text style={[styles.userName, { color: currentTheme.textPrimary }]}>
@@ -122,21 +268,29 @@ const Profile: React.FC = () => {
           </Text>
         </View>
 
-        <Pressable
-          onPress={handlePickImage}
-          style={styles.profileImageContainer}
-        >
-          <View style={styles.profilePictureBackground}>
-            <Image
-              source={{ uri: profilePicture }}
-              style={styles.profilePicture}
-            />
-
-            <View style={styles.editIconContainer}>
-              <MaterialIcons name="edit" size={20} color="white" />
-            </View>
-          </View>
-        </Pressable>
+        <View style={styles.profileImageContainer}>
+          <Pressable
+            onPress={handleProfilePress}
+            style={styles.profilePictureBackground}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="large" color={currentTheme.primary} />
+            ) : (
+              <Image
+                source={{
+                  uri:
+                    profilePicture ||
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/2048px-Default_pfp.svg.png",
+                  cache: "reload",
+                }}
+                style={styles.profilePicture}
+                onError={(e) =>
+                  console.log("Error loading image:", e.nativeEvent.error)
+                }
+              />
+            )}
+          </Pressable>
+        </View>
       </View>
 
       {/* Settings Section */}
@@ -401,5 +555,43 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     fontSize: 16,
     fontWeight: "600",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalView: {
+    width: "80%",
+    borderRadius: 15,
+    padding: 0,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    overflow: "hidden",
+  },
+  modalImageContainer: {
+    width: "100%",
+    aspectRatio: 1,
+  },
+  modalProfilePicture: {
+    width: "100%",
+    height: "100%",
+  },
+  modalOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalOptionText: {
+    fontSize: 16,
+    marginLeft: 15,
+    fontFamily: "outfit-medium",
   },
 });

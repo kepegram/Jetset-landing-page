@@ -255,7 +255,7 @@ const GenerateTrip: React.FC = () => {
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: currentTheme.secondary }]}
+      style={[styles.container, { backgroundColor: currentTheme.background }]}
     >
       <View style={styles.gradient}>
         <View style={styles.contentContainer}>

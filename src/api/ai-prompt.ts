@@ -166,11 +166,19 @@ Return ONLY a valid JSON object with this exact structure:
 
 export const RECOMMEND_TRIP_AI_PROMPT = `Generate a detailed and realistic JSON Travel Plan for a popular tourist destination that meets these exact parameters:
 - Must be a top 50 global tourist destination by visitor numbers
+- Must be from a different continent than any other generated destination in this session
+- Must have a different primary tourism type (e.g., beach, cultural, historical, adventure) than other destinations
 - Duration: Exactly 5 days
 - Group size: 2 adults
 - Budget level: Average ($300 per person per day)
 - Accommodation: 4-star hotels only
 - Activity level: Moderate (2-3 hours walking per day)
+
+Important diversity requirements:
+- Each destination must be from a different continent
+- Each destination must offer a different primary type of tourism experience
+- Destinations should vary in climate and setting (e.g., not all tropical beaches)
+- Cultural and geographical diversity must be maintained
 
 Important formatting requirements:
 - Response must be ONLY valid JSON - no additional text before or after
@@ -188,6 +196,7 @@ Return this exact JSON structure:
     "numberOfDays": 5,
     "numberOfNights": 4,
     "destination": "City, Region, Country",
+    "destinationType": "Primary tourism type (Beach/Cultural/Historical/Adventure)",
     "destinationDescription": "Single line description",
     "photoRef": "photo_reference_string",
     "flights": {

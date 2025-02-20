@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Dimensions,
   Platform,
-  Alert,
 } from "react-native";
 import React, { useState, useContext, useCallback, useRef } from "react";
 import { useFocusEffect } from "@react-navigation/native";
@@ -70,6 +69,14 @@ interface LoadingProgress {
   total: number;
 }
 
+// Add this near the LoadingProgress interface
+interface RecommendedTripsState {
+  trips: RecommendedTrip[];
+  status: "idle" | "loading" | "error" | "success";
+  error: string | null;
+  lastFetched: Date | null;
+}
+
 const { width } = Dimensions.get("window");
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "HomeMain">;
@@ -79,10 +86,13 @@ const Home: React.FC = () => {
   const { tripData = {}, setTripData = () => {} } =
     useContext(CreateTripContext) || {};
   const [userName, setUserName] = useState("");
-  const [recommendedTrips, setRecommendedTrips] = useState<RecommendedTrip[]>(
-    []
-  );
-  const [isLoading, setIsLoading] = useState(false);
+  const [recommendedTripsState, setRecommendedTripsState] =
+    useState<RecommendedTripsState>({
+      trips: [],
+      status: "idle",
+      error: null,
+      lastFetched: null,
+    });
   const [loadingProgress, setLoadingProgress] = useState<LoadingProgress>({
     completed: 0,
     total: 3,
@@ -144,6 +154,7 @@ const Home: React.FC = () => {
       response &&
       response.travelPlan &&
       response.travelPlan.destination &&
+      response.travelPlan.destinationType &&
       response.travelPlan.itinerary &&
       Array.isArray(response.travelPlan.itinerary)
     );
@@ -158,7 +169,7 @@ const Home: React.FC = () => {
     retryCount = 0
   ): Promise<RecommendedTrip | null> => {
     const MAX_RETRIES = 3;
-    const INITIAL_RETRY_DELAY = 1000; // 1 second
+    const INITIAL_RETRY_DELAY = 1000;
 
     try {
       const result = await chatSession.sendMessage(RECOMMEND_TRIP_AI_PROMPT);
@@ -176,11 +187,19 @@ const Home: React.FC = () => {
         tripResp = JSON.parse(cleanedResponse);
       } catch (parseError) {
         console.error("Failed to parse AI response:", parseError);
+        if (retryCount < MAX_RETRIES) {
+          await delay(INITIAL_RETRY_DELAY * Math.pow(2, retryCount));
+          return generateSingleTrip(retryCount + 1);
+        }
         return null;
       }
 
       if (!isValidTripResponse(tripResp)) {
         console.error("Invalid trip response structure");
+        if (retryCount < MAX_RETRIES) {
+          await delay(INITIAL_RETRY_DELAY * Math.pow(2, retryCount));
+          return generateSingleTrip(retryCount + 1);
+        }
         return null;
       }
 
@@ -191,7 +210,6 @@ const Home: React.FC = () => {
         id: `trip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name: placeName,
         description:
-          tripResp.travelPlan.itinerary[0]?.places[0]?.placeDetails ||
           tripResp.travelPlan.destinationDescription ||
           "No description available",
         photoRef,
@@ -199,21 +217,15 @@ const Home: React.FC = () => {
       };
     } catch (error) {
       const aiError = error as AIError;
-
-      // Check if it's an overload error (503) and we haven't exceeded max retries
       if (
         retryCount < MAX_RETRIES &&
         (aiError.message?.includes("503") ||
           aiError.message?.includes("overloaded") ||
           aiError.status === 503)
       ) {
-        console.log(`Retry attempt ${retryCount + 1} for AI generation...`);
-        // Exponential backoff: wait longer between each retry
-        const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryCount);
-        await delay(retryDelay);
+        await delay(INITIAL_RETRY_DELAY * Math.pow(2, retryCount));
         return generateSingleTrip(retryCount + 1);
       }
-
       console.error("Error generating trip:", error);
       return null;
     }
@@ -254,10 +266,67 @@ const Home: React.FC = () => {
     }
   };
 
-  // Modify the generateRecommendedTrips function
-  const generateRecommendedTrips = async (isRefresh = false) => {
+  // Modify useFocusEffect to only load existing trips
+  useFocusEffect(
+    useCallback(() => {
+      loadExistingTrips(); // New function to load trips from Firebase
+      getUserName();
+    }, [])
+  );
+
+  // Add this new function to load existing trips
+  const loadExistingTrips = async () => {
     try {
-      setIsLoading(true);
+      const user = getAuth().currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      const userTripsCollection = collection(
+        FIREBASE_DB,
+        `users/${user.uid}/suggestedTrips`
+      );
+
+      const userTripsSnapshot = await getDocs(userTripsCollection);
+      if (!userTripsSnapshot.empty) {
+        const trips: RecommendedTrip[] = [];
+        userTripsSnapshot.forEach((doc) => {
+          const tripData = doc.data();
+          trips.push(tripData as RecommendedTrip);
+        });
+        setRecommendedTripsState({
+          trips: trips,
+          status: "success",
+          error: null,
+          lastFetched: new Date(),
+        });
+      } else {
+        setRecommendedTripsState((prev) => ({
+          ...prev,
+          status: "idle",
+          error: null,
+        }));
+      }
+    } catch (error) {
+      console.error("Error loading trips:", error);
+      setRecommendedTripsState((prev) => ({
+        ...prev,
+        status: "error",
+        error: "Failed to load trips",
+      }));
+    }
+  };
+
+  // Modify the handleRefresh function to handle the generation
+  const handleRefresh = async () => {
+    if (recommendedTripsState.status === "loading") return;
+
+    try {
+      setRecommendedTripsState((prev) => ({
+        ...prev,
+        status: "loading",
+        error: null,
+      }));
       setLoadingProgress({ completed: 0, total: 3 });
 
       const user = getAuth().currentUser;
@@ -270,22 +339,7 @@ const Home: React.FC = () => {
         `users/${user.uid}/suggestedTrips`
       );
 
-      // If not refreshing, try to load existing trips
-      if (!isRefresh) {
-        const userTripsSnapshot = await getDocs(userTripsCollection);
-        if (!userTripsSnapshot.empty) {
-          const trips: RecommendedTrip[] = [];
-          userTripsSnapshot.forEach((doc) => {
-            const tripData = doc.data();
-            trips.push(tripData as RecommendedTrip);
-          });
-          setRecommendedTrips(trips);
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      // Generate trips with timeout and progress tracking
+      // Generate new trips
       const tripPromises = Array(3)
         .fill(null)
         .map((_, index) => delay(index * 500).then(() => generateSingleTrip()));
@@ -311,31 +365,24 @@ const Home: React.FC = () => {
         });
 
         await batch.commit();
-        setRecommendedTrips(validTrips);
+        setRecommendedTripsState({
+          trips: validTrips,
+          status: "success",
+          error: null,
+          lastFetched: new Date(),
+        });
         await AsyncStorage.setItem("lastFetchTime", new Date().toISOString());
       } else {
-        // Show error message if no valid trips were generated
-        Alert.alert(
-          "Trip Generation Failed",
-          "Unable to generate trip recommendations. Please try again later.",
-          [{ text: "OK" }]
-        );
+        throw new Error("No valid trips could be generated. Please try again.");
       }
     } catch (error) {
-      console.error("Error in generateRecommendedTrips:", error);
-      Alert.alert(
-        "Error",
-        "An error occurred while generating trips. Please try again.",
-        [{ text: "OK" }]
-      );
-    } finally {
-      setIsLoading(false);
+      setRecommendedTripsState((prev) => ({
+        ...prev,
+        status: "error",
+        error:
+          error instanceof Error ? error.message : "Failed to generate trips",
+      }));
     }
-  };
-
-  // Modify the refresh button press handler
-  const handleRefresh = () => {
-    generateRecommendedTrips(true); // Pass true to indicate this is a refresh
   };
 
   // Type guard to check if a trip is a RecommendedTrip
@@ -345,11 +392,23 @@ const Home: React.FC = () => {
     return (trip as RecommendedTrip).fullResponse !== undefined;
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      generateRecommendedTrips(false); // Pass false to indicate this is initial load
-      getUserName();
-    }, [])
+  // Add this component for empty state
+  const EmptyTripsState: React.FC<{ onRetry: () => void; theme: any }> = ({
+    onRetry,
+    theme,
+  }) => (
+    <View style={styles.emptyStateContainer}>
+      <Ionicons name="compass-outline" size={50} color={theme.textSecondary} />
+      <Text style={[styles.emptyStateText, { color: theme.textSecondary }]}>
+        No trips available at the moment
+      </Text>
+      <Pressable
+        onPress={onRetry}
+        style={[styles.retryButton, { backgroundColor: theme.alternate }]}
+      >
+        <Text style={styles.retryButtonText}>Try Again</Text>
+      </Pressable>
+    </View>
   );
 
   return (
@@ -548,6 +607,7 @@ const Home: React.FC = () => {
             </Text>
             <Pressable
               onPress={handleRefresh}
+              disabled={recommendedTripsState.status === "loading"}
               style={({ pressed }) => ({
                 opacity: pressed ? 0.7 : 1,
                 transform: [{ scale: pressed ? 0.95 : 1 }],
@@ -557,10 +617,15 @@ const Home: React.FC = () => {
                 name="refresh"
                 size={28}
                 color={currentTheme.textPrimary}
+                style={
+                  recommendedTripsState.status === "loading"
+                    ? styles.spinningIcon
+                    : undefined
+                }
               />
             </Pressable>
           </View>
-          {isLoading ? (
+          {recommendedTripsState.status === "loading" ? (
             <View style={{ flexDirection: "row" }}>
               {[1, 2, 3].map((_, index) => (
                 <RecommendedTripSkeleton
@@ -575,11 +640,16 @@ const Home: React.FC = () => {
                 />
               ))}
             </View>
-          ) : recommendedTrips.length > 0 ? (
+          ) : recommendedTripsState.status === "error" ? (
+            <EmptyTripsState onRetry={handleRefresh} theme={currentTheme} />
+          ) : recommendedTripsState.trips.length > 0 ? (
             <FlatList
               testID="recommended-trips-list"
               horizontal
-              data={[...recommendedTrips, { id: "dont-like-button" }]}
+              data={[
+                ...recommendedTripsState.trips,
+                { id: "dont-like-button" },
+              ]}
               keyExtractor={(trip) => trip.id}
               renderItem={({ item: trip }) => {
                 if (trip.id === "dont-like-button") {
@@ -589,12 +659,26 @@ const Home: React.FC = () => {
                         onPress={() => navigation.navigate("WhereTo")}
                         style={({ pressed }) => [
                           styles.dontLikeButton,
-                          { backgroundColor: currentTheme.alternate },
-                          { opacity: pressed ? 0.8 : 1 },
+                          {
+                            borderColor: currentTheme.alternate,
+                            opacity: pressed ? 0.8 : 1,
+                            transform: [{ scale: pressed ? 0.98 : 1 }],
+                          },
                         ]}
                       >
-                        <Text style={styles.dontLikeButtonText}>
-                          Create Your Own Adventure
+                        <Ionicons
+                          name="add-circle-outline"
+                          size={40}
+                          color={currentTheme.alternate}
+                          style={styles.createTripIcon}
+                        />
+                        <Text
+                          style={[
+                            styles.dontLikeButtonText,
+                            { color: currentTheme.alternate },
+                          ]}
+                        >
+                          Create Your Own{"\n"}Adventure
                         </Text>
                       </Pressable>
                     </View>
@@ -671,15 +755,10 @@ const Home: React.FC = () => {
                 return null;
               }}
               showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.recommendedTripsContent}
             />
           ) : (
-            <View style={styles.noTripsContainer}>
-              <Text style={[styles.noTripsText]}>
-                Cannot generate trips right now.
-                {"\n"}
-                Create your own adventure or please try again later!
-              </Text>
-            </View>
+            <EmptyTripsState onRetry={handleRefresh} theme={currentTheme} />
           )}
         </View>
       </ScrollView>
@@ -841,10 +920,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: width * 0.6,
     height: width * 0.8,
+    padding: 20,
   },
   dontLikeButton: {
-    padding: 15,
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 15,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderWidth: 2,
+    borderStyle: "dashed",
+    padding: 20,
     ...Platform.select({
       ios: {
         shadowColor: "#000",
@@ -859,9 +946,14 @@ const styles = StyleSheet.create({
   },
   dontLikeButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "600",
     textAlign: "center",
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
+    marginTop: 10,
+  },
+  createTripIcon: {
+    marginBottom: 10,
   },
   tripCard: {
     borderRadius: 15,
@@ -929,6 +1021,67 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
     textAlign: "center",
     color: "grey",
+  },
+  errorContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
+    marginBottom: 20,
+  },
+  refreshButton: {
+    padding: 15,
+    borderRadius: 15,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
+  },
+  refreshButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  emptyStateContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+    height: 200,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginVertical: 10,
+    fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
+  },
+  retryButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginTop: 10,
+  },
+  retryButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  spinningIcon: {
+    transform: [{ rotate: "45deg" }],
+  },
+  recommendedTripsContent: {
+    paddingRight: 20,
   },
 });
 
