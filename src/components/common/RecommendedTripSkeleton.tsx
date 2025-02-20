@@ -15,11 +15,13 @@ const { width } = Dimensions.get("window");
 interface RecommendedTripSkeletonProps {
   loadingProgress?: number;
   isFirstCard?: boolean;
+  status?: 'loading' | 'completed';
 }
 
 const RecommendedTripSkeleton: React.FC<RecommendedTripSkeletonProps> = ({
   loadingProgress = 0,
   isFirstCard = false,
+  status = 'loading',
 }) => {
   const { currentTheme } = useTheme();
   const shimmerValue = useRef(new Animated.Value(-1)).current;
@@ -49,13 +51,14 @@ const RecommendedTripSkeleton: React.FC<RecommendedTripSkeletonProps> = ({
         <Text
           style={[styles.loadingText, { color: currentTheme.textSecondary }]}
         >
-          Generating trips... {loadingProgress}/3
+          {status === 'completed' ? 'Trip generated!' : 'Generating trip...'}
         </Text>
       )}
       <View
         style={[
           styles.tripCard,
           { backgroundColor: currentTheme.accentBackground },
+          status === 'completed' && styles.completedCard,
         ]}
       >
         <View style={StyleSheet.absoluteFill}>
@@ -173,6 +176,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 10,
     fontFamily: Platform.OS === "ios" ? "Helvetica Neue" : "sans-serif",
+  },
+  completedCard: {
+    opacity: 0.7,
   },
 });
 

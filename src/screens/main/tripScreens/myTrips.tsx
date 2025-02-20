@@ -356,7 +356,7 @@ const MyTrips: React.FC = () => {
                     </Pressable>
                   )}
                 </View>
-                {sortedUpcomingTrips.length > 0 && (
+                {sortedUpcomingTrips.length > 0 ? (
                   <View>
                     <FlatList
                       data={sortedUpcomingTrips}
@@ -390,6 +390,33 @@ const MyTrips: React.FC = () => {
                       }
                     />
                   </View>
+                ) : (
+                  <Pressable
+                    style={styles.noUpcomingTripsContainer}
+                    onPress={() => navigation.navigate("WhereTo")}
+                  >
+                    <MaterialCommunityIcons
+                      name="calendar-plus"
+                      size={24}
+                      color={currentTheme.textSecondary}
+                    />
+                    <Text
+                      style={[
+                        styles.noUpcomingTripsText,
+                        { color: currentTheme.textSecondary },
+                      ]}
+                    >
+                      No upcoming trips planned
+                    </Text>
+                    <Text
+                      style={[
+                        styles.addTripText,
+                        { color: currentTheme.alternate },
+                      ]}
+                    >
+                      Tap to plan a new adventure
+                    </Text>
+                  </Pressable>
                 )}
 
                 {totalPastTrips > 0 && (
@@ -616,6 +643,21 @@ const styles = StyleSheet.create({
   },
   seeMoreText: {
     fontSize: 16,
+    fontWeight: "600",
+  },
+  noUpcomingTripsContainer: {
+    padding: 20,
+    backgroundColor: "rgba(0,0,0,0.03)",
+    borderRadius: 12,
+    alignItems: "center",
+    gap: 8,
+  },
+  noUpcomingTripsText: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  addTripText: {
+    fontSize: 14,
     fontWeight: "600",
   },
 });

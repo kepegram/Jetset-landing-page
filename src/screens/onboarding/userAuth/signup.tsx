@@ -369,7 +369,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             onPress={() => promptAsync()}
             backgroundColor={currentTheme.accentBackground}
             textColor={currentTheme.textPrimary}
-            style={[styles.socialButton, { opacity: loading ? 0.7 : 1 }]}
+            style={[styles.socialButton, { width: "100%" }]}
             disabled={loading}
           >
             <Image
@@ -382,7 +382,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
                 { color: currentTheme.textPrimary },
               ]}
             >
-              Google
+              Continue with Google
             </Text>
           </MainButton>
 
@@ -395,7 +395,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
               buttonStyle={
                 AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
               }
-              cornerRadius={5}
+              cornerRadius={12}
               style={styles.socialButton}
               onPress={handleAppleSignIn}
             />
@@ -433,10 +433,10 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: "flex-start",
-    paddingTop: 10,
+    paddingTop: Platform.OS === "ios" ? 10 : 40,
   },
   headerContainer: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   title: {
     fontSize: 32,
@@ -449,13 +449,13 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   signUpContainer: {
-    marginBottom: 24,
+    marginBottom: 16,
     width: "100%",
     maxWidth: 400,
     alignSelf: "center",
   },
   inputWrapper: {
-    marginBottom: 16,
+    marginBottom: 12,
   },
   inputLabel: {
     fontSize: 16,
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 22,
+    marginBottom: 16,
   },
   divider: {
     flex: 1,
@@ -505,26 +505,24 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   socialButtonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 22,
+    flexDirection: "column",
+    gap: 12,
     width: "100%",
     maxWidth: 400,
     alignSelf: "center",
+    marginBottom: 16,
   },
   socialButton: {
-    flex: 1,
-    marginHorizontal: 6,
     height: 52,
-    borderRadius: 16,
+    borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 12,
   },
   socialIcon: {
     width: 24,
     height: 24,
-    marginRight: 8,
   },
   socialButtonText: {
     fontSize: 16,

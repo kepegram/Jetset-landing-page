@@ -103,6 +103,11 @@ const DeleteAccount: React.FC = () => {
                   const subcollectionNames = [
                     "subcollection1",
                     "subcollection2",
+                    "activeTrips",
+                    "completedTrips",
+                    "savedTrips",
+                    "notifications",
+                    "preferences",
                   ];
                   for (const name of subcollectionNames) {
                     const subcollectionRef = collection(docRef, name);
@@ -113,6 +118,14 @@ const DeleteAccount: React.FC = () => {
                     }
                   }
                 };
+
+                // Delete from activeUsers collection
+                const activeUserDocRef = doc(
+                  FIREBASE_DB,
+                  "activeUsers",
+                  userId!
+                );
+                await deleteDoc(activeUserDocRef);
 
                 // Delete user data from Firestore
                 const userDocRef = doc(FIREBASE_DB, "users", userId!);

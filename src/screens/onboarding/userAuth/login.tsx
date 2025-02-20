@@ -305,7 +305,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               onPress={() => promptAsync()}
               backgroundColor={currentTheme.accentBackground}
               textColor={currentTheme.textPrimary}
-              style={styles.socialButton}
+              style={[styles.socialButton, { width: "100%" }]}
               disabled={loading}
             >
               <Image
@@ -318,7 +318,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                   { color: currentTheme.textPrimary },
                 ]}
               >
-                Google
+                Continue with Google
               </Text>
             </MainButton>
 
@@ -332,7 +332,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                   AppleAuthentication.AppleAuthenticationButtonStyle
                     .WHITE_OUTLINE
                 }
-                cornerRadius={5}
+                cornerRadius={12}
                 style={styles.socialButton}
                 onPress={() => handleAppleSignIn()}
               />
@@ -438,17 +438,17 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   socialIconsContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     gap: 12,
+    width: "100%",
   },
   socialButton: {
-    flex: 1,
     height: 56,
     borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: 12,
   },
   socialIcon: {
     width: 24,

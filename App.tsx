@@ -1,6 +1,6 @@
 import "react-native-get-random-values";
 import React, { useEffect, useState, useCallback } from "react";
-import { Pressable } from "react-native";
+import { Pressable, Animated } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import {
   GoogleAuthProvider,
@@ -36,7 +36,7 @@ export type RootStackParamList = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-// Prevent splash screen from auto-hiding
+// Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 WebBrowser.maybeCompleteAuthSession();
@@ -44,6 +44,10 @@ WebBrowser.maybeCompleteAuthSession();
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [appIsReady, setAppIsReady] = useState(false);
+  const [splashAnimationComplete, setSplashAnimationComplete] = useState(false);
+  const fadeAnim = new Animated.Value(1);
+  const planeAnim = new Animated.Value(0);
+  const textAnim = new Animated.Value(0);
   const { currentTheme } = useTheme();
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
@@ -82,10 +86,24 @@ const App: React.FC = () => {
     return () => unsub();
   }, []);
 
+  // Prepare app resources and loading
   useEffect(() => {
     async function prepare() {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Pre-load fonts, make API calls, etc.
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // Minimum display time for splash
+
+        // Load any resources or data here
+        await Promise.all([
+          // Add your resource loading promises here
+          new Promise((resolve) =>
+            onAuthStateChanged(FIREBASE_AUTH, (user) => {
+              setUser(user);
+              resolve(true);
+            })
+          ),
+          // Add other initialization promises...
+        ]);
       } catch (e) {
         console.warn(e);
       } finally {
@@ -96,9 +114,35 @@ const App: React.FC = () => {
     prepare();
   }, []);
 
+  // Handle splash screen animation
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
-      await SplashScreen.hideAsync();
+      // Animate the plane and text
+      Animated.sequence([
+        Animated.parallel([
+          // Fade in text
+          Animated.timing(textAnim, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+          // Move plane
+          Animated.timing(planeAnim, {
+            toValue: 1,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Fade out everything
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start(async () => {
+        await SplashScreen.hideAsync();
+        setSplashAnimationComplete(true);
+      });
     }
   }, [appIsReady]);
 
@@ -130,6 +174,38 @@ const App: React.FC = () => {
     <ThemeProvider>
       <NavigationContainer onReady={onLayoutRootView}>
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+        {!splashAnimationComplete && (
+          <Animated.View
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: colorScheme === "dark" ? "#000000" : "#ffffff",
+              opacity: fadeAnim,
+              zIndex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Animated.Image
+              source={require("./src/assets/splash/splash-icon-light.png")}
+              style={{
+                opacity: textAnim,
+                transform: [
+                  {
+                    translateY: planeAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [50, 0],
+                    }),
+                  },
+                ],
+              }}
+              resizeMode="contain"
+            />
+          </Animated.View>
+        )}
         <Stack.Navigator initialRouteName="Welcome">
           {user ? (
             <Stack.Screen

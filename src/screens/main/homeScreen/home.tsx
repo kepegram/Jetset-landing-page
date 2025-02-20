@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Dimensions,
   Platform,
+  Alert,
 } from "react-native";
 import React, { useState, useContext, useCallback, useRef } from "react";
 import { useFocusEffect } from "@react-navigation/native";
@@ -63,6 +64,12 @@ interface AIError extends Error {
   status?: number;
 }
 
+// Add near the top with other interfaces
+interface LoadingProgress {
+  completed: number;
+  total: number;
+}
+
 const { width } = Dimensions.get("window");
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "HomeMain">;
@@ -76,7 +83,10 @@ const Home: React.FC = () => {
     []
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingProgress, setLoadingProgress] = useState<LoadingProgress>({
+    completed: 0,
+    total: 3,
+  });
   const navigation = useNavigation<NavigationProp>();
   const googlePlacesRef = useRef<any>(null);
 
@@ -209,13 +219,48 @@ const Home: React.FC = () => {
     }
   };
 
+  // Add this utility function
+  const generateTripsWithTimeout = async (
+    promises: Promise<RecommendedTrip | null>[],
+    timeout: number = 30000
+  ): Promise<(RecommendedTrip | null)[]> => {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("Generation timed out")), timeout);
+    });
+
+    try {
+      const results: (RecommendedTrip | null)[] = [];
+      for (let i = 0; i < promises.length; i++) {
+        try {
+          const result = await Promise.race([promises[i], timeoutPromise]);
+          results.push(result);
+          setLoadingProgress((prev) => ({
+            ...prev,
+            completed: prev.completed + 1,
+          }));
+        } catch (error) {
+          console.error(`Error generating trip ${i + 1}:`, error);
+          results.push(null);
+          setLoadingProgress((prev) => ({
+            ...prev,
+            completed: prev.completed + 1,
+          }));
+        }
+      }
+      return results;
+    } catch (error) {
+      console.error("Trip generation timed out:", error);
+      return [];
+    }
+  };
+
   // Modify the generateRecommendedTrips function
   const generateRecommendedTrips = async (isRefresh = false) => {
     try {
       setIsLoading(true);
-      setLoadingProgress(0);
-      const user = getAuth().currentUser;
+      setLoadingProgress({ completed: 0, total: 3 });
 
+      const user = getAuth().currentUser;
       if (!user) {
         throw new Error("User not authenticated");
       }
@@ -240,22 +285,21 @@ const Home: React.FC = () => {
         }
       }
 
-      // Generate trips with some delay between each to avoid rate limiting
+      // Generate trips with timeout and progress tracking
       const tripPromises = Array(3)
         .fill(null)
         .map((_, index) => delay(index * 500).then(() => generateSingleTrip()));
 
-      const generatedTrips = await Promise.all(tripPromises);
+      const generatedTrips = await generateTripsWithTimeout(tripPromises);
       const validTrips = generatedTrips.filter(
         (trip): trip is RecommendedTrip => trip !== null
       );
 
       if (validTrips.length > 0) {
-        // Delete all existing trips first
-        const existingTripsSnapshot = await getDocs(userTripsCollection);
         const batch = writeBatch(FIREBASE_DB);
 
         // Delete existing trips
+        const existingTripsSnapshot = await getDocs(userTripsCollection);
         existingTripsSnapshot.forEach((document) => {
           batch.delete(doc(userTripsCollection, document.id));
         });
@@ -266,13 +310,24 @@ const Home: React.FC = () => {
           batch.set(newTripRef, trip);
         });
 
-        // Execute all operations in a single batch
         await batch.commit();
         setRecommendedTrips(validTrips);
         await AsyncStorage.setItem("lastFetchTime", new Date().toISOString());
+      } else {
+        // Show error message if no valid trips were generated
+        Alert.alert(
+          "Trip Generation Failed",
+          "Unable to generate trip recommendations. Please try again later.",
+          [{ text: "OK" }]
+        );
       }
     } catch (error) {
       console.error("Error in generateRecommendedTrips:", error);
+      Alert.alert(
+        "Error",
+        "An error occurred while generating trips. Please try again.",
+        [{ text: "OK" }]
+      );
     } finally {
       setIsLoading(false);
     }
@@ -510,8 +565,13 @@ const Home: React.FC = () => {
               {[1, 2, 3].map((_, index) => (
                 <RecommendedTripSkeleton
                   key={index}
-                  loadingProgress={loadingProgress}
+                  loadingProgress={
+                    loadingProgress.completed / loadingProgress.total
+                  }
                   isFirstCard={index === 0}
+                  status={
+                    index < loadingProgress.completed ? "completed" : "loading"
+                  }
                 />
               ))}
             </View>
