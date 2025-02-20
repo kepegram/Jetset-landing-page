@@ -12,37 +12,75 @@ import Carousel from "react-native-reanimated-carousel";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
-import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "../../../components/ui/button";
 import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeIn } from "react-native-reanimated";
+
+const { width, height } = Dimensions.get("window");
 
 type CarouselScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Carousel"
 >;
 
-const { width, height } = Dimensions.get("window");
-
 const CarouselScreen: React.FC = () => {
   const navigation = useNavigation<CarouselScreenNavigationProp>();
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Handle slide changes
+  const handleSlideChange = (index: number) => {
+    setActiveIndex(index);
+  };
+
+  // Handle button presses
+  const handleGetStarted = () => {
+    navigation.navigate("SignUp");
+  };
+
+  const handleLogin = () => {
+    navigation.navigate("Login");
+  };
+
+  // Handle reaching final slide
+  const handleMomentumEnd = (index: number) => {
+    // Remove haptics code
+  };
+
   const slides = [
     {
-      image: require("../../../assets/onboarding-imgs/city.jpeg"),
-      title: "Create your dream travel list",
-      subtitle: "Curate your own personalized travel bucket list",
-    },
-    {
-      image: require("../../../assets/onboarding-imgs/igloo.jpg"),
-      title: "Plan trips and explore destinations",
-      subtitle: "Simple AI tools to help you plan your dream trip.",
-    },
-    {
-      image: require("../../../assets/onboarding-imgs/beautiful.jpeg"),
-      title: "Become\nJetset\nToday",
+      image: require("../../../assets/onboarding-imgs/ai-planning.jpeg"),
+      title: "AI-Powered Travel Planning 🤖",
       subtitle:
-        "Join our community to start planning your travel list and explore the world",
+        "Let our smart AI create personalized travel plans just for you. From duration to budget, we've got you covered.",
+      emoji: "✨",
+    },
+    {
+      image: require("../../../assets/onboarding-imgs/city.jpeg"),
+      title: "Interactive Trip Planning 🗺️",
+      subtitle:
+        "Visualize your journey with interactive maps and real-time updates. Plan smarter, travel better.",
+      emoji: "📍",
+    },
+    {
+      image: require("../../../assets/onboarding-imgs/itinerary.jpeg"),
+      title: "Smart Itineraries 📱",
+      subtitle:
+        "Get day-by-day plans with estimated times, costs, and local insights. Everything you need in one place.",
+      emoji: "⏰",
+    },
+    {
+      image: require("../../../assets/onboarding-imgs/offline.jpeg"),
+      title: "Always Available 🌐",
+      subtitle:
+        "Access your trips offline. Stay organized even without internet connection.",
+      emoji: "💫",
+    },
+    {
+      image: require("../../../assets/onboarding-imgs/ready.jpeg"),
+      title: "Ready for Adventure?",
+      subtitle:
+        "Join our community of travelers and start planning your next unforgettable journey.",
+      emoji: "🚀",
     },
   ];
 
@@ -58,42 +96,58 @@ const CarouselScreen: React.FC = () => {
           style={styles.gradient}
         >
           <SafeAreaView style={styles.contentContainer}>
-            <View style={styles.dotsContainer}>
+            <Animated.View
+              entering={FadeIn.duration(800)}
+              style={styles.dotsContainer}
+            >
               {slides.map((_, i) => (
                 <View
                   key={i}
-                  style={[styles.dot, i === activeIndex && styles.activeDot]}
+                  style={[
+                    styles.dot,
+                    i === activeIndex && styles.activeDot,
+                    {
+                      backgroundColor:
+                        i === activeIndex ? "#fff" : "rgba(255,255,255,0.4)",
+                    },
+                  ]}
                 />
               ))}
-            </View>
+            </Animated.View>
 
             <View style={styles.bottomContent}>
-              <View style={styles.textContainer}>
+              <Animated.View
+                entering={FadeIn.duration(1000)}
+                style={styles.textContainer}
+              >
+                <Text style={styles.emoji}>{item.emoji}</Text>
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.subtitle}>{item.subtitle}</Text>
-              </View>
+              </Animated.View>
 
               {index === slides.length - 1 ? (
-                <View style={styles.buttonContainer}>
+                <Animated.View
+                  entering={FadeIn.delay(500).duration(800)}
+                  style={styles.buttonContainer}
+                >
                   <MainButton
-                    onPress={() => navigation.navigate("SignUp")}
+                    onPress={handleGetStarted}
                     buttonText="Get Started"
                     width="100%"
+                    style={styles.getStartedButton}
+                    textColor="black"
                   />
-                </View>
+                  <MainButton
+                    onPress={handleLogin}
+                    buttonText="I already have an account"
+                    width="100%"
+                    style={styles.loginButton}
+                    textColor="white"
+                  />
+                </Animated.View>
               ) : (
-                <View style={styles.swipeIndicatorContainer}>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={28}
-                    color="rgba(255,255,255,0.6)"
-                  />
-                  <Ionicons
-                    name="chevron-forward"
-                    size={28}
-                    color="rgba(255,255,255,0.3)"
-                    style={styles.secondArrow}
-                  />
+                <View style={styles.swipeIndicator}>
+                  <Text style={styles.swipeText}>Swipe to continue</Text>
                 </View>
               )}
             </View>
@@ -111,14 +165,17 @@ const CarouselScreen: React.FC = () => {
         height={height}
         data={slides}
         renderItem={renderSlide}
-        onSnapToItem={setActiveIndex}
+        onSnapToItem={handleSlideChange}
+        onProgressChange={(_, absoluteProgress) => {
+          const slideIndex = Math.round(absoluteProgress);
+          handleMomentumEnd(slideIndex);
+        }}
         defaultIndex={0}
+        enabled={true}
       />
     </View>
   );
 };
-
-export default CarouselScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -153,12 +210,10 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "rgba(255, 255, 255, 0.4)",
     marginHorizontal: 4,
   },
   activeDot: {
     width: 24,
-    backgroundColor: "#fff",
   },
   bottomContent: {
     paddingBottom: Platform.OS === "ios" ? 50 : 40,
@@ -166,33 +221,54 @@ const styles = StyleSheet.create({
   textContainer: {
     padding: 32,
     paddingBottom: 20,
+    alignItems: "center",
+  },
+  emoji: {
+    fontSize: 48,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 42,
+    fontSize: 32,
     fontWeight: "800",
     color: "white",
     marginBottom: 16,
-    lineHeight: 52,
-    letterSpacing: -0.5,
+    textAlign: "center",
+    lineHeight: 40,
   },
   subtitle: {
     fontSize: 18,
     color: "#F5F5F5",
     lineHeight: 26,
-    letterSpacing: 0.2,
+    textAlign: "center",
     opacity: 0.9,
+    paddingHorizontal: 10,
   },
   buttonContainer: {
     paddingHorizontal: 32,
     width: "100%",
+    gap: 12,
   },
-  swipeIndicatorContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
+  getStartedButton: {
+    backgroundColor: "#fff",
+    height: 56,
+    borderRadius: 16,
+  },
+  loginButton: {
+    backgroundColor: "transparent",
+    height: 56,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.3)",
+  },
+  swipeIndicator: {
     alignItems: "center",
-    paddingTop: 10,
+    marginTop: 20,
   },
-  secondArrow: {
-    marginLeft: -15,
+  swipeText: {
+    color: "rgba(255,255,255,0.6)",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
+
+export default CarouselScreen;

@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../App";
 import { MainButton } from "../../../components/ui/button";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -15,34 +16,41 @@ const Welcome: React.FC = () => {
 
   return (
     <ImageBackground
-      source={require("../../../assets/onboarding-imgs/jetset-welcome.jpeg")}
+      source={require("../../../assets/onboarding-imgs/beautiful.jpeg")}
       style={styles.backgroundImage}
     >
       <View style={styles.slide}>
-        <Text style={styles.appName}>Jetset</Text>
-        <Text style={styles.paragraph}>
-          Dream. Discover. <Text style={styles.exploreText}>Explore.</Text>
-        </Text>
+        <Animated.Text
+          entering={FadeIn.delay(500).duration(1000)}
+          style={styles.appName}
+        >
+          Jetset
+        </Animated.Text>
 
-        {/* Buttons */}
-        <View style={styles.buttonContainer}>
+        <Animated.Text
+          entering={FadeIn.delay(1000).duration(1000)}
+          style={styles.paragraph}
+        >
+          Dream. Discover. <Text style={styles.exploreText}>Explore.</Text>
+        </Animated.Text>
+
+        <Animated.View
+          entering={FadeIn.delay(1500).duration(1000)}
+          style={styles.buttonContainer}
+        >
           <MainButton
-            onPress={() => {
-              navigation.navigate("Carousel");
-            }}
+            onPress={() => navigation.navigate("SignUp")}
             buttonText="Sign Up"
+            style={styles.signUpButton}
             textColor="black"
-            style={styles.button}
           />
 
           <MainButton
-            onPress={() => {
-              navigation.navigate("Login");
-            }}
+            onPress={() => navigation.navigate("Login")}
             buttonText="Login"
             style={styles.altButton}
           />
-        </View>
+        </Animated.View>
       </View>
     </ImageBackground>
   );
@@ -92,14 +100,13 @@ const styles = StyleSheet.create({
     width: "80%",
     alignItems: "center",
   },
-  buttonText: {
-    color: "#000",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
   altButtonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  signUpButton: {
+    backgroundColor: "white",
+    width: "80%",
   },
 });

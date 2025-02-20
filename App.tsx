@@ -1,6 +1,6 @@
 import "react-native-get-random-values";
 import React, { useEffect, useState, useCallback } from "react";
-import { Pressable, Animated } from "react-native";
+import { Pressable, Animated, Dimensions } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import {
   GoogleAuthProvider,
@@ -40,6 +40,8 @@ const Stack = createStackNavigator<RootStackParamList>();
 SplashScreen.preventAutoHideAsync();
 
 WebBrowser.maybeCompleteAuthSession();
+
+const { width: screenWidth } = Dimensions.get("window");
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -182,7 +184,7 @@ const App: React.FC = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: colorScheme === "dark" ? "#000000" : "#ffffff",
+              backgroundColor: "#387694",
               opacity: fadeAnim,
               zIndex: 1,
               alignItems: "center",
@@ -193,6 +195,8 @@ const App: React.FC = () => {
               source={require("./src/assets/splash/splash-icon-light.png")}
               style={{
                 opacity: textAnim,
+                width: screenWidth * 2.0,
+                height: screenWidth * 0.533,
                 transform: [
                   {
                     translateY: planeAnim.interpolate({

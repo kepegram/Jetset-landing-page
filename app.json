@@ -9,13 +9,7 @@
       "image": "./src/assets/splash/splash-icon-light.png",
       "imageWidth": 200,
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
-      "dark": {
-        "image": "./src/assets/splash/splash-icon-dark.png",
-        "imageWidth": 200,
-        "resizeMode": "contain",
-        "backgroundColor": "#000000"
-      }
+      "backgroundColor": "#387694"
     },
     "newArchEnabled": true,
     "ios": {

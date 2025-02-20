@@ -59,6 +59,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@types/eslint": "^9.6.1",
     "@types/eslint-scope": "^3.7.7",
     "@types/estree": "^1.0.6",

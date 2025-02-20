@@ -57,13 +57,10 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
 
   const handleLogin = async () => {
     setErrorMessage(null);
-
     setLoading(true);
     try {
-      const response = await signInWithEmailAndPassword(auth, email, password);
-      console.log(response);
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
-      console.log(err);
       setErrorMessage(
         "Login failed. Incorrect username or password. Please try again."
       );
@@ -72,9 +69,11 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
     }
   };
 
-  const handleAppleSignIn = async () => {
-    setErrorMessage(null);
+  const handleGoogleLogin = () => {
+    promptAsync();
+  };
 
+  const handleAppleSignIn = async () => {
     try {
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
@@ -119,6 +118,14 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
       }
       console.error("Apple Sign-In Error:", e);
     }
+  };
+
+  const handleForgotPassword = () => {
+    navigation.navigate("ForgotPassword");
+  };
+
+  const handleSignUpNavigation = () => {
+    navigation.navigate("SignUp");
   };
 
   return (
@@ -217,7 +224,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
 
           <Pressable
             testID="forgot-password-button"
-            onPress={() => navigation.navigate("ForgotPassword")}
+            onPress={handleForgotPassword}
             style={styles.forgotPasswordContainer}
             disabled={loading}
           >
@@ -269,13 +276,15 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               <Text
                 style={[styles.signUpLink, { color: currentTheme.alternate }]}
                 testID="signup-link-text"
-                onPress={() => navigation.navigate("SignUp")}
+                onPress={handleSignUpNavigation}
               >
                 Sign up here
               </Text>
             </Text>
           </View>
+        </View>
 
+        <View style={styles.dividerContainer}>
           <View style={styles.dividerContainer}>
             <View
               style={[
@@ -298,46 +307,46 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               ]}
             />
           </View>
+        </View>
 
-          <View style={styles.socialIconsContainer}>
-            <MainButton
-              testID="google-signin-button"
-              onPress={() => promptAsync()}
-              backgroundColor={currentTheme.accentBackground}
-              textColor={currentTheme.textPrimary}
-              style={[styles.socialButton, { width: "100%" }]}
-              disabled={loading}
+        <View style={styles.socialIconsContainer}>
+          <MainButton
+            testID="google-signin-button"
+            onPress={handleGoogleLogin}
+            backgroundColor={currentTheme.accentBackground}
+            textColor={currentTheme.textPrimary}
+            style={[styles.socialButton, { width: "100%" }]}
+            disabled={loading}
+          >
+            <Image
+              source={require("../../../assets/app-imgs/google.png")}
+              style={styles.socialIcon}
+            />
+            <Text
+              style={[
+                styles.socialButtonText,
+                { color: currentTheme.textPrimary },
+              ]}
             >
-              <Image
-                source={require("../../../assets/app-imgs/google.png")}
-                style={styles.socialIcon}
-              />
-              <Text
-                style={[
-                  styles.socialButtonText,
-                  { color: currentTheme.textPrimary },
-                ]}
-              >
-                Continue with Google
-              </Text>
-            </MainButton>
+              Continue with Google
+            </Text>
+          </MainButton>
 
-            {Platform.OS === "ios" && (
-              <AppleAuthentication.AppleAuthenticationButton
-                testID="apple-signin-button"
-                buttonType={
-                  AppleAuthentication.AppleAuthenticationButtonType.CONTINUE
-                }
-                buttonStyle={
-                  AppleAuthentication.AppleAuthenticationButtonStyle
-                    .WHITE_OUTLINE
-                }
-                cornerRadius={12}
-                style={styles.socialButton}
-                onPress={() => handleAppleSignIn()}
-              />
-            )}
-          </View>
+          {Platform.OS === "ios" && (
+            <AppleAuthentication.AppleAuthenticationButton
+              testID="apple-signin-button"
+              buttonType={
+                AppleAuthentication.AppleAuthenticationButtonType.CONTINUE
+              }
+              buttonStyle={
+                AppleAuthentication.AppleAuthenticationButtonStyle
+                  .WHITE_OUTLINE
+              }
+              cornerRadius={12}
+              style={styles.socialButton}
+              onPress={() => handleAppleSignIn()}
+            />
+          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

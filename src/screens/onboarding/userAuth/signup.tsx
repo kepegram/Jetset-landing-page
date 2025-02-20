@@ -172,11 +172,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
     setLoading(true);
     try {
-      const response = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const response = await createUserWithEmailAndPassword(auth, email, password);
       const user = response.user;
 
       const userRef = doc(db, "users", user.uid);
@@ -203,9 +199,11 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
     }
   };
 
-  const handleAppleSignIn = async () => {
-    setErrorMessage(null);
+  const handleGoogleSignUp = async () => {
+    promptAsync();
+  };
 
+  const handleAppleSignIn = async () => {
     try {
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
@@ -250,6 +248,10 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
       }
       console.error("Apple Sign-In Error:", e);
     }
+  };
+
+  const handleLoginNavigation = () => {
+    navigation.navigate("Login");
   };
 
   return (
@@ -366,7 +368,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
         <View style={styles.socialButtonsContainer}>
           <MainButton
             testID="google-signup-button"
-            onPress={() => promptAsync()}
+            onPress={handleGoogleSignUp}
             backgroundColor={currentTheme.accentBackground}
             textColor={currentTheme.textPrimary}
             style={[styles.socialButton, { width: "100%" }]}
@@ -382,7 +384,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
                 { color: currentTheme.textPrimary },
               ]}
             >
-              Continue with Google
+              Sign up with Google
             </Text>
           </MainButton>
 
@@ -404,7 +406,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
         <Pressable
           testID="login-link-button"
-          onPress={() => navigation.navigate("Login")}
+          onPress={handleLoginNavigation}
           disabled={loading}
           style={[styles.loginLink, { opacity: loading ? 0.7 : 1 }]}
         >
