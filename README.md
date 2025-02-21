@@ -1,179 +1,77 @@
-# Jetset
+# Jetset Landing Page
 
-Jetset is an AI-powered travel app built with **React Native** and **Expo**, designed to make trip planning effortless. By analyzing users' travel preferences, the app delivers tailored destination suggestions and comprehensive itineraries. With its smart technology and user-focused approach, Jetset redefines the travel planning experience.
+A modern, responsive landing page for Jetset - an AI-powered travel planning app. Built with HTML, CSS, and vanilla JavaScript, this landing page showcases the app's key features and provides a seamless user experience.
 
-The app leverages powerful APIs and a robust tech stack to provide precise global destination mapping, personalized travel plans, and seamless trip organization. Whether you're exploring new places or revisiting old favorites, Jetset is your perfect travel companion.
+## 🎨 Design Features
 
----
+- **Modern UI**: Clean, minimalist design with a focus on user experience
+- **Responsive Layout**: Fully responsive design that works on all devices
+- **Light Theme**: Professional white theme with blue accents (#3BACE3)
+- **Interactive Elements**: Subtle animations and hover effects
+- **Custom Components**:
+  - App store download buttons
+  - Feature cards
+  - Device showcases
+  - AI code window
+  - Mobile app screenshots
 
-## 🚀 Features
+## 📱 Key Sections
 
-### Core Features
+1. **Hero Section**
 
-- **AI-Powered Travel Planning**:
+   - Main value proposition
+   - App store download buttons
+   - Featured app screenshots
 
-  - Generates efficient, personalized travel plans based on user preferences
-  - Smart destination recommendations using machine learning
-  - Adaptive itineraries based on travel style and group size
+2. **Features Grid**
 
-- **Smart Trip Generation**:
+   - Smart Planning
+   - Dynamic Itineraries
+   - AI Technology
+   - Security Features
 
-  - Customized trip duration and activity planning
-  - Budget-aware recommendations
-  - Group size optimization (Solo, Couple, or Group travel)
-  - Activity level customization
+3. **App Showcase**
 
-- **Comprehensive Itineraries**:
-  - Day-by-day detailed travel plans
-  - Points of interest with descriptions
-  - Travel time estimates between locations
-  - Budget considerations and recommendations
+   - Interactive app screenshots
+   - Feature descriptions
+   - User interface highlights
 
-### User Experience
+4. **AI Technology**
 
-- **Modern UI/UX**:
+   - Technical capabilities
+   - Gemini API integration
+   - Interactive code window
 
-  - Smooth animations and transitions
-  - Dark and light theme support
-  - Intuitive navigation flow
-  - Responsive design for all screen sizes
+5. **Download Section**
+   - App store links
+   - Call to action
 
-- **Interactive Maps**:
-  - Visual trip planning interface
-  - Real-time location updates
-  - Interactive destination markers
-  - Route visualization
+## 📄 Additional Pages
 
-### Technical Features
+- **Privacy Policy**: Detailed privacy information
+- **Terms of Service**: User agreement and terms
 
-- **Cross-Platform Support**:
+## 🛠️ Technical Details
 
-  - iOS and Android compatibility
-  - Native performance optimization
-  - Platform-specific UI adaptations
+- Pure HTML/CSS implementation
+- No external JavaScript libraries
+- CSS custom properties for theming
+- Optimized assets and images
+- Mobile-first approach
 
-- **Offline Capabilities**:
+## 🚀 Deployment
 
-  - Local data persistence
-  - Cached trip information
-  - Seamless online/offline transitions
+The landing page is deployed using GitHub Pages and can be accessed at:
+https://kepegram.github.io/Jetset-2.0
 
-- **Security**:
-  - Secure user authentication
-  - Encrypted data storage
-  - Protected API communications
+## 📱 Browser Support
 
----
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+- Mobile browsers
 
-## 🌐 Integrated APIs
+## 🔄 Updates
 
-### 1. **Firebase**
-
-- **Authentication**:
-  - Secure user registration and login
-  - Social media authentication
-  - Password recovery
-- **Firestore**:
-  - Real-time data synchronization
-  - User preferences storage
-  - Trip data persistence
-  - Offline data access
-
-### 2. **Gemini API**
-
-- AI-powered trip generation
-- Natural language processing for preferences
-- Smart itinerary optimization
-- Context-aware recommendations
-
-### 3. **Google Maps Platform**
-
-- **Maps API**:
-  - Interactive mapping
-  - Real-time location services
-  - Route optimization
-- **Places API**:
-  - Global destination database
-  - Point of interest details
-  - Photo references
-  - Place recommendations
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend
-
-- **Framework**: React Native
-- **UI Kit**: React Native Paper
-- **Navigation**: React Navigation
-- **Maps**: React Native Maps
-- **Animations**: React Native Animated
-
-### Backend Services
-
-- **Database**: Firebase Firestore
-- **Authentication**: Firebase Auth
-- **Storage**: Firebase Cloud Storage
-- **AI Services**: Google Gemini API
-
-### Development Tools
-
-- **Build System**: Expo
-- **State Management**: Context API
-- **Package Management**: npm/yarn
-- **Code Quality**: TypeScript
-- **Styling**: StyleSheet API
-
----
-
-## 📱 Key Components
-
-### Navigation
-
-- Stack Navigation for main flow
-- Tab Navigation for bottom menu
-- Modal Navigation for overlays
-
-### Screens
-
-- Onboarding & Authentication
-- Home & Discovery
-- Trip Planning & Generation
-- Trip Details & Management
-- User Profile & Settings
-
-### Custom Components
-
-- Themed UI elements
-- Reusable buttons and cards
-- Loading animations
-- Custom map markers
-
----
-
-## 🔒 Environment Setup
-
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Configure environment variables:
-   - Firebase configuration
-   - Google Maps API key
-   - Gemini API key
-4. Start the development server: `expo start`
-
----
-
-## 🎨 Theming
-
-The app supports both light and dark themes with:
-
-- Consistent color palette
-- Dynamic theme switching
-- Custom fonts and typography
-- Responsive layouts
-- Animated theme transitions
-
----
-
-Start planning your travels today with Jetset, and experience the future of travel planning!
+Last updated: March 2024
