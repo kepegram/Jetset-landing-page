@@ -23,7 +23,6 @@ import {
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../../App";
-import { useTheme } from "../../../context/themeContext";
 import { AuthRequestPromptOptions, AuthSessionResult } from "expo-auth-session";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { MainButton } from "../../../components/ui/button";
@@ -41,14 +40,6 @@ interface SignUpProps {
 
 interface InputFieldProps {
   label: string;
-  theme: {
-    textPrimary: string;
-    background: string;
-    secondary: string;
-    textSecondary: string;
-    accentBackground: string;
-    inactive: string;
-  };
   placeholder?: string;
   value?: string;
   onChangeText?: (text: string) => void;
@@ -64,35 +55,14 @@ interface PasswordFieldProps {
   onChangeText: (text: string) => void;
   visible: boolean;
   toggleVisible: () => void;
-  theme: {
-    textPrimary: string;
-    background: string;
-    secondary: string;
-    textSecondary: string;
-    accentBackground: string;
-    inactive: string;
-  };
   editable: boolean;
   testID?: string;
 }
 
-const InputField: React.FC<InputFieldProps> = ({ label, theme, ...props }) => (
+const InputField: React.FC<InputFieldProps> = ({ label, ...props }) => (
   <View style={styles.inputWrapper}>
-    <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
-      {label}
-    </Text>
-    <TextInput
-      style={[
-        styles.input,
-        {
-          backgroundColor: theme.accentBackground,
-          color: theme.textPrimary,
-          borderColor: theme.inactive,
-        },
-      ]}
-      placeholderTextColor={theme.textSecondary}
-      {...props}
-    />
+    <Text style={styles.inputLabel}>{label}</Text>
+    <TextInput style={styles.input} placeholderTextColor={"grey"} {...props} />
   </View>
 );
 
@@ -102,26 +72,16 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
   onChangeText,
   visible,
   toggleVisible,
-  theme,
   editable,
   testID,
 }) => (
   <View style={styles.inputWrapper}>
-    <Text style={[styles.inputLabel, { color: theme.textPrimary }]}>
-      {label}
-    </Text>
+    <Text style={styles.inputLabel}>{label}</Text>
     <View style={styles.passwordContainer}>
       <TextInput
-        style={[
-          styles.input,
-          {
-            backgroundColor: theme.accentBackground,
-            color: theme.textPrimary,
-            borderColor: theme.inactive,
-          },
-        ]}
+        style={styles.input}
         placeholder="••••••••••"
-        placeholderTextColor={theme.textSecondary}
+        placeholderTextColor={"grey"}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={!visible}
@@ -134,18 +94,13 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
         onPress={toggleVisible}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
-        <Ionicons
-          name={visible ? "eye-off" : "eye"}
-          size={24}
-          color={theme.textSecondary}
-        />
+        <Ionicons name={visible ? "eye-off" : "eye"} size={24} color={"grey"} />
       </Pressable>
     </View>
   </View>
 );
 
 const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
-  const { currentTheme } = useTheme();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -172,7 +127,11 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
 
     setLoading(true);
     try {
-      const response = await createUserWithEmailAndPassword(auth, email, password);
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = response.user;
 
       const userRef = doc(db, "users", user.uid);
@@ -255,27 +214,19 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
   };
 
   return (
-    <SafeAreaView
-      testID="signup-screen"
-      style={[styles.container, { backgroundColor: currentTheme.background }]}
-    >
+    <SafeAreaView testID="signup-screen" style={styles.container}>
       <KeyboardAvoidingView
         testID="signup-content"
-        style={styles.contentContainer}
+        style={[styles.contentContainer, { backgroundColor: "white" }]}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View testID="signup-header" style={styles.headerContainer}>
-          <Text
-            testID="signup-title"
-            style={[styles.title, { color: currentTheme.textPrimary }]}
-          >
-            Create Account
-          </Text>
-          <Text
-            testID="signup-subtitle"
-            style={[styles.subtitle, { color: currentTheme.textSecondary }]}
-          >
-            Sign up to get started
+          <Image
+            source={require("../../../assets/icons/adaptive-icon.png")}
+            style={styles.logo}
+          />
+          <Text testID="signup-subtitle" style={styles.subtitle}>
+            Your journey begins here
           </Text>
         </View>
 
@@ -287,7 +238,6 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             value={username}
             onChangeText={setUsername}
             editable={!loading}
-            theme={currentTheme}
             autoCapitalize="none"
           />
 
@@ -300,7 +250,6 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             keyboardType="email-address"
             autoCapitalize="none"
             editable={!loading}
-            theme={currentTheme}
           />
 
           <PasswordField
@@ -311,7 +260,6 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
             visible={passwordVisible}
             toggleVisible={() => setPasswordVisible(!passwordVisible)}
             editable={!loading}
-            theme={currentTheme}
           />
 
           <PasswordField
@@ -324,7 +272,6 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
               setConfirmPasswordVisible(!confirmPasswordVisible)
             }
             editable={!loading}
-            theme={currentTheme}
           />
 
           <MainButton
@@ -336,41 +283,24 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           />
 
           {errorMessage && (
-            <Text
-              testID="signup-error-message"
-              style={[styles.errorText, { color: currentTheme.error || "red" }]}
-            >
+            <Text testID="signup-error-message" style={styles.errorText}>
               {errorMessage}
             </Text>
           )}
         </View>
 
         <View style={styles.dividerContainer}>
-          <View
-            style={[
-              styles.divider,
-              { backgroundColor: currentTheme.secondary },
-            ]}
-          />
-          <Text
-            style={[styles.dividerText, { color: currentTheme.textSecondary }]}
-          >
-            or continue with
-          </Text>
-          <View
-            style={[
-              styles.divider,
-              { backgroundColor: currentTheme.secondary },
-            ]}
-          />
+          <View style={styles.divider} />
+          <Text style={styles.dividerText}>or continue with</Text>
+          <View style={styles.divider} />
         </View>
 
         <View style={styles.socialButtonsContainer}>
           <MainButton
             testID="google-signup-button"
             onPress={handleGoogleSignUp}
-            backgroundColor={currentTheme.accentBackground}
-            textColor={currentTheme.textPrimary}
+            backgroundColor="white"
+            textColor="black"
             style={[styles.socialButton, { width: "100%" }]}
             disabled={loading}
           >
@@ -378,14 +308,7 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
               source={require("../../../assets/app-imgs/google.png")}
               style={styles.socialIcon}
             />
-            <Text
-              style={[
-                styles.socialButtonText,
-                { color: currentTheme.textPrimary },
-              ]}
-            >
-              Sign up with Google
-            </Text>
+            <Text style={styles.socialButtonText}>Sign up with Google</Text>
           </MainButton>
 
           {Platform.OS === "ios" && (
@@ -410,14 +333,9 @@ const SignUp: React.FC<SignUpProps> = ({ promptAsync }) => {
           disabled={loading}
           style={[styles.loginLink, { opacity: loading ? 0.7 : 1 }]}
         >
-          <Text
-            testID="login-link-text"
-            style={[styles.loginText, { color: currentTheme.textSecondary }]}
-          >
+          <Text testID="login-link-text" style={styles.loginText}>
             Already have an account?{" "}
-            <Text style={{ color: currentTheme.alternate, fontWeight: "bold" }}>
-              Log in
-            </Text>
+            <Text style={{ fontWeight: "bold", color: "#3BACE3" }}>Log in</Text>
           </Text>
         </Pressable>
       </KeyboardAvoidingView>
@@ -430,18 +348,24 @@ export default SignUp;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
   contentContainer: {
     flex: 1,
     padding: 24,
     justifyContent: "flex-start",
-    paddingTop: Platform.OS === "ios" ? 10 : 40,
+    paddingTop: 0,
   },
   headerContainer: {
-    marginBottom: 16,
+    alignItems: "center",
+    marginBottom: 22,
   },
-  title: {
-    fontSize: 32,
+  logo: {
+    width: 80,
+    height: 80,
+  },
+  appName: {
+    fontSize: 42,
     fontWeight: "bold",
     marginBottom: 8,
     letterSpacing: 0.5,
@@ -449,6 +373,8 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     opacity: 0.8,
+    letterSpacing: 0.3,
+    color: "black",
   },
   signUpContainer: {
     marginBottom: 16,
@@ -500,11 +426,13 @@ const styles = StyleSheet.create({
   divider: {
     flex: 1,
     height: 1.5,
+    backgroundColor: "grey",
   },
   dividerText: {
     marginHorizontal: 16,
     fontSize: 14,
     fontWeight: "500",
+    color: "grey",
   },
   socialButtonsContainer: {
     flexDirection: "column",
@@ -517,6 +445,8 @@ const styles = StyleSheet.create({
   socialButton: {
     height: 52,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "black",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

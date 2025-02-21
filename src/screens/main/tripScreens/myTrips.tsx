@@ -34,35 +34,12 @@ type MyTripsScreenNavigationProp =
 
 const MyTrips: React.FC = () => {
   const { currentTheme } = useTheme();
-  const { displayName } = useProfile();
-  const [userName, setUserName] = useState<string | null>(null);
   const [userTrips, setUserTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<MyTripsScreenNavigationProp>();
   const ITEMS_TO_SHOW = 6;
 
   const user = FIREBASE_AUTH.currentUser;
-
-  useFocusEffect(
-    useCallback(() => {
-      const fetchUserData = async () => {
-        const user = getAuth().currentUser;
-        if (user) {
-          try {
-            const userDoc = await getDoc(doc(FIREBASE_DB, "users", user.uid));
-            if (userDoc.exists()) {
-              const data = userDoc.data();
-              setUserName(data?.name || "");
-            }
-          } catch (error) {
-            console.error("Error fetching user data:", error);
-          }
-        }
-      };
-
-      fetchUserData();
-    }, [])
-  );
 
   useFocusEffect(
     useCallback(() => {
@@ -172,22 +149,11 @@ const MyTrips: React.FC = () => {
         ]}
       >
         <View style={styles.headerContent}>
-          {userName ? (
-            <Text
-              style={[styles.headerTitle, { color: currentTheme.textPrimary }]}
-            >
-              {userName}'s Trips ✈️
-            </Text>
-          ) : (
-            <Text
-              style={[
-                styles.smheaderTitle,
-                { color: currentTheme.textPrimary },
-              ]}
-            >
-              {displayName}'s Trips ✈️
-            </Text>
-          )}
+          <Text
+            style={[styles.headerTitle, { color: currentTheme.textPrimary }]}
+          >
+            My Trips ✈️
+          </Text>
           <Pressable
             style={styles.addButton}
             onPress={() => navigation.navigate("WhereTo")}

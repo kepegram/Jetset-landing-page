@@ -14,13 +14,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../../context/themeContext";
 import { CreateTripContext } from "../../../context/createTripContext";
 import { getAuth } from "firebase/auth";
-import {
-  doc,
-  getDoc,
-  collection,
-  getDocs,
-  writeBatch,
-} from "firebase/firestore";
+import { doc, collection, getDocs, writeBatch } from "firebase/firestore";
 import { FIREBASE_DB } from "../../../../firebase.config";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -85,7 +79,6 @@ const Home: React.FC = () => {
   const { currentTheme } = useTheme();
   const { tripData = {}, setTripData = () => {} } =
     useContext(CreateTripContext) || {};
-  const [userName, setUserName] = useState("");
   const [recommendedTripsState, setRecommendedTripsState] =
     useState<RecommendedTripsState>({
       trips: [],
@@ -104,29 +97,11 @@ const Home: React.FC = () => {
   const getGreeting = () => {
     const currentHour = new Date().getHours();
     if (currentHour < 12) {
-      return `Good Morning,`;
+      return `Good Morning ☀️`;
     } else if (currentHour < 18) {
-      return `Good Afternoon,`;
+      return `Good Afternoon 🌤️`;
     } else {
-      return `Good Evening,`;
-    }
-  };
-
-  // Fetch user's name from Firestore
-  const getUserName = async () => {
-    try {
-      const user = getAuth().currentUser;
-      if (!user) {
-        console.error("User not authenticated");
-        return;
-      }
-      const userDoc = await getDoc(doc(FIREBASE_DB, "users", user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setUserName(userData?.name || "");
-      }
-    } catch (error) {
-      console.error("Error fetching username", error);
+      return `Good Evening 🌙`;
     }
   };
 
@@ -270,7 +245,6 @@ const Home: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       loadExistingTrips(); // New function to load trips from Firebase
-      getUserName();
     }, [])
   );
 
@@ -434,9 +408,6 @@ const Home: React.FC = () => {
           <View testID="home-header-content" style={styles.headerContent}>
             <Text testID="home-greeting" style={styles.greetingText}>
               {getGreeting()}
-            </Text>
-            <Text testID="home-name" style={styles.greetingText}>
-              {userName} 🌅
             </Text>
             <Text testID="home-subgreeting" style={styles.subGreetingText}>
               Let's plan your next adventure!
@@ -823,7 +794,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop: -70,
+    marginTop: -100,
   },
   searchContainer: {
     marginBottom: 20,

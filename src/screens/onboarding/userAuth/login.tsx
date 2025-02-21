@@ -4,7 +4,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -22,7 +21,6 @@ import {
   signInWithCredential,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { useTheme } from "../../../context/themeContext";
 import { AuthRequestPromptOptions, AuthSessionResult } from "expo-auth-session";
 import { MainButton } from "../../../components/ui/button";
 import { setDoc } from "firebase/firestore";
@@ -41,7 +39,6 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ promptAsync }) => {
-  const { currentTheme } = useTheme();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
@@ -131,48 +128,38 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
   return (
     <KeyboardAvoidingView
       testID="login-screen"
-      style={[styles.container, { backgroundColor: currentTheme.background }]}
+      style={[styles.container, { backgroundColor: "white" }]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={styles.scrollContainer}>
         <View testID="login-header" style={styles.headerContainer}>
-          <Text
-            testID="login-title"
-            style={[styles.title, { color: currentTheme.textPrimary }]}
-          >
-            Welcome Back
-          </Text>
+          <Image
+            source={require("../../../assets/icons/adaptive-icon.png")}
+            style={styles.logo}
+          />
           <Text
             testID="login-subtitle"
-            style={[styles.subTitle, { color: currentTheme.textSecondary }]}
+            style={[styles.subTitle, { color: "black" }]}
           >
-            Sign in to continue your journey
+            Welcome back, adventurer
           </Text>
         </View>
 
         <View testID="login-form" style={styles.loginContainer}>
           <View style={styles.inputWrapper}>
-            <Text
-              style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
-            >
-              Email
-            </Text>
+            <Text style={[styles.inputHeader, { color: "black" }]}>Email</Text>
             <TextInput
               testID="login-email-input"
               style={[
                 styles.input,
                 {
-                  backgroundColor: currentTheme.accentBackground,
-                  color: currentTheme.textPrimary,
-                  borderColor: currentTheme.inactive,
+                  backgroundColor: "white",
+                  color: "black",
+                  borderColor: "gray",
                 },
               ]}
               placeholder="user@example.com"
-              placeholderTextColor={currentTheme.textSecondary}
+              placeholderTextColor="gray"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -183,9 +170,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           </View>
 
           <View style={styles.inputWrapper}>
-            <Text
-              style={[styles.inputHeader, { color: currentTheme.textPrimary }]}
-            >
+            <Text style={[styles.inputHeader, { color: "black" }]}>
               Password
             </Text>
             <View style={styles.passwordContainer}>
@@ -194,13 +179,13 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                 style={[
                   styles.input,
                   {
-                    backgroundColor: currentTheme.accentBackground,
-                    color: currentTheme.textPrimary,
-                    borderColor: currentTheme.inactive,
+                    backgroundColor: "white",
+                    color: "black",
+                    borderColor: "gray",
                   },
                 ]}
                 placeholder="••••••••••"
-                placeholderTextColor={currentTheme.textSecondary}
+                placeholderTextColor="gray"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!passwordVisible}
@@ -216,7 +201,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                 <Ionicons
                   name={passwordVisible ? "eye-off" : "eye"}
                   size={24}
-                  color={currentTheme.textSecondary}
+                  color="gray"
                 />
               </Pressable>
             </View>
@@ -230,10 +215,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           >
             <Text
               testID="forgot-password-text"
-              style={[
-                styles.forgotPasswordText,
-                { color: currentTheme.alternate },
-              ]}
+              style={[styles.forgotPasswordText, { color: "#3BACE3" }]}
             >
               Forgot Password?
             </Text>
@@ -242,7 +224,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           {loading ? (
             <ActivityIndicator
               size="large"
-              color={currentTheme.primary}
+              color="black"
               style={styles.button}
             />
           ) : (
@@ -259,22 +241,17 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           {errorMessage && (
             <Text
               testID="login-error-message"
-              style={[styles.errorText, { color: currentTheme.error }]}
+              style={[styles.errorText, { color: "red" }]}
             >
               {errorMessage}
             </Text>
           )}
 
           <View style={styles.createAccountContainer}>
-            <Text
-              style={[
-                styles.createAccountText,
-                { color: currentTheme.textSecondary },
-              ]}
-            >
+            <Text style={[styles.createAccountText, { color: "black" }]}>
               New to Jetset?{" "}
               <Text
-                style={[styles.signUpLink, { color: currentTheme.alternate }]}
+                style={[styles.signUpLink, { color: "#3BACE3" }]}
                 testID="signup-link-text"
                 onPress={handleSignUpNavigation}
               >
@@ -286,26 +263,11 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
 
         <View style={styles.dividerContainer}>
           <View style={styles.dividerContainer}>
-            <View
-              style={[
-                styles.divider,
-                { backgroundColor: currentTheme.secondary },
-              ]}
-            />
-            <Text
-              style={[
-                styles.dividerText,
-                { color: currentTheme.textSecondary },
-              ]}
-            >
+            <View style={[styles.divider, { backgroundColor: "gray" }]} />
+            <Text style={[styles.dividerText, { color: "black" }]}>
               or continue with
             </Text>
-            <View
-              style={[
-                styles.divider,
-                { backgroundColor: currentTheme.secondary },
-              ]}
-            />
+            <View style={[styles.divider, { backgroundColor: "gray" }]} />
           </View>
         </View>
 
@@ -313,8 +275,8 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
           <MainButton
             testID="google-signin-button"
             onPress={handleGoogleLogin}
-            backgroundColor={currentTheme.accentBackground}
-            textColor={currentTheme.textPrimary}
+            backgroundColor="white"
+            textColor="black"
             style={[styles.socialButton, { width: "100%" }]}
             disabled={loading}
           >
@@ -322,12 +284,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
               source={require("../../../assets/app-imgs/google.png")}
               style={styles.socialIcon}
             />
-            <Text
-              style={[
-                styles.socialButtonText,
-                { color: currentTheme.textPrimary },
-              ]}
-            >
+            <Text style={[styles.socialButtonText, { color: "black" }]}>
               Continue with Google
             </Text>
           </MainButton>
@@ -339,8 +296,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
                 AppleAuthentication.AppleAuthenticationButtonType.CONTINUE
               }
               buttonStyle={
-                AppleAuthentication.AppleAuthenticationButtonStyle
-                  .WHITE_OUTLINE
+                AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
               }
               cornerRadius={12}
               style={styles.socialButton}
@@ -348,7 +304,7 @@ const Login: React.FC<LoginProps> = ({ promptAsync }) => {
             />
           )}
         </View>
-      </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 };
@@ -358,26 +314,28 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
   scrollContainer: {
     flexGrow: 1,
     padding: 24,
   },
   headerContainer: {
-    marginTop: 80,
-    marginBottom: 40,
+    alignItems: "center",
+    marginTop: 20,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 12,
+  logo: {
+    width: 80,
+    height: 80,
   },
   subTitle: {
     fontSize: 16,
     lineHeight: 24,
+    letterSpacing: 0.3,
   },
   loginContainer: {
     width: "100%",
+    marginTop: 20,
   },
   inputWrapper: {
     marginBottom: 20,
@@ -435,7 +393,7 @@ const styles = StyleSheet.create({
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 32,
+    marginBottom: 10,
   },
   divider: {
     flex: 1,
@@ -454,6 +412,8 @@ const styles = StyleSheet.create({
   socialButton: {
     height: 56,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "black",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

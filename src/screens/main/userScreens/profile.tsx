@@ -154,7 +154,7 @@ const Profile: React.FC = () => {
             const userDoc = await getDoc(doc(FIREBASE_DB, "users", user.uid));
             if (userDoc.exists()) {
               const data = userDoc.data();
-              setUserName(data?.name || "");
+              setUserName(data?.name || data?.username || "");
             }
           } catch (error) {
             console.error("Error fetching user data:", error);

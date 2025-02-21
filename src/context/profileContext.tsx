@@ -71,9 +71,9 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
               setProfilePictureState(data.profilePicture);
               await AsyncStorage.setItem("profilePicture", data.profilePicture);
             }
-            if (data?.displayName) {
-              setDisplayNameState(data.displayName);
-              await AsyncStorage.setItem("displayName", data.displayName);
+            if (data?.username) {
+              setDisplayNameState(data.username);
+              await AsyncStorage.setItem("displayName", data.username);
             }
           }
         }
