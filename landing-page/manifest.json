@@ -1,0 +1,16 @@
+{
+  "name": "Jetset - AI Travel Planning",
+  "short_name": "Jetset",
+  "description": "AI-powered travel planning app",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3BACE3",
+  "icons": [
+    {
+      "src": "assets/adaptive-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+} 

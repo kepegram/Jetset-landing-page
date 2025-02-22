@@ -17,6 +17,50 @@
     />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="assets/adaptive-icon.png"
+      sizes="32x32"
+    />
+    <link rel="apple-touch-icon" href="assets/adaptive-icon.png" />
+    <link rel="preload" as="image" href="assets/screenshots/welcome.png" />
+    <link rel="preload" as="image" href="assets/screenshots/home-screen.png" />
+    <meta
+      name="description"
+      content="Experience the future of travel planning with Jetset's AI-powered itinerary generation and personalized recommendations."
+    />
+    <meta
+      name="keywords"
+      content="travel planning, AI travel, itinerary generator, travel app"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://download-jetset.app/" />
+    <meta property="og:title" content="Jetset - AI-Powered Travel Planning" />
+    <meta
+      property="og:description"
+      content="Experience the future of travel planning with Jetset's AI-powered itinerary generation."
+    />
+    <meta
+      property="og:image"
+      content="https://download-jetset.app/assets/og-image.png"
+    />
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://download-jetset.app/" />
+    <meta
+      property="twitter:title"
+      content="Jetset - AI-Powered Travel Planning"
+    />
+    <meta
+      property="twitter:description"
+      content="Experience the future of travel planning with Jetset's AI-powered itinerary generation."
+    />
+    <meta
+      property="twitter:image"
+      content="https://download-jetset.app/assets/og-image.png"
+    />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#3BACE3" />
   </head>
   <body>
     <nav class="nav">
@@ -137,6 +181,7 @@
               <div class="device-screen">
                 <img
                   src="assets/screenshots/generateTrip.png"
+                  loading="lazy"
                   alt="Trip Generation"
                 />
               </div>
@@ -153,6 +198,7 @@
               <div class="device-screen">
                 <img
                   src="assets/screenshots/reviewTrip.png"
+                  loading="lazy"
                   alt="Itinerary View"
                 />
               </div>
@@ -168,6 +214,7 @@
               <div class="device-screen">
                 <img
                   src="assets/screenshots/moreInfo.png"
+                  loading="lazy"
                   alt="Travel Preferences"
                 />
               </div>
@@ -280,6 +327,34 @@ Creating personalized itinerary...
         window.scrollTo({
           top: 0,
           behavior: "smooth",
+        });
+      }
+
+      // Image loading optimization
+      document.addEventListener("DOMContentLoaded", function () {
+        const images = document.querySelectorAll('img[loading="lazy"]');
+
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const img = entry.target;
+              img.addEventListener("load", () => {
+                img.classList.add("loaded");
+              });
+              observer.unobserve(img);
+            }
+          });
+        });
+
+        images.forEach((img) => imageObserver.observe(img));
+      });
+
+      // Performance monitoring
+      if (window.performance) {
+        const timing = window.performance.timing;
+        window.addEventListener("load", () => {
+          const loadTime = timing.loadEventEnd - timing.navigationStart;
+          console.log(`Page load time: ${loadTime}ms`);
         });
       }
     </script>
