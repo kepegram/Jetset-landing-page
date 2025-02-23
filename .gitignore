@@ -43,3 +43,38 @@ firebase.config.ts
 AI-Model.tsx
 google-services.json
 GoogleService-Info.plist
+
+# React Native / Mobile App files
+node_modules/
+.expo/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+.DS_Store
+
+# Root level files to ignore
+app.json
+babel.config.js
+eas.json
+metro.config.js
+package.json
+package-lock.json
+tsconfig.json
+.easignore
+App.tsx
+
+# Keep only landing page files
+!index.html
+!css/
+!lp-assets/
+!privacy.html
+!terms.html
+!service-worker.js
+!manifest.json
+!.htaccess
