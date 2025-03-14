@@ -30,6 +30,9 @@
         --text: #1a1a1a;
         --text-secondary: #64748b;
         --card-bg: #f8f9fa;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
       }
 
       body {
@@ -44,7 +47,8 @@
       .container {
         max-width: 800px;
         margin: 0 auto;
-        padding: 2rem;
+        padding: 4rem 2rem;
+        animation: fadeIn 0.8s ease;
       }
 
       .back-link {
@@ -55,17 +59,24 @@
         text-decoration: none;
         margin-bottom: 2rem;
         font-weight: 500;
-        transition: opacity 0.3s;
+        transition: var(--transition);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        background: var(--card-bg);
       }
 
       .back-link:hover {
-        opacity: 0.8;
+        transform: translateX(-4px);
+        background: var(--gradient-start);
       }
 
       h1 {
-        font-size: 2.5rem;
+        font-size: 3rem;
         margin-bottom: 1rem;
         color: var(--text);
+        background: linear-gradient(135deg, var(--text), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
       h2 {
@@ -78,38 +89,95 @@
       p {
         color: var(--text-secondary);
         margin-bottom: 1.5rem;
+        font-size: 1.1rem;
       }
 
       .last-updated {
         display: inline-block;
-        padding: 0.5rem 1rem;
+        padding: 0.75rem 1.5rem;
         background: var(--card-bg);
-        border-radius: 6px;
+        border-radius: 12px;
         margin-bottom: 2rem;
         font-size: 0.9rem;
         color: var(--text-secondary);
+        box-shadow: var(--shadow-sm);
       }
 
       .section {
-        padding: 1.5rem;
+        padding: 2rem;
         background: var(--card-bg);
-        border-radius: 12px;
+        border-radius: 16px;
         margin-bottom: 2rem;
         border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: var(--transition);
+        animation: fadeInUp 0.8s ease backwards;
+      }
+
+      .section:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
       }
 
       .contact-section {
-        margin-top: 3rem;
-        padding: 2rem;
-        background: var(--card-bg);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 4rem;
+        padding: 3rem;
+        background: linear-gradient(
+          135deg,
+          var(--gradient-start),
+          var(--gradient-end)
+        );
+        border-radius: 16px;
+        border: none;
+        animation: fadeInUp 0.8s ease 0.2s backwards;
+      }
+
+      .contact-section h2 {
+        color: var(--text);
+      }
+
+      .contact-section p {
+        font-size: 1.1rem;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 2rem 1rem;
+        }
+
+        h1 {
+          font-size: 2.5rem;
+        }
+
+        .section,
+        .contact-section {
+          padding: 1.5rem;
+        }
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <a href="/" class="back-link">← Back to Home</a>
+      <a href="index.html" class="back-link">← Back to Home</a>
 
       <h1>Terms of Service</h1>
       <span class="last-updated">Last updated: March 2025</span>

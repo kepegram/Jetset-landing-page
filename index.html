@@ -111,6 +111,449 @@
     <link rel="preload" href="lp-assets/Light.png" as="image" />
     <link rel="preload" href="lp-assets/app-store.png" as="image" />
     <link rel="preload" href="lp-assets/google-play.png" as="image" />
+    <style>
+      :root {
+        --background: #ffffff;
+        --primary: #3bace3;
+        --text: #1a1a1a;
+        --text-secondary: #64748b;
+        --card-bg: #f8f9fa;
+        --gradient-start: rgba(59, 172, 227, 0.1);
+        --gradient-end: rgba(59, 172, 227, 0.02);
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        line-height: 1.6;
+        background: var(--background);
+        color: var(--text);
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+      }
+
+      .nav {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.8);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+      }
+
+      .nav .container {
+        padding: 0.5rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5px;
+        transition: var(--transition);
+      }
+
+      .logo:hover {
+        transform: translateY(-1px);
+      }
+
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .nav-links a {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        position: relative;
+        padding: 0.25rem 0;
+      }
+
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -4px;
+        left: 0;
+        background-color: var(--primary);
+        transition: var(--transition);
+      }
+
+      .nav-links a:hover {
+        color: var(--primary);
+      }
+
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+
+      .hero {
+        padding: 8rem 0 4rem;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(
+          135deg,
+          var(--gradient-start),
+          var(--gradient-end)
+        );
+      }
+
+      .hero-content {
+        max-width: 600px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero h1 {
+        font-size: 4rem;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--text), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: fadeInUp 0.8s ease;
+      }
+
+      .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        margin-bottom: 2.5rem;
+        animation: fadeInUp 0.8s ease 0.2s backwards;
+      }
+
+      .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        animation: fadeInUp 0.8s ease 0.4s backwards;
+      }
+
+      .store-badge {
+        transition: var(--transition);
+      }
+
+      .store-badge:hover {
+        transform: translateY(-2px);
+      }
+
+      .store-badge img {
+        height: 48px;
+        width: auto;
+      }
+
+      .hero-image {
+        position: relative;
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .device-wrapper {
+        position: relative;
+        transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
+        transition: var(--transition);
+      }
+
+      .device-wrapper:hover {
+        transform: perspective(1000px) rotateY(-10deg) rotateX(2deg);
+      }
+
+      .device-screen {
+        border-radius: 32px;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+      }
+
+      .features {
+        padding: 8rem 0;
+        background: linear-gradient(180deg, var(--background), var(--card-bg));
+      }
+
+      .section-header {
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto 4rem;
+      }
+
+      .section-header h2 {
+        font-size: 2.5rem;
+        color: var(--text);
+        margin-bottom: 1rem;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .feature-card {
+        background: var(--background);
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .feature-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      .feature-card h3 {
+        color: var(--text);
+        margin-bottom: 1rem;
+      }
+
+      .feature-card p {
+        color: var(--text-secondary);
+      }
+
+      .showcase {
+        padding: 8rem 0;
+        background: var(--background);
+      }
+
+      .device-showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 4rem;
+        margin-top: 4rem;
+      }
+
+      .device-container {
+        text-align: center;
+        transition: var(--transition);
+      }
+
+      .device-container:hover {
+        transform: translateY(-8px);
+      }
+
+      .screen-caption {
+        font-weight: 600;
+        color: var(--text);
+        margin: 1.5rem 0 0.5rem;
+      }
+
+      .screen-description {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+      }
+
+      .ai-section {
+        padding: 8rem 0;
+        background: linear-gradient(
+          135deg,
+          var(--gradient-start),
+          var(--gradient-end)
+        );
+      }
+
+      .ai-content {
+        max-width: 500px;
+      }
+
+      .ai-features {
+        margin-top: 3rem;
+      }
+
+      .ai-feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--background);
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+      }
+
+      .ai-feature-item:hover {
+        transform: translateX(4px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .code-window {
+        background: #1e1e1e;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .code-header {
+        background: #2d2d2d;
+        padding: 0.75rem;
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .dot.red {
+        background: #ff5f56;
+      }
+      .dot.yellow {
+        background: #ffbd2e;
+      }
+      .dot.green {
+        background: #27c93f;
+      }
+
+      .code-content {
+        padding: 1.5rem;
+        color: #a9b7c6;
+      }
+
+      .code-content code {
+        font-family: "Fira Code", monospace;
+        display: block;
+      }
+
+      .code-content code span.success {
+        color: #98c379;
+      }
+
+      .code-content code span.process {
+        color: #61afef;
+      }
+
+      footer {
+        background: var(--card-bg);
+        padding: 4rem 0 2rem;
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 4rem;
+        margin-bottom: 3rem;
+      }
+
+      .footer-brand h3 {
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .footer-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 2rem;
+      }
+
+      .footer-column h4 {
+        color: var(--text);
+        margin-bottom: 1rem;
+      }
+
+      .footer-column a {
+        display: block;
+        color: var(--text-secondary);
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+        transition: var(--transition);
+      }
+
+      .footer-column a:hover {
+        color: var(--primary);
+      }
+
+      .footer-bottom {
+        padding-top: 2rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        text-align: center;
+        color: var(--text-secondary);
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+
+        .hero h1 {
+          font-size: 3rem;
+        }
+
+        .hero-content {
+          text-align: center;
+          margin: 0 auto;
+        }
+
+        .hero-buttons {
+          justify-content: center;
+        }
+
+        .footer-content {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+      }
+
+      @media (max-width: 1200px) {
+        .feature-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .feature-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
   </head>
   <body>
     <nav class="nav">
@@ -127,8 +570,8 @@
           <a href="#features">Features</a>
           <a href="#ai">AI Technology</a>
           <a href="#download">Download</a>
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
         </div>
       </div>
     </nav>
@@ -359,10 +802,10 @@
               <span class="dot green"></span>
             </div>
             <div class="code-content">
-              <pre><code>Analyzing preferences...
-Generating optimal routes...
-Creating personalized itinerary...
-✨ Your perfect trip is ready!</code></pre>
+              <pre><code><span class="process">Analyzing preferences...</span>
+<span class="process">Generating optimal routes...</span>
+<span class="process">Creating personalized itinerary...</span>
+<span class="success">✨ Your perfect trip is ready!</span></code></pre>
             </div>
           </div>
         </div>
