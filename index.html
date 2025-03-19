@@ -144,7 +144,8 @@
         top: 0;
         z-index: 1000;
         box-shadow: var(--shadow-sm);
-        transition: var(--transition);
+        transition: background-color 0.3s ease;
+        will-change: background-color;
       }
 
       .nav .container {
@@ -162,7 +163,8 @@
         display: flex;
         align-items: center;
         gap: 0.5px;
-        transition: var(--transition);
+        transition: transform 0.3s ease;
+        will-change: transform;
       }
 
       .logo:hover {
@@ -184,9 +186,10 @@
         color: var(--text-secondary);
         text-decoration: none;
         font-weight: 500;
-        transition: var(--transition);
+        transition: color 0.3s ease;
         position: relative;
         padding: 0.25rem 0;
+        will-change: color;
       }
 
       .nav-links a::after {
@@ -197,7 +200,8 @@
         bottom: -4px;
         left: 0;
         background-color: var(--primary);
-        transition: var(--transition);
+        transition: width 0.3s ease;
+        will-change: width;
       }
 
       .nav-links a:hover {
@@ -249,7 +253,8 @@
       }
 
       .store-badge {
-        transition: var(--transition);
+        transition: transform 0.3s ease;
+        will-change: transform;
       }
 
       .store-badge:hover {
@@ -264,12 +269,16 @@
       .hero-image {
         position: relative;
         animation: float 6s ease-in-out infinite;
+        will-change: transform;
+        backface-visibility: hidden;
       }
 
       .device-wrapper {
         position: relative;
         transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
-        transition: var(--transition);
+        transition: transform 0.3s ease;
+        will-change: transform;
+        backface-visibility: hidden;
       }
 
       .device-wrapper:hover {
@@ -279,7 +288,8 @@
       .device-screen {
         border-radius: 32px;
         box-shadow: var(--shadow-md);
-        transition: var(--transition);
+        transition: box-shadow 0.3s ease;
+        will-change: box-shadow;
       }
 
       .features {
@@ -313,7 +323,8 @@
         padding: 1.5rem;
         border-radius: 16px;
         box-shadow: var(--shadow-sm);
-        transition: var(--transition);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        will-change: transform, box-shadow;
       }
 
       .feature-card:hover {
@@ -349,7 +360,8 @@
 
       .device-container {
         text-align: center;
-        transition: var(--transition);
+        transition: transform 0.3s ease;
+        will-change: transform;
       }
 
       .device-container:hover {
@@ -393,7 +405,8 @@
         background: var(--background);
         border-radius: 12px;
         box-shadow: var(--shadow-sm);
-        transition: var(--transition);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        will-change: transform, box-shadow;
       }
 
       .ai-feature-item:hover {
@@ -407,6 +420,8 @@
         overflow: hidden;
         box-shadow: var(--shadow-md);
         animation: float 6s ease-in-out infinite;
+        will-change: transform;
+        backface-visibility: hidden;
       }
 
       .code-header {
@@ -511,10 +526,10 @@
       @keyframes float {
         0%,
         100% {
-          transform: translateY(0);
+          transform: translateY(0) translateZ(0);
         }
         50% {
-          transform: translateY(-10px);
+          transform: translateY(-10px) translateZ(0);
         }
       }
 
