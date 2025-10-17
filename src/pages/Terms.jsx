@@ -10,15 +10,46 @@ const Terms = () => {
   };
 
   return (
-    <div className="container">
-      <Link to="/" className="logo" onClick={scrollToTop}>
-        Jetset
-        <img
-          src="/src/assets/adaptive-icon.png"
-          alt="Jetset"
-          className="logo-icon"
-        />
+    <div
+      className="container"
+      style={{ paddingTop: "4rem", paddingBottom: "4rem" }}
+    >
+      <Link to="/" className="back-button">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+          style={{ width: "20px", height: "20px" }}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+          />
+        </svg>
+        Back to Home
       </Link>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "1rem",
+          marginBottom: "2rem",
+          marginTop: "2rem",
+        }}
+      >
+        <Link to="/" className="logo" onClick={scrollToTop}>
+          Jetset
+          <img
+            src="/src/assets/adaptive-icon.png"
+            alt="Jetset"
+            className="logo-icon"
+          />
+        </Link>
+      </div>
 
       <h1>Terms of Service</h1>
       <span className="last-updated">Last updated: March 2025</span>
@@ -64,35 +95,38 @@ const Terms = () => {
       </div>
 
       <div className="section">
-        <h2>4. AI-Generated Content</h2>
+        <h2>4. Photo and Content Ownership</h2>
         <p>
-          Jetset uses artificial intelligence to generate travel plans and
-          recommendations. By using our service, you acknowledge that:
+          You retain full ownership of all photos and content you upload to
+          Jetset. By using our service, you acknowledge that:
         </p>
         <ul>
-          <li>AI-generated content is for informational purposes only</li>
+          <li>You own all rights to the photos and content you upload</li>
           <li>
-            We do not guarantee the accuracy of AI-generated recommendations
+            You grant Jetset a license to store and display your content for
+            service delivery
           </li>
-          <li>You should verify all travel information independently</li>
           <li>
-            We are not responsible for any issues arising from AI-generated
+            You are responsible for ensuring you have rights to uploaded content
+          </li>
+          <li>
+            We are not responsible for copyright infringement of user-uploaded
             content
           </li>
         </ul>
       </div>
 
       <div className="section">
-        <h2>5. User Content</h2>
+        <h2>5. User Content and Storage</h2>
         <p>
           Users retain all rights to the content they create and share through
           Jetset. By posting content, you grant Jetset a license to:
         </p>
         <ul>
-          <li>Use, modify, and display that content</li>
-          <li>Store and process the content for service delivery</li>
-          <li>Use the content to improve our AI models</li>
-          <li>Share the content with other users when appropriate</li>
+          <li>Store and backup your photos and scrapbook entries</li>
+          <li>Display content across your devices</li>
+          <li>Process and optimize images for storage and display</li>
+          <li>Synchronize content through cloud services</li>
         </ul>
       </div>
 
@@ -174,11 +208,11 @@ const Terms = () => {
           <li>
             Indirect, incidental, special, consequential or punitive damages
           </li>
-          <li>Loss of profits, data, or use</li>
+          <li>Loss of photos, data, or scrapbook content</li>
           <li>Service interruptions or errors</li>
           <li>Third-party actions or content</li>
-          <li>AI-generated content accuracy</li>
-          <li>Travel-related issues or incidents</li>
+          <li>Photo quality or optimization results</li>
+          <li>Data synchronization issues</li>
         </ul>
       </div>
 

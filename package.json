@@ -1,7 +1,7 @@
 {
   "name": "jetset-landing-page",
   "version": "1.0.0",
-  "description": "A modern, responsive landing page for Jetset - an AI-powered travel planning app. Built with HTML, CSS, and vanilla JavaScript, this landing page showcases the app's key features and provides a seamless user experience.",
+  "description": "A modern, responsive landing page for Jetset - a digital travel scrapbook app. Built with React and Vite, this landing page showcases the app's key features and provides a seamless user experience.",
   "main": "service-worker.js",
   "scripts": {
     "dev": "vite",

@@ -5,23 +5,23 @@ const Showcase = () => {
     {
       image: "/src/assets/screenshots/generateTrip.webp",
       fallback: "/src/assets/screenshots/generateTrip.png",
-      caption: "AI Trip Generation",
+      caption: "Create Your Scrapbook",
       description:
-        "Create personalized itineraries instantly with our advanced AI technology",
+        "Start a new trip and add cover photos, dates, and destinations to organize your memories",
     },
     {
       image: "/src/assets/screenshots/reviewTrip.webp",
       fallback: "/src/assets/screenshots/reviewTrip.png",
-      caption: "Smart Planning",
+      caption: "Document Your Journey",
       description:
-        "Review and customize your AI-generated travel plans effortlessly",
+        "Add excursions with photos and descriptions to capture every moment of your adventure",
     },
     {
       image: "/src/assets/screenshots/moreInfo.webp",
       fallback: "/src/assets/screenshots/moreInfo.png",
-      caption: "Personalization",
+      caption: "Relive Your Memories",
       description:
-        "Fine-tune your preferences for perfectly tailored travel experiences",
+        "Browse through beautiful photo galleries and revisit your favorite travel moments anytime",
     },
   ];
 
@@ -31,9 +31,9 @@ const Showcase = () => {
         <div className="section-header">
           <h2>Experience Jetset</h2>
           <p className="showcase-description">
-            See how Jetset transforms your travel planning with AI-powered
-            features and an intuitive interface designed for seamless
-            experiences.
+            See how Jetset helps you create beautiful digital scrapbooks with an
+            intuitive interface designed for capturing and preserving your
+            travel memories.
           </p>
         </div>
         <div className="device-showcase">

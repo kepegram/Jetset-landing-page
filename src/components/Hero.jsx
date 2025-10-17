@@ -6,13 +6,14 @@ const Hero = () => {
       <div className="container">
         <div className="hero-content">
           <h1>
-            Travel Smarter
+            Your Travels
             <br />
-            <span>with AI</span>
+            <span>Beautifully Preserved</span>
           </h1>
           <p className="hero-subtitle">
-            Experience the future of travel planning with Jetset's AI-powered
-            itinerary generation and personalized recommendations.
+            Transform your adventures into stunning digital scrapbooks. Capture
+            every moment, organize your memories, and relive your journeys
+            forever.
           </p>
           <div className="hero-buttons">
             <a href="#" className="store-badge app-store">

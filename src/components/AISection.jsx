@@ -1,15 +1,16 @@
-const AISection = () => {
-  const aiFeatures = [
+const TechnologySection = () => {
+  const techFeatures = [
     {
-      icon: "🤖",
-      title: "Natural Language Processing",
-      description: "Understand your preferences through natural conversation",
+      icon: "☁️",
+      title: "Cloud Synchronization",
+      description:
+        "Your scrapbooks are safely stored and synced across all your devices in real-time",
     },
     {
-      icon: "⚡",
-      title: "Real-time Optimization",
+      icon: "📱",
+      title: "Cross-Platform Experience",
       description:
-        "Continuously improve recommendations based on your feedback",
+        "Native iOS and Android apps with smooth animations and intuitive touch interactions",
     },
   ];
 
@@ -21,14 +22,14 @@ const AISection = () => {
             className="section-header"
             style={{ textAlign: "left", margin: 0 }}
           >
-            <h2>Powered by Advanced AI</h2>
+            <h2>Built with Modern Technology</h2>
             <p>
-              Experience the power of Google's Gemini API, creating travel
-              experiences that adapt to your unique preferences.
+              Experience a seamless scrapbooking experience powered by React
+              Native, Firebase, and cutting-edge mobile technologies.
             </p>
           </div>
           <div className="ai-features">
-            {aiFeatures.map((feature, index) => (
+            {techFeatures.map((feature, index) => (
               <div key={index} className="ai-feature-item">
                 <span className="ai-feature-icon">{feature.icon}</span>
                 <div>
@@ -49,13 +50,11 @@ const AISection = () => {
             <div className="code-content">
               <pre>
                 <code>
-                  <span className="process">Analyzing preferences...</span>
-                  <span className="process">Generating optimal routes...</span>
-                  <span className="process">
-                    Creating personalized itinerary...
-                  </span>
+                  <span className="process">Uploading photos...</span>
+                  <span className="process">Creating scrapbook entry...</span>
+                  <span className="process">Syncing to cloud storage...</span>
                   <span className="success">
-                    ✨ Your perfect trip is ready!
+                    ✨ Your memories are preserved!
                   </span>
                 </code>
               </pre>
@@ -67,4 +66,4 @@ const AISection = () => {
   );
 };
 
-export default AISection;
+export default TechnologySection;

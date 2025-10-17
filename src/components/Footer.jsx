@@ -7,13 +7,12 @@ const Footer = () => {
         <div className="footer-content">
           <div className="footer-brand">
             <h3>Jetset</h3>
-            <p>Your AI Travel Companion</p>
+            <p>Your Digital Travel Scrapbook</p>
           </div>
           <div className="footer-links">
             <div className="footer-column">
               <h4>Product</h4>
               <a href="#features">Features</a>
-              <a href="#ai">Technology</a>
               <a href="#download">Download</a>
             </div>
             <div className="footer-column">

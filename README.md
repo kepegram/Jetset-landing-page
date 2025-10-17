@@ -1,6 +1,6 @@
 # Jetset Landing Page
 
-A modern, responsive landing page for Jetset - an AI-powered travel planning app. Built with React, Vite, and modern web technologies, this landing page showcases the app's key features and provides a seamless user experience.
+A modern, responsive landing page for Jetset - a digital travel scrapbook app. Built with React, Vite, and modern web technologies, this landing page showcases the app's key features and provides a seamless user experience.
 
 ## 🎨 Design Features
 
@@ -21,6 +21,17 @@ A modern, responsive landing page for Jetset - an AI-powered travel planning app
 - **CSS**: Custom properties for theming
 - **Modern JavaScript**: ES6+ features
 
+## 📱 About Jetset
+
+Jetset is a modern travel scrapbook app that helps travelers capture, organize, and preserve their travel memories. Key features include:
+
+- **Digital Scrapbooks**: Create beautiful trip scrapbooks with photos and descriptions
+- **Smart Organization**: Organize trips by dates and destinations with multiple excursions
+- **Photo Galleries**: Full-screen photo viewing with swipe navigation
+- **Cloud Sync**: Real-time synchronization across all devices
+- **Cross-Platform**: Native iOS and Android apps built with React Native
+- **Secure Storage**: Enterprise-grade security with Firebase
+
 ## 📱 Key Sections
 
 1. **Hero Section**
@@ -31,9 +42,9 @@ A modern, responsive landing page for Jetset - an AI-powered travel planning app
 
 2. **Features Grid**
 
-   - Smart Planning
-   - Dynamic Itineraries
-   - AI Technology
+   - Digital Scrapbooks
+   - Smart Organization
+   - Photo Galleries
    - Security Features
 
 3. **App Showcase**
@@ -42,11 +53,11 @@ A modern, responsive landing page for Jetset - an AI-powered travel planning app
    - Feature descriptions
    - User interface highlights
 
-4. **AI Technology**
+4. **Technology Section**
 
    - Technical capabilities
-   - Gemini API integration
-   - Interactive code window
+   - Firebase and React Native integration
+   - Cloud synchronization
 
 5. **Download Section**
    - App store links
@@ -89,7 +100,7 @@ src/
 │   ├── Hero.jsx
 │   ├── Features.jsx
 │   ├── Showcase.jsx
-│   ├── AISection.jsx
+│   ├── AISection.jsx (TechnologySection)
 │   ├── DownloadSection.jsx
 │   ├── Footer.jsx
 │   └── OptimizedImage.jsx
@@ -112,20 +123,25 @@ src/
 
 ## 🚀 Deployment
 
-The landing page can be deployed to:
+The landing page automatically deploys to GitHub Pages when you push to the `main` branch.
 
-- GitHub Pages
-- Vercel
-- Netlify
-- Any static hosting service
+### GitHub Actions Setup
 
-### Build for Production
+1. Ensure GitHub Pages is enabled in repository settings
+2. Set Source to "GitHub Actions"
+3. Push to `main` branch to trigger deployment
+
+### Manual Build
 
 ```bash
 npm run build
 ```
 
 The production files will be in the `dist/` directory.
+
+## 🌐 Custom Domain
+
+This landing page is configured for the custom domain: `download-jetset.app`
 
 ## 📱 Browser Support
 
@@ -137,4 +153,4 @@ The production files will be in the `dist/` directory.
 
 ## 🔄 Updates
 
-Last updated: October 2025 - Migrated to React
+Last updated: October 2025 - Complete redesign for digital scrapbook app

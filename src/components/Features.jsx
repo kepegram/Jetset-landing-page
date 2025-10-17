@@ -1,28 +1,22 @@
 const Features = () => {
   const features = [
     {
-      icon: "🎯",
-      title: "Smart Planning",
+      icon: "📸",
+      title: "Digital Scrapbooks",
       description:
-        "Generate personalized travel plans instantly using advanced AI that understands your preferences and travel style.",
+        "Create beautiful trip scrapbooks with photos, descriptions, and organized excursions. Preserve your travel memories in a structured, visual format.",
     },
     {
-      icon: "🗺️",
-      title: "Dynamic Itineraries",
+      icon: "🗂️",
+      title: "Smart Organization",
       description:
-        "Customize your trip duration, activities, and budget with our intelligent recommendation system.",
+        "Organize trips by dates and destinations. Add multiple excursions with photos and descriptions. Search and filter through all your memories.",
     },
     {
-      icon: "✨",
-      title: "AI Powered",
+      icon: "🖼️",
+      title: "Photo Galleries",
       description:
-        "Leverage Google's Gemini API for context-aware suggestions and real-time adaptability.",
-    },
-    {
-      icon: "🔒",
-      title: "Secure & Private",
-      description:
-        "Enterprise-grade security with encrypted data storage and protected communications.",
+        "Upload multiple photos per entry with full-screen viewing. Swipe through your memories with smooth animations and intuitive navigation.",
     },
   ];
 
@@ -30,10 +24,11 @@ const Features = () => {
     <section id="features" className="features">
       <div className="container">
         <div className="section-header">
-          <h2>Reimagine Travel Planning</h2>
+          <h2>Preserve Your Travel Memories</h2>
           <p>
-            Discover how Jetset transforms your travel experience with
-            cutting-edge AI technology and intuitive design.
+            Discover how Jetset transforms your travel experiences into
+            beautiful digital scrapbooks with intuitive organization and
+            stunning photo galleries.
           </p>
         </div>
         <div className="feature-grid">

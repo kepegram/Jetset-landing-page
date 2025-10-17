@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
       manifest: {
-        name: "Jetset - AI Travel Planning",
+        name: "Jetset - Digital Travel Scrapbook",
         short_name: "Jetset",
-        description: "AI-powered travel planning app",
+        description: "Create beautiful digital travel scrapbooks",
         theme_color: "#3BACE3",
         background_color: "#ffffff",
         display: "standalone",

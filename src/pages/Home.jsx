@@ -3,7 +3,6 @@ import Navigation from "../components/Navigation";
 import Hero from "../components/Hero";
 import Features from "../components/Features";
 import Showcase from "../components/Showcase";
-import AISection from "../components/AISection";
 import DownloadSection from "../components/DownloadSection";
 import Footer from "../components/Footer";
 
@@ -47,7 +46,6 @@ const Home = () => {
       <Hero />
       <Features />
       <Showcase />
-      <AISection />
       <DownloadSection />
       <Footer />
     </>
