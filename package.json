@@ -1,0 +1,34 @@
+{
+  "name": "jetset-landing-page",
+  "version": "1.0.0",
+  "description": "A modern, responsive landing page for Jetset - an AI-powered travel planning app. Built with HTML, CSS, and vanilla JavaScript, this landing page showcases the app's key features and provides a seamless user experience.",
+  "main": "service-worker.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kepegram/Jetset-landing-page.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/kepegram/Jetset-landing-page/issues"
+  },
+  "homepage": "https://github.com/kepegram/Jetset-landing-page#readme",
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "vite": "^6.3.6",
+    "vite-plugin-pwa": "^1.1.0"
+  }
+}

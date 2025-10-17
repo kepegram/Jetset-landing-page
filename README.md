@@ -1,6 +1,6 @@
 # Jetset Landing Page
 
-A modern, responsive landing page for Jetset - an AI-powered travel planning app. Built with HTML, CSS, and vanilla JavaScript, this landing page showcases the app's key features and provides a seamless user experience.
+A modern, responsive landing page for Jetset - an AI-powered travel planning app. Built with React, Vite, and modern web technologies, this landing page showcases the app's key features and provides a seamless user experience.
 
 ## 🎨 Design Features
 
@@ -8,12 +8,18 @@ A modern, responsive landing page for Jetset - an AI-powered travel planning app
 - **Responsive Layout**: Fully responsive design that works on all devices
 - **Light Theme**: Professional white theme with blue accents (#3BACE3)
 - **Interactive Elements**: Subtle animations and hover effects
-- **Custom Components**:
-  - App store download buttons
-  - Feature cards
-  - Device showcases
-  - AI code window
-  - Mobile app screenshots
+- **Component-Based Architecture**: Reusable React components
+- **Optimized Images**: Lazy loading and WebP format support
+- **PWA Ready**: Progressive Web App capabilities
+
+## 🛠️ Tech Stack
+
+- **React 18**: Modern React with hooks
+- **Vite**: Fast build tool and dev server
+- **React Router**: Client-side routing
+- **Vite PWA Plugin**: Progressive Web App support
+- **CSS**: Custom properties for theming
+- **Modern JavaScript**: ES6+ features
 
 ## 📱 Key Sections
 
@@ -21,7 +27,7 @@ A modern, responsive landing page for Jetset - an AI-powered travel planning app
 
    - Main value proposition
    - App store download buttons
-   - Featured app screenshots
+   - Featured app screenshots with optimized loading
 
 2. **Features Grid**
 
@@ -48,21 +54,78 @@ A modern, responsive landing page for Jetset - an AI-powered travel planning app
 
 ## 📄 Additional Pages
 
-- **Privacy Policy**: Detailed privacy information
-- **Terms of Service**: User agreement and terms
+- **Privacy Policy**: Detailed privacy information (React component)
+- **Terms of Service**: User agreement and terms (React component)
 
-## 🛠️ Technical Details
+## 🚀 Getting Started
 
-- Pure HTML/CSS implementation
-- No external JavaScript libraries
-- CSS custom properties for theming
-- Optimized assets and images
-- Mobile-first approach
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+### Development
+
+The app will run on `http://localhost:3000` by default.
+
+## 📦 Project Structure
+
+```
+src/
+├── assets/          # Images and static assets
+├── components/      # React components
+│   ├── Navigation.jsx
+│   ├── Hero.jsx
+│   ├── Features.jsx
+│   ├── Showcase.jsx
+│   ├── AISection.jsx
+│   ├── DownloadSection.jsx
+│   ├── Footer.jsx
+│   └── OptimizedImage.jsx
+├── pages/          # Page components
+│   ├── Home.jsx
+│   ├── Privacy.jsx
+│   └── Terms.jsx
+├── App.jsx         # Main app component
+├── main.jsx        # Entry point
+└── styles.css      # Global styles
+```
+
+## ⚡ Performance Features
+
+- **Code Splitting**: Lazy loading for Privacy and Terms pages
+- **Image Optimization**: WebP format with lazy loading
+- **PWA Support**: Service worker for offline functionality
+- **Optimized Build**: Vite's efficient bundling
+- **Preloading**: Critical assets preloaded for faster initial load
 
 ## 🚀 Deployment
 
-The landing page is deployed using GitHub Pages and can be accessed at:
-https://kepegram.github.io/Jetset-2.0
+The landing page can be deployed to:
+
+- GitHub Pages
+- Vercel
+- Netlify
+- Any static hosting service
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+The production files will be in the `dist/` directory.
 
 ## 📱 Browser Support
 
@@ -74,4 +137,4 @@ https://kepegram.github.io/Jetset-2.0
 
 ## 🔄 Updates
 
-Last updated: March 2024
+Last updated: October 2025 - Migrated to React

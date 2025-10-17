@@ -1,80 +1,29 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# dependencies
-node_modules/
+node_modules
+dist
+dist-ssr
+*.local
 
-# Expo
-.expo/
-dist/
-web-build/
-
-# Native
-ios/
-!ios/Jetset/
-android/
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-
-# Metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macOS
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-*.pem
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-# personal
-.env
-firebase.config.ts
-AI-Model.tsx
-google-services.json
-GoogleService-Info.plist
-
-# React Native / Mobile App files
-node_modules/
-.expo/
-dist/
-npm-debug.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
-web-build/
-.DS_Store
-
-# Root level files to ignore
-app.json
-babel.config.js
-eas.json
-metro.config.js
-package.json
-package-lock.json
-tsconfig.json
-.easignore
-App.tsx
-
-# Keep only landing page files
-!index.html
-!css/
-!lp-assets/
-!privacy.html
-!terms.html
-!service-worker.js
-!manifest.json
-!.htaccess
+# PWA
+dev-dist
+sw.js
+workbox-*.js

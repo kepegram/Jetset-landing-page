@@ -1,196 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Terms of Service - Jetset</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="lp-assets/Light.png"
-      sizes="192x192"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="lp-assets/Light.png"
-      sizes="512x512"
-    />
-    <link rel="apple-touch-icon" href="lp-assets/Light.png" sizes="180x180" />
-    <style>
-      :root {
-        --background: #ffffff;
-        --primary: #3bace3;
-        --text: #1a1a1a;
-        --text-secondary: #64748b;
-        --card-bg: #f8f9fa;
-        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-        --transition: all 0.3s ease;
-      }
+import { Link } from "react-router-dom";
 
-      body {
-        font-family: "Inter", sans-serif;
-        line-height: 1.6;
-        background: var(--background);
-        color: var(--text);
-        margin: 0;
-        padding: 0;
-      }
+const Terms = () => {
+  const scrollToTop = (e) => {
+    e.preventDefault();
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 4rem 2rem;
-        animation: fadeIn 0.8s ease;
-      }
-
-      .logo {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: var(--primary);
-        text-decoration: none;
-        margin-bottom: 2rem;
-        font-weight: 500;
-        transition: var(--transition);
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        background: var(--card-bg);
-      }
-
-      .logo:hover {
-        transform: translateX(-4px);
-        background: var(--gradient-start);
-      }
-
-      .logo-icon {
-        width: 24px;
-        height: 24px;
-      }
-
-      h1 {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        color: var(--text);
-        background: linear-gradient(135deg, var(--text), var(--primary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      h2 {
-        font-size: 1.5rem;
-        margin-top: 2.5rem;
-        margin-bottom: 1rem;
-        color: var(--primary);
-      }
-
-      p {
-        color: var(--text-secondary);
-        margin-bottom: 1.5rem;
-        font-size: 1.1rem;
-      }
-
-      .last-updated {
-        display: inline-block;
-        padding: 0.75rem 1.5rem;
-        background: var(--card-bg);
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-        box-shadow: var(--shadow-sm);
-      }
-
-      .section {
-        padding: 2rem;
-        background: var(--card-bg);
-        border-radius: 16px;
-        margin-bottom: 2rem;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        transition: var(--transition);
-        animation: fadeInUp 0.8s ease backwards;
-      }
-
-      .section:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-md);
-      }
-
-      .contact-section {
-        margin-top: 4rem;
-        padding: 3rem;
-        background: linear-gradient(
-          135deg,
-          var(--gradient-start),
-          var(--gradient-end)
-        );
-        border-radius: 16px;
-        border: none;
-        animation: fadeInUp 0.8s ease 0.2s backwards;
-      }
-
-      .contact-section h2 {
-        color: var(--text);
-      }
-
-      .contact-section p {
-        font-size: 1.1rem;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @media (max-width: 768px) {
-        .container {
-          padding: 2rem 1rem;
-        }
-
-        h1 {
-          font-size: 2.5rem;
-        }
-
-        .section,
-        .contact-section {
-          padding: 1.5rem;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <a href="index.html" class="logo" onclick="scrollToTop(event)">
+  return (
+    <div className="container">
+      <Link to="/" className="logo" onClick={scrollToTop}>
         Jetset
-        <img src="lp-assets/adaptive-icon.png" alt="Jetset" class="logo-icon" />
-      </a>
+        <img
+          src="/src/assets/adaptive-icon.png"
+          alt="Jetset"
+          className="logo-icon"
+        />
+      </Link>
 
       <h1>Terms of Service</h1>
-      <span class="last-updated">Last updated: March 2025</span>
+      <span className="last-updated">Last updated: March 2025</span>
 
-      <div class="section">
+      <div className="section">
         <h2>1. Acceptance of Terms</h2>
         <p>
           By accessing and using Jetset, you accept and agree to be bound by the
@@ -199,7 +32,7 @@
         </p>
       </div>
 
-      <div class="section">
+      <div className="section">
         <h2>2. Use License</h2>
         <p>
           Permission is granted to temporarily download one copy of Jetset
@@ -215,7 +48,7 @@
         </ul>
       </div>
 
-      <div class="section">
+      <div className="section">
         <h2>3. User Account</h2>
         <p>
           To use certain features of the app, you must register for an account.
@@ -230,7 +63,7 @@
         </ul>
       </div>
 
-      <div class="section">
+      <div className="section">
         <h2>4. AI-Generated Content</h2>
         <p>
           Jetset uses artificial intelligence to generate travel plans and
@@ -249,7 +82,7 @@
         </ul>
       </div>
 
-      <div class="section">
+      <div className="section">
         <h2>5. User Content</h2>
         <p>
           Users retain all rights to the content they create and share through
@@ -263,7 +96,7 @@
         </ul>
       </div>
 
-      <div class="section">
+      <div className="section">
         <h2>6. Notifications</h2>
         <p>By using Jetset, you agree to receive notifications for:</p>
         <ul>
@@ -275,7 +108,7 @@
         <p>You can manage your notification preferences in the app settings.</p>
       </div>
 
-      <div class="section">
+      <div className="section">
         <h2>7. Offline Usage</h2>
         <p>
           Jetset provides offline functionality for certain features. You agree
@@ -289,7 +122,7 @@
         </ul>
       </div>
 
-      <div class="section">
+      <div className="section">
         <h2>8. Analytics and Monitoring</h2>
         <p>
           We collect usage data to improve our services. By using Jetset, you
@@ -303,7 +136,7 @@
         </ul>
       </div>
 
-      <div class="section">
+      <div className="section">
         <h2>9. Prohibited Uses</h2>
         <p>
           You may not use Jetset for any illegal or unauthorized purpose. You
@@ -319,7 +152,7 @@
         </ul>
       </div>
 
-      <div class="section">
+      <div className="section">
         <h2>10. Termination</h2>
         <p>
           We may terminate or suspend your account and bar access to the Service
@@ -334,7 +167,7 @@
         </ul>
       </div>
 
-      <div class="section">
+      <div className="section">
         <h2>11. Limitation of Liability</h2>
         <p>Jetset shall not be liable for:</p>
         <ul>
@@ -349,7 +182,7 @@
         </ul>
       </div>
 
-      <div class="contact-section">
+      <div className="contact-section">
         <h2>Contact Us</h2>
         <p>
           If you have any questions about these Terms, please contact us at:
@@ -358,5 +191,7 @@
         <p>Address: [Your Business Address]</p>
       </div>
     </div>
-  </body>
-</html>
+  );
+};
+
+export default Terms;
