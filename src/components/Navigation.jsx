@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import jetsetIcon from "../assets/icons/jetset-icon.svg";
 
 const Navigation = () => {
   const { theme, toggleTheme } = useTheme();
@@ -15,12 +16,8 @@ const Navigation = () => {
     <nav className="nav">
       <div className="container">
         <Link to="/" className="logo" onClick={scrollToTop}>
-          Jetset
-          <img
-            src="/src/assets/adaptive-icon.png"
-            alt="Jetset"
-            className="logo-icon"
-          />
+          <img src={jetsetIcon} alt="Jetset" className="logo-icon" />
+          <span>Jetset</span>
         </Link>
         <div className="nav-links">
           <a href="#features">Features</a>

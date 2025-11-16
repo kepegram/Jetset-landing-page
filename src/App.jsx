@@ -1,5 +1,5 @@
-import { Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
 import Home from "./pages/Home";
 
 // Lazy load pages for better performance
@@ -23,6 +23,16 @@ const Loading = () => (
 );
 
 function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Handle GitHub Pages routing
+    if (location.pathname.includes('/?/')) {
+      const path = location.pathname.split('/?/')[1];
+      window.history.replaceState(null, '', '/' + path);
+    }
+  }, [location]);
+
   return (
     <Suspense fallback={<Loading />}>
       <Routes>

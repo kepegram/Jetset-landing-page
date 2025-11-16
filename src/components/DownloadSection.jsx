@@ -1,3 +1,5 @@
+import appStore from "../assets/app-store.png";
+
 const DownloadSection = () => {
   return (
     <section id="download" className="download-section">
@@ -10,19 +12,10 @@ const DownloadSection = () => {
         <div className="download-buttons">
           <a href="#" className="store-badge app-store">
             <img
-              src="/src/assets/app-store.png"
+              src={appStore}
               alt="Download on the App Store"
             />
           </a>
-          <div className="store-badge google-play">
-            <img
-              src="/src/assets/google-play.png"
-              alt="Get it on Google Play"
-            />
-            <div className="coming-soon-overlay">
-              <span>Coming Soon</span>
-            </div>
-          </div>
         </div>
       </div>
     </section>

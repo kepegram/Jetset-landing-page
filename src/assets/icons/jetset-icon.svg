@@ -1,0 +1,72 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient for photo elements -->
+    <linearGradient id="photoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3BACE3;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8CD3F0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3BACE3;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="photoGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FF8E8E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF6B6B;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background with warm scrapbook color -->
+  <rect width="1024" height="1024" fill="#F8F5F0" rx="0"/>
+  
+  <!-- Main scrapbook page - flat rectangle -->
+  <rect x="100" y="100" width="824" height="824" fill="#FFFFFF" rx="0" stroke="#E8E8E8" stroke-width="2"/>
+  
+  <!-- Decorative tape strips at corners (flat style) -->
+  <g transform="translate(80, 80) rotate(-25)">
+    <rect x="0" y="0" width="120" height="40" fill="rgba(255, 220, 150, 0.95)" rx="2"/>
+    <rect x="4" y="4" width="112" height="32" fill="rgba(255, 240, 200, 0.8)" rx="1"/>
+    <line x1="8" y1="20" x2="112" y2="20" stroke="rgba(255, 200, 120, 0.5)" stroke-width="1"/>
+  </g>
+  
+  <g transform="translate(824, 80) rotate(25)">
+    <rect x="0" y="0" width="120" height="40" fill="rgba(200, 230, 255, 0.95)" rx="2"/>
+    <rect x="4" y="4" width="112" height="32" fill="rgba(220, 240, 255, 0.8)" rx="1"/>
+    <line x1="8" y1="20" x2="112" y2="20" stroke="rgba(180, 220, 255, 0.5)" stroke-width="1"/>
+  </g>
+  
+  <g transform="translate(80, 884) rotate(-15)">
+    <rect x="0" y="0" width="120" height="40" fill="rgba(255, 200, 200, 0.95)" rx="2"/>
+    <rect x="4" y="4" width="112" height="32" fill="rgba(255, 220, 220, 0.8)" rx="1"/>
+  </g>
+  
+  <g transform="translate(824, 884) rotate(15)">
+    <rect x="0" y="0" width="120" height="40" fill="rgba(200, 230, 255, 0.95)" rx="2"/>
+    <rect x="4" y="4" width="112" height="32" fill="rgba(220, 240, 255, 0.8)" rx="1"/>
+  </g>
+  
+  <!-- Photo elements on the page - flat rectangles with slight rotation -->
+  <g transform="translate(200, 200) rotate(-2)">
+    <rect x="0" y="0" width="280" height="200" fill="url(#photoGradient)" rx="4" stroke="#E8E8E8" stroke-width="2"/>
+    <!-- Subtle pattern -->
+    <circle cx="140" cy="100" r="40" fill="rgba(255, 255, 255, 0.2)"/>
+  </g>
+  
+  <g transform="translate(544, 250) rotate(1.5)">
+    <rect x="0" y="0" width="280" height="200" fill="url(#photoGradient2)" rx="4" stroke="#E8E8E8" stroke-width="2"/>
+    <!-- Subtle pattern -->
+    <circle cx="140" cy="100" r="50" fill="rgba(255, 255, 255, 0.2)"/>
+  </g>
+  
+  <g transform="translate(300, 480) rotate(-1)">
+    <rect x="0" y="0" width="320" height="240" fill="url(#photoGradient)" rx="4" stroke="#E8E8E8" stroke-width="2"/>
+    <!-- Subtle pattern -->
+    <circle cx="160" cy="120" r="60" fill="rgba(255, 255, 255, 0.15)"/>
+    <circle cx="240" cy="180" r="40" fill="rgba(255, 107, 107, 0.2)"/>
+  </g>
+  
+  <!-- Decorative corner elements -->
+  <g opacity="0.3">
+    <rect x="120" y="120" width="8" height="8" fill="#3BACE3" rx="1"/>
+    <rect x="896" y="120" width="8" height="8" fill="#FF6B6B" rx="1"/>
+    <rect x="120" y="896" width="8" height="8" fill="#FF6B6B" rx="1"/>
+    <rect x="896" y="896" width="8" height="8" fill="#3BACE3" rx="1"/>
+  </g>
+</svg>
